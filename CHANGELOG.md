@@ -7,3 +7,6 @@ and this project adheres to [Semantic Versioning].
 
 ## [Unreleased]
 
+### Added
+
+- Initial UI package creation ([#1](https://github.com/Phoenix-Protocol-Group/phoenix-frontend/pull/1]))
