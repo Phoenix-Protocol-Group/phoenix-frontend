@@ -1,6 +1,7 @@
 <p align="center">
   <img src="https://avatars.githubusercontent.com/u/133277324" />
 </p>
+
 # Phoenix Frontend
 
 The Phoenix Frontend is a TypeScript-based application that utilizes yarn workspaces to manage multiple packages. It consists of several packages located in the `/packages` directory. Each package has a specific purpose and contributes to the overall functionality of the application.
