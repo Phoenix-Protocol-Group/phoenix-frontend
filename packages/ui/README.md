@@ -1,1 +1,23 @@
-Checkout the article for more info: https://prateeksurana.me/blog/react-component-library-using-storybook-7/
+# Phoenix UI #
+
+## Development
+
+### Testing
+
+```
+yarn test
+```
+
+### Building
+
+```
+yarn build
+```
+
+### Storybook
+
+To run a live-reload Storybook server on your local machine:
+
+```
+yarn storybook
+```

@@ -16,7 +16,8 @@
     "publish": false,
     "tests": false
   },
-  "author": "VarNotUsed",
+  "author": "Phoenix Protocol Group",
+  "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@babel/preset-env": "^7.21.5",
