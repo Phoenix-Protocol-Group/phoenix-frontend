@@ -10,7 +10,6 @@ To install the UI package, follow these steps:
 2. Navigate to the root directory of the Phoenix Frontend project.
 3. Run `yarn install` to install all project dependencies.
 4. Navigate to the `/packages/ui` directory.
-5. Run `yarn install` to install the UI package dependencies.
 
 ## Usage
 
