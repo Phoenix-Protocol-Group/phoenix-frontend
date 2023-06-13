@@ -1,4 +1,4 @@
 {
     "private": true,
-    "workspaces": ["core", "state", "ui", "util"]
+    "workspaces": ["packages/*"]
   }
