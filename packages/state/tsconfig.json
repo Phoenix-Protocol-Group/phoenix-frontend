@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "outDir": "build",
     "experimentalDecorators": true,
-    "rootDir": "src"
+    "rootDir": "src",
+    "jsx": "react",
   },
   "include": ["src/**/*"]
 }
