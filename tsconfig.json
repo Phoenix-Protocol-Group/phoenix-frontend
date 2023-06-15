@@ -1,24 +1,9 @@
 {
+  "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
+    "module": "CommonJS",
     "declaration": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "lib": ["es2020"],
-    "target": "es2020",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "newLine": "LF",
-    "noEmitOnError": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "noImplicitOverride": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "pretty": true,
-    "removeComments": false,
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "strict": true
-  }
+    "moduleResolution": "Node"
+  },
+  "exclude": ["**/*.spec.ts"]
 }

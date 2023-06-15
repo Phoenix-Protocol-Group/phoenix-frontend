@@ -1,11 +1,8 @@
 {
   "extends": "../../tsconfig.json",
+  "include": ["./src"],
   "compilerOptions": {
-    "baseUrl": ".",
-    "outDir": "build",
-    "experimentalDecorators": true,
-    "rootDir": "src",
-    "jsx": "react"
-  },
-  "include": ["src/**/*"]
+    "jsx": "react",
+    "outDir": "./build"
+  }
 }
