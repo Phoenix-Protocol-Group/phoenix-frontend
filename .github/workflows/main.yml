@@ -1,0 +1,36 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 17.x]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install -g yarn
+
+      - name: Lint, test and build (push)
+        if: ${{ github.event_name == 'push' }}
+        run: yarn && yarn build
+
+      - name: Lint, test and build (pull request)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: yarn && yarn build
