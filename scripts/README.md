@@ -6,6 +6,11 @@
 2. If you want to run everything locally: `docker` (you can run both Standalone and Futurenet backends with it)
 3. `Node.js v17`
 4. [Freighter Wallet](https://www.freighter.app/) ≥[v5.0.2](https://github.com/stellar/freighter/releases/tag/2.9.1). Or from the Firefox / Chrome extension store. Once installed, enable "Experimental Mode" in the settings (gear icon).
+5. If you want to run everything locally, build the `soroban-preview` docker image:
+
+       ./preview.sh
+
+   Building the docker image lets you avoid installing the specific version of soroban-cli in step (1), if desired.
 
 ## Run Backend
 
@@ -16,6 +21,7 @@ You have three options: 1. Deploy on [Futurenet](https://soroban.stellar.org/doc
 0. Make sure you have soroban-cli installed, as explained above
 
 1. Deploy the contracts and initialize them
+@TODO JS Script
 
        ./initialize.sh futurenet
 
@@ -30,7 +36,7 @@ You have three options: 1. Deploy on [Futurenet](https://soroban.stellar.org/doc
    **Note:** This can take up to 5 minutes to start syncing. You can tell it is
    working by visiting http://localhost:8000/, and look at the
    `ingest_latest_ledger`, field. If it is `0`, the quickstart image is not ready yet. The quickstart container also prints console statements on start status, it will print `soroban rpc: waiting for ready state...` at first and then `soroban rpc: up and ready` when network sync has been reached.
-
+@TODO JS SCRIPT
 2. Load the contracts and initialize them
 
    Use your own local soroban-cli:
@@ -61,7 +67,7 @@ You have three options: 1. Deploy on [Futurenet](https://soroban.stellar.org/doc
 
 0. If you didn't yet, build the `soroban-preview` docker image, as described above:
 
-       make build-docker
+       ./preview.sh
 
 1. In one terminal, run the backend docker containers and wait for them to start:
 
@@ -72,7 +78,7 @@ You have three options: 1. Deploy on [Futurenet](https://soroban.stellar.org/doc
    You can stop this process with <kbd>ctrl</kbd><kbd>c</kbd>
 
 2. Keep that running, then deploy the contracts and initialize them:
-
+@TODO JS SCRIPT
    You can use your own local soroban-cli:
 
        ./initialize.sh standalone
@@ -97,3 +103,4 @@ You have three options: 1. Deploy on [Futurenet](https://soroban.stellar.org/doc
 
    1. Copy the address for your freighter wallet.
    2. Visit `http://localhost:8000/friendbot?addr=<your address>`
+

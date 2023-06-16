@@ -1,0 +1,1 @@
+docker build . --tag soroban-preview:9
