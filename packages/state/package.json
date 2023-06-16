@@ -1,0 +1,27 @@
+{
+  "name": "state",
+  "version": "0.0.1",
+  "description": "",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "np": {
+    "publish": false,
+    "tests": false
+  },
+  "author": "Phoenix Protocol Group",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@types/urijs": "^1.19.19",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "@stellar/freighter-api": "^1.4.0",
+    "react": "^18.2.0",
+    "react-query": "^3.39.3",
+    "soroban-client": "^0.8.1"
+  }
+}
