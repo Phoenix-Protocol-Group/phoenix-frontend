@@ -1,22 +1,5 @@
 #!/bin/bash
 
-set -e
-
-case "$1" in
-standalone)
-    echo "Using standalone network"
-    ARGS="--standalone"
-    ;;
-futurenet)
-    echo "Using Futurenet network"
-    ARGS="--futurenet"
-    ;;
-*)
-    echo "Usage: $0 standalone|futurenet"
-    exit 1
-    ;;
-esac
-
 # this is set to the quickstart `soroban-dev` image annointed as the release 
 # for a given Soroban Release, it is captured on Soroban Releases - https://soroban.stellar.org/docs/reference/releases 
 QUICKSTART_SOROBAN_DOCKER_SHA=stellar/quickstart:soroban-dev@sha256:57e8ab498bfa14c65595fbb01cb94b1cdee9637ef2e6634e59d54f6958c05bdb
@@ -57,6 +40,6 @@ docker run --rm -ti \
   --network soroban-network \
   -p 8000:8000 \
   "$QUICKSTART_SOROBAN_DOCKER_SHA" \
-  $ARGS \
+  --standalone \
   --enable-soroban-rpc \
   "$@" # Pass through args from the CLI

@@ -1,0 +1,1 @@
+/Users/vossd/workspace/soroban-examples/hello_world/target/wasm32-unknown-unknown/release/soroban_hello_world_contract.wasm: /Users/vossd/workspace/soroban-examples/hello_world/src/lib.rs /Users/vossd/workspace/soroban-examples/hello_world/src/test.rs

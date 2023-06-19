@@ -21,7 +21,6 @@ You have three options: 1. Deploy on [Futurenet](https://soroban.stellar.org/doc
 0. Make sure you have soroban-cli installed, as explained above
 
 1. Deploy the contracts and initialize them
-@TODO JS Script
 
        ./initialize.sh futurenet
 
@@ -29,41 +28,7 @@ You have three options: 1. Deploy on [Futurenet](https://soroban.stellar.org/doc
 
 2. Select the Futurenet network in your Freighter browser extension
 
-### Option 2: Run your own Futurenet node
-
-1. Run the backend docker container with `./quickstart.sh futurenet`, and wait for it to start.
-
-   **Note:** This can take up to 5 minutes to start syncing. You can tell it is
-   working by visiting http://localhost:8000/, and look at the
-   `ingest_latest_ledger`, field. If it is `0`, the quickstart image is not ready yet. The quickstart container also prints console statements on start status, it will print `soroban rpc: waiting for ready state...` at first and then `soroban rpc: up and ready` when network sync has been reached.
-@TODO JS SCRIPT
-2. Load the contracts and initialize them
-
-   Use your own local soroban-cli:
-
-       ./initialize.sh futurenet http://localhost:8000
-
-   Or run it inside the soroban-preview docker container:
-
-       docker exec soroban-preview ./initialize.sh futurenet
-
-3. Add the Futurenet custom network in Freighter (Note, the out-of-the-box
-   "Future Net" network in Freighter will not work with a local quickstart
-   container, so we need to add our own):
-
-   |   |   |
-   |---|---|
-   | Name | Futurenet Local RPC|
-   | URL | http://localhost:8000/soroban/rpc |
-   | Passphrase | Test SDF Future Network ; October 2022 |
-   | Allow HTTP connection | Enabled |
-   | Switch to this network | Enabled |
-
-4. Add some Futurenet network lumens to your Freighter wallet.
-
-   Visit https://laboratory.stellar.org/#create-account, and follow the instructions to create your freighter account on Futurenet.
-
-### Option 3: Localnet/Standalone
+### Option 2: Localnet/Standalone
 
 0. If you didn't yet, build the `soroban-preview` docker image, as described above:
 
@@ -71,14 +36,13 @@ You have three options: 1. Deploy on [Futurenet](https://soroban.stellar.org/doc
 
 1. In one terminal, run the backend docker containers and wait for them to start:
 
-       ./quickstart.sh standalone
+       ./localnet.sh
 
    You know that it fully started if it goes into a loop publishing & syncing checkpoints.
 
    You can stop this process with <kbd>ctrl</kbd><kbd>c</kbd>
 
 2. Keep that running, then deploy the contracts and initialize them:
-@TODO JS SCRIPT
    You can use your own local soroban-cli:
 
        ./initialize.sh standalone

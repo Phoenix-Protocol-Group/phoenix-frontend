@@ -51,7 +51,6 @@ TOKEN_ADMIN_SECRET="$(soroban config identity show token-admin)"
 TOKEN_ADMIN_ADDRESS="$(soroban config identity address token-admin)"
 
 # TODO: Remove this once we can use `soroban config identity` from webpack.
-mkdir -p .soroban-example-dapp
 echo "$TOKEN_ADMIN_SECRET" > .token_admin_secret
 echo "$TOKEN_ADMIN_ADDRESS" > .token_admin_address
 
@@ -61,16 +60,20 @@ curl --silent -X POST "$FRIENDBOT_URL?addr=$TOKEN_ADMIN_ADDRESS" >/dev/null
 
 ARGS="--network $NETWORK --source token-admin"
 
-echo Wrap the Stellar asset
-TOKEN_ID=$(soroban lab token wrap $ARGS --asset "EXT:$TOKEN_ADMIN_ADDRESS" 2>/dev/null)
+echo Deploy the contract
+CONTRACT_ID="$(
+  soroban contract deploy $ARGS \
+    --wasm ./contracts/soroban_hello_world_contract.wasm
+)"
+echo "Contract deployed succesfully with ID: $CONTRACT_ID"
+echo "$CONTRACT_ID" > .contract_id
 
-if [[ "$TOKEN_ID" == "" ]]; then
-  echo "Token already wrapped; everything initialized."
-  exit 0
-else
-  echo "Token wrapped succesfully with TOKEN_ID: $TOKEN_ID"
-  echo "Token Address:" $TOKEN_ADDRESS
+echo "Initialize the contract"
+soroban contract invoke \
+  $ARGS \
+  --id "$CONTRACT_ID" \
+  -- \
+  hello \
+  --to friend
 
-  echo -n "$TOKEN_ID" > .token_id
-  echo -n "$TOKEN_ID" > .token_address
-fi
+echo "Done"
