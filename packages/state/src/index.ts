@@ -8,6 +8,8 @@ export {
   WalletChain,
 } from "./providers/walletProvider/types";
 
+export { useSorobanReact } from "./providers/walletProvider/hooks/useSorobanReact";
+
 // Export freighter
 export { freighter } from "./providers/walletProvider/freighter";
 
@@ -19,6 +21,10 @@ export {
   sandbox,
   standalone,
 } from "./providers/walletProvider/chains";
+
+export { useLoadToken } from "./hooks/useLoadToken";
+
+export { useContractSign } from "./hooks/contracts/useContractSign";
 
 // Export walletProvider
 export { WalletProvider } from "./providers/walletProvider";
