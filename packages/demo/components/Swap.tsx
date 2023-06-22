@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import {
   contractTransaction,
@@ -74,12 +75,21 @@ const Swap = ({
         fullWidth
       />
       <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-        <Button onClick={() => doSwap(true)} variant="outlined" sx={{ mr: 1 }}>
+        <LoadingButton
+          loading={submitting}
+          onClick={() => doSwap(true)}
+          variant="outlined"
+          sx={{ mr: 1 }}
+        >
           $PHO {"->"} $FAK
-        </Button>
-        <Button variant="outlined" onClick={() => doSwap(false)}>
+        </LoadingButton>
+        <LoadingButton
+          loading={submitting}
+          variant="outlined"
+          onClick={() => doSwap(false)}
+        >
           $FAK {"->"} $PHO
-        </Button>
+        </LoadingButton>
       </Box>
     </>
   );
