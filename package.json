@@ -18,6 +18,8 @@
   "homepage": "https://github.com/Phoenix-Protocol-Group/phoenix-frontend",
   "private": true,
   "workspaces": [
+    "packages/utils",
+    "packages/state",
     "packages/*"
   ],
   "devDependencies": {

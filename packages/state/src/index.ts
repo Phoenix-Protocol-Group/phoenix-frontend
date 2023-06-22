@@ -31,3 +31,5 @@ export { WalletProvider } from "./providers/walletProvider";
 
 // Export PhoenixProvider
 export { PhoenixProvider } from "./providers/phoenixProvider";
+
+export { contractTransaction } from "./hooks/contracts/useContractSign";

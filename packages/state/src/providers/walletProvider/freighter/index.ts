@@ -17,8 +17,12 @@ export function freighter(): Connector {
     isConnected(): boolean {
       return !!freighterApi?.isConnected();
     },
-    getNetworkDetails(): Promise<NetworkDetails> {
-      return freighterApi.getNetworkDetails();
+    async getNetworkDetails(): Promise<NetworkDetails> {
+      // !TODO - find a better solution here
+      return {
+        ...(await freighterApi.getNetworkDetails()),
+        networkUrl: "https://rpc-futurenet.stellar.org/",
+      };
     },
     getPublicKey(): Promise<string> {
       return freighterApi.getPublicKey();

@@ -11,6 +11,7 @@
     "dependencies": {
         "@emotion/react": "^11.11.1",
         "@emotion/styled": "^11.11.0",
+        "@mui/lab": "^5.0.0-alpha.134",
         "@mui/material": "^5.13.5",
         "@phoenix-protocol/state": "^0.0.1",
         "@phoenix-protocol/utils": "^0.0.1",

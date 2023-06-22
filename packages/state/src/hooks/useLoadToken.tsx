@@ -7,7 +7,6 @@ export const useLoadToken = (
   address: string,
   sorobanContext: SorobanContextType
 ): any => {
-    console.log(address)
   return {
     userBalance: useContractQuery({
       contractId,

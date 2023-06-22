@@ -94,11 +94,43 @@ function bigNumberFromBytes(
     b <<= BigInt(8);
     b |= BigInt(byte);
   }
-  console.log(bytes);
   return BigNumber(b.toString()).multipliedBy(sign);
 }
 
 export function bigNumberToI128(value: BigNumber): SorobanClient.xdr.ScVal {
+  const b: bigint = BigInt(value.toFixed(0));
+  const buf = bigintToBuf(b);
+  if (buf.length > 16) {
+    throw new Error("BigNumber overflows i128");
+  }
+
+  if (value.isNegative()) {
+    // Clear the top bit
+    buf[0] &= 0x7f;
+  }
+
+  // left-pad with zeros up to 16 bytes
+  let padded = Buffer.alloc(16);
+  buf.copy(padded, padded.length - buf.length);
+
+  if (value.isNegative()) {
+    // Set the top bit
+    padded[0] |= 0x80;
+  }
+
+  const hi = new xdr.Int64(
+    bigNumberFromBytes(false, ...padded.slice(4, 8)).toNumber(),
+    bigNumberFromBytes(false, ...padded.slice(0, 4)).toNumber()
+  );
+  const lo = new xdr.Uint64(
+    bigNumberFromBytes(false, ...padded.slice(12, 16)).toNumber(),
+    bigNumberFromBytes(false, ...padded.slice(8, 12)).toNumber()
+  );
+
+  return xdr.ScVal.scvI128(new xdr.Int128Parts({ lo, hi }));
+}
+
+export function bigNumberToU128(value: BigNumber): SorobanClient.xdr.ScVal {
   const b: bigint = BigInt(value.toFixed(0));
   const buf = bigintToBuf(b);
   if (buf.length > 16) {
@@ -120,7 +152,7 @@ export function bigNumberToI128(value: BigNumber): SorobanClient.xdr.ScVal {
     padded[0] |= 0x80;
   }
 
-  const hi = new xdr.Int64(
+  const hi = new xdr.Uint64(
     bigNumberFromBytes(false, ...padded.slice(4, 8)).toNumber(),
     bigNumberFromBytes(false, ...padded.slice(0, 4)).toNumber()
   );
@@ -129,7 +161,7 @@ export function bigNumberToI128(value: BigNumber): SorobanClient.xdr.ScVal {
     bigNumberFromBytes(false, ...padded.slice(8, 12)).toNumber()
   );
 
-  return xdr.ScVal.scvI128(new xdr.Int128Parts({ lo, hi }));
+  return xdr.ScVal.scvU128(new xdr.UInt128Parts({ lo, hi }));
 }
 
 function bigintToBuf(bn: bigint): Buffer {
@@ -169,4 +201,21 @@ export function scvalToString(
   value: SorobanClient.xdr.ScVal
 ): string | undefined {
   return value.bytes().toString();
+}
+
+// Function to convert an array of params to scvals
+export function paramsToScVals(
+  params: (string | number | BigNumber)[]
+): SorobanClient.xdr.ScVal[] {
+  return params.map((p) => {
+    if (typeof p === "string") {
+      return xdr.ScVal.scvBytes(Buffer.from(p));
+    } else if (typeof p === "number") {
+      return xdr.ScVal.scvI32(p);
+    } else if (p instanceof BigNumber) {
+      return bigNumberToI128(p);
+    } else {
+      throw new Error(`Invalid param type: ${typeof p}`);
+    }
+  });
 }
