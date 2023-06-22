@@ -5,15 +5,24 @@ import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import {
   contractTransaction,
   useContractSign,
+  usePairInfos,
   useSorobanReact,
 } from "@phoenix-protocol/state";
 import WelcomeMessage from "../components/WelcomeMessage";
 import Balance from "../components/Balance";
 import ProvideLp from "../components/ProvideLp";
 import Swap from "../components/Swap";
+import { convert } from "@phoenix-protocol/utils";
 
 export default function Page() {
   const { address, activeChain, server } = useSorobanReact();
+  const { infos } = usePairInfos(
+    "b39b7afe36930c98d247fd203795d977bbef6f2fb617f1fe50532b45b10114ae",
+    useSorobanReact()
+  );
+
+  if (infos.result) {
+  }
 
   return (
     <Container>
@@ -61,6 +70,11 @@ export default function Page() {
         <Grid2 xs={12}>
           <Card sx={{ p: 4 }}>
             <WelcomeMessage />
+          </Card>
+        </Grid2>
+        <Grid2 xs={4}>
+          <Card sx={{ p: 4 }}>
+            <Typography variant="h4">Pool Infos</Typography>
           </Card>
         </Grid2>
       </Grid2>

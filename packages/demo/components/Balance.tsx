@@ -5,12 +5,14 @@ import * as SorobanClient from "soroban-client";
 import { useLoadToken, useSorobanReact } from "@phoenix-protocol/state";
 import { convert } from "@phoenix-protocol/utils";
 
-const Balance = ({ address, tokenId }: { address: string, tokenId: string }) => {
-  const token = useLoadToken(
-    tokenId,
-    address,
-    useSorobanReact()
-  );
+const Balance = ({
+  address,
+  tokenId,
+}: {
+  address: string;
+  tokenId: string;
+}) => {
+  const token = useLoadToken(tokenId, address, useSorobanReact());
   // Convert the result ScVals to js types
   const tokenDecimals =
     token.decimals.result && (token.decimals.result?.u32() ?? 7);
@@ -26,6 +28,10 @@ const Balance = ({ address, tokenId }: { address: string, tokenId: string }) => 
   if (token.userBalance.result) {
     balance = BigInt(token.userBalance.result.i128().lo()).toString();
   }
-  return <div>${tokenSymbol}: {Number(balance) / 10 ** 7}</div>;
+  return (
+    <div>
+      ${tokenSymbol}: {Number(balance) / 10 ** 7}
+    </div>
+  );
 };
 export default Balance;

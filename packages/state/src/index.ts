@@ -23,6 +23,7 @@ export {
 } from "./providers/walletProvider/chains";
 
 export { useLoadToken } from "./hooks/useLoadToken";
+export { usePairInfos } from "./hooks/usePairInfos";
 
 export { useContractSign } from "./hooks/contracts/useContractSign";
 
