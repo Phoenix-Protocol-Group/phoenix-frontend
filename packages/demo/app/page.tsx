@@ -10,6 +10,7 @@ import {
 import WelcomeMessage from "../components/WelcomeMessage";
 import Balance from "../components/Balance";
 import ProvideLp from "../components/ProvideLp";
+import Swap from "../components/Swap";
 
 export default function Page() {
   const { address, activeChain, server } = useSorobanReact();
@@ -37,11 +38,7 @@ export default function Page() {
         </Grid2>
         <Grid2 xs={4}>
           <Card sx={{ p: 4 }}>
-            <Typography variant="h4">Swap</Typography>
-            <Button onClick={() => {}} variant="contained" sx={{ mb: 3 }}>
-              Swap 1000 $PHO {"->"} $FAK
-            </Button>
-            <Button variant="outlined">Swap 1000 $FAK {"->"} $PHO</Button>
+            {address && server && <Swap address={address} server={server} />}
           </Card>
         </Grid2>
         <Grid2 xs={4}>
