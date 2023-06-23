@@ -21,10 +21,11 @@ export default function Page() {
     "b39b7afe36930c98d247fd203795d977bbef6f2fb617f1fe50532b45b10114ae",
     useSorobanReact()
   );
+  console.log(server);
 
   if (infos.result) {
     const x = convert.scValToJs(infos.result);
-    console.log(x)
+    console.log(x);
   }
 
   return (
