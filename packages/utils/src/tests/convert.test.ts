@@ -1,5 +1,11 @@
 import { fetchContractValue } from "@phoenix-protocol/state/src/hooks/contracts";
-import { Server, xdr, Networks, Account } from "soroban-client";
+import {
+  Server,
+  xdr,
+  Networks,
+  Account,
+  Address as SorobanAddress,
+} from "soroban-client";
 import { convert } from "..";
 import BigNumber from "bignumber.js";
 
@@ -24,13 +30,17 @@ const source: Account = new Account(
   "1"
 );
 
-describe("XDR Decoding", () => {
-  it("Pool Info Map works", async () => {
+const contractIds = {
+  pair: "b39b7afe36930c98d247fd203795d977bbef6f2fb617f1fe50532b45b10114ae",
+  asset: "984af61b50b042c0dad2f30b369513b12bf4b2f0b705e0165fce57c2105b7523",
+};
+
+describe("XDR Decoding & Querying", () => {
+  it("Pair - query_pool_info works", async () => {
     const scVal = await fetchContractValue({
       server,
       networkPassphrase,
-      contractId:
-        "b39b7afe36930c98d247fd203795d977bbef6f2fb617f1fe50532b45b10114ae",
+      contractId: contractIds.pair,
       method: "query_pool_info",
       params: [],
       source,
@@ -40,5 +50,19 @@ describe("XDR Decoding", () => {
 
     expect(decodedScVal?.asset_a.get("address")).toEqual(expect.any(String));
     expect(decodedScVal?.asset_a.get("amount")).toBeInstanceOf(BigNumber);
+  });
+
+  it("Asset - balance works", async () => {
+    const scVal = await fetchContractValue({
+      server,
+      networkPassphrase,
+      contractId: contractIds.asset,
+      method: "balance",
+      params: [new SorobanAddress(source.accountId()).toScVal()],
+      source,
+    });
+
+    const decodedScVal: any = convert.scValToJs(scVal);
+    expect(decodedScVal).toBeInstanceOf(BigNumber);
   });
 });
