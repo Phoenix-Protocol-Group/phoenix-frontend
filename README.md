@@ -20,11 +20,11 @@ The `State` package is responsible for managing all the application's states. It
 
 The `Utils` package contains various utility and helper functions that are used throughout the application. These functions are designed to perform common tasks, such as data manipulation, date formatting, string operations, or network requests. The `Utils` package provides a centralized location for these functions, promoting code reusability and maintainability.
 
-### Core
+### [Core](https://github.com/Phoenix-Protocol-Group/phoenix-frontend/tree/main/packages/core)
 
 The `Core` package serves as the central package that brings all the other packages together. It acts as the main entry point of the application, coordinating the initialization and integration of the UI, state management, and utility functions. The `Core` package establishes the foundation for the application's architecture and provides the necessary interfaces for interaction between different parts of the system.
 
-### Demo
+### [Demo](https://github.com/Phoenix-Protocol-Group/phoenix-frontend/tree/main/packages/demo)
 
 The `Demo` package is just a playground for internal demos and to play around with the soroban sdk. Only used for internal tests and unstable.
 
