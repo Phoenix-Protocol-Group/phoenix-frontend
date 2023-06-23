@@ -17,15 +17,16 @@ const Button = ({
 }: ButtonProps) => {
   return (
     <MuiButton
-      style={{
+      sx={{
         background: type == "primary" ? Colors.primary : Colors.background,
         border: type == "primary" ? "none" : "1px solid",
         borderImage: "linear-gradient(180deg, #E2391B 0%, #E29E1B 100%),linear-gradient(0deg, #000000, #000000)",
-        padding: size == "medium" ? "18px, 40px, 18px, 40px" : "12px, 40px, 12px, 40px",
+        padding: size == "medium" ? "18px 40px 18px 40px" : "12px 40px 12px 40px",
         borderRadius: "16px",
         fontSize: "14px",
         fontWeight: "700",
-        lineHeight: "20px"
+        lineHeight: "20px",
+        color: Colors.backgroundLight
       }}
       size={size}
       onClick={onClick}
