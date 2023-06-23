@@ -1,7 +1,7 @@
 import { PaletteOptions } from "@mui/material";
 
 const Palette: PaletteOptions = {
-  mode: "dark",
+  mode: "dark"
 };
 
 export default Palette;
