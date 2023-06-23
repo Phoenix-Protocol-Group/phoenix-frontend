@@ -94,7 +94,7 @@ export interface fetchContractValueProps {
   source: SorobanClient.Account;
 }
 
-async function fetchContractValue({
+export async function fetchContractValue({
   server,
   networkPassphrase,
   contractId,
