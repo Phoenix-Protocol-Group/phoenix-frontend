@@ -1,7 +1,6 @@
 import { fetchContractValue } from "@phoenix-protocol/state/src/hooks/contracts";
 import {
   Server,
-  xdr,
   Networks,
   Account,
   Address as SorobanAddress,
@@ -23,8 +22,13 @@ export type Typepoint = bigint;
 export type Duration = bigint;
 export type Timestamp = bigint;
 
+// The server we will connect to.
 const server: Server = new Server("https://rpc-futurenet.stellar.org/");
+
+// The passphrase of the Stellar network that we will be using.
 const networkPassphrase: string = Networks.TESTNET;
+
+// The source account that will be used to send the payment.
 const source: Account = new Account(
   "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
   "1"
@@ -37,6 +41,7 @@ const contractIds = {
 
 describe("XDR Decoding & Querying", () => {
   it("Pair - query_pool_info works", async () => {
+    // Fetch the pool info from the smart contract.
     const scVal = await fetchContractValue({
       server,
       networkPassphrase,
@@ -46,23 +51,34 @@ describe("XDR Decoding & Querying", () => {
       source,
     });
 
+    // Decode the pool info from the smart contract.
     const decodedScVal: any = convert.scValToJs(scVal);
 
+    // Expect the asset a address to be a string.
     expect(decodedScVal?.asset_a.get("address")).toEqual(expect.any(String));
+
+    // Expect the asset a amount to be a BigNumber.
     expect(decodedScVal?.asset_a.get("amount")).toBeInstanceOf(BigNumber);
   });
 
   it("Asset - balance works", async () => {
+    // get balance of the source account for the asset
+    const sourceAccountAddress = new SorobanAddress(
+      source.accountId()
+    ).toScVal();
     const scVal = await fetchContractValue({
       server,
       networkPassphrase,
       contractId: contractIds.asset,
       method: "balance",
-      params: [new SorobanAddress(source.accountId()).toScVal()],
+      params: [sourceAccountAddress],
       source,
     });
 
+    // decode the balance
     const decodedScVal: any = convert.scValToJs(scVal);
+
+    // ensure the balance is a BigNumber
     expect(decodedScVal).toBeInstanceOf(BigNumber);
   });
 });

@@ -6,7 +6,13 @@ type KeyType<T> = T extends Map<infer K, any> ? K : never;
 type ValueType<T> = T extends Map<any, infer V> ? V : never;
 
 export function scValStrToJs<T>(base64Xdr: string): T {
-  let scval = xdr.ScVal.fromXDR(Buffer.from(base64Xdr, "base64"));
+  // Convert the base64 XDR to a raw buffer.
+  let buffer = Buffer.from(base64Xdr, "base64");
+
+  // Convert the XDR buffer to a ScVal object.
+  let scval = xdr.ScVal.fromXDR(buffer);
+
+  // Convert the ScVal object to a JavaScript object.
   return scValToJs(scval);
 }
 

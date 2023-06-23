@@ -83,29 +83,41 @@ function bigNumberFromBytes(
   signed: boolean,
   ...bytes: (string | number | bigint)[]
 ): BigNumber {
+  // If the number is negative, the top bit is set.
   let sign = 1;
   if (signed && bytes[0] === 0x80) {
-    // top bit is set, negative number.
     sign = -1;
     bytes[0] &= 0x7f;
   }
+
+  // Start with an initial value of zero.
   let b = BigInt(0);
+
+  // Add each byte to the number.
   for (let byte of bytes) {
     b <<= BigInt(8);
     b |= BigInt(byte);
   }
+
+  // Multiply by -1 if the number is negative.
   return BigNumber(b.toString()).multipliedBy(sign);
 }
 
 export function bigNumberToI128(value: BigNumber): SorobanClient.xdr.ScVal {
   const b: bigint = BigInt(value.toFixed(0));
+
+  // Convert to a 16-byte two's complement integer.
+  // The top bit is the sign bit.
+  // https://en.wikipedia.org/wiki/Two%27s_complement
   const buf = bigintToBuf(b);
+
+  // Ensure the value fits in 16 bytes.
   if (buf.length > 16) {
     throw new Error("BigNumber overflows i128");
   }
 
+  // If the value is negative, clear the top bit.
   if (value.isNegative()) {
-    // Clear the top bit
     buf[0] &= 0x7f;
   }
 
@@ -113,11 +125,12 @@ export function bigNumberToI128(value: BigNumber): SorobanClient.xdr.ScVal {
   let padded = Buffer.alloc(16);
   buf.copy(padded, padded.length - buf.length);
 
+  // If the value is negative, set the top bit.
   if (value.isNegative()) {
-    // Set the top bit
     padded[0] |= 0x80;
   }
 
+  // Split the 16-byte integer into two 8-byte integers.
   const hi = new xdr.Int64(
     bigNumberFromBytes(false, ...padded.slice(4, 8)).toNumber(),
     bigNumberFromBytes(false, ...padded.slice(0, 4)).toNumber()
@@ -133,22 +146,23 @@ export function bigNumberToI128(value: BigNumber): SorobanClient.xdr.ScVal {
 export function bigNumberToU128(value: BigNumber): SorobanClient.xdr.ScVal {
   const b: bigint = BigInt(value.toFixed(0));
   const buf = bigintToBuf(b);
+
   if (buf.length > 16) {
     throw new Error("BigNumber overflows i128");
   }
 
+  // If the value is negative, clear the top bit.
   if (value.isNegative()) {
-    // Clear the top bit
     buf[0] &= 0x7f;
   }
 
-  // left-pad with zeros up to 16 bytes
+  // Left-pad with zeros up to 16 bytes.
   let padded = Buffer.alloc(16);
   buf.copy(padded, padded.length - buf.length);
   console.debug({ value: value.toString(), padded });
 
+  // If the value is negative, set the top bit.
   if (value.isNegative()) {
-    // Set the top bit
     padded[0] |= 0x80;
   }
 
@@ -156,6 +170,7 @@ export function bigNumberToU128(value: BigNumber): SorobanClient.xdr.ScVal {
     bigNumberFromBytes(false, ...padded.slice(4, 8)).toNumber(),
     bigNumberFromBytes(false, ...padded.slice(0, 4)).toNumber()
   );
+
   const lo = new xdr.Uint64(
     bigNumberFromBytes(false, ...padded.slice(12, 16)).toNumber(),
     bigNumberFromBytes(false, ...padded.slice(8, 12)).toNumber()
@@ -164,12 +179,15 @@ export function bigNumberToU128(value: BigNumber): SorobanClient.xdr.ScVal {
   return xdr.ScVal.scvU128(new xdr.UInt128Parts({ lo, hi }));
 }
 
-function bigintToBuf(bn: bigint): Buffer {
-  var hex = BigInt(bn).toString(16).replace(/^-/, "");
+function bigintToBuf(n: bigint): Buffer {
+  // Convert n to a hex string with no leading 0x or -
+  // and with an even number of digits
+  var hex = BigInt(n).toString(16).replace(/^-/, "");
   if (hex.length % 2) {
     hex = "0" + hex;
   }
 
+  // Convert the hex string to a Uint8Array
   var len = hex.length / 2;
   var u8 = new Uint8Array(len);
 
@@ -181,8 +199,8 @@ function bigintToBuf(bn: bigint): Buffer {
     j += 2;
   }
 
-  if (bn < BigInt(0)) {
-    // Set the top bit
+  // Set the top bit if n < 0
+  if (n < BigInt(0)) {
     u8[0] |= 0x80;
   }
 
@@ -190,9 +208,9 @@ function bigintToBuf(bn: bigint): Buffer {
 }
 
 export function xdrUint64ToNumber(value: SorobanClient.xdr.Uint64): number {
-  let b = 0;
-  b |= value.high;
-  b <<= 8;
-  b |= value.low;
-  return b;
+  let number = 0;
+  number |= value.high;
+  number <<= 8;
+  number |= value.low;
+  return number;
 }
