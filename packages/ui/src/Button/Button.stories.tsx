@@ -1,6 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import Button from "./Button";
+import { Button } from "./Button";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof Button> = {
