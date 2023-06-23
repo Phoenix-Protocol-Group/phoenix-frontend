@@ -8,12 +8,6 @@ export const useLoadToken = (
   sorobanContext: SorobanContextType
 ): any => {
   return {
-    userBalance: useContractQuery({
-      contractId,
-      method: "balance",
-      params: [new SorobanClient.Address(address).toScVal()],
-      sorobanContext,
-    }),
     decimals: useContractQuery({
       contractId,
       method: "decimals",
