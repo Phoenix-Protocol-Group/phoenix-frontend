@@ -13,6 +13,7 @@ import Balance from "../components/Balance";
 import ProvideLp from "../components/ProvideLp";
 import Swap from "../components/Swap";
 import { convert } from "@phoenix-protocol/utils";
+import * as SorobanClient from "soroban-client";
 
 export default function Page() {
   const { address, activeChain, server } = useSorobanReact();
@@ -22,6 +23,8 @@ export default function Page() {
   );
 
   if (infos.result) {
+    const x = convert.scValToJs(infos.result);
+    console.log(x)
   }
 
   return (
