@@ -22,7 +22,7 @@ export function contractTransaction({
   const contract = new SorobanClient.Contract(contractId);
   return new SorobanClient.TransactionBuilder(source, {
     // TODO: Figure out the fee
-    fee: "100",
+    fee: "1000",
     networkPassphrase,
   })
     .addOperation(contract.call(method, ...myParams))
@@ -111,29 +111,16 @@ export function useContractSign<E = Error>(
       const networkPassphrase = activeChain.networkPassphrase;
       setState("loading");
 
-      // preflight and add the footprint
-      if (!skipAddingFootprint) {
-        txn = await server.prepareTransaction(txn, networkPassphrase);
-        if (!txn) {
-          throw new Error("No transaction after adding footprint");
-        }
-      }
+      txn = await server.prepareTransaction(txn, networkPassphrase);
 
       let signed = "";
-      if (passedOptions?.secretKey) {
-        // User as set a secretKey, txn will be signed using the secretKey
-        const keypair = SorobanClient.Keypair.fromSecret(
-          passedOptions.secretKey
-        );
-        txn.sign(keypair);
-        signed = txn.toXDR();
-      } else {
-        // User has not set a secretKey, txn will be signed using the Connector (wallet) provided in the sorobanContext
-        signed = await activeConnector.signTransaction(txn.toXDR(), {
-          networkPassphrase,
-        });
-      }
 
+      // User has not set a secretKey, txn will be signed using the Connector (wallet) provided in the sorobanContext
+      signed = await activeConnector.signTransaction(txn.toXDR(), {
+        networkPassphrase,
+      });
+      console.log(1);
+      console.log(signed);
       const transactionToSubmit = SorobanClient.TransactionBuilder.fromXDR(
         signed,
         networkPassphrase
