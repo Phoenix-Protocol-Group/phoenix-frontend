@@ -1,42 +1,32 @@
 import React from "react";
 import { Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/material';
+import Colors from '../Theme/colors';
 
 export interface ButtonProps {
-  /**
-   * Is this the principal call to action on the page?
-   */
   type?: "primary" | "secondary";
-  /**
-   * What background color to use
-   */
-  textColor?: string;
-  /**
-   * How large should the button be?
-   */
-  size?: "small" | "medium" | "large";
-  /**
-   * Button contents
-   */
+  size?: "medium" | "small";
   label: string;
-  /**
-   * Optional click handler
-   */
   onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
-/**
- * Primary UI component for user interaction
- */
-
 const Button = ({
-  textColor,
+  type = "primary",
   size = "medium",
   onClick,
   label,
 }: ButtonProps) => {
   return (
     <MuiButton
-      style={textColor ? { color: textColor } : {}}
+      style={{
+        background: type == "primary" ? Colors.primary : Colors.background,
+        border: type == "primary" ? "none" : "1px solid",
+        borderImage: "linear-gradient(180deg, #E2391B 0%, #E29E1B 100%),linear-gradient(0deg, #000000, #000000)",
+        padding: size == "medium" ? "18px, 40px, 18px, 40px" : "12px, 40px, 12px, 40px",
+        borderRadius: "16px",
+        fontSize: "14px",
+        fontWeight: "700",
+        lineHeight: "20px"
+      }}
       size={size}
       onClick={onClick}
     >
