@@ -1,9 +1,33 @@
-export type InstructionStepName = "install" | "create" | "scan";
+import { Server } from "soroban-client";
+import { BigNumber } from "bignumber.js";
 
-export interface NetworkDetails {
-  network: string;
-  networkUrl: string;
+export type Token = {
+  id: string;
+  balance: BigNumber;
+};
+
+export type Wallet = {
+  address: string | undefined;
+  activeChain: WalletChain | undefined;
+  server: Server | undefined;
+};
+
+export interface WalletActions {
+  connectWallet: () => void;
+  disconnectWallet: () => void;
+  wallet: Wallet;
+  tokens: Token[];
+  fetchTokenBalance: (tokenId: string) => void;
+}
+
+export interface WalletChain {
+  id: string;
+  name?: string;
   networkPassphrase: string;
+  iconBackground?: string;
+  iconUrl?: string | null;
+  // TODO: Use this to indicate which chains a dapp supports
+  unsupported?: boolean;
 }
 
 export type Connector = {
@@ -32,14 +56,12 @@ export type Connector = {
   ) => Promise<string>;
 };
 
-export interface WalletChain {
-  id: string;
-  name?: string;
+export type InstructionStepName = "install" | "create" | "scan";
+
+export interface NetworkDetails {
+  network: string;
+  networkUrl: string;
   networkPassphrase: string;
-  iconBackground?: string;
-  iconUrl?: string | null;
-  // TODO: Use this to indicate which chains a dapp supports
-  unsupported?: boolean;
 }
 
 // Sourced from https://github.com/tmm/wagmi/blob/main/packages/core/src/constants/chains.ts
