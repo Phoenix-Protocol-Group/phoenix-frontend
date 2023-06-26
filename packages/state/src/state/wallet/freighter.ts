@@ -5,7 +5,7 @@ export function freighter(): Connector {
   return {
     id: "freighter",
     name: "Freighter",
-    iconUrl: async () => "",
+    iconUrl: "http://i.epvpimg.com/o9f6fab.png",
     iconBackground: "#fff",
     installed: true,
     downloadUrls: {
