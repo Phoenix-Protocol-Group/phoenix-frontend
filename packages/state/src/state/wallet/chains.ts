@@ -1,5 +1,5 @@
 import * as SorobanClient from "soroban-client";
-import { WalletChain } from "../../providers/walletProvider/types";
+import { WalletChain } from "./types";
 
 export const public_chain: WalletChain = {
   id: "public",
@@ -38,7 +38,6 @@ export const allChains: WalletChain[] = [
   sandbox,
   standalone,
 ];
-
 
 export const networkToActiveChain = (networkDetails: any, chains: any) => {
   // Find the chain that matches the network passphrase.

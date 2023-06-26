@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext } from "react";
-import { PhoenixProvider, freighter } from "@phoenix-protocol/state";
+import { freighter } from "@phoenix-protocol/state";
 import * as SorobanClient from "soroban-client";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 
@@ -30,16 +30,10 @@ export default function RootLayout({
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </head>
       <body>
-        <PhoenixProvider
-          appName={appName}
-          chains={chains}
-          connectors={allowedConnectors}
-        >
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {children}
-          </ThemeProvider>
-        </PhoenixProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

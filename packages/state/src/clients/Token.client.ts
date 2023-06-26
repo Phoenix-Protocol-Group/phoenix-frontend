@@ -1,5 +1,5 @@
 import { Account, Address, Server } from "soroban-client";
-import { fetchContractValue } from "../hooks/contracts";
+import { fetchContractValue } from "../soroban";
 import { convert } from "@phoenix-protocol/utils";
 import BigNumber from "bignumber.js";
 
@@ -8,7 +8,7 @@ interface SorobanTokenClientReadOnlyInterface {
   networkPassphrase: string;
   contractId: string;
   source: Account;
-  balance: (walletAddress: string) => void;
+  balance: () => Promise<BigNumber>;
 }
 
 export class SorobanTokenQueryClient
@@ -31,7 +31,7 @@ export class SorobanTokenQueryClient
     this.source = source;
   }
 
-  async balance(walletAddress: string): Promise<BigNumber> {
+  async balance(): Promise<BigNumber> {
     try {
       // Fetch token balance
       const scVal = await fetchContractValue({

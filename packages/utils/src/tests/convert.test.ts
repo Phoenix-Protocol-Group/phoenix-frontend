@@ -1,4 +1,4 @@
-import { fetchContractValue } from "@phoenix-protocol/state/src/hooks/contracts";
+import { fetchContractValue } from "@phoenix-protocol/state";
 import {
   Server,
   Networks,

@@ -1,14 +1,12 @@
 import freighterApi from "@stellar/freighter-api";
-import { NetworkDetails, Connector } from "../../providers/walletProvider/types";
+import { NetworkDetails, Connector } from "./types";
 
 export function freighter(): Connector {
   return {
     id: "freighter",
     name: "Freighter",
     iconUrl: async () => "",
-    // iconUrl: async () => (await import('./freighter.svg')).default,
     iconBackground: "#fff",
-    // TODO: Check this
     installed: true,
     downloadUrls: {
       browserExtension:
