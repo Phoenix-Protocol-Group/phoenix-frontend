@@ -4,20 +4,6 @@ import { convert } from "@phoenix-protocol/utils";
 import { fetchContractValue } from "../soroban";
 import { server, networkPassphrase, source, contractIds } from "./constants";
 
-export type u32 = number;
-export type i32 = number;
-export type u64 = bigint;
-export type i64 = bigint;
-export type u128 = bigint;
-export type i128 = bigint;
-export type u256 = bigint;
-export type i256 = bigint;
-export type Address = string;
-export type Option<T> = T | undefined;
-export type Typepoint = bigint;
-export type Duration = bigint;
-export type Timestamp = bigint;
-
 describe("Token Client", () => {
   it("Query - balance works", async () => {
     // get balance of the source account for the asset
