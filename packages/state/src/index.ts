@@ -11,7 +11,7 @@ export {
 export { useSorobanReact } from "./providers/walletProvider/hooks/useSorobanReact";
 
 // Export freighter
-export { freighter } from "./providers/walletProvider/freighter";
+export { freighter } from "./state/wallet/freighter";
 
 // Export chains
 export {
@@ -20,7 +20,7 @@ export {
   testnet,
   sandbox,
   standalone,
-} from "./providers/walletProvider/chains";
+} from "./state/wallet/chains";
 
 export { useLoadToken } from "./hooks/useLoadToken";
 export { usePairInfos } from "./hooks/usePairInfos";
