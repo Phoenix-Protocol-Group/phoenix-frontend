@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning].
 - Added packages/ui, packages/state, packages/demo, packages/utils, packages/core, packages/demo. [general]
 - Added some example React Next code to the demo package for testing purposes. [demo]
 - Added button component. [ui]
+- Added storybook. [ui]
 
 ### Removed
 - Removed Soroban React and replaced with Zustand for state management. [state]
