@@ -1,12 +1,12 @@
-import { fetchContractValue } from "@phoenix-protocol/state";
 import {
   Server,
   Networks,
   Account,
   Address as SorobanAddress,
 } from "soroban-client";
-import { convert } from "..";
 import BigNumber from "bignumber.js";
+import { convert } from "@phoenix-protocol/utils";
+import { fetchContractValue } from "../soroban";
 
 export type u32 = number;
 export type i32 = number;
@@ -39,29 +39,8 @@ const contractIds = {
   asset: "984af61b50b042c0dad2f30b369513b12bf4b2f0b705e0165fce57c2105b7523",
 };
 
-describe("XDR Decoding & Querying", () => {
-  it("Pair - query_pool_info works", async () => {
-    // Fetch the pool info from the smart contract.
-    const scVal = await fetchContractValue({
-      server,
-      networkPassphrase,
-      contractId: contractIds.pair,
-      method: "query_pool_info",
-      params: [],
-      source,
-    });
-
-    // Decode the pool info from the smart contract.
-    const decodedScVal: any = convert.scValToJs(scVal);
-
-    // Expect the asset a address to be a string.
-    expect(decodedScVal?.asset_a.get("address")).toEqual(expect.any(String));
-
-    // Expect the asset a amount to be a BigNumber.
-    expect(decodedScVal?.asset_a.get("amount")).toBeInstanceOf(BigNumber);
-  });
-
-  it("Asset - balance works", async () => {
+describe("Token Client", () => {
+  it("Query - balance works", async () => {
     // get balance of the source account for the asset
     const sourceAccountAddress = new SorobanAddress(
       source.accountId()
