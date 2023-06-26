@@ -55,7 +55,6 @@ interface ConnectWalletProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   connectors: Connector[];
-  isConnected: boolean;
   connect: (connector: Connector) => Promise<void>;
 }
 
@@ -63,7 +62,6 @@ const ConnectWallet = ({
   open,
   setOpen,
   connectors,
-  isConnected,
   connect,
 }: ConnectWalletProps): React.ReactNode => {
   const [loading, setLoading] = React.useState(false);
@@ -94,7 +92,7 @@ const ConnectWallet = ({
 
   return (
     <Modal
-      open={true}
+      open={open}
       onClose={() => setOpen(false)}
       aria-labelledby="connectwallet-modal"
       aria-describedby="connect your wallet to the app"
