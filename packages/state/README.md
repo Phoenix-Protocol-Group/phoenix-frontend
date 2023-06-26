@@ -1,7 +1,6 @@
 # State Package
 
-The State package is a collection of state management utilities for the Phoenix Frontend project. It utilizes React Query, a powerful library for managing and caching asynchronous data. The package includes various providers that integrate with React Query and enable efficient state management across the application.
-This package started heavily inspired by [soroban-react](https://github.com/esteblock/soroban-react).
+The State package is a collection of state management utilities for the Phoenix Frontend project. It utilizes Zustand, a powerful library for managing and caching asynchronous data. 
 
 ## Installation
 
@@ -21,12 +20,3 @@ To use the State package in your application, follow these steps:
 3. Utilize the available hooks and utilities provided by React Query to manage and interact with the application's state.
 4. Customize the state management as needed, utilizing the options and configurations available in React Query and the State package.
 
-## Providers
-
-The State package provides the following providers to include in the Core package:
-
-- `WalletProvider`: Handles all wallet and chain-related states.
-- `StateProvider`: Handles all React Query states, including queried data from the chain as well as app-specific states.
-- `PhoenixProvider`: Combines the `WalletProvider` and `StateProvider` for easier setup in the Core package.
-
-Refer to the respective provider documentation for detailed instructions on their usage and configurations.
