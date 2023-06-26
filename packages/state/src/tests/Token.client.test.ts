@@ -1,9 +1,4 @@
-import {
-  Server,
-  Networks,
-  Account,
-  Address as SorobanAddress,
-} from "soroban-client";
+import { Address as SorobanAddress } from "soroban-client";
 import BigNumber from "bignumber.js";
 import { convert } from "@phoenix-protocol/utils";
 import { fetchContractValue } from "../soroban";
