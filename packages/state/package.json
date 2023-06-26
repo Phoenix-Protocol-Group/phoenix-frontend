@@ -16,8 +16,8 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/urijs": "^1.19.19",
-    "typescript": "^5.1.3",
-    "ts-jest": "^29.1.0"
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.1.3"
   },
   "dependencies": {
     "@stellar/freighter-api": "^1.4.0",
