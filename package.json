@@ -20,6 +20,7 @@
   "workspaces": [
     "packages/utils",
     "packages/state",
+    "packages/ui",
     "packages/*"
   ],
   "devDependencies": {
