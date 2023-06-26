@@ -14,7 +14,7 @@ The `UI` package is a UI kit based on Material-UI (MUI). It provides a set of re
 
 ### [State](https://github.com/Phoenix-Protocol-Group/phoenix-frontend/tree/main/packages/state)
 
-The `State` package is responsible for managing all the application's states. It includes recoil along with its associated actions, reducers, and selectors. This package ensures that the application's data is efficiently managed and updated in response to user interactions or external events.
+The `State` package is responsible for managing all the application's states. It includes zustand along with its associated actions. This package ensures that the application's data is efficiently managed and updated in response to user interactions or external events.
 
 ### [Utils](https://github.com/Phoenix-Protocol-Group/phoenix-frontend/tree/main/packages/utils)
 
