@@ -25,7 +25,7 @@ export default function Page() {
       await server.getAccount(address)
     );
 
-    const res = await pairClient.provideLiquidity(1000, 1000, 1000, 1000);
+    const res = await pairClient.swap(true, 1000, undefined, 1);
     console.log(res);
   };
 
