@@ -1,7 +1,10 @@
 import * as React from 'react';
 import Colors from '../Theme/colors';
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
-import MuiDrawer from '@mui/material/Drawer';
+import {
+  Drawer as MuiDrawer,
+  DrawerProps as MuiDrawerProps,
+} from "@mui/material";
 import List from '@mui/material/List';
 import IconButton from '@mui/material/IconButton';
 import ListSubheader from '@mui/material/ListSubheader';
@@ -10,8 +13,15 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+interface Items {
+  label: string;
+  icon: any;
+  active: boolean;
+}
+
+interface DrawerProps extends MuiDrawerProps {
+  items: Items[];
+}
 
 const drawerWidth = 240;
 
@@ -62,7 +72,10 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-const SidebarNavigation = () => {
+const SidebarNavigation = ({
+  items,
+  ...props
+}: DrawerProps) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
 
@@ -91,6 +104,7 @@ const SidebarNavigation = () => {
         }}
         variant="permanent"
         open={open}
+        {...props}
       >
         <DrawerHeader
           sx={{
@@ -124,21 +138,18 @@ const SidebarNavigation = () => {
           >
             Menu
           </ListSubheader>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          {items.map((item, index) => (
             <ListItem 
-              key={text} 
+              key={item.label} 
               disablePadding
               sx={{
                 margin: '0 16px',
                 width: 'unset',
                 padding: 0,
-                border: '1px solid transparent',
                 borderRadius: '12px',
                 overflow: 'hidden',
-                '&:hover': {
-                  borderColor: '#E2491A',
-                  background: 'rgba(226, 73, 26, 0.10)'
-                }
+                border: item.active ? '1px solid #E2491A' : '1px solid transparent',
+                background: item.active ? 'rgba(226, 73, 26, 0.10)' : 'transparent'
               }}
             >
               <ListItemButton
@@ -152,7 +163,7 @@ const SidebarNavigation = () => {
                     marginLeft: '20px'
                   }}
                 >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  {item.icon}
                 </ListItemIcon>
                 <ListItemText
                   primaryTypographyProps={{
@@ -162,7 +173,7 @@ const SidebarNavigation = () => {
                   sx={{
                     padding: '16px 24px 16px 20px'
                   }}
-                  primary={text} 
+                  primary={item.label} 
                 />
               </ListItemButton>
             </ListItem>

@@ -1,6 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { SidebarNavigation } from "./SidebarNavigation";
+import MailIcon from '@mui/icons-material/Mail';
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof SidebarNavigation> = {
@@ -15,16 +16,27 @@ type Story = StoryObj<typeof SidebarNavigation>;
 
 export const Primary: Story = {
   args: {
-    label: "Primary",
-    size: "medium",
-    type: "primary",
-  },
-};
-
-export const Secondary: Story = {
-  args: {
-    ...Primary.args,
-    type: "secondary",
-    label: "Secondary",
+    items: [
+      {
+        label: "Nav Item 1",
+        icon: <MailIcon/>,
+        active: true
+      },
+      {
+        label: "Nav Item 2",
+        icon: <MailIcon/>,
+        active: false
+      },
+      {
+        label: "Nav Item 3",
+        icon: <MailIcon/>,
+        active: false
+      },
+      {
+        label: "Nav Item 4",
+        icon: <MailIcon/>,
+        active: false
+      }
+    ]
   },
 };
