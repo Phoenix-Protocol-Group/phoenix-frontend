@@ -11,7 +11,7 @@ export {
   allChains,
 } from "./state/wallet/chains";
 
-export * from "./state/store";
+export * from "./state";
 
 export * from "./soroban";
 export * from "./clients";

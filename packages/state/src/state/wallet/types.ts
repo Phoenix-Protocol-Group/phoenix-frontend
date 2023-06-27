@@ -34,7 +34,7 @@ export type Connector = {
   id: string;
   name: string;
   shortName?: string;
-  iconUrl: string | (() => Promise<string>);
+  iconUrl: string;
   iconBackground: string;
   installed?: boolean;
   downloadUrls?: {
