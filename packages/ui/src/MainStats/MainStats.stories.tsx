@@ -1,7 +1,5 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import MainStats from "./MainStats";
-import { freighter } from "@phoenix-protocol/state";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof MainStats> = {
