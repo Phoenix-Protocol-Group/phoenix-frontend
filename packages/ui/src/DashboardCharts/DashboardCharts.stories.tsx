@@ -4,7 +4,7 @@ import { Grid } from "@mui/material";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof DashboardPriceCharts> = {
-  title: "Dashboard/DashboardCharts",
+  title: "Dashboard/DashboardPriceCharts",
   // @ts-ignore
   component: DashboardPriceCharts,
   decorators: [
