@@ -14,23 +14,5 @@ export default meta;
 type Story = StoryObj<typeof MainStats>;
 
 export const Primary: Story = {
-  args: {
-    stats: [
-      {
-        title: "Total Assets",
-        value: "$100,000",
-        link: "https://google.com",
-      },
-      {
-        title: "Total Rewards",
-        value: "$100,000",
-        link: "https://google.com",
-      },
-      {
-        title: "Staked Phoenix",
-        value: "$100,000",
-        link: "https://google.com",
-      },
-    ],
-  },
+  args: {},
 };

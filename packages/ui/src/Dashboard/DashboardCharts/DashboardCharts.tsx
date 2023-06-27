@@ -43,7 +43,11 @@ const GlowingChart = ({ data }: { data: Data[] }) => (
   </AreaChart>
 );
 
-const DashboardPriceCharts = ({ data, icon, assetName }: DashboardChartsProps) => {
+const DashboardPriceCharts = ({
+  data,
+  icon,
+  assetName,
+}: DashboardChartsProps) => {
   const differencePercent: number =
     ((data[data.length - 1][1] - data[0][1]) / data[data.length - 1][1]) * 100;
 
