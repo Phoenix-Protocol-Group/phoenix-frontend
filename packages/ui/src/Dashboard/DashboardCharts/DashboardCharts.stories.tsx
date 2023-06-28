@@ -23,7 +23,7 @@ export default meta;
 // The story type for the component https://storybook.js.org/docs/react/api/csf#named-story-exports
 type Story = StoryObj<typeof DashboardPriceCharts>;
 
-const mockDataset = [
+export const mockDataset = [
   [1687392000000, 0.08683713332799949],
   [1687478400000, 0.08669248419239592],
   [1687564800000, 0.0893807322702632],

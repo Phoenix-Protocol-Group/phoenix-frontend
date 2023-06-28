@@ -12,6 +12,7 @@ const CryptoCTA = ({ onClick }: CryptoCTAProps) => {
         borderRadius: "24px",
         border: "2px solid #E2621B",
         p: "2.5rem",
+        height: "26rem",
         background:
           "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
       }}

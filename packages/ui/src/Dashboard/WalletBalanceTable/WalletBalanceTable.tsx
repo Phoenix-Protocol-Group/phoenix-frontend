@@ -1,36 +1,60 @@
 import {
   Box,
   FormControl,
+  IconButton,
   InputAdornment,
   MenuItem,
   Select,
   Tab,
   Tabs,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
-import styled from "@emotion/styled";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarIcon from "@mui/icons-material/Star";
+
 interface WalletBalanceTableProps {
   onClick: () => void;
 }
 function a11yProps(index: number) {
   return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
+    id: `category-tab-${index}`,
+    "aria-controls": `category-tabpanel-${index}`,
   };
 }
 
-const FilterAndTabPanel = () => {
-  const [value, setValue] = useState(0);
-  const [selectValue, setSelectValue] = useState<number>(10);
+export interface Token {
+  name: string;
+  icon: string;
+  usdValue: number;
+  amount: number;
+  category: string;
+}
 
+interface FilterAndTabPanelProps {
+  categories: string[];
+  searchTerm: string;
+  sort: string;
+  setCategory: (category: string) => void;
+  setSearchTerm: (searchTerm: string) => void;
+  setSort: (sort: "highest" | "lowest") => void;
+}
+
+const FilterAndTabPanel = ({
+  categories,
+  searchTerm,
+  sort,
+  setCategory,
+  setSearchTerm,
+  setSort,
+}: FilterAndTabPanelProps) => {
+  const [value, setValue] = useState<number>(0);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-
-  const [searchTerm, setSearchTerm] = useState("");
 
   return (
     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -54,9 +78,19 @@ const FilterAndTabPanel = () => {
           },
         }}
       >
-        <Tab label="All Assets" {...a11yProps(0)} />
-        <Tab label="Stable" {...a11yProps(1)} />
-        <Tab label="Non-stable" {...a11yProps(2)} />
+        <Tab
+          label="All Assets"
+          {...a11yProps(10)}
+          onClick={() => setCategory("All")}
+        />
+        {categories.map((category, index) => (
+          <Tab
+            key={index}
+            label={category}
+            {...a11yProps(index)}
+            onClick={() => setCategory(category)}
+          />
+        ))}
       </Tabs>
       <Box>
         <TextField
@@ -103,14 +137,14 @@ const FilterAndTabPanel = () => {
         />
         <FormControl sx={{ ml: 1, minWidth: 120 }}>
           <Select
-            value={selectValue}
-            onChange={(e) => setSelectValue(Number(e.target.value))}
+            value={sort}
+            onChange={(e) => setSort(e.target.value as "highest" | "lowest")}
             displayEmpty
             inputProps={{ "aria-label": "Without label" }}
             sx={{ borderRadius: "16px", opacity: 0.6 }}
           >
-            <MenuItem value={10}>Highest Balance</MenuItem>
-            <MenuItem value={20}>Lowest Balance</MenuItem>
+            <MenuItem value={"highest"}>Highest Balance</MenuItem>
+            <MenuItem value={"lowest"}>Lowest Balance</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -118,7 +152,28 @@ const FilterAndTabPanel = () => {
   );
 };
 
-const ListItem = () => {
+interface ListItemProps {
+  token: Token;
+}
+
+const ListItem = ({
+  token: { name, icon, usdValue, amount },
+}: ListItemProps) => {
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  useEffect(() => {
+    localStorage.setItem("items", JSON.stringify(favorites));
+    console.log(localStorage.getItem("items"));
+    console.log(favorites);
+  }, [favorites]);
+
+  useEffect(() => {
+    const items = JSON.parse(localStorage.getItem("favorites")!) || [];
+    if (items) {
+      setFavorites(items);
+    }
+  }, []);
+
   return (
     <Box
       sx={{
@@ -130,7 +185,7 @@ const ListItem = () => {
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Box component={"img"} src={"image-97.png"} />
+        <Box component={"img"} src={icon} />
         <Typography
           sx={{
             fontWeight: 700,
@@ -138,7 +193,7 @@ const ListItem = () => {
             lineHeight: "1.125rem",
           }}
         >
-          USDC
+          {name}
         </Typography>
       </Box>
       <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -149,7 +204,7 @@ const ListItem = () => {
             lineHeight: "1.125rem",
           }}
         >
-          567.43
+          {amount}
         </Typography>
         <Typography
           sx={{
@@ -160,14 +215,61 @@ const ListItem = () => {
             ml: "0.5rem",
           }}
         >
-          $56.72
+          ${usdValue}
         </Typography>
+        {!favorites.includes(name) ? (
+          <Tooltip title="Add to favorites">
+            <IconButton onClick={() => setFavorites([...favorites, name])}>
+              <StarBorderIcon />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Remove from favorites">
+            <IconButton
+              onClick={() => setFavorites(favorites.filter((f) => f !== name))}
+            >
+              <StarIcon />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
     </Box>
   );
 };
 
-const WalletBalanceTable = ({ onClick }: WalletBalanceTableProps) => {
+interface WalletBalanceTableProps {
+  tokens: Token[];
+}
+
+const scrollbarStyles = {
+  
+  /* Firefox */
+  scrollbarWidth: "thin",
+  scrollbarColor: "#E2AA1B #1B1B1B",
+
+  /* Chrome, Edge, and Safari */
+  "&::-webkit-scrollbar": {
+    width: "4px",
+  },
+
+  "&::-webkit-scrollbar-track": {
+    background: "#ffffff",
+  },
+
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "#E2AA1B",
+    borderRadius: "8px",
+  },
+};
+
+const WalletBalanceTable = ({ tokens }: WalletBalanceTableProps) => {
+  const [sort, setSort] = useState("highest" as "highest" | "lowest");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [category, setCategory] = useState("All");
+
+  const categories = tokens.map((token) => token.category);
+  const uniqueCategories = [...new Set(categories)];
+
   return (
     <Box
       sx={{
@@ -175,13 +277,34 @@ const WalletBalanceTable = ({ onClick }: WalletBalanceTableProps) => {
         p: "1.6rem",
         background:
           "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+        height: "26rem",
       }}
     >
-      <FilterAndTabPanel />
-      <ListItem />
-      <ListItem />
-      <ListItem />
-      <ListItem />
+      <FilterAndTabPanel
+        searchTerm={searchTerm}
+        categories={uniqueCategories}
+        setCategory={setCategory}
+        setSearchTerm={setSearchTerm}
+        setSort={setSort}
+        sort={sort}
+      />
+      <Box sx={{ overflow: "auto", maxHeight: "19rem", ...scrollbarStyles }}>
+        {[...tokens]
+          .filter((token) => token.category === category || category === "All")
+          .filter((token) =>
+            token.name.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+          .sort((a, b) => {
+            if (sort === "highest") {
+              return b.usdValue - a.usdValue;
+            } else {
+              return a.usdValue - b.usdValue;
+            }
+          })
+          .map((token, index) => (
+            <ListItem token={token} key={index} />
+          ))}
+      </Box>
     </Box>
   );
 };
