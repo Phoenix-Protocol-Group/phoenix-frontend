@@ -2,6 +2,7 @@ import * as React from "react";
 import Colors from "../Theme/colors";
 import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
 import {
+  Box,
   Drawer as MuiDrawer,
   DrawerProps as MuiDrawerProps,
 } from "@mui/material";
@@ -76,12 +77,8 @@ const SidebarNavigation = ({ items, ...props }: DrawerProps) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
+  const toggleDrawer = () => {
+    setOpen(!open);
   };
 
   return (
@@ -100,17 +97,21 @@ const SidebarNavigation = ({ items, ...props }: DrawerProps) => {
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          padding: "30px",
+          padding: open ? "30px" : "18px",
         }}
       >
-        <img src="/logo.svg" />
+        <Box sx={{
+          display: open ? "block" : "none"
+        }}>
+          <img src="/logo.svg" />
+        </Box>
         <IconButton
-          onClick={handleDrawerClose}
+          onClick={toggleDrawer}
           sx={{
             borderRadius: "8px",
             background:
               "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
-            transform: theme.direction === "rtl" ? "rotate(180deg)" : "none",
+            transform: open ? "none" : "rotate(180deg)",
             padding: "10px",
           }}
         >
@@ -125,6 +126,7 @@ const SidebarNavigation = ({ items, ...props }: DrawerProps) => {
             fontSize: "14px",
             lineHeight: "16px",
             marginBottom: "20px",
+            display: open ? "block" : "none"
           }}
         >
           Menu
@@ -136,7 +138,6 @@ const SidebarNavigation = ({ items, ...props }: DrawerProps) => {
             sx={{
               margin: "0 16px",
               width: "unset",
-              padding: 0,
               borderRadius: "12px",
               overflow: "hidden",
               border: item.active
@@ -145,6 +146,8 @@ const SidebarNavigation = ({ items, ...props }: DrawerProps) => {
               background: item.active
                 ? "rgba(226, 73, 26, 0.10)"
                 : "transparent",
+              height: open ? "unset" : "32px",
+              marginBottom: open ? 0 : "16px"
             }}
           >
             <ListItemButton
@@ -155,7 +158,7 @@ const SidebarNavigation = ({ items, ...props }: DrawerProps) => {
               <ListItemIcon
                 sx={{
                   minWidth: "24px",
-                  marginLeft: "20px",
+                  marginLeft: open ? "20px" : "1px",
                 }}
               >
                 {item.icon}
