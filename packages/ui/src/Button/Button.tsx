@@ -52,8 +52,8 @@ const Button = ({
         ...props.sx,
       }}
       size={size}
-      onClick={onClick}
       disabled={props.disabled}
+      {...props}
     >
       {props.children || label}
     </MuiButton>
