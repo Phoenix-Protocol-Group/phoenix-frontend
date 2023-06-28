@@ -112,6 +112,7 @@ const SidebarNavigation = ({ items, ...props }: DrawerProps) => {
             background:
               "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
             transform: open ? "none" : "rotate(180deg)",
+            marginTop: open ? 0 : '12px',
             padding: "10px",
           }}
         >
