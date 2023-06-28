@@ -376,7 +376,7 @@ const WalletBalanceTable = ({ tokens }: WalletBalanceTableProps) => {
   const uniqueCategories = [...new Set(categories)];
 
   const theme = useTheme();
-  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
+  const largerThenMd = useMediaQuery(theme.breakpoints.up("xl"));
 
   return (
     <Box
