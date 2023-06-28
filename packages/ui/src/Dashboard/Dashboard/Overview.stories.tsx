@@ -57,11 +57,11 @@ export const Dashboard: Story = {
   render: (args: any) => (
     // The grid is a component that allows us to
     // easily organize the layout of our UI
-    <Grid container spacing={4}>
+    <Grid container spacing={3}>
       <Grid item xs={12}>
         <MainStats {...args.mainstatsArgs} />
       </Grid>
-      <Grid item xs={8}>
+      <Grid item xs={12} md={8}>
         <Box
           sx={{
             border: "1px solid #E5E5E5",
@@ -74,16 +74,16 @@ export const Dashboard: Story = {
           Coming soon
         </Box>
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={6} md={2}>
         <DashboardPriceCharts {...args.dashboardArgs} />
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={6} md={2}>
         <DashboardPriceCharts {...args.dashboardArgs} />
       </Grid>
-      <Grid item xs={4}>
+      <Grid item xs={12} md={4}>
         <CryptoCTA onClick={() => {}} />
       </Grid>
-      <Grid item xs={8}>
+      <Grid item xs={12} md={8}>
         <WalletBalanceTable {...args.walletBalanceArgs} />
       </Grid>
     </Grid>

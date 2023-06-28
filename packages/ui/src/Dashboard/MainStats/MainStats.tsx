@@ -1,13 +1,14 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
 
 interface TileProps {
   title: string;
   value: string;
   link: string;
+  isMobile?: boolean;
 }
 
-const Tile = ({ title, value, link }: TileProps) => {
+const Tile = ({ title, value, link, isMobile }: TileProps) => {
   const openInNewTab = () => {
     if (window) {
       window.open(link, "_blank")?.focus();
@@ -34,7 +35,7 @@ const Tile = ({ title, value, link }: TileProps) => {
           {value}
         </Typography>
         <Box
-          sx={{ ml: "3.4rem", cursor: "pointer" }}
+          sx={{ ml: isMobile ? "1rem" : "3.4rem", cursor: "pointer" }}
           component="img"
           src="arrow4.svg"
           onClick={() => openInNewTab()}
@@ -52,23 +53,45 @@ interface MainStatsProps {
 }
 
 const MainStats = ({ stats }: MainStatsProps) => {
-  return (
-    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-      <Box>
-        <Typography sx={{ fontSize: "2rem", fontWeight: "700" }}>
-          Hello 👋
-        </Typography>
-        <Typography sx={{ fontSize: "0.875rem", opacity: "0.4" }}>
-          Here are your main stats.
-        </Typography>
-      </Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-        {stats.map((stat) => (
-          <Tile {...stat} />
-        ))}
-      </Box>
+  const theme = useTheme();
+  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
+
+  const HelloMsg = () => (
+    <Box>
+      <Typography sx={{ fontSize: "2rem", fontWeight: "700" }}>
+        Hello 👋
+      </Typography>
+      <Typography sx={{ fontSize: "0.875rem", opacity: "0.4" }}>
+        Here are your main stats.
+      </Typography>
     </Box>
   );
+
+  if (largerThenMd) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <HelloMsg />
+        <Box sx={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+          {stats.map((stat) => (
+            <Tile {...stat} />
+          ))}
+        </Box>
+      </Box>
+    );
+  } else {
+    return (
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <HelloMsg />
+        </Grid>
+        {stats.map((stat) => (
+          <Grid item xs={6}>
+            <Tile {...stat} isMobile={true} />
+          </Grid>
+        ))}
+      </Grid>
+    );
+  }
 };
 
 export default MainStats;

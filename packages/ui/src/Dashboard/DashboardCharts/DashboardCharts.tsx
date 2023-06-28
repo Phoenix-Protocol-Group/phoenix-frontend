@@ -1,4 +1,11 @@
-import { Box, Chip, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Chip,
+  Grid,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import React from "react";
 import { AreaChart, Area, YAxis, ResponsiveContainer } from "recharts";
 
@@ -50,7 +57,8 @@ const DashboardPriceCharts = ({
 }: DashboardChartsProps) => {
   const differencePercent: number =
     ((data[data.length - 1][1] - data[0][1]) / data[data.length - 1][1]) * 100;
-
+  const theme = useTheme();
+  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
   return (
     <Box
       sx={{
@@ -65,20 +73,47 @@ const DashboardPriceCharts = ({
       <Box sx={{ p: "1.2rem" }}>
         <Box
           sx={{
-            p: "0.6rem",
-            display: "inline-flex",
-            borderRadius: "8px",
-            justifyContent: "center",
+            display: largerThenMd ? "block" : "flex",
+            justifyContent: largerThenMd ? "normal" : "space-between",
             alignItems: "center",
-            background:
-              "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
           }}
         >
           <Box
-            component="img"
-            sx={{ width: "1.25rem", height: "1.25rem" }}
-            src={icon.small}
-          />
+            sx={{
+              p: "0.6rem",
+              display: "inline-flex",
+              borderRadius: "8px",
+              justifyContent: "center",
+              alignItems: "center",
+              background:
+                "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+            }}
+          >
+            <Box
+              component="img"
+              sx={{ width: "1.25rem", height: "1.25rem" }}
+              src={icon.small}
+            />
+          </Box>
+
+          {!largerThenMd && (
+            <Chip
+              label={`${differencePercent.toFixed(2)}%`}
+              sx={{
+                borderRadius: "16px",
+                border:
+                  differencePercent > 0
+                    ? "1px solid #5BFF22"
+                    : "1px solid #F22",
+                background:
+                  differencePercent > 0
+                    ? "rgba(91, 255, 34, 0.20)"
+                    : "rgba(255, 34, 34, 0.20)",
+                backdropFilter: "blur(2.5px)",
+                color: differencePercent > 0 ? "#5BFF22" : "#F22",
+              }}
+            />
+          )}
         </Box>
         <Typography
           sx={{
@@ -107,20 +142,24 @@ const DashboardPriceCharts = ({
           >
             ${data[data.length - 1][1].toString().slice(0, 5)}
           </Typography>
-          <Chip
-            label={`${differencePercent.toFixed(2)}%`}
-            sx={{
-              borderRadius: "16px",
-              border:
-                differencePercent > 0 ? "1px solid #5BFF22" : "1px solid #F22",
-              background:
-                differencePercent > 0
-                  ? "rgba(91, 255, 34, 0.20)"
-                  : "rgba(255, 34, 34, 0.20)",
-              backdropFilter: "blur(2.5px)",
-              color: differencePercent > 0 ? "#5BFF22" : "#F22",
-            }}
-          />
+          {largerThenMd && (
+            <Chip
+              label={`${differencePercent.toFixed(2)}%`}
+              sx={{
+                borderRadius: "16px",
+                border:
+                  differencePercent > 0
+                    ? "1px solid #5BFF22"
+                    : "1px solid #F22",
+                background:
+                  differencePercent > 0
+                    ? "rgba(91, 255, 34, 0.20)"
+                    : "rgba(255, 34, 34, 0.20)",
+                backdropFilter: "blur(2.5px)",
+                color: differencePercent > 0 ? "#5BFF22" : "#F22",
+              }}
+            />
+          )}
         </Box>
       </Box>
       <Box
