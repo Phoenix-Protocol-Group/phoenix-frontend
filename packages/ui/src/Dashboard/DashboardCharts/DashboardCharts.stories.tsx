@@ -9,7 +9,7 @@ const meta: Meta<typeof DashboardPriceCharts> = {
   component: DashboardPriceCharts,
   decorators: [
     (Story) => (
-      <Grid container gap={3} style={{ margin: "3em" }}>
+      <Grid container gap={3} sx={{ margin: { md: "3rem" } }}>
         {/* 👇 Decorators in Storybook also accept a function. Replace <Story/> with Story() to enable it  */}
 
         <Story />
@@ -48,12 +48,12 @@ export const OneItem: Story = {
     data: mockDataset,
     icon: {
       small: "image-103.png",
-      large: "image-97.png",
+      large: "image-stellar.png",
     },
     assetName: "XLM",
   },
   render: (args) => (
-    <Grid item xs={2}>
+    <Grid item xs={12} md={2}>
       <DashboardPriceCharts {...args} />
     </Grid>
   ),
@@ -65,7 +65,7 @@ export const TwoItems: Story = {
     data: mockDataset,
     icon: {
       small: "image-103.png",
-      large: "image-97.png",
+      large: "image-stellar.png",
     },
     assetName: "XLM",
   },
@@ -73,11 +73,15 @@ export const TwoItems: Story = {
     // The grid is a component that allows us to
     // easily organize the layout of our UI
     <Grid container spacing={2}>
-      <Grid item xs={2}>
+      <Grid item xs={12} md={2}>
         <DashboardPriceCharts {...args} />
       </Grid>
-      <Grid item xs={2}>
-        <DashboardPriceCharts assetName="Fake" icon={args.icon} data={mockDataset2} />
+      <Grid item xs={12} md={2}>
+        <DashboardPriceCharts
+          assetName="Fake"
+          icon={args.icon}
+          data={mockDataset2}
+        />
       </Grid>
     </Grid>
   ),

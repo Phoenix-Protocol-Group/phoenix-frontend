@@ -9,9 +9,9 @@ const meta: Meta<typeof CryptoCTA> = {
   component: CryptoCTA,
   decorators: [
     (Story) => (
-      <Grid container gap={3} style={{ margin: "3em" }}>
+      <Grid container gap={3} sx={{ margin: { md: "3rem" } }}>
         {/* 👇 Decorators in Storybook also accept a function. Replace <Story/> with Story() to enable it  */}
-        <Grid item xs={3}>
+        <Grid item xs={12} md={3}>
           <Story />
         </Grid>
       </Grid>
