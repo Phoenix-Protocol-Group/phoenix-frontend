@@ -14,7 +14,7 @@ export default meta;
 // The story type for the component https://storybook.js.org/docs/react/api/csf#named-story-exports
 type Story = StoryObj<typeof SidebarNavigation>;
 
-export const Primary: Story = {
+export const Open: Story = {
   args: {
     open: true,
     items: [
@@ -47,7 +47,7 @@ export const Primary: Story = {
 };
 
 
-export const Secondary: Story = {
+export const Closed: Story = {
   args: {
     open: false,
     items: [
