@@ -5,7 +5,7 @@ import { freighter } from "@phoenix-protocol/state";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof ConnectWallet> = {
-  title: "Components/ConnectWallet",
+  title: "General/ConnectWalletModal",
   // @ts-ignore
   component: ConnectWallet,
 };

@@ -44,6 +44,7 @@ const Button = ({
       opacity: 0.3,
     },
   };
+  const { sx, ...otherProps } = props;
 
   return (
     <MuiButton
@@ -53,7 +54,7 @@ const Button = ({
       }}
       size={size}
       disabled={props.disabled}
-      {...props}
+      {...otherProps}
     >
       {props.children || label}
     </MuiButton>
