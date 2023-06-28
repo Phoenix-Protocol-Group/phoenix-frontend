@@ -8,6 +8,7 @@ import CryptoCTA from "../CryptoCTA/CryptoCTA";
 import WalletBalanceTable from "../WalletBalanceTable/WalletBalanceTable";
 import React from "react";
 import MailIcon from "@mui/icons-material/Mail";
+import AppBar from "../../AppBar/AppBar";
 
 const args = {
   mainstatsArgs: {
@@ -66,6 +67,12 @@ const args = {
       href: "#",
     },
   ],
+  appBarArgs: {
+    balance: 125.5,
+    walletAddress: "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
+    connectWallet: () => {},
+    disconnectWallet: () => {},
+  },
 };
 
 export default function Overview() {
@@ -78,6 +85,7 @@ export default function Overview() {
         open={navOpen}
         setOpen={setNavOpen}
       />
+      <AppBar {...args.appBarArgs} />
       <Grid
         sx={{
           marginLeft: navOpen ? "240px" : "60px",
