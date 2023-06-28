@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import Overview from "./Overview";
 import { Box, Grid } from "@mui/material";
 import MainStats from "../MainStats/MainStats";
-import { mockDataset } from "../DashboardCharts/DashboardCharts.stories";
+import { mockDataset } from "../DashboardCharts/mockdata";
 import DashboardPriceCharts from "../DashboardCharts/DashboardCharts";
 import CryptoCTA from "../CryptoCTA/CryptoCTA";
 import WalletBalanceTable from "../WalletBalanceTable/WalletBalanceTable";
