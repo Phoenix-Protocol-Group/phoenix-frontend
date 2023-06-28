@@ -19,9 +19,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarIcon from "@mui/icons-material/Star";
 
-interface WalletBalanceTableProps {
-  onClick: () => void;
-}
 function a11yProps(index: number) {
   return {
     id: `category-tab-${index}`,
