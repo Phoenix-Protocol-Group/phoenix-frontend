@@ -16,26 +16,64 @@ type Story = StoryObj<typeof SidebarNavigation>;
 
 export const Primary: Story = {
   args: {
+    open: true,
     items: [
       {
         label: "Nav Item 1",
         icon: <MailIcon/>,
-        active: true
+        active: true,
+        href: "#"
       },
       {
         label: "Nav Item 2",
         icon: <MailIcon/>,
-        active: false
+        active: false,
+        href: "#"
       },
       {
         label: "Nav Item 3",
         icon: <MailIcon/>,
-        active: false
+        active: false,
+        href: "#"
       },
       {
         label: "Nav Item 4",
         icon: <MailIcon/>,
-        active: false
+        active: false,
+        href: "#"
+      }
+    ]
+  },
+};
+
+
+export const Secondary: Story = {
+  args: {
+    open: false,
+    items: [
+      {
+        label: "Nav Item 1",
+        icon: <MailIcon/>,
+        active: true,
+        href: "#"
+      },
+      {
+        label: "Nav Item 2",
+        icon: <MailIcon/>,
+        active: false,
+        href: "#"
+      },
+      {
+        label: "Nav Item 3",
+        icon: <MailIcon/>,
+        active: false,
+        href: "#"
+      },
+      {
+        label: "Nav Item 4",
+        icon: <MailIcon/>,
+        active: false,
+        href: "#"
       }
     ]
   },

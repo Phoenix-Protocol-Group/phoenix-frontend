@@ -18,10 +18,14 @@ interface Items {
   label: string;
   icon: any;
   active: boolean;
+  href: string;
 }
 
 interface DrawerProps extends MuiDrawerProps {
   items: Items[];
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  onNavClick: (href: string) => void;
 }
 
 const drawerWidth = 240;
@@ -73,9 +77,8 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-const SidebarNavigation = ({ items, ...props }: DrawerProps) => {
+const SidebarNavigation = ({ items, open, setOpen, onNavClick, ...props }: DrawerProps) => {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(true);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -152,6 +155,7 @@ const SidebarNavigation = ({ items, ...props }: DrawerProps) => {
             }}
           >
             <ListItemButton
+              onClick={(e) => onNavClick(item.href)}
               sx={{
                 padding: 0,
               }}
