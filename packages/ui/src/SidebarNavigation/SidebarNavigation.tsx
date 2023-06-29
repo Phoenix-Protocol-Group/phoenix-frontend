@@ -4,6 +4,8 @@ import {
   Box,
   Drawer as MuiDrawer,
   DrawerProps as MuiDrawerProps,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import List from "@mui/material/List";
 import IconButton from "@mui/material/IconButton";
@@ -12,6 +14,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import { useEffect } from "react";
 
 interface Items {
   label: string;
@@ -38,6 +41,8 @@ const openedMixin = (theme: Theme): CSSObject => ({
   overflowX: "hidden",
   [theme.breakpoints.down("md")]: {
     width: "100%",
+    top: "60px",
+    paddingTop: 2,
   },
 });
 
@@ -50,6 +55,9 @@ const closedMixin = (theme: Theme): CSSObject => ({
   width: 0,
   [theme.breakpoints.up("md")]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
+  },
+  [theme.breakpoints.down("md")]: {
+    top: "60px",
   },
 });
 
@@ -86,6 +94,17 @@ const SidebarNavigation = ({
   onNavClick,
   ...props
 }: DrawerProps) => {
+  const theme = useTheme();
+  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
+
+  useEffect(() => {
+    if (!largerThenMd && open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [largerThenMd, open]);
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -102,34 +121,36 @@ const SidebarNavigation = ({
       open={open}
       {...props}
     >
-      <DrawerHeader
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          padding: open ? "30px" : "18px",
-        }}
-      >
-        <Box
+      {largerThenMd && (
+        <DrawerHeader
           sx={{
-            display: open ? "block" : "none",
+            display: "flex",
+            justifyContent: "space-between",
+            padding: open ? "30px" : "18px",
           }}
         >
-          <img src="/logo.svg" />
-        </Box>
-        <IconButton
-          onClick={toggleDrawer}
-          sx={{
-            borderRadius: "8px",
-            background:
-              "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
-            transform: open ? "none" : "rotate(180deg)",
-            marginTop: open ? 0 : "12px",
-            padding: "10px",
-          }}
-        >
-          <img src="/arrow.svg" />
-        </IconButton>
-      </DrawerHeader>
+          <Box
+            sx={{
+              display: open ? "block" : "none",
+            }}
+          >
+            <img src="/logo.svg" />
+          </Box>
+          <IconButton
+            onClick={toggleDrawer}
+            sx={{
+              borderRadius: "8px",
+              background:
+                "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
+              transform: open ? "none" : "rotate(180deg)",
+              marginTop: open ? 0 : "12px",
+              padding: "10px",
+            }}
+          >
+            <img src="/arrow.svg" />
+          </IconButton>
+        </DrawerHeader>
+      )}
       <List>
         <ListSubheader
           sx={{
@@ -163,7 +184,12 @@ const SidebarNavigation = ({
             }}
           >
             <ListItemButton
-              onClick={(e) => onNavClick(item.href)}
+              onClick={() => {
+                if (!largerThenMd) {
+                  setOpen(false);
+                }
+                onNavClick(item.href);
+              }}
               sx={{
                 padding: 0,
               }}
