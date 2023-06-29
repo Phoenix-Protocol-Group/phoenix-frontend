@@ -41,7 +41,7 @@ const openedMixin = (theme: Theme): CSSObject => ({
   overflowX: "hidden",
   [theme.breakpoints.down("md")]: {
     width: "100%",
-    top: "60px",
+    top: "70px",
     paddingTop: 2,
   },
 });
@@ -57,7 +57,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
   [theme.breakpoints.down("md")]: {
-    top: "60px",
+    top: "70px",
   },
 });
 

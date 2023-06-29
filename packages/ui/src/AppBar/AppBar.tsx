@@ -134,11 +134,11 @@ const AppBar = ({
 
   return (
     <>
-      <Box height="60px" />
+      <Box height="70px" />
       <Box
         sx={{
           display: "flex",
-          justifyContent: "end",
+          justifyContent: "space-between",
           marginBottom: "3rem",
           background: largerThenMd
             ? "transparent"
@@ -150,40 +150,52 @@ const AppBar = ({
           p: "0.8rem 0.3rem",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {walletAddress && balance ? (
-            <>
-              <BalanceChip balance={balance} />
-              <OptionMenu
-                walletAddress={walletAddress}
-                disconnectWallet={disconnectWallet}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            ml: "1rem",
+            maxHeight: "54px",
+          }}
+        >
+          <Box component="img" src="logo_icon.svg" />
+        </Box>
+        <Box sx={{ display: "flex" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {walletAddress && balance ? (
+              <>
+                <BalanceChip balance={balance} />
+                <OptionMenu
+                  walletAddress={walletAddress}
+                  disconnectWallet={disconnectWallet}
+                />
+              </>
+            ) : (
+              <Button
+                size="small"
+                sx={{ marginRight: 1 }}
+                // @ts-ignore
+                variant="primary"
+                onClick={connectWallet}
+              >
+                Connect Wallet
+              </Button>
+            )}
+          </Box>
+          {!largerThenMd && (
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <MenuButton
+                isOpen={mobileNavOpen}
+                onClick={() => toggleMobileNav(!mobileNavOpen)}
+                color="white"
+                strokeWidth="1"
+                transition={{ ease: "easeOut", duration: 0.2 }}
+                width="20"
+                height="8"
               />
-            </>
-          ) : (
-            <Button
-              size="small"
-              sx={{ marginRight: 1 }}
-              // @ts-ignore
-              variant="primary"
-              onClick={connectWallet}
-            >
-              Connect Wallet
-            </Button>
+            </Box>
           )}
         </Box>
-        {!largerThenMd && (
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <MenuButton
-              isOpen={mobileNavOpen}
-              onClick={() => toggleMobileNav(!mobileNavOpen)}
-              color="white"
-              strokeWidth="1"
-              transition={{ ease: "easeOut", duration: 0.2 }}
-              width="20"
-              height="8"
-            />
-          </Box>
-        )}
       </Box>
     </>
   );
