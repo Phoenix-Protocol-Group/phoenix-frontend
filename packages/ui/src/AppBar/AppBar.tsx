@@ -6,11 +6,14 @@ import {
   Menu,
   MenuItem,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import React from "react";
 import { Button } from "../Button/Button";
+import { MenuButton } from "./MenuButton";
 
 const BalanceChip = ({ balance }: { balance: number }) => (
   <Chip
@@ -43,12 +46,13 @@ const OptionMenu = ({
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   return (
-    <div>
+    <Box>
       <IconButton
         aria-label="more"
         id="long-button"
@@ -104,42 +108,84 @@ const OptionMenu = ({
           Disconnect Wallet
         </MenuItem>
       </Menu>
-    </div>
+    </Box>
   );
 };
 
 interface AppBarProps {
-  balance: number | undefined;
-  walletAddress: string | undefined;
+  balance?: number | undefined;
+  walletAddress?: string | undefined;
+  mobileNavOpen: boolean;
   connectWallet: () => void;
   disconnectWallet: () => void;
+  toggleMobileNav: (open: boolean) => void;
 }
 
 const AppBar = ({
   balance,
   walletAddress,
+  mobileNavOpen,
   connectWallet,
   disconnectWallet,
+  toggleMobileNav,
 }: AppBarProps) => {
+  const theme = useTheme();
+  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
+
   return (
-    <Box sx={{ display: "flex", justifyContent: "end", marginBottom: "3rem" }}>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        {walletAddress && balance ? (
-          <>
-            <BalanceChip balance={balance} />
-            <OptionMenu
-              walletAddress={walletAddress}
-              disconnectWallet={disconnectWallet}
+    <>
+      <Box height="60px" />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "end",
+          marginBottom: "3rem",
+          background: largerThenMd
+            ? "transparent"
+            : "linear-gradient(180deg, #1A1C20 0%, #0E1011 100%)",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          p: "0.8rem 0.3rem",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {walletAddress && balance ? (
+            <>
+              <BalanceChip balance={balance} />
+              <OptionMenu
+                walletAddress={walletAddress}
+                disconnectWallet={disconnectWallet}
+              />
+            </>
+          ) : (
+            <Button
+              size="small"
+              sx={{ marginRight: 1 }}
+              // @ts-ignore
+              variant="primary"
+              onClick={connectWallet}
+            >
+              Connect Wallet
+            </Button>
+          )}
+        </Box>
+        {!largerThenMd && (
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <MenuButton
+              isOpen={mobileNavOpen}
+              onClick={() => toggleMobileNav(!mobileNavOpen)}
+              color="white"
+              strokeWidth="1"
+              transition={{ ease: "easeOut", duration: 0.2 }}
+              width="20"
+              height="8"
             />
-          </>
-        ) : (
-          // @ts-ignore
-          <Button variant="primary" onClick={connectWallet}>
-            Connect Wallet
-          </Button>
+          </Box>
         )}
       </Box>
-    </Box>
+    </>
   );
 };
 export default AppBar;

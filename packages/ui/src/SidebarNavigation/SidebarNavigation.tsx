@@ -1,6 +1,5 @@
-import * as React from "react";
 import Colors from "../Theme/colors";
-import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
+import { styled, Theme, CSSObject } from "@mui/material/styles";
 import {
   Box,
   Drawer as MuiDrawer,
@@ -37,6 +36,9 @@ const openedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.enteringScreen,
   }),
   overflowX: "hidden",
+  [theme.breakpoints.down("md")]: {
+    width: "100%",
+  },
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
@@ -45,8 +47,8 @@ const closedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
+  width: 0,
+  [theme.breakpoints.up("md")]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
 });
@@ -77,9 +79,13 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-const SidebarNavigation = ({ items, open, setOpen, onNavClick, ...props }: DrawerProps) => {
-  const theme = useTheme();
-
+const SidebarNavigation = ({
+  items,
+  open,
+  setOpen,
+  onNavClick,
+  ...props
+}: DrawerProps) => {
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -103,9 +109,11 @@ const SidebarNavigation = ({ items, open, setOpen, onNavClick, ...props }: Drawe
           padding: open ? "30px" : "18px",
         }}
       >
-        <Box sx={{
-          display: open ? "block" : "none"
-        }}>
+        <Box
+          sx={{
+            display: open ? "block" : "none",
+          }}
+        >
           <img src="/logo.svg" />
         </Box>
         <IconButton
@@ -115,7 +123,7 @@ const SidebarNavigation = ({ items, open, setOpen, onNavClick, ...props }: Drawe
             background:
               "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
             transform: open ? "none" : "rotate(180deg)",
-            marginTop: open ? 0 : '12px',
+            marginTop: open ? 0 : "12px",
             padding: "10px",
           }}
         >
@@ -130,7 +138,7 @@ const SidebarNavigation = ({ items, open, setOpen, onNavClick, ...props }: Drawe
             fontSize: "14px",
             lineHeight: "16px",
             marginBottom: "20px",
-            display: open ? "block" : "none"
+            display: open ? "block" : "none",
           }}
         >
           Menu
@@ -151,7 +159,7 @@ const SidebarNavigation = ({ items, open, setOpen, onNavClick, ...props }: Drawe
                 ? "rgba(226, 73, 26, 0.10)"
                 : "transparent",
               height: open ? "unset" : "32px",
-              marginBottom: open ? 0 : "16px"
+              marginBottom: open ? 0 : "16px",
             }}
           >
             <ListItemButton
