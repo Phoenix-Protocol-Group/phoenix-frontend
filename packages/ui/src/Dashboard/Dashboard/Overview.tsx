@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
 import { SidebarNavigation } from "../../SidebarNavigation/SidebarNavigation";
 import { mockDataset } from "../DashboardCharts/mockdata";
 import { testTokens } from "../WalletBalanceTable/WalletBalanceTable.stories";
@@ -76,7 +76,9 @@ const args = {
 };
 
 export default function Overview() {
-  const [navOpen, setNavOpen] = React.useState(true);
+  const theme = useTheme();
+  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
+  const [navOpen, setNavOpen] = React.useState(largerThenMd ? true : false);
   return (
     <>
       <SidebarNavigation
@@ -85,20 +87,36 @@ export default function Overview() {
         open={navOpen}
         setOpen={setNavOpen}
       />
-      <AppBar {...args.appBarArgs} />
+      <AppBar
+        mobileNavOpen={navOpen}
+        toggleMobileNav={(open) => setNavOpen(open)}
+        {...args.appBarArgs}
+      />
       <Grid
         sx={{
-          marginLeft: navOpen ? "240px" : "60px",
-          width: navOpen ? "calc(100% - 240px)" : "calc(100% - 60px)",
+          marginLeft: largerThenMd
+            ? navOpen
+              ? "240px"
+              : "60px"
+            : navOpen
+            ? "240px"
+            : "0",
+          width: largerThenMd
+            ? navOpen
+              ? "calc(100% - 240px)"
+              : "calc(100% - 60px"
+            : navOpen
+            ? "0"
+            : "100%",
           transition: "all 0.2s ease-in-out",
         }}
         container
-        spacing={3}
+        spacing={largerThenMd ? 3 : 1}
       >
         <Grid item xs={12}>
           <MainStats {...args.mainstatsArgs} />
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
           <Box
             sx={{
               border: "1px solid #E5E5E5",
@@ -111,16 +129,16 @@ export default function Overview() {
             Coming soon
           </Box>
         </Grid>
-        <Grid item xs={6} md={2}>
+        <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
           <DashboardPriceCharts {...args.dashboardArgs} />
         </Grid>
-        <Grid item xs={6} md={2}>
+        <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
           <DashboardPriceCharts {...args.dashboardArgs} />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4} mt={!largerThenMd ? 2 : undefined}>
           <CryptoCTA onClick={() => {}} />
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
           <WalletBalanceTable {...args.walletBalanceArgs} />
         </Grid>
       </Grid>

@@ -1,10 +1,11 @@
-import * as React from "react";
 import Colors from "../Theme/colors";
-import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
+import { styled, Theme, CSSObject } from "@mui/material/styles";
 import {
   Box,
   Drawer as MuiDrawer,
   DrawerProps as MuiDrawerProps,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import List from "@mui/material/List";
 import IconButton from "@mui/material/IconButton";
@@ -13,6 +14,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import { useEffect } from "react";
 
 interface Items {
   label: string;
@@ -37,6 +39,11 @@ const openedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.enteringScreen,
   }),
   overflowX: "hidden",
+  [theme.breakpoints.down("md")]: {
+    width: "100%",
+    top: "70px",
+    paddingTop: 2,
+  },
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
@@ -45,9 +52,12 @@ const closedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
+  width: 0,
+  [theme.breakpoints.up("md")]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
+  },
+  [theme.breakpoints.down("md")]: {
+    top: "70px",
   },
 });
 
@@ -77,8 +87,23 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-const SidebarNavigation = ({ items, open, setOpen, onNavClick, ...props }: DrawerProps) => {
+const SidebarNavigation = ({
+  items,
+  open,
+  setOpen,
+  onNavClick,
+  ...props
+}: DrawerProps) => {
   const theme = useTheme();
+  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
+
+  useEffect(() => {
+    if (!largerThenMd && open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [largerThenMd, open]);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -96,32 +121,38 @@ const SidebarNavigation = ({ items, open, setOpen, onNavClick, ...props }: Drawe
       open={open}
       {...props}
     >
-      <DrawerHeader
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          padding: open ? "30px" : "18px",
-        }}
-      >
-        <Box sx={{
-          display: open ? "block" : "none"
-        }}>
-          <img src="/logo.svg" />
-        </Box>
-        <IconButton
-          onClick={toggleDrawer}
+      {largerThenMd && (
+        <DrawerHeader
           sx={{
-            borderRadius: "8px",
-            background:
-              "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
-            transform: open ? "none" : "rotate(180deg)",
-            marginTop: open ? 0 : '12px',
-            padding: "10px",
+            display: "flex",
+            justifyContent: "space-between",
+            padding: open ? "30px" : "18px",
           }}
         >
-          <img src="/arrow.svg" />
-        </IconButton>
-      </DrawerHeader>
+          <Box
+            component="img"
+            alt="Phoenix Logo"
+            sx={open ? { maxWidth: "128px" } : { mx: "-8px" }}
+            src={open ? "/logo.png" : "/logo_icon.svg"}
+          />
+          {open && (
+            <IconButton
+              onClick={toggleDrawer}
+              sx={{
+                borderRadius: "8px",
+                background:
+                  "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
+                transform: open ? "none" : "rotate(180deg)",
+                marginTop: open ? 0 : "12px",
+                marginLeft: "8px",
+                padding: "10px",
+              }}
+            >
+              <img src="/arrow.svg" />
+            </IconButton>
+          )}
+        </DrawerHeader>
+      )}
       <List>
         <ListSubheader
           sx={{
@@ -130,7 +161,7 @@ const SidebarNavigation = ({ items, open, setOpen, onNavClick, ...props }: Drawe
             fontSize: "14px",
             lineHeight: "16px",
             marginBottom: "20px",
-            display: open ? "block" : "none"
+            display: open ? "block" : "none",
           }}
         >
           Menu
@@ -151,11 +182,16 @@ const SidebarNavigation = ({ items, open, setOpen, onNavClick, ...props }: Drawe
                 ? "rgba(226, 73, 26, 0.10)"
                 : "transparent",
               height: open ? "unset" : "32px",
-              marginBottom: open ? 0 : "16px"
+              marginBottom: open ? 0 : "16px",
             }}
           >
             <ListItemButton
-              onClick={(e) => onNavClick(item.href)}
+              onClick={() => {
+                if (!largerThenMd) {
+                  setOpen(false);
+                }
+                onNavClick(item.href);
+              }}
               sx={{
                 padding: 0,
               }}
@@ -181,6 +217,23 @@ const SidebarNavigation = ({ items, open, setOpen, onNavClick, ...props }: Drawe
             </ListItemButton>
           </ListItem>
         ))}
+        {!open && (
+          <ListItem>
+            <IconButton
+              onClick={toggleDrawer}
+              sx={{
+                borderRadius: "8px",
+                background:
+                  "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
+                transform: open ? "none" : "rotate(180deg)",
+                marginTop: open ? 0 : "12px",
+                padding: "10px",
+              }}
+            >
+              <img src="/arrow.svg" />
+            </IconButton>
+          </ListItem>
+        )}
       </List>
     </Drawer>
   );
