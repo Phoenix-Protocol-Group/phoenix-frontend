@@ -130,25 +130,27 @@ const SidebarNavigation = ({
           }}
         >
           <Box
-            sx={{
-              display: open ? "block" : "none",
-            }}
-          >
-            <img src="/logo.svg" />
-          </Box>
-          <IconButton
-            onClick={toggleDrawer}
-            sx={{
-              borderRadius: "8px",
-              background:
-                "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
-              transform: open ? "none" : "rotate(180deg)",
-              marginTop: open ? 0 : "12px",
-              padding: "10px",
-            }}
-          >
-            <img src="/arrow.svg" />
-          </IconButton>
+            component="img"
+            alt="Phoenix Logo"
+            sx={open ? { maxWidth: "128px" } : { mx: "-8px" }}
+            src={open ? "/logo.png" : "/logo_icon.svg"}
+          />
+          {open && (
+            <IconButton
+              onClick={toggleDrawer}
+              sx={{
+                borderRadius: "8px",
+                background:
+                  "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
+                transform: open ? "none" : "rotate(180deg)",
+                marginTop: open ? 0 : "12px",
+                marginLeft: "8px",
+                padding: "10px",
+              }}
+            >
+              <img src="/arrow.svg" />
+            </IconButton>
+          )}
         </DrawerHeader>
       )}
       <List>
@@ -215,6 +217,23 @@ const SidebarNavigation = ({
             </ListItemButton>
           </ListItem>
         ))}
+        {!open && (
+          <ListItem>
+            <IconButton
+              onClick={toggleDrawer}
+              sx={{
+                borderRadius: "8px",
+                background:
+                  "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
+                transform: open ? "none" : "rotate(180deg)",
+                marginTop: open ? 0 : "12px",
+                padding: "10px",
+              }}
+            >
+              <img src="/arrow.svg" />
+            </IconButton>
+          </ListItem>
+        )}
       </List>
     </Drawer>
   );
