@@ -1,23 +1,5 @@
 import { Box, Grid, Typography } from "@mui/material";
 
-const stellarGainerAsset: GainerOrLooserAsset = {
-  name: "Stellar",
-  symbol: "XLM",
-  price: "$3.00",
-  change: 22.5,
-  icon: "/cryptoIcons/xlm.svg",
-  volume: "$100,000",
-};
-
-const usdcLoserAsset: GainerOrLooserAsset = {
-  name: "USDC",
-  symbol: "USDC",
-  price: "$1",
-  change: -0.8,
-  icon: "/cryptoIcons/usdc.svg",
-  volume: "$100,000",
-};
-
 interface GainerOrLooserAsset {
   name: string;
   symbol: string;
@@ -162,7 +144,19 @@ const GainerAndLooser = ({
   </Box>
 );
 
-const DashBoardStats = () => {
+interface DashboardStatsProps {
+  lockedAssets: string;
+  availableAssets: string;
+  loser: GainerOrLooserAsset;
+  gainer: GainerOrLooserAsset;
+}
+
+const DashboardStats = ({
+  lockedAssets,
+  availableAssets,
+  loser,
+  gainer,
+}: DashboardStatsProps) => {
   return (
     <Box
       sx={{
@@ -178,20 +172,20 @@ const DashBoardStats = () => {
           <AssetStat
             title="Available assets"
             icon="/hand-coins.svg"
-            value="$1,223.00"
+            value={availableAssets}
           />
         </Grid>
         <Grid item xs={12} md={6}>
           <AssetStat
             title="Locked assets"
             icon="/coins.svg"
-            value="$1,223.00"
+            value={lockedAssets}
           />
         </Grid>
       </Grid>
       <Grid container sx={{ px: "1.6rem", mt: 3 }}>
         <Grid item xs={12} md={6} sx={{ padding: "1.2rem" }}>
-          <GainerAndLooser title="Top Gainer" asset={stellarGainerAsset} />
+          <GainerAndLooser title="Top Gainer" asset={gainer} />
         </Grid>
         <Grid
           item
@@ -202,11 +196,11 @@ const DashBoardStats = () => {
             borderLeft: "1px solid rgba(255, 255, 255, 0.10)",
           }}
         >
-          <GainerAndLooser title="Top Loser" asset={usdcLoserAsset} />
+          <GainerAndLooser title="Top Loser" asset={loser} />
         </Grid>
       </Grid>
     </Box>
   );
 };
 
-export default DashBoardStats;
+export default DashboardStats;
