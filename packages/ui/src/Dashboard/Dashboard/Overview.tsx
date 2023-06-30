@@ -9,6 +9,25 @@ import WalletBalanceTable from "../WalletBalanceTable/WalletBalanceTable";
 import React from "react";
 import MailIcon from "@mui/icons-material/Mail";
 import AppBar from "../../AppBar/AppBar";
+import DashBoardStats from "../DashboardStats/DashboardStats";
+
+const stellarGainerAsset = {
+  name: "Stellar",
+  symbol: "XLM",
+  price: "$3.00",
+  change: 22.5,
+  icon: "/cryptoIcons/xlm.svg",
+  volume: "$100,000",
+};
+
+const usdcLoserAsset = {
+  name: "USDC",
+  symbol: "USDC",
+  price: "$1",
+  change: -0.8,
+  icon: "/cryptoIcons/usdc.svg",
+  volume: "$100,000",
+};
 
 const args = {
   mainstatsArgs: {
@@ -73,6 +92,12 @@ const args = {
     connectWallet: () => {},
     disconnectWallet: () => {},
   },
+  dashboardStatsArgs: {
+    gainer: stellarGainerAsset,
+    loser: usdcLoserAsset,
+    availableAssets: "$100,000",
+    lockedAssets: "$100,000",
+  },
 };
 
 export default function Overview() {
@@ -104,7 +129,7 @@ export default function Overview() {
           width: largerThenMd
             ? navOpen
               ? "calc(100% - 240px)"
-              : "calc(100% - 60px"
+              : "calc(100% - 60px)"
             : navOpen
             ? "0"
             : "100%",
@@ -117,17 +142,7 @@ export default function Overview() {
           <MainStats {...args.mainstatsArgs} />
         </Grid>
         <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
-          <Box
-            sx={{
-              border: "1px solid #E5E5E5",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            Coming soon
-          </Box>
+          <DashBoardStats {...args.dashboardStatsArgs} />
         </Grid>
         <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
           <DashboardPriceCharts {...args.dashboardArgs} />

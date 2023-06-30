@@ -343,11 +343,10 @@ const ListItem = ({
 interface WalletBalanceTableProps {
   tokens: Token[];
 }
-
 const scrollbarStyles = {
   /* Firefox */
   scrollbarWidth: "thin",
-  scrollbarColor: "#E2AA1B #1B1B1B",
+  scrollbarColor: "#E2491A #1B1B1B",
 
   /* Chrome, Edge, and Safari */
   "&::-webkit-scrollbar": {
@@ -355,11 +354,12 @@ const scrollbarStyles = {
   },
 
   "&::-webkit-scrollbar-track": {
-    background: "#ffffff",
+    background:
+      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);",
   },
 
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#E2AA1B",
+    backgroundColor: "#E2491A",
     borderRadius: "8px",
   },
 };
