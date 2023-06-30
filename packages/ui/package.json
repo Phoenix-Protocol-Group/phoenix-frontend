@@ -60,10 +60,13 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fontsource/inter": "^5.0.3",
+    "@fontsource/poppins": "^5.0.3",
     "@fontsource/roboto": "^5.0.3",
     "@fontsource/ubuntu": "^5.0.3",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.5",
-    "classnames": "^2.3.2"
+    "classnames": "^2.3.2",
+    "framer-motion": "^10.12.17",
+    "recharts": "^2.7.2"
   }
 }
