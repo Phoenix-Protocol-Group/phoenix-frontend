@@ -1,5 +1,7 @@
-import { Box, Input, Typography } from "@mui/material";
+import React from "react";
+import { Box, Grid, IconButton, Input, Typography } from "@mui/material";
 import AssetItem from "./AssetItem";
+import { KeyboardArrowLeft } from "@mui/icons-material";
 
 export interface Token {
   name: string;
@@ -11,6 +13,9 @@ export interface Token {
 
 interface AssetSelectorProps {
   tokens: Token[];
+  tokensAll: Token[];
+  onClose: () => void;
+  onTokenClick: (token: Token) => void;
 }
 
 const containerStyle = {
@@ -26,17 +31,58 @@ const headerStyle = {
   marginBottom: "18px"
 };
 
-const AssetSelector = ({tokens}: AssetSelectorProps) => {
+const scrollbarStyles = {
+  /* Firefox */
+  scrollbarWidth: "thin",
+  scrollbarColor: "#E2491A #1B1B1B",
+
+  /* Chrome, Edge, and Safari */
+  "&::-webkit-scrollbar": {
+    width: "4px",
+  },
+
+  "&::-webkit-scrollbar-track": {
+    background: "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);",
+  },
+
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "#E2491A",
+    borderRadius: "8px",
+  },
+};
+
+const AssetSelector = ({tokens, tokensAll, onClose, onTokenClick}: AssetSelectorProps) => {
+  const [searchValue, setSearchValue] = React.useState("");
+
   return (
     <Box sx={{
       maxWidth: "600px",
     }}>
-      <Typography sx={{
-        color: "white",
-        fontSize: "32px"
-      }}>Select Token</Typography>
+      <Box sx={{
+        display: "flex"
+      }}>
+        <IconButton 
+          onClick={onClose}
+          sx={{
+            maxWidth: "32px",
+            maxHeight: "32px",
+            margin: "8px 16px 0 0",
+            borderRadius: "8px",
+            background: "linear-gradient(180deg, #292B2C 0%, #222426 100%),linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)"
+          }}
+        >
+          <KeyboardArrowLeft/>
+        </IconButton>
+        <Typography sx={{
+          color: "white",
+          fontSize: "32px"
+        }}>
+          Select Token
+        </Typography>
+      </Box>
       <Input
         placeholder="Search by name or address"
+        onChange={(e: any) => setSearchValue(e.target.value)}
         sx={{
           width: "100%",
           borderRadius: "16px",
@@ -59,15 +105,24 @@ const AssetSelector = ({tokens}: AssetSelectorProps) => {
       />
       <Box sx={containerStyle}>
         <Typography sx={headerStyle}>Quick select</Typography>
+        <Grid container spacing={1}>
+          {tokens.map((token, index) => (
+            <Grid item xs={2}>
+              <AssetItem token={token} onClick={onTokenClick}/>
+            </Grid>
+          ))}
+        </Grid>
       </Box>
       <Box sx={containerStyle}>
         <Typography sx={headerStyle}>All tokens</Typography>
         <Box sx={{
           maxHeight: "50vh",
           overflow: "auto",
+          ...scrollbarStyles,
+          paddingRight: "8px"
         }}>
-          {tokens.map((token, index) => (
-            <AssetItem token={token}/>
+          {tokensAll.filter(token => token.name.toLowerCase().includes(searchValue)).map((token, index) => (
+            <AssetItem token={token} onClick={onTokenClick}/>
           ))}
         </Box>
       </Box>
