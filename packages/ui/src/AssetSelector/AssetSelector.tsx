@@ -1,6 +1,18 @@
 import { Box, Input, Typography } from "@mui/material";
 import AssetItem from "./AssetItem";
 
+export interface Token {
+  name: string;
+  icon: string;
+  usdValue: number;
+  amount: number;
+  category: string;
+}
+
+interface AssetSelectorProps {
+  tokens: Token[];
+}
+
 const containerStyle = {
   borderRadius: "16px",
   background: "linear-gradient(180deg, #292B2C 0%, #222426 100%), linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
@@ -14,7 +26,7 @@ const headerStyle = {
   marginBottom: "18px"
 };
 
-const AssetSelector = () => {
+const AssetSelector = ({tokens}: AssetSelectorProps) => {
   return (
     <Box sx={{
       maxWidth: "600px",
@@ -54,24 +66,9 @@ const AssetSelector = () => {
           maxHeight: "50vh",
           overflow: "auto",
         }}>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
-          <AssetItem label="BTC"/>
+          {tokens.map((token, index) => (
+            <AssetItem token={token}/>
+          ))}
         </Box>
       </Box>
     </Box>

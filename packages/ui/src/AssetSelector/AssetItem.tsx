@@ -1,9 +1,11 @@
 import { Box } from "@mui/material";
 
+import { Token } from "./AssetSelector";
+
 const AssetItem = ({
-  label
+  token
 }: {
-  label: string
+  token: Token
 }) => {
   return (
     <Box sx={{
@@ -17,7 +19,7 @@ const AssetItem = ({
         marginBottom: "8px"
       }
     }}>
-      {label}
+      {token.icon}{token.name}
     </Box>
   );
 };
