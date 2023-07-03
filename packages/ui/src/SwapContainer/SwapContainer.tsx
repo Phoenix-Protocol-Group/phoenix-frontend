@@ -2,6 +2,7 @@ import { Box, Divider, IconButton, Typography, Accordion, AccordionSummary, Acco
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SwapBox from "./SwapBox";
 import {Button} from "@mui/material";
+import { useState } from "react";
 
 export interface Token {
   name: string;
@@ -14,10 +15,36 @@ export interface Token {
 interface SwapContainerProps {
   fromToken: Token;
   toToken: Token;
+  exchangeRate: string;
+  networkFee: string;
+  route: string;
+  estSellPrice: string;
+  minSellPrice: string;
+  slippageTolerance: string;
   onOptionsClick: () => void;
   onSwapTokensClick: () => void;
   onTokenSelectorClick: () => void;
 }
+
+const listItemContainer = {
+  display: "flex",
+  justifyContent: "space-between"
+};
+
+const listItemNameStyle = {
+  color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
+  fontSize: "14px",
+  lineHeight: "140%",
+  marginBottom: 0
+};
+
+const listItemContentStyle = {
+  color: "#FFF",
+  fontSize: "14px",
+  fontStyle: "normal",
+  fontWeight: "700",
+  lineHeight: "140%",
+};
 
 const SwapAssetsButton = ({
   onClick
@@ -26,7 +53,7 @@ const SwapAssetsButton = ({
 }) => {
   return (
     <Button
-      onClick={() => onClick()}
+      onClick={onClick}
       sx={{
         padding: "4px",
         borderRadius: "8px",
@@ -46,10 +73,18 @@ const SwapAssetsButton = ({
 const SwapContainer = ({
   fromToken,
   toToken,
+  exchangeRate,
+  networkFee,
+  route,
+  estSellPrice,
+  minSellPrice,
+  slippageTolerance,
   onOptionsClick,
   onSwapTokensClick,
   onTokenSelectorClick
 }: SwapContainerProps) => {
+  const [expanded, setExpanded] = useState(true);
+
   return (
     <Box sx={{
       maxWidth: "600px"
@@ -92,7 +127,9 @@ const SwapContainer = ({
         borderRadius: "16px"
       }}>
         <Accordion 
+          onChange={(e, isExpanded) => setExpanded(isExpanded)}
           disableGutters 
+          expanded={expanded}
           sx={{
             background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
           }}>
@@ -105,30 +142,63 @@ const SwapContainer = ({
               fontWeight: "700"
             }}>Swap details</Typography>
           </AccordionSummary>
-          <AccordionDetails>
-            <List>
-              <ListItem>
-                <Typography sx={{
-                  color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
-                  fontSize: "14px"
-                }}>
+          <AccordionDetails sx={{
+            borderTop: "1px solid rgba(255, 255, 255, 0.10)",
+            margin: 0,
+            padding: 0,
+            paddingBottom: "8px"
+          }}>
+            <List sx={{
+              padding: 0,
+              margin: 0
+            }}>
+              <ListItem sx={listItemContainer}>
+                <Typography sx={listItemNameStyle}>
                   Exchange rate
                 </Typography>
+                <Typography sx={listItemContentStyle}>
+                  {exchangeRate}
+                </Typography>
               </ListItem>
-              <ListItem>
-                Network fee
+              <ListItem sx={listItemContainer}>
+                <Typography sx={listItemNameStyle}>
+                  Network fee
+                </Typography>
+                <Typography sx={listItemContentStyle}>
+                  {networkFee}
+                </Typography>
               </ListItem>
-              <ListItem>
-                Route
+              <ListItem sx={listItemContainer}>
+                <Typography sx={listItemNameStyle}>
+                  Route
+                </Typography>
+                <Typography sx={listItemContentStyle}>
+                  {route}
+                </Typography>
               </ListItem>
-              <ListItem>
-                Est. BTC sell price
+              <ListItem sx={listItemContainer}>
+                <Typography sx={listItemNameStyle}>
+                  Est. BTC sell price
+                </Typography>
+                <Typography sx={listItemContentStyle}>
+                  {estSellPrice}
+                </Typography>
               </ListItem>
-              <ListItem>
-                Min. BTC sell price
+              <ListItem sx={listItemContainer}>
+                <Typography sx={listItemNameStyle}>
+                  Min. BTC sell price
+                </Typography>
+                <Typography sx={listItemContentStyle}>
+                  {minSellPrice}
+                </Typography>
               </ListItem>
-              <ListItem>
-                Slippage tolerance
+              <ListItem sx={listItemContainer}>
+                <Typography sx={listItemNameStyle}>
+                  Slippage tolerance
+                </Typography>
+                <Typography sx={listItemContentStyle}>
+                 {slippageTolerance}
+                </Typography>
               </ListItem>
             </List>
           </AccordionDetails>

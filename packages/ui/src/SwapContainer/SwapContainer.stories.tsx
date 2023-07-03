@@ -33,6 +33,12 @@ type Story = StoryObj<typeof SwapContainer>;
 export const Primary: Story = {
   args: {
     fromToken: fromToken,
-    toToken: toToken
+    toToken: toToken,
+    exchangeRate: "1 BTC = 26,567 USDT ($26,564)",
+    networkFee: "0.0562 USDT (~$0.0562)",
+    route: "Trycryptousd",
+    estSellPrice: "0.0562 USDT (~$0.0562)",
+    minSellPrice: "0.0562 USDT (~$0.0562)",
+    slippageTolerance: "0.1%",
   },
 };
