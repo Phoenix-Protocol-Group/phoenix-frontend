@@ -54,6 +54,10 @@ const scrollbarStyles = {
 const AssetSelector = ({tokens, tokensAll, onClose, onTokenClick}: AssetSelectorProps) => {
   const [searchValue, setSearchValue] = React.useState("");
 
+  const getFilteredTokens = () => {
+    return tokensAll.filter(token => token.name.toLowerCase().includes(searchValue));
+  }
+
   return (
     <Box sx={{
       maxWidth: "600px",
@@ -109,7 +113,7 @@ const AssetSelector = ({tokens, tokensAll, onClose, onTokenClick}: AssetSelector
         <Typography sx={headerStyle}>Quick select</Typography>
         <Grid container spacing={1}>
           {tokens.map((token, index) => (
-            <Grid item xs={2}>
+            <Grid item xs={4} md={2}>
               <AssetItem token={token} onClick={onTokenClick}/>
             </Grid>
           ))}
@@ -123,9 +127,24 @@ const AssetSelector = ({tokens, tokensAll, onClose, onTokenClick}: AssetSelector
           ...scrollbarStyles,
           paddingRight: "8px"
         }}>
-          {tokensAll.filter(token => token.name.toLowerCase().includes(searchValue)).map((token, index) => (
+          {getFilteredTokens().map((token, index) => (
             <AssetItem token={token} onClick={onTokenClick}/>
           ))}
+          <Box sx={{
+            display: getFilteredTokens().length ? "none" : "flex",
+            flexDirection: "column",
+            alignItems: "center"
+          }}>
+            <Box component={"img"} src="/search-not-found.svg" sx={{
+              maxWidth: "160px",
+            }} />
+            <Typography sx={{
+              lineHeight: "18px",
+              fontSize: "14px",
+              fontWeight: "400",
+              color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))"
+            }}>We didn’t find any assets for {searchValue}</Typography>
+          </Box>
         </Box>
       </Box>
     </Box>
