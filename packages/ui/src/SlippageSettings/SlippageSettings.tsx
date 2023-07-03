@@ -63,7 +63,12 @@ const SlippageSettings = ({options, selectedOption, onClose, onChange}: Slippage
             <FormControlLabel 
               value={index}
               control={
-                <Radio color="primary"/>
+                <Radio color="primary" sx={{
+                  '& .MuiSvgIcon-root': {
+                    fontSize: 20,
+                  },
+                }}
+                />
               } 
               label={<Typography sx={{
                 color: "#FFF",

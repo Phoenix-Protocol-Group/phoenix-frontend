@@ -1,0 +1,5 @@
+const SwapPage = () => {
+  
+};
+
+export { SwapPage }
