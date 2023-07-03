@@ -24,6 +24,5 @@ type Story = StoryObj<typeof SwapPage>;
 
 export const Primary: Story = {
   args: {
-    token: token
   },
 };

@@ -15,6 +15,7 @@ const SlippageSettings = ({options, selectedOption, onClose, onChange}: Slippage
   return (
     <Box sx={{
       maxWidth: "600px",
+      width: "100%"
     }}>
       <Box sx={{
         display: "flex"

@@ -14,6 +14,7 @@ export interface Token {
 interface AssetSelectorProps {
   tokens: Token[];
   tokensAll: Token[];
+  
   onClose: () => void;
   onTokenClick: (token: Token) => void;
 }
@@ -61,6 +62,7 @@ const AssetSelector = ({tokens, tokensAll, onClose, onTokenClick}: AssetSelector
   return (
     <Box sx={{
       maxWidth: "600px",
+      width: "100%"
     }}>
       <Box sx={{
         display: "flex",
@@ -122,7 +124,7 @@ const AssetSelector = ({tokens, tokensAll, onClose, onTokenClick}: AssetSelector
       <Box sx={containerStyle}>
         <Typography sx={headerStyle}>All tokens</Typography>
         <Box sx={{
-          maxHeight: "50vh",
+          maxHeight: "30vh",
           overflow: "auto",
           ...scrollbarStyles,
           paddingRight: "8px"
