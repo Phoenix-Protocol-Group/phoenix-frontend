@@ -20,7 +20,7 @@ const toToken = {
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof SwapContainer> = {
-  title: "Components/SwapContainer",
+  title: "Swap/SwapContainer",
   // @ts-ignore
   component: SwapContainer,
 };

@@ -4,7 +4,7 @@ import {SlippageSettings} from "./SlippageSettings";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof SlippageSettings> = {
-  title: "Components/SlippageSettings",
+  title: "Swap/SlippageSettings",
   // @ts-ignore
   component: SlippageSettings,
 };

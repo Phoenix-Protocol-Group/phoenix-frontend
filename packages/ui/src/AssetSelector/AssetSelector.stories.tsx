@@ -44,7 +44,7 @@ const testTokens: Token[] = [
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof AssetSelector> = {
-  title: "Components/AssetSelector",
+  title: "Swap/AssetSelector",
   // @ts-ignore
   component: AssetSelector,
 };

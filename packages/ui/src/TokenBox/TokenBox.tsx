@@ -1,13 +1,24 @@
 import { Box, Button, Grid, Typography } from "@mui/material";
-import { Token } from "./SwapContainer";
+
+interface Token {
+  name: string;
+  icon: string;
+  usdValue: number;
+  amount: number;
+  category: string;
+}
+
+interface TokenBoxProps {
+  token: Token;
+  onClick: () => void;
+  hideDropdownButton?: boolean;
+}
 
 const AssetButton = ({
   token,
-  onClick
-}: {
-  token: Token;
-  onClick: () => void;
-}) => {
+  onClick,
+  hideDropdownButton
+}: TokenBoxProps) => {
   return (
     <Button 
       onClick={() => onClick()}
@@ -25,18 +36,18 @@ const AssetButton = ({
         marginRight: "8px"
       }} />
       {token.name}
-      <img src="/CaretDown.svg"/>
+      <Box component={"img"} src="/CaretDown.svg" sx={{
+        display: hideDropdownButton ? "none" : "block"
+      }} />
     </Button>
   );
 };
 
-const SwapBox = ({
+const TokenBox = ({
   token,
-  onClick
-}: {
-  token: Token,
-  onClick: () => void;
-}) => {
+  onClick,
+  hideDropdownButton = false
+}: TokenBoxProps) => {
   return (
     <Box sx={{
       background: "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
@@ -52,7 +63,7 @@ const SwapBox = ({
           display: "flex",
           justifyContent: "flex-end"
         }}>
-          <AssetButton token={token} onClick={onClick}/>
+          <AssetButton hideDropdownButton={hideDropdownButton} token={token} onClick={onClick}/>
         </Grid>
         <Grid item xs={6} sx={{
           fontSize: "14px",
@@ -89,4 +100,4 @@ const SwapBox = ({
   );
 };
 
-export default SwapBox;
+export {TokenBox};

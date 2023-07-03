@@ -1,10 +1,10 @@
 import { Box, Divider, IconButton, Typography, Accordion, AccordionSummary, AccordionDetails, List, ListItem } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import SwapBox from "./SwapBox";
+import { TokenBox } from "../TokenBox/TokenBox";
 import {Button} from "@mui/material";
 import { useState } from "react";
 
-export interface Token {
+interface Token {
   name: string;
   icon: string;
   usdValue: number;
@@ -113,7 +113,7 @@ const SwapContainer = ({
           </IconButton>
         </Box>
       </Box>
-      <SwapBox token={fromToken} onClick={onTokenSelectorClick}/>
+      <TokenBox token={fromToken} onClick={onTokenSelectorClick}/>
       <Box sx={{
         height: "8px",
         width: "100%",
@@ -121,7 +121,7 @@ const SwapContainer = ({
       }}>
         <SwapAssetsButton onClick={onSwapTokensClick}/>
       </Box>
-      <SwapBox token={toToken} onClick={onTokenSelectorClick}/>
+      <TokenBox token={toToken} onClick={onTokenSelectorClick}/>
       <Box sx={{
         marginTop: "24px",
         borderRadius: "16px"
