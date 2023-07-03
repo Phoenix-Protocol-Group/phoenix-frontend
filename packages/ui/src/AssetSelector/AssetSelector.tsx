@@ -75,7 +75,8 @@ const AssetSelector = ({tokens, tokensAll, onClose, onTokenClick}: AssetSelector
         </IconButton>
         <Typography sx={{
           color: "white",
-          fontSize: "32px"
+          fontSize: "32px",
+          fontWeight: "700"
         }}>
           Select Token
         </Typography>

@@ -1,22 +1,42 @@
 import { Box, Button, Grid, Typography } from "@mui/material";
+import { Token } from "./SwapContainer";
 
-const AssetButton = () => {
+const AssetButton = ({
+  token,
+  onClick
+}: {
+  token: Token;
+  onClick: () => void;
+}) => {
   return (
-    <Button sx={{
-      fontSize: "14px",
-      padding: "4px",
-      borderRadius: "8px",
-      background: "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-      display: "inline-flex",
-      color: "white"
-    }}>
-      BTC
+    <Button 
+      onClick={() => onClick()}
+      sx={{
+        fontSize: "14px",
+        padding: "4px",
+        borderRadius: "8px",
+        background: "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+        display: "inline-flex",
+        color: "white"
+      }}
+    >
+      <Box component={"img"} src={token.icon} sx={{
+        maxWidth: "24px",
+        marginRight: "8px"
+      }} />
+      {token.name}
       <img src="/CaretDown.svg"/>
     </Button>
   );
 };
 
-const SwapBox = () => {
+const SwapBox = ({
+  token,
+  onClick
+}: {
+  token: Token,
+  onClick: () => void;
+}) => {
   return (
     <Box sx={{
       background: "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
@@ -32,7 +52,7 @@ const SwapBox = () => {
           display: "flex",
           justifyContent: "flex-end"
         }}>
-          <AssetButton/>
+          <AssetButton token={token} onClick={onClick}/>
         </Grid>
         <Grid item xs={6} sx={{
           fontSize: "14px",
