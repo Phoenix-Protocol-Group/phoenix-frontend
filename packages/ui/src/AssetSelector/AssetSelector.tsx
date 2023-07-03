@@ -59,7 +59,8 @@ const AssetSelector = ({tokens, tokensAll, onClose, onTokenClick}: AssetSelector
       maxWidth: "600px",
     }}>
       <Box sx={{
-        display: "flex"
+        display: "flex",
+        marginBottom: "16px"
       }}>
         <IconButton 
           onClick={onClose}
