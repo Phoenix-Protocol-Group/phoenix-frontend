@@ -46,11 +46,14 @@ const OptionButton = ({
 const StakeInput = ({
   onStake,
   balance,
+  amount,
+  setAmount
 }: {
   onStake: () => void;
   balance: number;
+  amount: number;
+  setAmount: (amount: number) => void;
 }) => {
-  const [value, setValue] = useState("");
   const options = [
     {
       title: "25%",
@@ -75,7 +78,7 @@ const StakeInput = ({
       <TextField
         id="input"
         type="number"
-        value={value}
+        value={amount}
         placeholder="0.00"
         fullWidth
         sx={{
@@ -87,7 +90,7 @@ const StakeInput = ({
             fontSize: "0.8125rem!important",
           },
         }}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => setAmount(Number(e.target.value))}
         InputLabelProps={{
           sx: {
             color: "white!important",
@@ -139,14 +142,14 @@ const StakeInput = ({
         {options.map((value, index) => (
           <Grid item key={index} xs={3}>
             <OptionButton
-              onClick={(number) => setValue((balance * number).toString())}
+              onClick={(number) => setAmount(balance * number)}
               {...value}
             />
           </Grid>
         ))}
         <Grid item xs={12}>
           {/* @ts-ignore */}
-          <Button fullWidth variant="primary" size="large" onClick={onStake}>
+          <Button disabled={amount > balance || amount <= 0} fullWidth variant="primary" size="large" onClick={onStake}>
             Stake
           </Button>
           <Typography sx={{ fontSize: "0.875rem", opacity: 0.7, mt: 1 }}>
@@ -218,7 +221,7 @@ interface LiquidityMiningProps {
 
   // Stake LP Tokens
   balance: number;
-  onStake: () => void;
+  onStake: (amount: number) => void;
 }
 
 const LiquidityMining = ({
@@ -227,6 +230,7 @@ const LiquidityMining = ({
   balance,
   onStake,
 }: LiquidityMiningProps) => {
+  const [amount, setAmount] = useState<number>(0);
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
@@ -244,7 +248,7 @@ const LiquidityMining = ({
         </Typography>
       </Grid>
       <Grid item xs={12} sm={8}>
-        <StakeInput balance={balance} onStake={onStake} />
+        <StakeInput balance={balance} setAmount={setAmount} amount={amount} onStake={() => onStake(amount)} />
       </Grid>
       <Grid item xs={12} sm={4}>
         <ClaimRewards onClaim={onClaimRewards} rewards={rewards} />
