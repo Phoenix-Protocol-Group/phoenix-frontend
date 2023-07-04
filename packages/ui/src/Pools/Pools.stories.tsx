@@ -14,5 +14,14 @@ export default meta;
 type Story = StoryObj<typeof Pools>;
 
 export const Primary: Story = {
-  args: {},
+  args: {
+    items: [
+      "XLM - USDT",
+      "XLM - USDT",
+      "XLM - USDT",
+      "foo",
+      "foo",
+      "foo"
+    ]
+  },
 };
