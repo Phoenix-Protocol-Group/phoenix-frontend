@@ -1,7 +1,19 @@
-import { Box, Grid } from "@mui/material";
+import {
+  Box,
+  GlobalStyles,
+  Grid,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import PoolStats from "../PoolStats/PoolStats";
 import LiquidityMining from "../LiquidityMining/LiquidityMining";
 import StakingList from "../StakingList/StakingList";
+import PoolLiquidity from "../PoolLiquidity/PoolLiquidity";
+import { SidebarNavigation } from "../../SidebarNavigation/SidebarNavigation";
+import { useState } from "react";
+import MailIcon from "@mui/icons-material/Mail";
+import AppBar from "../../AppBar/AppBar";
 
 const args = {
   poolStatArgs: {
@@ -113,25 +125,123 @@ const args = {
       // Add more entries as needed
     ],
   },
+  appBarArgs: {
+    balance: 125.5,
+    walletAddress: "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
+    connectWallet: () => {},
+    disconnectWallet: () => {},
+  },
+  navItems: [
+    {
+      label: "Nav Item 1",
+      icon: <MailIcon />,
+      active: true,
+      href: "#",
+    },
+    {
+      label: "Nav Item 2",
+      icon: <MailIcon />,
+      active: false,
+      href: "#",
+    },
+    {
+      label: "Nav Item 3",
+      icon: <MailIcon />,
+      active: false,
+      href: "#",
+    },
+    {
+      label: "Nav Item 4",
+      icon: <MailIcon />,
+      active: false,
+      href: "#",
+    },
+  ],
 };
 
+const overviewStyles = (
+  <GlobalStyles
+    styles={{
+      body: { background: "linear-gradient(180deg, #1F2123 0%, #131517 100%)" },
+    }}
+  />
+);
+
 const Overview = () => {
+  const theme = useTheme();
+  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
+  const [navOpen, setNavOpen] = useState(largerThenMd ? true : false);
+
   return (
-    <Grid container>
-      <Grid item xs={12} md={7}>
-        <Box sx={{ mb: 2 }}>
-          <PoolStats {...args.poolStatArgs} />
+    <>
+      {overviewStyles}
+      <SidebarNavigation
+        onNavClick={() => {}}
+        items={args.navItems}
+        open={navOpen}
+        setOpen={setNavOpen}
+      />
+      <AppBar
+        mobileNavOpen={navOpen}
+        toggleMobileNav={(open) => setNavOpen(open)}
+        {...args.appBarArgs}
+      />
+      <Box
+        sx={{
+          marginLeft: largerThenMd
+            ? navOpen
+              ? "240px"
+              : "60px"
+            : navOpen
+            ? "240px"
+            : "0",
+          width: largerThenMd
+            ? navOpen
+              ? "calc(100% - 240px)"
+              : "calc(100% - 60px)"
+            : navOpen
+            ? "0"
+            : "100%",
+          transition: "all 0.2s ease-in-out",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box
+              sx={{ height: "2.5rem", width: "2.5rem" }}
+              component="img"
+              src="cryptoIcons/btc.svg"
+            />
+            <Box
+              sx={{ ml: -1, height: "2.5rem", width: "2.5rem" }}
+              component="img"
+              src="cryptoIcons/usdc.svg"
+            />
+          </Box>
+          <Typography sx={{ fontSize: "2rem", fontWeight: 700, ml: 1 }}>
+            BTC-USDC
+          </Typography>
         </Box>
-        <Box sx={{ mb: 4 }}>
-          <LiquidityMining
-            {...args.lpArgs}
-            onClaimRewards={() => {}}
-            onStake={() => {}}
-          />
-        </Box>
-        <StakingList {...args.stakingListArgs} />
-      </Grid>
-    </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={8}>
+            <Box sx={{ mb: 2 }}>
+              <PoolStats {...args.poolStatArgs} />
+            </Box>
+            <Box sx={{ mb: 4 }}>
+              <LiquidityMining
+                {...args.lpArgs}
+                onClaimRewards={() => {}}
+                onStake={() => {}}
+              />
+            </Box>
+            <StakingList {...args.stakingListArgs} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <PoolLiquidity />
+          </Grid>
+        </Grid>
+      </Box>
+    </>
   );
 };
 
