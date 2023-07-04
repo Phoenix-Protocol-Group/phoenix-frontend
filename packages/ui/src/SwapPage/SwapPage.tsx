@@ -110,13 +110,25 @@ const SwapPage = () => {
 
   const [optionsOpen, setOptionsOpen] = React.useState(false);
   const [assetSelectorOpen, setAssetSelectorOpen] = React.useState(false);
+  const [isFrom, setIsFrom] = React.useState(true);
+ 
+  const handleTokenClick = (token: Token) => {
+    if(isFrom) {
+      args.SwapContainerArgs.fromToken = token;
+    } else {
+      args.SwapContainerArgs.toToken = token;
+    }
 
-  const handleTokenClick = () => {
+    setAssetSelectorOpen(false);
+  };
 
+  const handleSelectorOpen = (isFromToken: boolean) => {
+    setAssetSelectorOpen(true);
+    setIsFrom(isFromToken);
   };
 
   return (
-    <>
+    <Box sx={{}}>
       <SidebarNavigation
           onNavClick={() => {}}
           items={args.navItems}
@@ -155,7 +167,7 @@ const SwapPage = () => {
               {...args.SwapContainerArgs} 
               onOptionsClick={() => setOptionsOpen(true)} 
               onSwapTokensClick={() => {}}
-              onTokenSelectorClick={() => setAssetSelectorOpen(true)}
+              onTokenSelectorClick={(isFromToken) => handleSelectorOpen(isFromToken)}
             />
           }
 
@@ -177,7 +189,7 @@ const SwapPage = () => {
             />
           }
         </Box>
-    </>
+    </Box>
   );
 };
 
