@@ -1,5 +1,16 @@
-import { Box, Divider, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Button as MuiButton,
+  Divider,
+  Grid,
+  Typography,
+} from "@mui/material";
+import { SyntheticEvent, useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
+import TabPanel from "@mui/lab/TabPanel";
+import TabContext from "@mui/lab/TabContext";
+import { TokenBox } from "../../TokenBox/TokenBox";
+import { Button } from "../../Button/Button";
 
 type Data = number[];
 
@@ -12,6 +23,30 @@ const mockDataset2: number[][] = [
   [1687824000000, 180000],
   [1687859473000, 200000],
 ];
+
+const tokenA = {
+  name: "BTC",
+  icon: "cryptoIcons/btc.svg",
+  amount: 100,
+  category: "Stable",
+  usdValue: 1 * 100,
+};
+
+const tokenB = {
+  name: "USDC",
+  icon: "cryptoIcons/usdc.svg",
+  amount: 100,
+  category: "Stable",
+  usdValue: 1 * 100,
+};
+
+const tokenC = {
+  name: "BTC/USDC",
+  icon: "cryptoIcons/usdc.svg",
+  amount: 100,
+  category: "Stable",
+  usdValue: 1 * 100,
+};
 
 const GlowingChart = ({ data }: { data: Data[] }) => (
   <ResponsiveContainer width="100%" height={200}>
@@ -42,6 +77,74 @@ const GlowingChart = ({ data }: { data: Data[] }) => (
     </AreaChart>
   </ResponsiveContainer>
 );
+
+const LabTabs = () => {
+  const [value, setValue] = useState("1");
+
+  const buttonStyles = {
+    display: "flex",
+    height: "2.5rem",
+    padding: "0rem 0.75rem",
+    borderRadius: "0.5rem",
+    textTransform: "none",
+    color: "white",
+    fontWeight: 700,
+    fontSize: "0.875rem",
+    background: "none",
+    boxShadow: "none",
+    "&:hover": {
+      background: "#37373D",
+      boxShadow: "none",
+    },
+  };
+
+  return (
+    <Box sx={{ width: "100%", typography: "body1", mt: 2, p: "1.4rem" }}>
+      <TabContext value={value}>
+        <Box sx={{ display: "flex" }}>
+          <MuiButton
+            variant="contained"
+            onClick={() => setValue("1")}
+            sx={{
+              ...buttonStyles,
+              background: value === "1" ? "#37373D" : "none",
+            }}
+          >
+            Add liquidity
+          </MuiButton>
+          <MuiButton
+            variant="contained"
+            onClick={() => setValue("2")}
+            sx={{
+              ...buttonStyles,
+              background: value === "2" ? "#37373D" : "none",
+              ml: 1,
+            }}
+          >
+            Remove liquidity
+          </MuiButton>
+        </Box>
+        <TabPanel sx={{ padding: "0", mt: "1rem" }} value="1">
+          <TokenBox token={tokenA} hideDropdownButton={true} />
+          <Box sx={{ mt: "0.5rem" }}>
+            <TokenBox token={tokenB} hideDropdownButton={true} />
+          </Box>
+          {/* @ts-ignore */}
+          <Button sx={{ mt: "0.5rem" }} fullWidth variant="primary">
+            Add Liquidity
+          </Button>
+        </TabPanel>
+        <TabPanel sx={{ padding: "0", mt: "1rem" }} value="2">
+          <TokenBox token={tokenC} hideDropdownButton={true} />
+          {/* @ts-ignore */}
+          <Button sx={{ mt: "0.5rem" }} fullWidth variant="primary">
+            Remove Liquidity
+          </Button>
+        </TabPanel>
+      </TabContext>
+    </Box>
+  );
+};
 
 const PoolLiquidity = ({}) => {
   return (
@@ -139,6 +242,7 @@ const PoolLiquidity = ({}) => {
             </Box>
           </Grid>
         </Grid>
+        <LabTabs />
       </Box>
     </Box>
   );
