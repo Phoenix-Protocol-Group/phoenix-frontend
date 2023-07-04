@@ -10,7 +10,7 @@ interface Token {
 
 interface TokenBoxProps {
   token: Token;
-  onClick: () => void;
+  onClick?: () => void;
   hideDropdownButton?: boolean;
 }
 
@@ -21,14 +21,19 @@ const AssetButton = ({
 }: TokenBoxProps) => {
   return (
     <Button 
-      onClick={() => onClick()}
+      onClick={onClick}
       sx={{
         fontSize: "14px",
         padding: "4px",
         borderRadius: "8px",
-        background: "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+        background: hideDropdownButton ? "none" : "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
         display: "inline-flex",
-        color: "white"
+        color: "white",
+        "&:hover": {
+          background: hideDropdownButton ? "none" : "rgba(226, 87, 28, 0.08)"
+        },
+        cursor: hideDropdownButton ? "auto" : "pointer",
+        pointerEvents: hideDropdownButton ? "none" : "auto"
       }}
     >
       <Box component={"img"} src={token.icon} sx={{
