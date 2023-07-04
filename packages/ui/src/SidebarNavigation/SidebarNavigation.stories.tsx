@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { SidebarNavigation } from "./SidebarNavigation";
-import MailIcon from '@mui/icons-material/Mail';
+import MailIcon from "@mui/icons-material/Mail";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof SidebarNavigation> = {
   title: "Layout/SidebarNavigation",
-  component: SidebarNavigation
+  component: SidebarNavigation,
 };
 
 export default meta;
@@ -19,32 +19,31 @@ export const Open: Story = {
     items: [
       {
         label: "Nav Item 1",
-        icon: <MailIcon/>,
+        icon: <MailIcon />,
         active: true,
-        href: "#"
+        href: "#",
       },
       {
         label: "Nav Item 2",
-        icon: <MailIcon/>,
+        icon: <MailIcon />,
         active: false,
-        href: "#"
+        href: "#",
       },
       {
         label: "Nav Item 3",
-        icon: <MailIcon/>,
+        icon: <MailIcon />,
         active: false,
-        href: "#"
+        href: "#",
       },
       {
         label: "Nav Item 4",
-        icon: <MailIcon/>,
+        icon: <MailIcon />,
         active: false,
-        href: "#"
-      }
-    ]
+        href: "#",
+      },
+    ],
   },
 };
-
 
 export const Closed: Story = {
   args: {
@@ -52,28 +51,28 @@ export const Closed: Story = {
     items: [
       {
         label: "Nav Item 1",
-        icon: <MailIcon/>,
+        icon: <MailIcon />,
         active: true,
-        href: "#"
+        href: "#",
       },
       {
         label: "Nav Item 2",
-        icon: <MailIcon/>,
+        icon: <MailIcon />,
         active: false,
-        href: "#"
+        href: "#",
       },
       {
         label: "Nav Item 3",
-        icon: <MailIcon/>,
+        icon: <MailIcon />,
         active: false,
-        href: "#"
+        href: "#",
       },
       {
         label: "Nav Item 4",
-        icon: <MailIcon/>,
+        icon: <MailIcon />,
         active: false,
-        href: "#"
-      }
-    ]
+        href: "#",
+      },
+    ],
   },
 };
