@@ -1,6 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import {TokenBox} from "./TokenBox";
+import { TokenBox } from "./TokenBox";
 
 const token = {
   name: "USDT",
@@ -24,13 +24,13 @@ type Story = StoryObj<typeof TokenBox>;
 
 export const Primary: Story = {
   args: {
-    token: token
+    token: token,
   },
 };
 
 export const Secondary: Story = {
   args: {
     token: token,
-    hideDropdownButton: true
+    hideDropdownButton: true,
   },
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import {SwapPage} from "./SwapPage";
+import { SwapPage } from "./SwapPage";
 
 const token = {
   name: "USDT",
@@ -23,6 +23,5 @@ export default meta;
 type Story = StoryObj<typeof SwapPage>;
 
 export const Primary: Story = {
-  args: {
-  },
+  args: {},
 };

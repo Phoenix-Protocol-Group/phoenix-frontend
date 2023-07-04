@@ -4,13 +4,13 @@ import { Token } from "./AssetSelector";
 
 const AssetItem = ({
   token,
-  onClick
+  onClick,
 }: {
-  token: Token,
+  token: Token;
   onClick: (token: Token) => void;
 }) => {
   return (
-    <Button 
+    <Button
       onClick={() => onClick(token)}
       sx={{
         padding: "8px",
@@ -22,16 +22,21 @@ const AssetItem = ({
         alignItems: "center",
         width: "100%",
         justifyContent: "flex-start",
-        background: "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+        background:
+          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
         "&:not(:last-of-type)": {
-          marginBottom: "8px"
-        }
+          marginBottom: "8px",
+        },
       }}
     >
-      <Box component={"img"} src={token.icon} sx={{
-        maxWidth: "24px",
-        marginRight: "8px"
-      }} />
+      <Box
+        component={"img"}
+        src={token.icon}
+        sx={{
+          maxWidth: "24px",
+          marginRight: "8px",
+        }}
+      />
       {token.name}
     </Button>
   );

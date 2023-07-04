@@ -99,8 +99,8 @@ const args = {
         category: "Non-Stable",
         usdValue: 30000 * 0.5,
       },
-    ]
-  }
+    ],
+  },
 };
 
 const SwapPage = () => {
@@ -111,9 +111,9 @@ const SwapPage = () => {
   const [optionsOpen, setOptionsOpen] = React.useState(false);
   const [assetSelectorOpen, setAssetSelectorOpen] = React.useState(false);
   const [isFrom, setIsFrom] = React.useState(true);
- 
-  const handleTokenClick = (token: Token) => {
-    if(isFrom) {
+
+  const handleTokenClick = (token: Token) => {
+    if (isFrom) {
       args.SwapContainerArgs.fromToken = token;
     } else {
       args.SwapContainerArgs.toToken = token;
@@ -130,67 +130,72 @@ const SwapPage = () => {
   return (
     <Box sx={{}}>
       <SidebarNavigation
-          onNavClick={() => {}}
-          items={args.navItems}
-          open={navOpen}
-          setOpen={setNavOpen}
-        />
-        <AppBar
-          mobileNavOpen={navOpen}
-          toggleMobileNav={(open) => setNavOpen(open)}
-          {...args.appBarArgs}
-        />
-        <Box
-          sx={{
-            marginLeft: largerThenMd
-              ? navOpen
-                ? "240px"
-                : "60px"
-              : navOpen
+        onNavClick={() => {}}
+        items={args.navItems}
+        open={navOpen}
+        setOpen={setNavOpen}
+      />
+      <AppBar
+        mobileNavOpen={navOpen}
+        toggleMobileNav={(open) => setNavOpen(open)}
+        {...args.appBarArgs}
+      />
+      <Box
+        sx={{
+          marginLeft: largerThenMd
+            ? navOpen
               ? "240px"
-              : "0",
-            width: largerThenMd
-              ? navOpen
-                ? "calc(100% - 240px)"
-                : "calc(100% - 60px)"
-              : navOpen
-              ? "0"
-              : "100%",
-            transition: "all 0.2s ease-in-out",
-            display: "flex",
-            justifyContent: "center",
+              : "60px"
+            : navOpen
+            ? "240px"
+            : "0",
+          width: largerThenMd
+            ? navOpen
+              ? "calc(100% - 240px)"
+              : "calc(100% - 60px)"
+            : navOpen
+            ? "0"
+            : "100%",
+          transition: "all 0.2s ease-in-out",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        {!optionsOpen && !assetSelectorOpen && (
+          <SwapContainer
+            {...args.SwapContainerArgs}
+            onOptionsClick={() => setOptionsOpen(true)}
+            onSwapTokensClick={() => {}}
+            onTokenSelectorClick={(isFromToken) =>
+              handleSelectorOpen(isFromToken)
+            }
+          />
+        )}
 
-          }}
-        >
-          {!optionsOpen && !assetSelectorOpen &&
-            <SwapContainer 
-              {...args.SwapContainerArgs} 
-              onOptionsClick={() => setOptionsOpen(true)} 
-              onSwapTokensClick={() => {}}
-              onTokenSelectorClick={(isFromToken) => handleSelectorOpen(isFromToken)}
-            />
-          }
+        {optionsOpen && (
+          <SlippageSettings
+            options={["0.1%", "0.5%", "2%"]}
+            selectedOption={0}
+            onClose={() => setOptionsOpen(false)}
+            onChange={() => {}}
+          />
+        )}
 
-          {optionsOpen &&
-            <SlippageSettings
-              options={["0.1%", "0.5%", "2%"]}
-              selectedOption={0}
-              onClose={() => setOptionsOpen(false)}
-              onChange={() => {}}
-            />
-          }
-
-          {assetSelectorOpen &&
-            <AssetSelector
-              tokens={args.AssetSelectorArgs.tokens}
-              tokensAll={[...args.AssetSelectorArgs.tokens, ...args.AssetSelectorArgs.tokens, ...args.AssetSelectorArgs.tokens]}
-              onClose={() => setAssetSelectorOpen(false)}
-              onTokenClick={handleTokenClick}
-            />
-          }
-        </Box>
+        {assetSelectorOpen && (
+          <AssetSelector
+            tokens={args.AssetSelectorArgs.tokens}
+            tokensAll={[
+              ...args.AssetSelectorArgs.tokens,
+              ...args.AssetSelectorArgs.tokens,
+              ...args.AssetSelectorArgs.tokens,
+            ]}
+            onClose={() => setAssetSelectorOpen(false)}
+            onTokenClick={handleTokenClick}
+          />
+        )}
+      </Box>
     </Box>
   );
 };
 
-export { SwapPage }
+export { SwapPage };

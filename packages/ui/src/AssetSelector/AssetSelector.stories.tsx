@@ -1,6 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import {AssetSelector} from "./AssetSelector";
+import { AssetSelector } from "./AssetSelector";
 import { Token } from "./AssetSelector";
 
 const testTokens: Token[] = [
@@ -41,7 +41,6 @@ const testTokens: Token[] = [
   },
 ];
 
-
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof AssetSelector> = {
   title: "Swap/AssetSelector",
@@ -57,6 +56,6 @@ type Story = StoryObj<typeof AssetSelector>;
 export const Primary: Story = {
   args: {
     tokens: testTokens,
-    tokensAll: [...testTokens, ...testTokens, ...testTokens]
+    tokensAll: [...testTokens, ...testTokens, ...testTokens],
   },
 };
