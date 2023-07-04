@@ -34,6 +34,7 @@ interface SwapContainerProps {
   onOptionsClick: () => void;
   onSwapTokensClick: () => void;
   onTokenSelectorClick: (isFromToken: boolean) => void;
+  onInputChange: (isFromToken: boolean, value: string) => void;
 }
 
 const listItemContainer = {
@@ -88,6 +89,7 @@ const SwapContainer = ({
   slippageTolerance,
   onOptionsClick,
   onSwapTokensClick,
+  onInputChange,
   onTokenSelectorClick,
 }: SwapContainerProps) => {
   const [expanded, setExpanded] = useState(true);
@@ -127,7 +129,11 @@ const SwapContainer = ({
           </IconButton>
         </Box>
       </Box>
-      <TokenBox token={fromToken} onClick={() => onTokenSelectorClick(true)} />
+      <TokenBox
+        token={fromToken}
+        onAssetClick={() => onTokenSelectorClick(true)}
+        onChange={(value) => onInputChange(true, value)}
+      />
       <Box
         sx={{
           height: "8px",
@@ -137,7 +143,11 @@ const SwapContainer = ({
       >
         <SwapAssetsButton onClick={onSwapTokensClick} />
       </Box>
-      <TokenBox token={toToken} onClick={() => onTokenSelectorClick(false)} />
+      <TokenBox
+        token={toToken}
+        onAssetClick={() => onTokenSelectorClick(false)}
+        onChange={(value) => onInputChange(false, value)}
+      />
       <Box
         sx={{
           marginTop: "24px",
