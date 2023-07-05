@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { KeyboardArrowLeft } from "@mui/icons-material";
-import Colors from "../Theme/colors";
+import Colors from "../../Theme/colors";
 
 interface SlippageOptionsProps {
   options: string[];

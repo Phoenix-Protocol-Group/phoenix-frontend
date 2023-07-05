@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import WalletBalanceTable, { Token } from "./WalletBalanceTable";
+import WalletBalanceTable from "./WalletBalanceTable";
 import { Grid } from "@mui/material";
 
-export const testTokens: Token[] = [
+export const testTokens = [
   {
     name: "USDT",
     icon: "cryptoIcons/usdt.svg",
