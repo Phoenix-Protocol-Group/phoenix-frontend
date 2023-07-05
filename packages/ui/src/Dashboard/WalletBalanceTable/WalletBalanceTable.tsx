@@ -26,7 +26,7 @@ function a11yProps(index: number) {
   };
 }
 
-export interface Token {
+interface Token {
   name: string;
   icon: string;
   usdValue: number;
