@@ -5,48 +5,14 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import { SyntheticEvent, useState } from "react";
+import { useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
 import TabPanel from "@mui/lab/TabPanel";
 import TabContext from "@mui/lab/TabContext";
-import { TokenBox } from "../../TokenBox/TokenBox";
+import { Token, TokenBox } from "../../Swap";
 import { Button } from "../../Button/Button";
 
 type Data = number[];
-
-const mockDataset2: number[][] = [
-  [1687392000000, 152000],
-  [1687478400000, 140400],
-  [1687564800000, 160100],
-  [1687651200000, 163300],
-  [1687737600000, 150000],
-  [1687824000000, 180000],
-  [1687859473000, 200000],
-];
-
-const tokenA = {
-  name: "BTC",
-  icon: "cryptoIcons/btc.svg",
-  amount: 100,
-  category: "Stable",
-  usdValue: 1 * 100,
-};
-
-const tokenB = {
-  name: "USDC",
-  icon: "cryptoIcons/usdc.svg",
-  amount: 100,
-  category: "Stable",
-  usdValue: 1 * 100,
-};
-
-const tokenC = {
-  name: "BTC/USDC",
-  icon: "cryptoIcons/usdc.svg",
-  amount: 100,
-  category: "Stable",
-  usdValue: 1 * 100,
-};
 
 const GlowingChart = ({ data }: { data: Data[] }) => (
   <ResponsiveContainer width="100%" height={200}>
@@ -78,8 +44,25 @@ const GlowingChart = ({ data }: { data: Data[] }) => (
   </ResponsiveContainer>
 );
 
-const LabTabs = () => {
+interface LabTabProps {
+  tokenA: Token;
+  tokenB: Token;
+  liquidityToken: Token;
+  onAddLiquidity: (tokenAAmount: number, tokenBAmount: number) => void;
+  onRemoveLiquidity: (liquidityTokenAmount: number) => void;
+}
+
+const LabTabs = ({
+  tokenA,
+  tokenB,
+  liquidityToken,
+  onAddLiquidity,
+  onRemoveLiquidity,
+}: LabTabProps) => {
   const [value, setValue] = useState("1");
+  const [tokenAValue, setTokenAValue] = useState<string | undefined>(undefined);
+  const [tokenBValue, setTokenBValue] = useState<string | undefined>(undefined);
+  const [tokenCValue, setTokenCValue] = useState<string | undefined>(undefined);
 
   const buttonStyles = {
     display: "flex",
@@ -125,19 +108,46 @@ const LabTabs = () => {
           </MuiButton>
         </Box>
         <TabPanel sx={{ padding: "0", mt: "1rem" }} value="1">
-          <TokenBox token={tokenA} hideDropdownButton={true} />
+          <TokenBox
+            value={tokenAValue}
+            onChange={(val) => setTokenAValue(val)}
+            token={tokenA}
+            hideDropdownButton={true}
+          />
           <Box sx={{ mt: "0.5rem" }}>
-            <TokenBox token={tokenB} hideDropdownButton={true} />
+            <TokenBox
+              onChange={(val) => setTokenBValue(val)}
+              value={tokenBValue}
+              token={tokenB}
+              hideDropdownButton={true}
+            />
           </Box>
-          {/* @ts-ignore */}
-          <Button sx={{ mt: "0.5rem" }} fullWidth variant="primary">
+          <Button
+            onClick={() =>
+              onAddLiquidity(Number(tokenAValue), Number(tokenBValue))
+            }
+            sx={{ mt: "0.5rem" }}
+            fullWidth
+            // @ts-ignore
+            variant="primary"
+          >
             Add Liquidity
           </Button>
         </TabPanel>
         <TabPanel sx={{ padding: "0", mt: "1rem" }} value="2">
-          <TokenBox token={tokenC} hideDropdownButton={true} />
-          {/* @ts-ignore */}
-          <Button sx={{ mt: "0.5rem" }} fullWidth variant="primary">
+          <TokenBox
+            onChange={(val) => setTokenCValue(val)}
+            value={tokenCValue}
+            token={liquidityToken}
+            hideDropdownButton={true}
+          />
+          <Button
+            onClick={() => onRemoveLiquidity(Number(tokenCValue))}
+            sx={{ mt: "0.5rem" }}
+            fullWidth
+            // @ts-ignore
+            variant="primary"
+          >
             Remove Liquidity
           </Button>
         </TabPanel>
@@ -146,7 +156,27 @@ const LabTabs = () => {
   );
 };
 
-const PoolLiquidity = ({}) => {
+interface PoolLiquidityProps {
+  tokenA: Token;
+  tokenB: Token;
+  liquidityToken: Token;
+  poolHistory: Data[];
+  liquidityA: number;
+  liquidityB: number;
+  onAddLiquidity: (tokenAAmount: number, tokenBAmount: number) => void;
+  onRemoveLiquidity: (liquidityTokenAmount: number) => void;
+}
+
+const PoolLiquidity = ({
+  tokenA,
+  tokenB,
+  liquidityA,
+  liquidityB,
+  liquidityToken,
+  poolHistory,
+  onAddLiquidity,
+  onRemoveLiquidity,
+}: PoolLiquidityProps) => {
   return (
     <Box
       sx={{
@@ -161,12 +191,12 @@ const PoolLiquidity = ({}) => {
           <Box
             sx={{ height: "4rem", width: "4rem" }}
             component="img"
-            src="cryptoIcons/btc.svg"
+            src={tokenA.icon}
           />
           <Box
             sx={{ ml: -1, height: "4rem", width: "4rem" }}
             component="img"
-            src="cryptoIcons/usdc.svg"
+            src={tokenB.icon}
           />
         </Box>
       </Box>
@@ -182,7 +212,7 @@ const PoolLiquidity = ({}) => {
         >
           Pool liquidity
         </Typography>
-        <GlowingChart data={mockDataset2} />
+        <GlowingChart data={poolHistory} />
         <Grid container>
           <Grid item xs={4}>
             <Box
@@ -195,10 +225,10 @@ const PoolLiquidity = ({}) => {
             >
               <Box>
                 <Typography sx={{ fontSize: "0.875rem", opacity: 0.7 }}>
-                  BTC
+                  {tokenA.name}
                 </Typography>
                 <Typography sx={{ fontWeight: 700, fontSize: "1.125rem" }}>
-                  10,784.99
+                  {liquidityA}
                 </Typography>
               </Box>
             </Box>
@@ -214,10 +244,10 @@ const PoolLiquidity = ({}) => {
             >
               <Box>
                 <Typography sx={{ fontSize: "0.875rem", opacity: 0.7 }}>
-                  USDC
+                  {tokenB.name}
                 </Typography>
                 <Typography sx={{ fontWeight: 700, fontSize: "1.125rem" }}>
-                  10,784.99
+                  {liquidityB}
                 </Typography>
               </Box>
             </Box>
@@ -236,13 +266,19 @@ const PoolLiquidity = ({}) => {
                   Ratio
                 </Typography>
                 <Typography sx={{ fontWeight: 700, fontSize: "1.125rem" }}>
-                  1:1.05
+                  1:{(liquidityB / liquidityA).toFixed(2)}
                 </Typography>
               </Box>
             </Box>
           </Grid>
         </Grid>
-        <LabTabs />
+        <LabTabs
+          tokenA={tokenA}
+          tokenB={tokenB}
+          liquidityToken={liquidityToken}
+          onAddLiquidity={onAddLiquidity}
+          onRemoveLiquidity={onRemoveLiquidity}
+        />
       </Box>
     </Box>
   );

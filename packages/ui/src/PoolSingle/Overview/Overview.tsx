@@ -14,6 +14,7 @@ import { SidebarNavigation } from "../../SidebarNavigation/SidebarNavigation";
 import { useState } from "react";
 import MailIcon from "@mui/icons-material/Mail";
 import AppBar from "../../AppBar/AppBar";
+import { testTokens } from "../../Dashboard/WalletBalanceTable/WalletBalanceTable.stories";
 
 const args = {
   poolStatArgs: {
@@ -157,6 +158,24 @@ const args = {
       href: "#",
     },
   ],
+  poolLiquidityArgs: {
+    poolHistory: [
+      [1687392000000, 152000],
+      [1687478400000, 140400],
+      [1687564800000, 160100],
+      [1687651200000, 163300],
+      [1687737600000, 150000],
+      [1687824000000, 180000],
+      [1687859473000, 200000],
+    ],
+    tokenA: testTokens[0],
+    tokenB: testTokens[1],
+    liquidityA: 10000,
+    liquidityB: 20000,
+    liquidityToken: testTokens[0],
+    onAddLiquidity: () => {},
+    onRemoveLiquidity: () => {},
+  },
 };
 
 const overviewStyles = (
@@ -237,7 +256,7 @@ const Overview = () => {
             <StakingList {...args.stakingListArgs} />
           </Grid>
           <Grid item xs={12} md={4}>
-            <PoolLiquidity />
+            <PoolLiquidity {...args.poolLiquidityArgs} />
           </Grid>
         </Grid>
       </Box>
