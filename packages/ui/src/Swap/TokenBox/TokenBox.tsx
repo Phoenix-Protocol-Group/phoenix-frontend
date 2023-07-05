@@ -21,6 +21,7 @@ interface TokenBoxProps {
   onAssetClick?: () => void;
   onChange: (value: string) => void;
   hideDropdownButton?: boolean;
+  value: string | undefined;
 }
 
 const AssetButton = ({
@@ -75,10 +76,12 @@ const TokenBox = ({
   token,
   onAssetClick,
   onChange,
+  value,
   hideDropdownButton = false,
 }: TokenBoxProps) => {
-  const [inputValue, setInputValue] = React.useState("0.00");
-  const [usdPrice, setUsdPrice] = React.useState(0);
+  const [usdPrice, setUsdPrice] = React.useState(
+    Number(value) * Number(token.usdValue) || 0
+  );
 
   return (
     <Box
@@ -93,14 +96,14 @@ const TokenBox = ({
       <Grid container>
         <Grid item xs={6}>
           <Input
-            value={inputValue}
+            value={value}
             onChange={(e) => {
-              setInputValue(e.target.value);
-              setUsdPrice(Number(e.target.value) * Number(token.usdValue));
               onChange(e.target.value);
+              setUsdPrice(Number(e.target.value) * Number(token.usdValue));
             }}
             inputProps={{ min: 0, max: token.amount }}
             type="number"
+            placeholder="0.00"
             sx={{
               color: "#FFF",
               fontSize: "24px",
@@ -178,9 +181,8 @@ const TokenBox = ({
           </Typography>
           <Button
             onClick={() => {
-              setInputValue(token.amount.toString());
-              setUsdPrice(token.amount * Number(token.usdValue));
               onChange(token.amount.toString());
+              setUsdPrice(token.amount * Number(token.usdValue));
             }}
             sx={{
               color: "white",

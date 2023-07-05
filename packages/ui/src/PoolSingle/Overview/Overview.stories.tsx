@@ -3,7 +3,7 @@ import Overview from "./Overview";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof Overview> = {
-  title: "Dashboard/Overview",
+  title: "Pool/Overview",
   // @ts-ignore
   component: Overview,
 };

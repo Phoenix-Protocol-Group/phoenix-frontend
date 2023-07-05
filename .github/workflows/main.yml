@@ -34,3 +34,6 @@ jobs:
       - name: Lint, test and build (pull request)
         if: ${{ github.event_name == 'pull_request' }}
         run: yarn && yarn build
+
+      - name: Lint Action
+        uses: wearerequired/lint-action@v2.3.0
