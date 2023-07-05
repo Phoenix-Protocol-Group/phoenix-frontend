@@ -5,9 +5,11 @@ import {
   Grid,
   TextField,
   Typography,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { Button } from "../../Button/Button";
-import { Token } from "../../Dashboard";
+import { Token } from "../../Swap";
 
 const OptionButton = ({
   value,
@@ -47,7 +49,7 @@ const StakeInput = ({
   onStake,
   balance,
   amount,
-  setAmount
+  setAmount,
 }: {
   onStake: () => void;
   balance: number;
@@ -148,8 +150,15 @@ const StakeInput = ({
           </Grid>
         ))}
         <Grid item xs={12}>
-          {/* @ts-ignore */}
-          <Button disabled={amount > balance || amount <= 0} fullWidth variant="primary" size="large" onClick={onStake}>
+          <Button
+            disabled={amount > balance || amount <= 0}
+            fullWidth
+            //@ts-ignore
+            variant="primary"
+            //@ts-ignore
+            size="large"
+            onClick={onStake}
+          >
             Stake
           </Button>
           <Typography sx={{ fontSize: "0.875rem", opacity: 0.7, mt: 1 }}>
@@ -168,14 +177,16 @@ const ClaimRewards = ({
   rewards: Token[];
   onClaim: () => void;
 }) => {
+  const theme = useTheme();
+  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
   return (
     <Box
       sx={{
         borderRadius: "0.5rem",
         background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
-        height: "100%",
         position: "relative",
         padding: "1rem",
+        height: !largerThenMd ? "calc(100% + 44px)" : "100%",
       }}
     >
       <Box>
@@ -248,7 +259,12 @@ const LiquidityMining = ({
         </Typography>
       </Grid>
       <Grid item xs={12} sm={8}>
-        <StakeInput balance={balance} setAmount={setAmount} amount={amount} onStake={() => onStake(amount)} />
+        <StakeInput
+          balance={balance}
+          setAmount={setAmount}
+          amount={amount}
+          onStake={() => onStake(amount)}
+        />
       </Grid>
       <Grid item xs={12} sm={4}>
         <ClaimRewards onClaim={onClaimRewards} rewards={rewards} />
