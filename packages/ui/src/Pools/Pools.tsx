@@ -1,4 +1,14 @@
-import { Box, Button, Grid, Input, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  Input,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import React from "react";
 import { Button as CustomButton } from "../Button/Button";
 
@@ -16,10 +26,22 @@ export interface Pool {
   maxApr: string;
 }
 
+export type Sort = "TVL" | "APR";
+export type Filter = "ALL" | "MY";
+
+interface PoolsProps {
+  pools: Pool[];
+  onAddLiquidityClick: (pool: Pool) => void;
+  onShowDetailsClick: (pool: Pool) => void;
+  filter: Filter;
+  onSortSelect: (by: Sort) => void;
+  onFilterClick: (by: Filter) => void;
+}
+
 const descriptionHeader = {
   color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
   fontSize: "14px",
-  lineHeight: "140%"
+  lineHeight: "140%",
 };
 
 const descriptionContent = {
@@ -27,18 +49,21 @@ const descriptionContent = {
   fontSize: "18px",
   fontWeight: 700,
   lineHeight: "140%",
-  textAlign: "right"
+  textAlign: "right",
 };
 
 const FilterButton = ({
   label,
   selected,
+  onClick
 }: {
   label: string;
   selected: boolean;
+  onClick: () => void;
 }) => {
   return (
     <Button
+      onClick={onClick}
       sx={{
         borderRadius: "16px",
         border: selected ? "1px solid #E2491A" : "none",
@@ -62,7 +87,15 @@ const FilterButton = ({
   );
 };
 
-const PoolItem = ({ pool }: { pool: Pool }) => {
+const PoolItem = ({
+  pool,
+  onAddLiquidityClick,
+  onShowDetailsClick,
+}: {
+  pool: Pool;
+  onAddLiquidityClick: (pool: Pool) => void;
+  onShowDetailsClick: (pool: Pool) => void;
+}) => {
   return (
     <Grid item xs={3}>
       <Box
@@ -73,17 +106,19 @@ const PoolItem = ({ pool }: { pool: Pool }) => {
             "linear-gradient(180deg, #292B2C 0%, #222426 100%), #242529",
         }}
       >
-        <Box sx={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "12px",
-          marginLeft: "5px"
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "12px",
+            marginLeft: "5px",
+          }}
+        >
           <Box
             component={"img"}
             src={pool.tokens[0].icon}
             sx={{
-              width: "64px"
+              width: "64px",
             }}
           />
           <Box
@@ -92,7 +127,7 @@ const PoolItem = ({ pool }: { pool: Pool }) => {
             sx={{
               width: "64px",
               position: "relative",
-              left: "-10px"
+              left: "-10px",
             }}
           />
         </Box>
@@ -105,37 +140,51 @@ const PoolItem = ({ pool }: { pool: Pool }) => {
           {`${pool.tokens[0].name} - ${pool.tokens[1].name}`}
         </Typography>
 
-        <Grid container rowSpacing={1} sx={{
-          marginBottom: "24px"
-        }}>
+        <Grid
+          container
+          rowSpacing={1}
+          sx={{
+            marginBottom: "24px",
+          }}
+        >
           <Grid item xs={6}>
-            <Typography sx={descriptionHeader}> 
-              TVL
-            </Typography>
+            <Typography sx={descriptionHeader}>TVL</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography sx={descriptionContent}> 
-              {pool.tvl}
-            </Typography>
+            <Typography sx={descriptionContent}>{pool.tvl}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography sx={descriptionHeader}> 
-              Max APR
-            </Typography>
+            <Typography sx={descriptionHeader}>Max APR</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography sx={descriptionContent}> 
-              {pool.maxApr}
-            </Typography>
+            <Typography sx={descriptionContent}>{pool.maxApr}</Typography>
           </Grid>
         </Grid>
 
-        <Grid container>
-          <Grid item xs={8}>
-            <CustomButton label="Add liquidity" type="primary" size="small" />
+        <Grid container spacing={1}>
+          <Grid item xs={7}>
+            <CustomButton
+              onClick={() => onAddLiquidityClick(pool)}
+              sx={{
+                padding: "12px 16px",
+                width: "100%",
+              }}
+              label="Add liquidity"
+              type="primary"
+              size="small"
+            />
           </Grid>
-          <Grid item xs={4}>
-            <CustomButton label="Details" type="secondary" size="small" />
+          <Grid item xs={5}>
+            <CustomButton
+              onClick={() => onShowDetailsClick(pool)}
+              sx={{
+                padding: "12px 16px",
+                width: "100%",
+              }}
+              label="Details"
+              type="secondary"
+              size="small"
+            />
           </Grid>
         </Grid>
       </Box>
@@ -143,7 +192,14 @@ const PoolItem = ({ pool }: { pool: Pool }) => {
   );
 };
 
-const Pools = ({ items }: { items: Pool[] }) => {
+const Pools = ({
+  pools,
+  onAddLiquidityClick,
+  onShowDetailsClick,
+  filter,
+  onSortSelect,
+  onFilterClick
+}: PoolsProps) => {
   const [searchValue, setSearchValue] = React.useState("");
 
   return (
@@ -166,40 +222,78 @@ const Pools = ({ items }: { items: Pool[] }) => {
         }}
       >
         <Grid item>
-          <FilterButton label="All Pools" selected={true} />
+          <FilterButton onClick={() => onFilterClick("ALL")} label="All Pools" selected={filter == "ALL"} />
         </Grid>
         <Grid item>
-          <FilterButton label="All Pools" selected={false} />
+          <FilterButton onClick={() => onFilterClick("MY")} label="My Pools" selected={filter == "MY"} />
         </Grid>
       </Grid>
-      <Input
-        placeholder="Search"
-        onChange={(e: any) => setSearchValue(e.target.value)}
+      <Grid container spacing={1}>
+        <Grid item xs={10}>
+          <Input
+            placeholder="Search"
+            onChange={(e: any) => setSearchValue(e.target.value)}
+            sx={{
+              width: "100%",
+              borderRadius: "16px",
+              border: "1px solid #2D303A",
+              background: "#1D1F21",
+              padding: "8px 16px",
+              lineHeight: "18px",
+              fontSize: "13px",
+              marginBottom: "16px",
+              "&:before": {
+                content: "none",
+              },
+              "&:after": {
+                content: "none",
+              },
+            }}
+            startAdornment={
+              <img style={{ marginRight: "8px" }} src="/MagnifyingGlass.svg" />
+            }
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <FormControl fullWidth>
+            <InputLabel sx={{
+              fontSize: "14px",
+              paddingBottom: "12px"
+            }}>
+              Sort by
+            </InputLabel>
+            <Select
+              autoWidth
+              label="Sort by"
+              sx={{
+                padding: "16px",
+                height: "46px",
+                borderRadius: "16px",
+                border: "1px solid #2D303A !important",
+                outline: "none !important",
+                background: "#1F2123",
+                fontSize: "14px"
+              }}
+            >
+              <MenuItem value={10}>TVL</MenuItem>
+              <MenuItem value={20}>APR</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+      <Grid
+        container
+        spacing={2}
         sx={{
-          width: "100%",
-          borderRadius: "16px",
-          border: "1px solid #2D303A",
-          background: "#1D1F21",
-          padding: "8px 16px",
-          lineHeight: "18px",
-          fontSize: "13px",
-          marginBottom: "16px",
-          "&:before": {
-            content: "none",
-          },
-          "&:after": {
-            content: "none",
-          },
+          overflow: "scroll",
         }}
-        startAdornment={
-          <img style={{ marginRight: "8px" }} src="/MagnifyingGlass.svg" />
-        }
-      />
-      <Grid container spacing={2} sx={{
-        overflow: "scroll"
-      }}>
-        {items.map((item) => (
-          <PoolItem pool={item} />
+      >
+        {pools.map((pool) => (
+          <PoolItem
+            onAddLiquidityClick={onAddLiquidityClick}
+            onShowDetailsClick={onShowDetailsClick}
+            pool={pool}
+          />
         ))}
       </Grid>
     </Box>

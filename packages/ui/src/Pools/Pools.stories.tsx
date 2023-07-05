@@ -41,6 +41,7 @@ type Story = StoryObj<typeof Pools>;
 
 export const Primary: Story = {
   args: {
-    items: pools
+    pools: pools,
+    filter: "ALL"
   },
 };
