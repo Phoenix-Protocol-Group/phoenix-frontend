@@ -14,6 +14,8 @@ import { TokenBox } from "../TokenBox/TokenBox";
 import { Button } from "@mui/material";
 import { useState } from "react";
 
+import { Button as CustomButton } from "../Button/Button";
+
 interface Token {
   name: string;
   icon: string;
@@ -33,7 +35,9 @@ interface SwapContainerProps {
   slippageTolerance: string;
   onOptionsClick: () => void;
   onSwapTokensClick: () => void;
+  onSwapButtonClick: () => void;
   onTokenSelectorClick: (isFromToken: boolean) => void;
+  onInputChange: (isFromToken: boolean, value: string) => void;
 }
 
 const listItemContainer = {
@@ -88,6 +92,8 @@ const SwapContainer = ({
   slippageTolerance,
   onOptionsClick,
   onSwapTokensClick,
+  onSwapButtonClick,
+  onInputChange,
   onTokenSelectorClick,
 }: SwapContainerProps) => {
   const [expanded, setExpanded] = useState(true);
@@ -127,7 +133,11 @@ const SwapContainer = ({
           </IconButton>
         </Box>
       </Box>
-      <TokenBox token={fromToken} onClick={() => onTokenSelectorClick(true)} />
+      <TokenBox
+        token={fromToken}
+        onAssetClick={() => onTokenSelectorClick(true)}
+        onChange={(value) => onInputChange(true, value)}
+      />
       <Box
         sx={{
           height: "8px",
@@ -137,7 +147,20 @@ const SwapContainer = ({
       >
         <SwapAssetsButton onClick={onSwapTokensClick} />
       </Box>
-      <TokenBox token={toToken} onClick={() => onTokenSelectorClick(false)} />
+      <TokenBox
+        token={toToken}
+        onAssetClick={() => onTokenSelectorClick(false)}
+        onChange={(value) => onInputChange(false, value)}
+      />
+      <CustomButton
+        onClick={onSwapButtonClick}
+        type="primary"
+        label="Swap"
+        sx={{
+          marginTop: "16px",
+          width: "100%",
+        }}
+      />
       <Box
         sx={{
           marginTop: "24px",

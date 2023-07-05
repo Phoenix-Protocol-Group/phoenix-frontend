@@ -1,4 +1,5 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, Input, Typography } from "@mui/material";
+import React from "react";
 
 interface Token {
   name: string;
@@ -10,11 +11,20 @@ interface Token {
 
 interface TokenBoxProps {
   token: Token;
-  onClick?: () => void;
+  onAssetClick?: () => void;
+  onChange: (value: string) => void;
   hideDropdownButton?: boolean;
 }
 
-const AssetButton = ({ token, onClick, hideDropdownButton }: TokenBoxProps) => {
+const AssetButton = ({
+  token,
+  onClick,
+  hideDropdownButton = false,
+}: {
+  token: Token;
+  onClick?: () => void;
+  hideDropdownButton?: boolean;
+}) => {
   return (
     <Button
       onClick={onClick}
@@ -56,9 +66,13 @@ const AssetButton = ({ token, onClick, hideDropdownButton }: TokenBoxProps) => {
 
 const TokenBox = ({
   token,
-  onClick,
+  onAssetClick,
+  onChange,
   hideDropdownButton = false,
 }: TokenBoxProps) => {
+  const [inputValue, setInputValue] = React.useState("0.00");
+  const [usdPrice, setUsdPrice] = React.useState(0);
+
   return (
     <Box
       sx={{
@@ -71,7 +85,26 @@ const TokenBox = ({
     >
       <Grid container>
         <Grid item xs={6}>
-          0.00
+          <Input
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setUsdPrice(Number(e.target.value) * Number(token.usdValue));
+              onChange(e.target.value);
+            }}
+            sx={{
+              color: "#FFF",
+              fontSize: "24px",
+              fontWeight: 700,
+              lineHeight: "140%",
+              "&:before": {
+                content: "none",
+              },
+              "&:after": {
+                content: "none",
+              },
+            }}
+          />
         </Grid>
         <Grid
           item
@@ -84,7 +117,7 @@ const TokenBox = ({
           <AssetButton
             hideDropdownButton={hideDropdownButton}
             token={token}
-            onClick={onClick}
+            onClick={onAssetClick}
           />
         </Grid>
         <Grid
@@ -95,7 +128,7 @@ const TokenBox = ({
             color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70));",
           }}
         >
-          $0.00
+          ${usdPrice.toFixed(2)}
         </Grid>
         <Grid
           item
@@ -114,9 +147,13 @@ const TokenBox = ({
                 "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70));",
             }}
           >
-            Balance 2.68448332
+            Balance {token.amount}
           </Typography>
           <Button
+            onClick={() => {
+              setInputValue(token.amount.toString());
+              onChange(token.amount.toString());
+            }}
             sx={{
               color: "white",
               fontSize: "12px",
