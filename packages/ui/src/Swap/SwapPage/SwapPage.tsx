@@ -1,7 +1,7 @@
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
-import AppBar from "../AppBar/AppBar";
-import { SidebarNavigation } from "../SidebarNavigation/SidebarNavigation";
+import AppBar from "../../AppBar/AppBar";
+import { SidebarNavigation } from "../../SidebarNavigation/SidebarNavigation";
 import MailIcon from "@mui/icons-material/Mail";
 import { SwapContainer } from "../SwapContainer/SwapContainer";
 import { SlippageSettings } from "../SlippageSettings/SlippageSettings";
@@ -169,6 +169,8 @@ const SwapPage = () => {
             onTokenSelectorClick={(isFromToken) =>
               handleSelectorOpen(isFromToken)
             }
+            onSwapButtonClick={() => {}}
+            onInputChange={() => {}}
           />
         )}
 

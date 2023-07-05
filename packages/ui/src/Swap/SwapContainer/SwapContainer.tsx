@@ -14,7 +14,7 @@ import { TokenBox } from "../TokenBox/TokenBox";
 import { Button } from "@mui/material";
 import { useState } from "react";
 
-import { Button as CustomButton } from "../Button/Button";
+import { Button as CustomButton } from "../../Button/Button";
 
 interface Token {
   name: string;

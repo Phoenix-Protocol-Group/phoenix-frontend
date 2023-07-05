@@ -1,4 +1,11 @@
-import { Box, Button, Grid, Input, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Input,
+  Typography,
+  makeStyles,
+} from "@mui/material";
 import React from "react";
 
 interface Token {
@@ -92,6 +99,8 @@ const TokenBox = ({
               setUsdPrice(Number(e.target.value) * Number(token.usdValue));
               onChange(e.target.value);
             }}
+            inputProps={{ min: 0, max: token.amount }}
+            type="number"
             sx={{
               color: "#FFF",
               fontSize: "24px",
@@ -102,6 +111,24 @@ const TokenBox = ({
               },
               "&:after": {
                 content: "none",
+              },
+              "&:hover fieldset": {
+                border: "1px solid #E2621B!important",
+              },
+              "&:focus-within fieldset, &:focus-visible fieldset": {
+                border: "1px solid #E2621B!important",
+                color: "white!important",
+              },
+              "& input[type=number]": {
+                "-moz-appearance": "textfield",
+              },
+              "& input[type=number]::-webkit-outer-spin-button": {
+                "-webkit-appearance": "none",
+                margin: 0,
+              },
+              "& input[type=number]::-webkit-inner-spin-button": {
+                "-webkit-appearance": "none",
+                margin: 0,
               },
             }}
           />
@@ -152,6 +179,7 @@ const TokenBox = ({
           <Button
             onClick={() => {
               setInputValue(token.amount.toString());
+              setUsdPrice(token.amount * Number(token.usdValue));
               onChange(token.amount.toString());
             }}
             sx={{
