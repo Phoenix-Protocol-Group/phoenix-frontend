@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://avatars.githubusercontent.com/u/133277324" />
+  <img src="https://i.epvpimg.com/Rx1ddab.png" />
 </p>
 
 # Phoenix Frontend
