@@ -42,13 +42,20 @@ interface PoolsProps {
 
 const descriptionHeader = {
   color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
-  fontSize: "14px",
+  marginTop: "3px",
+  fontSize: {
+    xs: "12px",
+    md: "14px",
+  },
   lineHeight: "140%",
 };
 
 const descriptionContent = {
   color: "#FFF",
-  fontSize: "18px",
+  fontSize: {
+    xs: "12px",
+    md: "18px",
+  },
   fontWeight: 700,
   lineHeight: "140%",
   textAlign: "right",
@@ -93,7 +100,7 @@ const PoolItem = ({
   pool,
   onAddLiquidityClick,
   onShowDetailsClick,
-  filter
+  filter,
 }: {
   pool: Pool;
   filter: Filter;
@@ -101,7 +108,7 @@ const PoolItem = ({
   onShowDetailsClick: (pool: Pool) => void;
 }) => {
   return (
-    <Grid item xs={3}>
+    <Grid item xs={6} md={3}>
       <Box
         sx={{
           padding: "16px",
@@ -122,14 +129,20 @@ const PoolItem = ({
             component={"img"}
             src={pool.tokens[0].icon}
             sx={{
-              width: "64px",
+              width: {
+                xs: "48px",
+                md: "64px",
+              },
             }}
           />
           <Box
             component={"img"}
             src={pool.tokens[1].icon}
             sx={{
-              width: "64px",
+              width: {
+                xs: "48px",
+                md: "64px",
+              },
               position: "relative",
               left: "-10px",
             }}
@@ -139,6 +152,11 @@ const PoolItem = ({
           sx={{
             textAlign: "center",
             marginBottom: "16px",
+            fontWeight: 700,
+            fontSize: {
+              xs: "16px",
+              md: "18px",
+            },
           }}
         >
           {`${pool.tokens[0].name} - ${pool.tokens[1].name}`}
@@ -167,12 +185,14 @@ const PoolItem = ({
             <Typography sx={descriptionHeader}>My Liquidity</Typography>
           </Grid>
           <Grid item xs={6} display={filter == "MY" ? "block" : "none"}>
-            <Typography sx={descriptionContent}>{pool.userLiquidity}</Typography>
+            <Typography sx={descriptionContent}>
+              {pool.userLiquidity}
+            </Typography>
           </Grid>
         </Grid>
 
         <Grid container spacing={1}>
-          <Grid item xs={7}>
+          <Grid item xs={12} md={7}>
             <CustomButton
               onClick={() => onAddLiquidityClick(pool)}
               sx={{
@@ -184,7 +204,7 @@ const PoolItem = ({
               size="small"
             />
           </Grid>
-          <Grid item xs={5}>
+          <Grid item xs={12} md={5}>
             <CustomButton
               onClick={() => onShowDetailsClick(pool)}
               sx={{
@@ -248,7 +268,7 @@ const Pools = ({
         </Grid>
       </Grid>
       <Grid container spacing={1}>
-        <Grid item xs={10}>
+        <Grid item xs={7} md={10}>
           <Input
             placeholder="Search"
             onChange={(e: any) => setSearchValue(e.target.value)}
@@ -273,14 +293,14 @@ const Pools = ({
             }
           />
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={5} md={2}>
           <FormControl fullWidth>
             <InputLabel
               sx={{
-                fontSize: "13px",
+                fontSize: "13px !important",
                 paddingBottom: "12px",
                 top: "-2px",
-                color: "rgba(255, 255, 255, 0.70)",
+                color: "rgba(255, 255, 255, 0.70) !important",
                 borderColor: "transparent",
                 "&:hover": {
                   borderColor: "transparent",
@@ -300,7 +320,7 @@ const Pools = ({
                 borderRadius: "16px",
                 border: "1px solid #2D303A !important",
                 background: "#1F2123",
-                fontSize: "14px",
+                fontSize: "14px !important",
               }}
             >
               <MenuItem value={"HighTVL"}>
