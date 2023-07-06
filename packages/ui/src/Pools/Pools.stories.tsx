@@ -31,7 +31,7 @@ const pools: Pool[] = [testPool, testPool, testPool, testPool, testPool, testPoo
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof Pools> = {
-  title: "General/Pools",
+  title: "Pools/Pools",
   component: Pools
 };
 
