@@ -26,7 +26,7 @@ export interface Pool {
   maxApr: string;
 }
 
-export type Sort = "TVL" | "APR";
+export type Sort = "HighTVL" | "HighAPR" | "LowTVL" | "LowAPR";
 export type Filter = "ALL" | "MY";
 
 interface PoolsProps {
@@ -55,7 +55,7 @@ const descriptionContent = {
 const FilterButton = ({
   label,
   selected,
-  onClick
+  onClick,
 }: {
   label: string;
   selected: boolean;
@@ -198,7 +198,7 @@ const Pools = ({
   onShowDetailsClick,
   filter,
   onSortSelect,
-  onFilterClick
+  onFilterClick,
 }: PoolsProps) => {
   const [searchValue, setSearchValue] = React.useState("");
 
@@ -222,10 +222,18 @@ const Pools = ({
         }}
       >
         <Grid item>
-          <FilterButton onClick={() => onFilterClick("ALL")} label="All Pools" selected={filter == "ALL"} />
+          <FilterButton
+            onClick={() => onFilterClick("ALL")}
+            label="All Pools"
+            selected={filter == "ALL"}
+          />
         </Grid>
         <Grid item>
-          <FilterButton onClick={() => onFilterClick("MY")} label="My Pools" selected={filter == "MY"} />
+          <FilterButton
+            onClick={() => onFilterClick("MY")}
+            label="My Pools"
+            selected={filter == "MY"}
+          />
         </Grid>
       </Grid>
       <Grid container spacing={1}>
@@ -256,13 +264,22 @@ const Pools = ({
         </Grid>
         <Grid item xs={2}>
           <FormControl fullWidth>
-            <InputLabel sx={{
-              fontSize: "14px",
-              paddingBottom: "12px"
-            }}>
+            <InputLabel
+              sx={{
+                fontSize: "13px",
+                paddingBottom: "12px",
+                top: "-2px",
+                color: "rgba(255, 255, 255, 0.70)",
+                borderColor: "transparent",
+                "&:hover": {
+                  borderColor: "transparent",
+                },
+              }}
+            >
               Sort by
             </InputLabel>
             <Select
+              onChange={(event: any) => onSortSelect(event.target.value)}
               autoWidth
               label="Sort by"
               sx={{
@@ -270,13 +287,22 @@ const Pools = ({
                 height: "46px",
                 borderRadius: "16px",
                 border: "1px solid #2D303A !important",
-                outline: "none !important",
                 background: "#1F2123",
-                fontSize: "14px"
+                fontSize: "14px",
               }}
             >
-              <MenuItem value={10}>TVL</MenuItem>
-              <MenuItem value={20}>APR</MenuItem>
+              <MenuItem value={"HighTVL"}>
+                <Typography fontSize="14px">TVL High to Low</Typography>
+              </MenuItem>
+              <MenuItem value={"HighTVL"}>
+                <Typography fontSize="14px">TVL Low to High</Typography>
+              </MenuItem>
+              <MenuItem value={"HighAPR"}>
+                <Typography fontSize="14px">APR High to Low</Typography>
+              </MenuItem>
+              <MenuItem value={"HighAPR"}>
+                <Typography fontSize="14px">APR Low to High</Typography>
+              </MenuItem>
             </Select>
           </FormControl>
         </Grid>
