@@ -22,7 +22,8 @@ const testTokens: Token[] = [
 const testPool: Pool = {
   tokens: testTokens,
   tvl: "$29,573.57",
-  maxApr: "98.65%"
+  maxApr: "98.65%",
+  userLiquidity: 30
 }
 
 const pools: Pool[] = [testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool];
@@ -43,5 +44,12 @@ export const Primary: Story = {
   args: {
     pools: pools,
     filter: "ALL"
+  },
+};
+
+export const Secondary: Story = {
+  args: {
+    pools: pools,
+    filter: "MY"
   },
 };

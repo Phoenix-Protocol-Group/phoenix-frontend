@@ -24,6 +24,7 @@ export interface Pool {
   tokens: Token[];
   tvl: string;
   maxApr: string;
+  userLiquidity: number;
 }
 
 export type Sort = "HighTVL" | "HighAPR" | "LowTVL" | "LowAPR";
@@ -34,6 +35,7 @@ interface PoolsProps {
   onAddLiquidityClick: (pool: Pool) => void;
   onShowDetailsClick: (pool: Pool) => void;
   filter: Filter;
+  sort: Sort;
   onSortSelect: (by: Sort) => void;
   onFilterClick: (by: Filter) => void;
 }
@@ -91,8 +93,10 @@ const PoolItem = ({
   pool,
   onAddLiquidityClick,
   onShowDetailsClick,
+  filter
 }: {
   pool: Pool;
+  filter: Filter;
   onAddLiquidityClick: (pool: Pool) => void;
   onShowDetailsClick: (pool: Pool) => void;
 }) => {
@@ -159,6 +163,12 @@ const PoolItem = ({
           <Grid item xs={6}>
             <Typography sx={descriptionContent}>{pool.maxApr}</Typography>
           </Grid>
+          <Grid item xs={6} display={filter == "MY" ? "block" : "none"}>
+            <Typography sx={descriptionHeader}>My Liquidity</Typography>
+          </Grid>
+          <Grid item xs={6} display={filter == "MY" ? "block" : "none"}>
+            <Typography sx={descriptionContent}>{pool.userLiquidity}</Typography>
+          </Grid>
         </Grid>
 
         <Grid container spacing={1}>
@@ -197,6 +207,7 @@ const Pools = ({
   onAddLiquidityClick,
   onShowDetailsClick,
   filter,
+  sort,
   onSortSelect,
   onFilterClick,
 }: PoolsProps) => {
@@ -282,6 +293,7 @@ const Pools = ({
               onChange={(event: any) => onSortSelect(event.target.value)}
               autoWidth
               label="Sort by"
+              value={sort}
               sx={{
                 padding: "16px",
                 height: "46px",
@@ -316,6 +328,7 @@ const Pools = ({
       >
         {pools.map((pool) => (
           <PoolItem
+            filter={filter}
             onAddLiquidityClick={onAddLiquidityClick}
             onShowDetailsClick={onShowDetailsClick}
             pool={pool}
