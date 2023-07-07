@@ -19,7 +19,6 @@ interface ButtonProps
 const Button = ({
   type = "primary",
   size = "medium",
-  onClick,
   label,
   ...props
 }: ButtonProps) => {
@@ -33,6 +32,7 @@ const Button = ({
     fontSize: "14px",
     fontWeight: "700",
     lineHeight: "20px",
+    textTransform: "none",
     color: Colors.backgroundLight,
     "&:hover": {
       background:
