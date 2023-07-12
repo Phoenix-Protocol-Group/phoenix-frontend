@@ -30,6 +30,9 @@ interface PairClientReadOnlyInterface {
     beliefPrice: number | undefined,
     maxSpread: number
   ) => Promise<any>;
+  simulateSwap: (sellA: boolean, sellAmount: number) => Promise<any>;
+  simulateReverseSwap: (sellA: boolean, sellAmount: number) => Promise<any>;
+  queryShareTokenAddress: () => Promise<any>;
 }
 
 export class PairClient implements PairClientReadOnlyInterface {
@@ -57,6 +60,56 @@ export class PairClient implements PairClientReadOnlyInterface {
       contractId: this.contractId,
       method: "pool_info",
       params: [],
+      source: this.source || constants.TESTING_SOURCE,
+    });
+
+    const decodedScVal: any = convert.scValToJs(scVal);
+    return decodedScVal;
+  }
+
+  async queryShareTokenAdress(): Promise<any> {
+    const scVal = await fetchContractValue({
+      server: this.server,
+      networkPassphrase: this.networkPassphrase,
+      contractId: this.contractId,
+      method: "query_share_token_address",
+      params: [],
+      source: this.source || constants.TESTING_SOURCE,
+    });
+
+    const decodedScVal: any = convert.scValToJs(scVal);
+    return decodedScVal;
+  }
+
+  async simulateSwap(sellA: boolean, sellAmount: number): Promise<any> {
+    const params = [
+      xdr.ScVal.scvBool(sellA),
+      convert.bigNumberToI128(new BigNumber(sellAmount)),
+    ];
+    const scVal = await fetchContractValue({
+      server: this.server,
+      networkPassphrase: this.networkPassphrase,
+      contractId: this.contractId,
+      method: "simulate_swap",
+      params,
+      source: this.source || constants.TESTING_SOURCE,
+    });
+
+    const decodedScVal: any = convert.scValToJs(scVal);
+    return decodedScVal;
+  }
+
+  async simulateReverseSwap(sellA: boolean, sellAmount: number): Promise<any> {
+    const params = [
+      xdr.ScVal.scvBool(sellA),
+      convert.bigNumberToI128(new BigNumber(sellAmount)),
+    ];
+    const scVal = await fetchContractValue({
+      server: this.server,
+      networkPassphrase: this.networkPassphrase,
+      contractId: this.contractId,
+      method: "simulate_reverse_swap",
+      params,
       source: this.source || constants.TESTING_SOURCE,
     });
 
