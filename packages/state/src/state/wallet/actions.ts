@@ -27,7 +27,7 @@ export const createWalletActions = (
     connectWallet: async () => {
       // Get the network details from the user's wallet.
       const networkDetails = await freighter().getNetworkDetails();
-      console.log(4);
+
       // Throw an error if the network is not supported.
       if (
         !allChains.find(
