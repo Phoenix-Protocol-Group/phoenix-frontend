@@ -1,9 +1,8 @@
 import { Server } from "soroban-client";
-import { BigNumber } from "bignumber.js";
 
 export type Token = {
   id: string;
-  balance: BigNumber;
+  balance: bigint;
 };
 
 export type Wallet = {
