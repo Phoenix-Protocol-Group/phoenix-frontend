@@ -1,13 +1,9 @@
-import { SorobanTokenQueryClient } from "../../clients/Token.client";
 import { WalletActions, Token, Wallet } from "./types";
 import { Account, Server } from "soroban-client";
 import { AppStore, SetStateType, GetStateType } from "../types";
 import { freighter } from "./freighter";
 import { allChains, networkToActiveChain } from "./chains";
-
-// Dummy source account for simulation. The public key for this is all 0-bytes.
-const defaultAddress =
-  "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF";
+import { SorobanTokenContract } from "@phoenix-protocol/contracts";
 
 export const createWalletActions = (
   setState: SetStateType,
@@ -27,7 +23,7 @@ export const createWalletActions = (
     connectWallet: async () => {
       // Get the network details from the user's wallet.
       const networkDetails = await freighter().getNetworkDetails();
-      console.log(4);
+
       // Throw an error if the network is not supported.
       if (
         !allChains.find(
@@ -86,15 +82,7 @@ export const createWalletActions = (
       }
 
       // Create Soroban token query client
-      const queryClient = new SorobanTokenQueryClient(
-        getState().server,
-        getState().networkPassphrase,
-        tokenId,
-        new Account(getState().wallet?.address ?? defaultAddress, "0")
-      );
-
-      // Fetch token balance
-      const balance = await queryClient.balance();
+      const balance = await SorobanTokenContract.balance({ id: tokenId });
 
       // Update token balance
       setState((state: AppStore) => {
