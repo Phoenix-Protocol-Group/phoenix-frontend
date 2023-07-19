@@ -1,4 +1,5 @@
 import Colors from "../Theme/colors";
+import React from "react";
 import { styled, Theme, CSSObject } from "@mui/material/styles";
 import {
   Box,
@@ -97,7 +98,7 @@ const SidebarNavigation = ({
   const theme = useTheme();
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!largerThenMd && open) {
       document.body.style.overflow = "hidden";
     } else {
