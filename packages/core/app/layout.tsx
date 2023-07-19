@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import type { Metadata } from "next";
-import { useMediaQuery, useTheme } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Providers from "../providers";
 import { SidebarNavigation, AppBar } from "@phoenix-protocol/ui";
 import MailIcon from "@mui/icons-material/Mail";
@@ -45,32 +44,6 @@ const args = {
       },
     ],
   },
-  navItems: [
-    {
-      label: "Nav Item 1",
-      icon: <MailIcon />,
-      active: true,
-      href: "#",
-    },
-    {
-      label: "Nav Item 2",
-      icon: <MailIcon />,
-      active: false,
-      href: "#",
-    },
-    {
-      label: "Nav Item 3",
-      icon: <MailIcon />,
-      active: false,
-      href: "#",
-    },
-    {
-      label: "Nav Item 4",
-      icon: <MailIcon />,
-      active: false,
-      href: "#",
-    },
-  ],
   appBarArgs: {
     balance: 125.5,
     walletAddress: "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
@@ -88,13 +61,34 @@ export default function RootLayout({
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
   const [navOpen, setNavOpen] = React.useState(largerThenMd ? true : false);
 
+  const navItems = [
+    {
+      label: "Dashboard",
+      icon: <MailIcon />,
+      active: false,
+      href: "#",
+    },
+    {
+      label: "Swap",
+      icon: <MailIcon />,
+      active: false,
+      href: "#",
+    },
+    {
+      label: "Pools",
+      icon: <MailIcon />,
+      active: true,
+      href: "#",
+    },
+  ];
+
   return (
     <html lang="en">
       <Providers>
         <body>
           <SidebarNavigation
             onNavClick={() => {}}
-            items={args.navItems}
+            items={navItems}
             open={navOpen}
             setOpen={setNavOpen}
           />
@@ -103,7 +97,30 @@ export default function RootLayout({
             toggleMobileNav={(open) => setNavOpen(open)}
             {...args.appBarArgs}
           />
-          {children}
+          <Box
+            sx={{
+              marginLeft: largerThenMd
+                ? navOpen
+                  ? "240px"
+                  : "60px"
+                : navOpen
+                ? "240px"
+                : "0",
+              width: largerThenMd
+                ? navOpen
+                  ? "calc(100% - 240px)"
+                  : "calc(100% - 60px)"
+                : navOpen
+                ? "0"
+                : "100%",
+              transition: "all 0.2s ease-in-out",
+              display: "flex",
+              justifyContent: "center",
+              padding: "16px"
+            }}
+          >
+            {children}
+          </Box>
         </body>
       </Providers>
     </html>
