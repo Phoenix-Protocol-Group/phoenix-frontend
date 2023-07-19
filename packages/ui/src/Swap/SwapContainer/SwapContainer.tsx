@@ -12,7 +12,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { TokenBox } from "../TokenBox/TokenBox";
 import { Button } from "@mui/material";
-import { useState } from "react";
+import React from "react";
 
 import { Button as CustomButton } from "../../Button/Button";
 
@@ -100,7 +100,7 @@ const SwapContainer = ({
   onInputChange,
   onTokenSelectorClick,
 }: SwapContainerProps) => {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = React.useState(true);
 
   return (
     <Box
