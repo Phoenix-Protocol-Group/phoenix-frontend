@@ -200,4 +200,4 @@ const AppBar = ({
     </>
   );
 };
-export default AppBar;
+export {AppBar};
