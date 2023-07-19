@@ -1,6 +1,6 @@
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
-import AppBar from "../../AppBar/AppBar";
+import { AppBar } from "../../AppBar/AppBar";
 import { SidebarNavigation } from "../../SidebarNavigation/SidebarNavigation";
 import MailIcon from "@mui/icons-material/Mail";
 import { SwapContainer } from "../SwapContainer/SwapContainer";

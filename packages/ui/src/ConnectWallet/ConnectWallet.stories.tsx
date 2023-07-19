@@ -1,6 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import ConnectWallet from "./ConnectWallet";
+import { ConnectWallet } from "./ConnectWallet";
 import { freighter } from "@phoenix-protocol/state";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export

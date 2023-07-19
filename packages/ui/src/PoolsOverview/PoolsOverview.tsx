@@ -4,7 +4,7 @@ import { Token } from "../Modal/Modal";
 import MailIcon from "@mui/icons-material/Mail";
 import React from "react";
 import { SidebarNavigation } from "../SidebarNavigation/SidebarNavigation";
-import AppBar from "../AppBar/AppBar";
+import { AppBar } from "../AppBar/AppBar";
 
 const testTokens: Token[] = [
   {

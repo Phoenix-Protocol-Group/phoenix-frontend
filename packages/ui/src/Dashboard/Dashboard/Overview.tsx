@@ -8,7 +8,7 @@ import CryptoCTA from "../CryptoCTA/CryptoCTA";
 import WalletBalanceTable from "../WalletBalanceTable/WalletBalanceTable";
 import React from "react";
 import MailIcon from "@mui/icons-material/Mail";
-import AppBar from "../../AppBar/AppBar";
+import { AppBar } from "../../AppBar/AppBar";
 import DashBoardStats from "../DashboardStats/DashboardStats";
 
 const stellarGainerAsset = {
