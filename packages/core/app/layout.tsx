@@ -4,8 +4,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { useMediaQuery, useTheme } from "@mui/material";
 import Providers from "../providers";
-import { SidebarNavigation } from "@phoenix-protocol/ui";
-import AppBar from "@phoenix-protocol/ui/build/AppBar/AppBar";
+import { SidebarNavigation, AppBar } from "@phoenix-protocol/ui";
 import MailIcon from "@mui/icons-material/Mail";
 
 const stellarGainerAsset = {
