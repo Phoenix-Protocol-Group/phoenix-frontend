@@ -1,7 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { AssetSelector } from "./AssetSelector";
-import { Token } from "./AssetSelector";
+import { Token } from "../../Modal/Modal";
 
 const testTokens: Token[] = [
   {

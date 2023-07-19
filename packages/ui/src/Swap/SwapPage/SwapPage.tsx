@@ -5,7 +5,8 @@ import { SidebarNavigation } from "../../SidebarNavigation/SidebarNavigation";
 import MailIcon from "@mui/icons-material/Mail";
 import { SwapContainer } from "../SwapContainer/SwapContainer";
 import { SlippageSettings } from "../SlippageSettings/SlippageSettings";
-import { AssetSelector, Token } from "../AssetSelector/AssetSelector";
+import { AssetSelector } from "../AssetSelector/AssetSelector";
+import { Token } from "../../Modal/Modal";
 
 const args = {
   navItems: [

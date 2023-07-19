@@ -9,7 +9,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { Button } from "../../Button/Button";
-import { Token } from "../../Swap";
+import { Token } from "../../Modal/Modal";
 
 const OptionButton = ({
   value,

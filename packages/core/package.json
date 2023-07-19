@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mui/material": "^5.14.1",
     "@phoenix-protocol/state": "^0.0.1",
     "@phoenix-protocol/ui": "^0.0.1",
     "@phoenix-protocol/utils": "^0.0.1",

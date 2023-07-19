@@ -3,6 +3,8 @@
   "include": ["./src"],
   "compilerOptions": {
     "jsx": "react-jsx",
-    "outDir": "./build"
+    "outDir": "./build",
+    "target": "ES5",
+    "downlevelIteration": true
   }
 }
