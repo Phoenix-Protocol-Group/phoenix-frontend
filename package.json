@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "yarn workspaces run build"
+    "build": "yarn workspaces run build",
+    "storybook": "yarn workspace @phoenix-protocol/ui storybook"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,7 @@
   "private": true,
   "workspaces": [
     "packages/utils",
+    "packages/contracts",
     "packages/state",
     "packages/contracts",
     "packages/ui",

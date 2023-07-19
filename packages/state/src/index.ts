@@ -14,4 +14,3 @@ export {
 export * from "./state";
 
 export * from "./soroban";
-export * from "./clients";
