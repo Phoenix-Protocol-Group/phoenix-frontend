@@ -3,7 +3,7 @@ import { Box, Grid, IconButton, Input, Typography } from "@mui/material";
 import AssetItem from "./AssetItem";
 import { KeyboardArrowLeft } from "@mui/icons-material";
 
-export interface Token {
+interface Token {
   name: string;
   icon: string;
   usdValue: number;

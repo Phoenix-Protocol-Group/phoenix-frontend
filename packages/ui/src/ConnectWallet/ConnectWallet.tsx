@@ -191,4 +191,4 @@ const ConnectWallet = ({
   );
 };
 
-export default ConnectWallet;
+export { ConnectWallet };

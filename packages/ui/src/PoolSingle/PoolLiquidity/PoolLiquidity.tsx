@@ -9,7 +9,8 @@ import { useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
 import TabPanel from "@mui/lab/TabPanel";
 import TabContext from "@mui/lab/TabContext";
-import { Token, TokenBox } from "../../Swap";
+import { TokenBox } from "../../Swap";
+import { Token } from "../../Modal/Modal";
 import { Button } from "../../Button/Button";
 
 type Data = number[];

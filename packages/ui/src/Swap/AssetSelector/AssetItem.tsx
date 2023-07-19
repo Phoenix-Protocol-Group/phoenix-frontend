@@ -1,6 +1,6 @@
 import { Box, Button } from "@mui/material";
 
-import { Token } from "./AssetSelector";
+import { Token } from "../../Modal/Modal";
 
 const AssetItem = ({
   token,

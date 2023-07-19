@@ -1,6 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Pools, Token, Pool } from "./Pools";
+import { Pools, Pool } from "./Pools";
+import { Token } from "../Modal/Modal";
 
 const testTokens: Token[] = [
   {

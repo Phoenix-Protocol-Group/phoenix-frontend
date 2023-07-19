@@ -12,7 +12,7 @@ import {
 import React from "react";
 import { Button as CustomButton } from "../Button/Button";
 
-export interface Token {
+interface Token {
   name: string;
   icon: string;
   usdValue: number;

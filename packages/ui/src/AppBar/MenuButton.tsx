@@ -1,4 +1,5 @@
 import { motion, Transition, SVGMotionProps } from "framer-motion";
+import React from "react";
 
 const MenuButton = ({
   isOpen = false,

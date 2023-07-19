@@ -13,7 +13,7 @@ import PoolLiquidity from "../PoolLiquidity/PoolLiquidity";
 import { SidebarNavigation } from "../../SidebarNavigation/SidebarNavigation";
 import { useState } from "react";
 import MailIcon from "@mui/icons-material/Mail";
-import AppBar from "../../AppBar/AppBar";
+import { AppBar } from "../../AppBar/AppBar";
 import { testTokens } from "../../Dashboard/WalletBalanceTable/WalletBalanceTable.stories";
 
 const args = {

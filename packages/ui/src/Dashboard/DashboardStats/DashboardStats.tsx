@@ -1,4 +1,5 @@
 import { Box, Grid, Typography } from "@mui/material";
+import React from "react";
 
 interface GainerOrLooserAsset {
   name: string;

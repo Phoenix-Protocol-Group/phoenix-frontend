@@ -33,6 +33,8 @@ interface SwapContainerProps {
   estSellPrice: string;
   minSellPrice: string;
   slippageTolerance: string;
+  fromTokenValue?: string;
+  toTokenValue?: string;
   onOptionsClick: () => void;
   onSwapTokensClick: () => void;
   onSwapButtonClick: () => void;
@@ -90,6 +92,8 @@ const SwapContainer = ({
   estSellPrice,
   minSellPrice,
   slippageTolerance,
+  fromTokenValue,
+  toTokenValue,
   onOptionsClick,
   onSwapTokensClick,
   onSwapButtonClick,
@@ -134,6 +138,7 @@ const SwapContainer = ({
         </Box>
       </Box>
       <TokenBox
+        value={toTokenValue}
         token={fromToken}
         onAssetClick={() => onTokenSelectorClick(true)}
         onChange={(value) => onInputChange(true, value)}
@@ -148,6 +153,7 @@ const SwapContainer = ({
         <SwapAssetsButton onClick={onSwapTokensClick} />
       </Box>
       <TokenBox
+        value={fromTokenValue}
         token={toToken}
         onAssetClick={() => onTokenSelectorClick(false)}
         onChange={(value) => onInputChange(false, value)}

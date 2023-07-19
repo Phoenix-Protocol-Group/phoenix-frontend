@@ -1,9 +1,10 @@
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import { Token, Pool, Pools } from "../Pools/Pools";
+import { Pool, Pools } from "../Pools/Pools";
+import { Token } from "../Modal/Modal";
 import MailIcon from "@mui/icons-material/Mail";
 import React from "react";
 import { SidebarNavigation } from "../SidebarNavigation/SidebarNavigation";
-import AppBar from "../AppBar/AppBar";
+import { AppBar } from "../AppBar/AppBar";
 
 const testTokens: Token[] = [
   {

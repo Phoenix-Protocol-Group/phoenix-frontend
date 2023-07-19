@@ -48,12 +48,13 @@ const Button = ({
 
   return (
     <MuiButton
+      size={size}
+      disabled={props.disabled}
+      //  @ts-ignore
       sx={{
         ...styles,
         ...props.sx,
       }}
-      size={size}
-      disabled={props.disabled}
       {...otherProps}
     >
       {props.children || label}
