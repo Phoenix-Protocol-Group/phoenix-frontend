@@ -2,3 +2,6 @@
 package-lock.json
 /build
 /.rollup.cache
+/module
+/main
+/types
