@@ -227,7 +227,7 @@ export async function balance(
     contractId,
     fee,
     method: "balance",
-    args: [((i) => addressToScVal(i))(id)],
+    args: [new SorobanClient.Address(id).toScVal()],
   };
 
   // @ts-ignore Type does exist

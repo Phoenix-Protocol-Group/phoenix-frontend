@@ -69,7 +69,7 @@ export async function invoke({
   const account =
     freighterAccount ??
     new SorobanClient.Account(
-      "GBZXP4PWQLOTBL3P6OE6DQ7QXNYDAZMWQG27V7ATM7P3TKSRDLQS4V7Q",
+      "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
       "0"
     );
 
