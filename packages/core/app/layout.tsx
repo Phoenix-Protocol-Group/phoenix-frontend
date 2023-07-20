@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Providers from "../providers";
 import { SidebarNavigation, AppBar } from "@phoenix-protocol/ui";
@@ -61,6 +61,10 @@ export default function RootLayout({
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
   const [navOpen, setNavOpen] = React.useState(largerThenMd ? true : false);
 
+  useEffect(() => {
+    setNavOpen(largerThenMd ? true : false);
+  }, [largerThenMd]);
+
   const navItems = [
     {
       label: "Dashboard",
@@ -116,7 +120,7 @@ export default function RootLayout({
               transition: "all 0.2s ease-in-out",
               display: "flex",
               justifyContent: "center",
-              padding: "16px"
+              padding: "16px",
             }}
           >
             {children}
