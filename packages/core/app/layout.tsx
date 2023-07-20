@@ -5,6 +5,7 @@ import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Providers from "../providers";
 import { SidebarNavigation, AppBar } from "@phoenix-protocol/ui";
 import MailIcon from "@mui/icons-material/Mail";
+import TopBar from "../components/TopBar/TopBar";
 
 const stellarGainerAsset = {
   name: "Stellar",
@@ -96,11 +97,7 @@ export default function RootLayout({
             open={navOpen}
             setOpen={setNavOpen}
           />
-          <AppBar
-            mobileNavOpen={navOpen}
-            toggleMobileNav={(open) => setNavOpen(open)}
-            {...args.appBarArgs}
-          />
+          <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
           <Box
             sx={{
               marginLeft: largerThenMd

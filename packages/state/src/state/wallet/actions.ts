@@ -54,6 +54,8 @@ export const createWalletActions = (
         ...state,
         wallet: { address, activeChain, server },
       }));
+
+      return;
     },
 
     // Disconnect the wallet
@@ -82,13 +84,30 @@ export const createWalletActions = (
       }
 
       // Create Soroban token query client
-      const balance = await SorobanTokenContract.balance({ id: tokenId });
+      if (typeof getState().wallet.address !== "string") {
+        throw new Error("Missing wallet address");
+      }
+
+      const balance = await SorobanTokenContract.balance(
+        // @ts-ignore
+        { id: getState().wallet.address },
+        {},
+        tokenId
+      );
+
+      const decimals =
+        getState().tokens.find((token: Token) => token.id === tokenId)
+          ?.decimals || (await SorobanTokenContract.decimals({}, tokenId));
 
       // Update token balance
       setState((state: AppStore) => {
         const updatedTokens = state.tokens.map((token: Token) =>
-          token.id === tokenId ? { ...token, balance } : token
+          token.id === tokenId ? { ...token, balance, decimals } : token
         );
+        // If token couldnt be found, add it
+        if (!updatedTokens.find((token: Token) => token.id === tokenId)) {
+          updatedTokens.push({ id: tokenId, balance, decimals: decimals });
+        }
         return { tokens: updatedTokens };
       });
     },

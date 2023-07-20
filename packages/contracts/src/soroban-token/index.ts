@@ -11,7 +11,6 @@ import {
 } from "./convert.js";
 import { invoke, InvokeArgs } from "./invoke.js";
 
-export * from "./constants.js";
 export * from "./server.js";
 export * from "./invoke.js";
 
@@ -104,10 +103,17 @@ function getError(err: string): Err<Error_> | undefined {
 export async function initialize(
   {
     admin,
+    contractId,
     decimal,
     name,
     symbol,
-  }: { admin: Address; decimal: u32; name: Buffer; symbol: Buffer },
+  }: {
+    admin: Address;
+    contractId: string;
+    decimal: u32;
+    name: Buffer;
+    symbol: Buffer;
+  },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -115,6 +121,7 @@ export async function initialize(
 ): Promise<void> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "initialize",
     args: [
@@ -131,7 +138,11 @@ export async function initialize(
 }
 
 export async function allowance(
-  { from, spender }: { from: Address; spender: Address },
+  {
+    from,
+    spender,
+    contractId,
+  }: { from: Address; spender: Address; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -139,6 +150,7 @@ export async function allowance(
 ): Promise<i128> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "allowance",
     args: [
@@ -157,10 +169,12 @@ export async function increase_allowance(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<void> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "increase_allowance",
     args: [
@@ -180,10 +194,12 @@ export async function decrease_allowance(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<void> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "decrease_allowance",
     args: [
@@ -203,13 +219,15 @@ export async function balance(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<i128> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "balance",
-    args: [((i) => addressToScVal(i))(id)],
+    args: [new SorobanClient.Address(id).toScVal()],
   };
 
   // @ts-ignore Type does exist
@@ -218,7 +236,7 @@ export async function balance(
 }
 
 export async function spendable_balance(
-  { id }: { id: Address },
+  { id, contractId }: { id: Address; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -226,6 +244,7 @@ export async function spendable_balance(
 ): Promise<i128> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "spendable_balance",
     args: [((i) => addressToScVal(i))(id)],
@@ -237,7 +256,7 @@ export async function spendable_balance(
 }
 
 export async function authorized(
-  { id }: { id: Address },
+  { id, contractId }: { id: Address; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -245,6 +264,7 @@ export async function authorized(
 ): Promise<boolean> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "authorized",
     args: [((i) => addressToScVal(i))(id)],
@@ -256,7 +276,12 @@ export async function authorized(
 }
 
 export async function transfer(
-  { from, to, amount }: { from: Address; to: Address; amount: i128 },
+  {
+    from,
+    to,
+    amount,
+    contractId,
+  }: { from: Address; to: Address; amount: i128; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -264,6 +289,7 @@ export async function transfer(
 ): Promise<void> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "transfer",
     args: [
@@ -284,7 +310,14 @@ export async function transfer_from(
     from,
     to,
     amount,
-  }: { spender: Address; from: Address; to: Address; amount: i128 },
+    contractId,
+  }: {
+    spender: Address;
+    from: Address;
+    to: Address;
+    amount: i128;
+    contractId: string;
+  },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -292,6 +325,7 @@ export async function transfer_from(
 ): Promise<void> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "transfer_from",
     args: [
@@ -308,7 +342,11 @@ export async function transfer_from(
 }
 
 export async function burn(
-  { from, amount }: { from: Address; amount: i128 },
+  {
+    from,
+    amount,
+    contractId,
+  }: { from: Address; amount: i128; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -316,6 +354,7 @@ export async function burn(
 ): Promise<void> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "burn",
     args: [((i) => addressToScVal(i))(from), ((i) => i128ToScVal(i))(amount)],
@@ -327,7 +366,12 @@ export async function burn(
 }
 
 export async function burn_from(
-  { spender, from, amount }: { spender: Address; from: Address; amount: i128 },
+  {
+    spender,
+    from,
+    amount,
+    contractId,
+  }: { spender: Address; from: Address; amount: i128; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -335,6 +379,7 @@ export async function burn_from(
 ): Promise<void> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "burn_from",
     args: [
@@ -350,7 +395,11 @@ export async function burn_from(
 }
 
 export async function clawback(
-  { from, amount }: { from: Address; amount: i128 },
+  {
+    from,
+    amount,
+    contractId,
+  }: { from: Address; amount: i128; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -358,6 +407,7 @@ export async function clawback(
 ): Promise<void> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "clawback",
     args: [((i) => addressToScVal(i))(from), ((i) => i128ToScVal(i))(amount)],
@@ -369,7 +419,11 @@ export async function clawback(
 }
 
 export async function set_authorized(
-  { id, authorize }: { id: Address; authorize: boolean },
+  {
+    id,
+    authorize,
+    contractId,
+  }: { id: Address; authorize: boolean; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -377,6 +431,7 @@ export async function set_authorized(
 ): Promise<void> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "set_authorized",
     args: [
@@ -391,7 +446,7 @@ export async function set_authorized(
 }
 
 export async function mint(
-  { to, amount }: { to: Address; amount: i128 },
+  { to, amount, contractId }: { to: Address; amount: i128; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -399,6 +454,7 @@ export async function mint(
 ): Promise<void> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "mint",
     args: [((i) => addressToScVal(i))(to), ((i) => i128ToScVal(i))(amount)],
@@ -410,7 +466,7 @@ export async function mint(
 }
 
 export async function set_admin(
-  { new_admin }: { new_admin: Address },
+  { new_admin, contractId }: { new_admin: Address; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
@@ -418,6 +474,7 @@ export async function set_admin(
 ): Promise<void> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "set_admin",
     args: [((i) => addressToScVal(i))(new_admin)],
@@ -432,10 +489,12 @@ export async function decimals(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<u32> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "decimals",
   };
@@ -449,10 +508,12 @@ export async function name(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<Buffer> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "name",
   };
@@ -466,10 +527,12 @@ export async function symbol(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<Buffer> {
   let invokeArgs: InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "symbol",
   };
