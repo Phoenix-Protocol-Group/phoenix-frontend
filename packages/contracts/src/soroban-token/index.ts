@@ -1,14 +1,15 @@
 import * as SorobanClient from "soroban-client";
 import { xdr } from "soroban-client";
 import { Buffer } from "buffer";
-import {
+import { convert } from "@phoenix-protocol/utils";
+const {
   scValStrToJs,
   scValToJs,
   addressToScVal,
   u128ToScVal,
   i128ToScVal,
   strToScVal,
-} from "./convert.js";
+} = convert;
 import { invoke } from "@phoenix-protocol/utils";
 
 export type u32 = number;
