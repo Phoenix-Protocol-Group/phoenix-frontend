@@ -67,7 +67,7 @@ export async function invoke({
     .addOperation(contract.call(method, ...args))
     .setTimeout(SorobanClient.TimeoutInfinite)
     .build();
-  console.log(tx);
+
   const simulated = await Server.simulateTransaction(tx);
 
   if (!signAndSend) {
