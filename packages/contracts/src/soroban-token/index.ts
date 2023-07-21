@@ -9,10 +9,7 @@ import {
   i128ToScVal,
   strToScVal,
 } from "./convert.js";
-import { invoke, InvokeArgs } from "./invoke.js";
-
-export * from "./server.js";
-export * from "./invoke.js";
+import { invoke } from "@phoenix-protocol/utils";
 
 export type u32 = number;
 export type i32 = number;
@@ -119,7 +116,7 @@ export async function initialize(
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -133,7 +130,7 @@ export async function initialize(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -148,7 +145,7 @@ export async function allowance(
     fee: 100,
   }
 ): Promise<i128> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -160,7 +157,7 @@ export async function allowance(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return scValStrToJs(response.xdr) as i128;
 }
 
@@ -172,7 +169,7 @@ export async function increase_allowance(
   },
   contractId: string
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -185,7 +182,7 @@ export async function increase_allowance(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -197,7 +194,7 @@ export async function decrease_allowance(
   },
   contractId: string
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -210,7 +207,7 @@ export async function decrease_allowance(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -222,17 +219,20 @@ export async function balance(
   },
   contractId: string
 ): Promise<i128> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
     method: "balance",
     args: [new SorobanClient.Address(id).toScVal()],
   };
-
-  // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
-  return scValStrToJs(response.xdr) as i128;
+  try {
+    // @ts-ignore Type does exist
+    const response = await invoke.invoke(invokeArgs);
+    return scValStrToJs(response.xdr) as i128;
+  } catch (e) {
+    return BigInt(0);
+  }
 }
 
 export async function spendable_balance(
@@ -242,7 +242,7 @@ export async function spendable_balance(
     fee: 100,
   }
 ): Promise<i128> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -251,7 +251,7 @@ export async function spendable_balance(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return scValStrToJs(response.xdr) as i128;
 }
 
@@ -262,7 +262,7 @@ export async function authorized(
     fee: 100,
   }
 ): Promise<boolean> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -271,7 +271,7 @@ export async function authorized(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return scValStrToJs(response.xdr) as boolean;
 }
 
@@ -287,7 +287,7 @@ export async function transfer(
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -300,7 +300,7 @@ export async function transfer(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -323,7 +323,7 @@ export async function transfer_from(
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -337,7 +337,7 @@ export async function transfer_from(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -352,7 +352,7 @@ export async function burn(
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -361,7 +361,7 @@ export async function burn(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -377,7 +377,7 @@ export async function burn_from(
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -390,7 +390,7 @@ export async function burn_from(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -405,7 +405,7 @@ export async function clawback(
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -414,7 +414,7 @@ export async function clawback(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -429,7 +429,7 @@ export async function set_authorized(
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -441,7 +441,7 @@ export async function set_authorized(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -452,7 +452,7 @@ export async function mint(
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -461,7 +461,7 @@ export async function mint(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -472,7 +472,7 @@ export async function set_admin(
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -481,7 +481,7 @@ export async function set_admin(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -492,7 +492,7 @@ export async function decimals(
   },
   contractId: string
 ): Promise<u32> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -500,7 +500,8 @@ export async function decimals(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
+
   return scValStrToJs(response.xdr) as u32;
 }
 
@@ -511,7 +512,7 @@ export async function name(
   },
   contractId: string
 ): Promise<Buffer> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -519,7 +520,7 @@ export async function name(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return scValStrToJs(response.xdr) as Buffer;
 }
 
@@ -530,7 +531,7 @@ export async function symbol(
   },
   contractId: string
 ): Promise<Buffer> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -538,7 +539,7 @@ export async function symbol(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return scValStrToJs(response.xdr) as Buffer;
 }
 

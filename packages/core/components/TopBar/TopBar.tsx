@@ -1,4 +1,5 @@
 "use client";
+import { Typography } from "@mui/material";
 import { freighter, useAppStore } from "@phoenix-protocol/state";
 import { AppBar, ConnectWallet } from "@phoenix-protocol/ui";
 import React, { useState } from "react";

@@ -1,6 +1,6 @@
 import freighter from "@stellar/freighter-api";
 // working around ESM compatibility issues
-const { isConnected, isAllowed, getUserInfo, signTransaction } = freighter;
+const { signTransaction } = freighter;
 import * as SorobanClient from "soroban-client";
 import type {
   Account,
@@ -9,9 +9,9 @@ import type {
   Operation,
   Transaction,
 } from "soroban-client";
-import { Server } from "./server.js";
-import { constants } from "@phoenix-protocol/utils";
-
+import { constants } from ".";
+import { getAccount } from "./account";
+import { Server } from "./server";
 export type Tx = Transaction<Memo<MemoType>, Operation[]>;
 
 export type Simulation = NonNullable<
@@ -22,31 +22,16 @@ export type TxResponse = SorobanClient.SorobanRpc.GetTransactionResponse;
 
 export type InvokeArgs = {
   method: string;
-  contractId: string;
   args?: any[];
   signAndSend?: boolean;
   fee?: number;
+  contractId: string;
 };
-
-/**
- * Get account details from the Soroban network for the publicKey currently
- * selected in Freighter. If not connected to Freighter, return null.
- */
-async function getAccount(): Promise<Account | null> {
-  if (!(await isConnected()) || !(await isAllowed())) {
-    return null;
-  }
-  const { publicKey } = await getUserInfo();
-  if (!publicKey) {
-    return null;
-  }
-  return await Server.getAccount(publicKey);
-}
 
 export class NotImplementedError extends Error {}
 
 /**
- * Invoke a method on the phoenix-pair contract.
+ * Invoke a method on the soroban-token-contract contract.
  *
  * Uses Freighter to determine the current user and if necessary sign the transaction.
  *
@@ -58,10 +43,10 @@ export class NotImplementedError extends Error {}
  */
 export async function invoke({
   method,
+  contractId,
   args = [],
   fee = 100,
   signAndSend = false,
-  contractId,
 }: InvokeArgs): Promise<(TxResponse & { xdr: string }) | Simulation> {
   const freighterAccount = await getAccount();
 
@@ -69,7 +54,7 @@ export async function invoke({
   const account =
     freighterAccount ??
     new SorobanClient.Account(
-      "GBZXP4PWQLOTBL3P6OE6DQ7QXNYDAZMWQG27V7ATM7P3TKSRDLQS4V7Q",
+      "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
       "0"
     );
 

@@ -162,7 +162,7 @@ const AppBar = ({
         </Box>
         <Box sx={{ display: "flex" }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            {walletAddress && balance ? (
+            {walletAddress && balance >= 0 ? (
               <>
                 <BalanceChip balance={balance} />
                 <OptionMenu
