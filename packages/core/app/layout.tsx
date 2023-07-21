@@ -6,6 +6,7 @@ import Providers from "../providers";
 import { SidebarNavigation, AppBar } from "@phoenix-protocol/ui";
 import MailIcon from "@mui/icons-material/Mail";
 import TopBar from "../components/TopBar/TopBar";
+import { usePathname, useRouter } from "next/navigation";
 
 const stellarGainerAsset = {
   name: "Stellar",
@@ -58,6 +59,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter()
+  const pathname = usePathname();
+  
   const theme = useTheme();
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
   const [navOpen, setNavOpen] = React.useState(largerThenMd ? true : false);
@@ -70,29 +74,33 @@ export default function RootLayout({
     {
       label: "Dashboard",
       icon: <MailIcon />,
-      active: false,
-      href: "#",
+      active: pathname == "/",
+      href: "/",
     },
     {
       label: "Swap",
       icon: <MailIcon />,
-      active: false,
-      href: "#",
+      active: pathname == "/swap",
+      href: "/swap",
     },
     {
       label: "Pools",
       icon: <MailIcon />,
-      active: true,
-      href: "#",
+      active: pathname == "/pools",
+      href: "/pools",
     },
   ];
+
+  const onNavClick = (href: string) => {
+    router.push(href);
+  };
 
   return (
     <html lang="en">
       <Providers>
         <body>
           <SidebarNavigation
-            onNavClick={() => {}}
+            onNavClick={onNavClick}
             items={navItems}
             open={navOpen}
             setOpen={setNavOpen}
