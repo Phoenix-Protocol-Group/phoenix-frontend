@@ -1,5 +1,5 @@
 import * as SorobanClient from "soroban-client";
-import { constants } from "@phoenix-protocol/utils";
+import { constants } from ".";
 
 /**
  * SorobanClient.Server instance, initialized using {@link RPC_URL} used to

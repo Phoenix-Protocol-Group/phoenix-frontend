@@ -9,10 +9,9 @@ import {
   i128ToScVal,
   strToScVal,
 } from "./convert.js";
-import { invoke, InvokeArgs } from "./invoke.js";
 
-export * from "./server.js";
-export * from "./invoke.js";
+import { invoke } from "@phoenix-protocol/utils";
+import { server } from "@phoenix-protocol/utils";
 
 export type u32 = number;
 export type i32 = number;
@@ -127,7 +126,7 @@ export async function initialize(
     fee: 100,
   }
 ): Promise<Result<void>> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     fee,
     method: "initialize",
@@ -153,7 +152,7 @@ export async function initialize(
 
   try {
     // @ts-ignore Type does exist
-    const response = await invoke(invokeArgs);
+    const response = await invoke.invoke(invokeArgs);
     return new Ok(scValStrToJs(response.xdr) as void);
   } catch (e) {
     //@ts-ignore
@@ -189,7 +188,7 @@ export async function provide_liquidity(
     fee: 100,
   }
 ): Promise<Result<void>> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
     contractId,
     fee,
@@ -211,7 +210,7 @@ export async function provide_liquidity(
 
   try {
     // @ts-ignore Type does exist
-    const response = await invoke(invokeArgs);
+    const response = await invoke.invoke(invokeArgs);
     return new Ok(scValStrToJs(response.xdr) as void);
   } catch (e) {
     //@ts-ignore
@@ -245,7 +244,7 @@ export async function swap(
     fee: 100,
   }
 ): Promise<Result<void>> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     contractId,
     signAndSend,
     fee,
@@ -269,7 +268,7 @@ export async function swap(
 
   try {
     // @ts-ignore Type does exist
-    const response = await invoke(invokeArgs);
+    const response = await invoke.invoke(invokeArgs);
     return new Ok(scValStrToJs(response.xdr) as void);
   } catch (e) {
     //@ts-ignore
@@ -301,7 +300,7 @@ export async function withdraw_liquidity(
     fee: 100,
   }
 ): Promise<Result<[i128, i128]>> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     contractId,
     signAndSend,
     fee,
@@ -316,7 +315,7 @@ export async function withdraw_liquidity(
 
   try {
     // @ts-ignore Type does exist
-    const response = await invoke(invokeArgs);
+    const response = await invoke.invoke(invokeArgs);
     return new Ok(scValStrToJs(response.xdr) as [i128, i128]);
   } catch (e) {
     //@ts-ignore
@@ -352,7 +351,7 @@ export async function update_config(
     fee: 100,
   }
 ): Promise<Result<void>> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     contractId,
     signAndSend,
     fee,
@@ -384,7 +383,7 @@ export async function update_config(
 
   try {
     // @ts-ignore Type does exist
-    const response = await invoke(invokeArgs);
+    const response = await invoke.invoke(invokeArgs);
     return new Ok(scValStrToJs(response.xdr) as void);
   } catch (e) {
     //@ts-ignore
@@ -404,7 +403,7 @@ export async function upgrade(
     fee: 100,
   }
 ): Promise<Result<void>> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     contractId,
     signAndSend,
     fee,
@@ -414,7 +413,7 @@ export async function upgrade(
 
   try {
     // @ts-ignore Type does exist
-    const response = await invoke(invokeArgs);
+    const response = await invoke.invoke(invokeArgs);
     return new Ok(scValStrToJs(response.xdr) as void);
   } catch (e) {
     //@ts-ignore
@@ -438,7 +437,7 @@ export async function query_config(
     fee: 100,
   }
 ): Promise<Result<Config>> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     contractId,
     signAndSend,
     fee,
@@ -447,7 +446,7 @@ export async function query_config(
 
   try {
     // @ts-ignore Type does exist
-    const response = await invoke(invokeArgs);
+    const response = await invoke.invoke(invokeArgs);
     return new Ok(scValStrToJs(response.xdr) as Config);
   } catch (e) {
     //@ts-ignore
@@ -471,7 +470,7 @@ export async function query_share_token_address(
     fee: 100,
   }
 ): Promise<Result<Address>> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     contractId,
     signAndSend,
     fee,
@@ -480,7 +479,7 @@ export async function query_share_token_address(
 
   try {
     // @ts-ignore Type does exist
-    const response = await invoke(invokeArgs);
+    const response = await invoke.invoke(invokeArgs);
     return new Ok(scValStrToJs(response.xdr) as Address);
   } catch (e) {
     //@ts-ignore
@@ -504,7 +503,7 @@ export async function query_pool_info(
     fee: 100,
   }
 ): Promise<Result<PoolResponse>> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     contractId,
     signAndSend,
     fee,
@@ -513,7 +512,7 @@ export async function query_pool_info(
 
   try {
     // @ts-ignore Type does exist
-    const response = await invoke(invokeArgs);
+    const response = await invoke.invoke(invokeArgs);
     return new Ok(scValStrToJs(response.xdr) as PoolResponse);
   } catch (e) {
     //@ts-ignore
@@ -537,7 +536,7 @@ export async function simulate_swap(
     fee: 100,
   }
 ): Promise<Result<SimulateSwapResponse>> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     contractId,
     signAndSend,
     fee,
@@ -550,7 +549,7 @@ export async function simulate_swap(
 
   try {
     // @ts-ignore Type does exist
-    const response = await invoke(invokeArgs);
+    const response = await invoke.invoke(invokeArgs);
     return new Ok(scValStrToJs(response.xdr) as SimulateSwapResponse);
   } catch (e) {
     //@ts-ignore
@@ -574,7 +573,7 @@ export async function simulate_reverse_swap(
     fee: 100,
   }
 ): Promise<Result<SimulateReverseSwapResponse>> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     contractId,
     signAndSend,
     fee,
@@ -587,7 +586,7 @@ export async function simulate_reverse_swap(
 
   try {
     // @ts-ignore Type does exist
-    const response = await invoke(invokeArgs);
+    const response = await invoke.invoke(invokeArgs);
     return new Ok(scValStrToJs(response.xdr) as SimulateReverseSwapResponse);
   } catch (e) {
     //@ts-ignore
