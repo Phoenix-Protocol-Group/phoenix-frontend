@@ -3,28 +3,8 @@
 import React, { useEffect } from "react";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Providers from "../providers";
-import { SidebarNavigation, AppBar } from "@phoenix-protocol/ui";
-import MailIcon from "@mui/icons-material/Mail";
 import TopBar from "../components/TopBar/TopBar";
-import { usePathname, useRouter } from "next/navigation";
-
-const stellarGainerAsset = {
-  name: "Stellar",
-  symbol: "XLM",
-  price: "$3.00",
-  change: 22.5,
-  icon: "/cryptoIcons/xlm.svg",
-  volume: "$100,000",
-};
-
-const usdcLoserAsset = {
-  name: "USDC",
-  symbol: "USDC",
-  price: "$1",
-  change: -0.8,
-  icon: "/cryptoIcons/usdc.svg",
-  volume: "$100,000",
-};
+import SideNav from "../components/SideNav/SideNav";
 
 const args = {
   mainstatsArgs: {
@@ -59,52 +39,19 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter()
-  const pathname = usePathname();
-  
   const theme = useTheme();
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
-  const [navOpen, setNavOpen] = React.useState(largerThenMd ? true : false);
+  const [navOpen, setNavOpen] = React.useState(false);
 
   useEffect(() => {
     setNavOpen(largerThenMd ? true : false);
   }, [largerThenMd]);
 
-  const navItems = [
-    {
-      label: "Dashboard",
-      icon: <MailIcon />,
-      active: pathname == "/",
-      href: "/",
-    },
-    {
-      label: "Swap",
-      icon: <MailIcon />,
-      active: pathname == "/swap",
-      href: "/swap",
-    },
-    {
-      label: "Pools",
-      icon: <MailIcon />,
-      active: pathname == "/pools",
-      href: "/pools",
-    },
-  ];
-
-  const onNavClick = (href: string) => {
-    router.push(href);
-  };
-
   return (
     <html lang="en">
       <Providers>
         <body>
-          <SidebarNavigation
-            onNavClick={onNavClick}
-            items={navItems}
-            open={navOpen}
-            setOpen={setNavOpen}
-          />
+          <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
           <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
           <Box
             sx={{
