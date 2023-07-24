@@ -1,6 +1,6 @@
 "use client";
 
-import { Grid } from "@mui/material";
+import { Grid, useMediaQuery, useTheme } from "@mui/material";
 import { CryptoCTA, DashboardPriceCharts, DashboardStats, MainStats, WalletBalanceTable } from "@phoenix-protocol/ui";
 import React from "react";
 
@@ -84,30 +84,33 @@ const args = {
 };
 
 export default function Page() {
+  const theme = useTheme();
+  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
+  
   return (
     <Grid
         sx={{
           transition: "all 0.2s ease-in-out",
         }}
         container
-        spacing={3}
+        spacing={largerThenMd ? 3 : 1}
       >
         <Grid item xs={12}>
           <MainStats {...args.mainstatsArgs} />
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
           <DashboardStats {...args.dashboardStatsArgs} />
         </Grid>
-        <Grid item xs={6} md={2}>
+        <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
           <DashboardPriceCharts {...args.dashboardArgs} />
         </Grid>
-        <Grid item xs={6} md={2}>
+        <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
           <DashboardPriceCharts {...args.dashboardArgs} />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4} mt={!largerThenMd ? 2 : undefined}>
           <CryptoCTA onClick={() => {}} />
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
           <WalletBalanceTable {...args.walletBalanceArgs} />
         </Grid>
       </Grid>
