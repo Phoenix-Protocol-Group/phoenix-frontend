@@ -2,6 +2,7 @@
   "version": "0.0.1",
   "name": "@phoenix-protocol/contracts",
   "dependencies": {
+    "@phoenix-protocol/utils": "^0.0.1",
     "@stellar/freighter-api": "1.5.0",
     "buffer": "6.0.3",
     "soroban-client": "0.9.1",

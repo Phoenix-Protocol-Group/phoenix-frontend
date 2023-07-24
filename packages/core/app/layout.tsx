@@ -1,29 +1,10 @@
 "use client";
 
-import React from "react";
-import type { Metadata } from "next";
-import { useMediaQuery, useTheme } from "@mui/material";
+import React, { useEffect } from "react";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Providers from "../providers";
-import { SidebarNavigation, AppBar } from "@phoenix-protocol/ui";
-import MailIcon from "@mui/icons-material/Mail";
-
-const stellarGainerAsset = {
-  name: "Stellar",
-  symbol: "XLM",
-  price: "$3.00",
-  change: 22.5,
-  icon: "/cryptoIcons/xlm.svg",
-  volume: "$100,000",
-};
-
-const usdcLoserAsset = {
-  name: "USDC",
-  symbol: "USDC",
-  price: "$1",
-  change: -0.8,
-  icon: "/cryptoIcons/usdc.svg",
-  volume: "$100,000",
-};
+import TopBar from "../components/TopBar/TopBar";
+import SideNav from "../components/SideNav/SideNav";
 
 const args = {
   mainstatsArgs: {
@@ -45,32 +26,6 @@ const args = {
       },
     ],
   },
-  navItems: [
-    {
-      label: "Nav Item 1",
-      icon: <MailIcon />,
-      active: true,
-      href: "#",
-    },
-    {
-      label: "Nav Item 2",
-      icon: <MailIcon />,
-      active: false,
-      href: "#",
-    },
-    {
-      label: "Nav Item 3",
-      icon: <MailIcon />,
-      active: false,
-      href: "#",
-    },
-    {
-      label: "Nav Item 4",
-      icon: <MailIcon />,
-      active: false,
-      href: "#",
-    },
-  ],
   appBarArgs: {
     balance: 125.5,
     walletAddress: "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
@@ -86,24 +41,42 @@ export default function RootLayout({
 }) {
   const theme = useTheme();
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
-  const [navOpen, setNavOpen] = React.useState(largerThenMd ? true : false);
+  const [navOpen, setNavOpen] = React.useState(false);
+
+  useEffect(() => {
+    setNavOpen(largerThenMd ? true : false);
+  }, [largerThenMd]);
 
   return (
     <html lang="en">
       <Providers>
         <body>
-          <SidebarNavigation
-            onNavClick={() => {}}
-            items={args.navItems}
-            open={navOpen}
-            setOpen={setNavOpen}
-          />
-          <AppBar
-            mobileNavOpen={navOpen}
-            toggleMobileNav={(open) => setNavOpen(open)}
-            {...args.appBarArgs}
-          />
-          {children}
+          <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
+          <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
+          <Box
+            sx={{
+              marginLeft: largerThenMd
+                ? navOpen
+                  ? "240px"
+                  : "60px"
+                : navOpen
+                ? "240px"
+                : "0",
+              width: largerThenMd
+                ? navOpen
+                  ? "calc(100% - 240px)"
+                  : "calc(100% - 60px)"
+                : navOpen
+                ? "0"
+                : "100%",
+              transition: "all 0.2s ease-in-out",
+              display: "flex",
+              justifyContent: "center",
+              padding: "16px",
+            }}
+          >
+            {children}
+          </Box>
         </body>
       </Providers>
     </html>

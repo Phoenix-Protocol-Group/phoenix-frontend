@@ -1,19 +1,16 @@
 import * as SorobanClient from "soroban-client";
 import { xdr } from "soroban-client";
 import { Buffer } from "buffer";
-import {
+import { convert } from "@phoenix-protocol/utils";
+const {
   scValStrToJs,
   scValToJs,
   addressToScVal,
   u128ToScVal,
   i128ToScVal,
   strToScVal,
-} from "./convert.js";
-import { invoke, InvokeArgs } from "./invoke.js";
-
-export * from "./constants.js";
-export * from "./server.js";
-export * from "./invoke.js";
+} = convert;
+import { invoke } from "@phoenix-protocol/utils";
 
 export type u32 = number;
 export type i32 = number;
@@ -104,17 +101,25 @@ function getError(err: string): Err<Error_> | undefined {
 export async function initialize(
   {
     admin,
+    contractId,
     decimal,
     name,
     symbol,
-  }: { admin: Address; decimal: u32; name: Buffer; symbol: Buffer },
+  }: {
+    admin: Address;
+    contractId: string;
+    decimal: u32;
+    name: Buffer;
+    symbol: Buffer;
+  },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "initialize",
     args: [
@@ -126,19 +131,24 @@ export async function initialize(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
 export async function allowance(
-  { from, spender }: { from: Address; spender: Address },
+  {
+    from,
+    spender,
+    contractId,
+  }: { from: Address; spender: Address; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<i128> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "allowance",
     args: [
@@ -148,7 +158,7 @@ export async function allowance(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return scValStrToJs(response.xdr) as i128;
 }
 
@@ -157,10 +167,12 @@ export async function increase_allowance(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "increase_allowance",
     args: [
@@ -171,7 +183,7 @@ export async function increase_allowance(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -180,10 +192,12 @@ export async function decrease_allowance(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "decrease_allowance",
     args: [
@@ -194,7 +208,7 @@ export async function decrease_allowance(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -203,67 +217,80 @@ export async function balance(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<i128> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "balance",
-    args: [((i) => addressToScVal(i))(id)],
+    args: [new SorobanClient.Address(id).toScVal()],
   };
-
-  // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
-  return scValStrToJs(response.xdr) as i128;
+  try {
+    // @ts-ignore Type does exist
+    const response = await invoke.invoke(invokeArgs);
+    return scValStrToJs(response.xdr) as i128;
+  } catch (e) {
+    return BigInt(0);
+  }
 }
 
 export async function spendable_balance(
-  { id }: { id: Address },
+  { id, contractId }: { id: Address; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<i128> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "spendable_balance",
     args: [((i) => addressToScVal(i))(id)],
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return scValStrToJs(response.xdr) as i128;
 }
 
 export async function authorized(
-  { id }: { id: Address },
+  { id, contractId }: { id: Address; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<boolean> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "authorized",
     args: [((i) => addressToScVal(i))(id)],
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return scValStrToJs(response.xdr) as boolean;
 }
 
 export async function transfer(
-  { from, to, amount }: { from: Address; to: Address; amount: i128 },
+  {
+    from,
+    to,
+    amount,
+    contractId,
+  }: { from: Address; to: Address; amount: i128; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "transfer",
     args: [
@@ -274,7 +301,7 @@ export async function transfer(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -284,14 +311,22 @@ export async function transfer_from(
     from,
     to,
     amount,
-  }: { spender: Address; from: Address; to: Address; amount: i128 },
+    contractId,
+  }: {
+    spender: Address;
+    from: Address;
+    to: Address;
+    amount: i128;
+    contractId: string;
+  },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "transfer_from",
     args: [
@@ -303,38 +338,49 @@ export async function transfer_from(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
 export async function burn(
-  { from, amount }: { from: Address; amount: i128 },
+  {
+    from,
+    amount,
+    contractId,
+  }: { from: Address; amount: i128; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "burn",
     args: [((i) => addressToScVal(i))(from), ((i) => i128ToScVal(i))(amount)],
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
 export async function burn_from(
-  { spender, from, amount }: { spender: Address; from: Address; amount: i128 },
+  {
+    spender,
+    from,
+    amount,
+    contractId,
+  }: { spender: Address; from: Address; amount: i128; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "burn_from",
     args: [
@@ -345,38 +391,48 @@ export async function burn_from(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
 export async function clawback(
-  { from, amount }: { from: Address; amount: i128 },
+  {
+    from,
+    amount,
+    contractId,
+  }: { from: Address; amount: i128; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "clawback",
     args: [((i) => addressToScVal(i))(from), ((i) => i128ToScVal(i))(amount)],
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
 export async function set_authorized(
-  { id, authorize }: { id: Address; authorize: boolean },
+  {
+    id,
+    authorize,
+    contractId,
+  }: { id: Address; authorize: boolean; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "set_authorized",
     args: [
@@ -386,45 +442,47 @@ export async function set_authorized(
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
 export async function mint(
-  { to, amount }: { to: Address; amount: i128 },
+  { to, amount, contractId }: { to: Address; amount: i128; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "mint",
     args: [((i) => addressToScVal(i))(to), ((i) => i128ToScVal(i))(amount)],
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
 export async function set_admin(
-  { new_admin }: { new_admin: Address },
+  { new_admin, contractId }: { new_admin: Address; contractId: string },
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
   }
 ): Promise<void> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "set_admin",
     args: [((i) => addressToScVal(i))(new_admin)],
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return;
 }
 
@@ -432,16 +490,19 @@ export async function decimals(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<u32> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "decimals",
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
+
   return scValStrToJs(response.xdr) as u32;
 }
 
@@ -449,16 +510,18 @@ export async function name(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<Buffer> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "name",
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return scValStrToJs(response.xdr) as Buffer;
 }
 
@@ -466,16 +529,18 @@ export async function symbol(
   { signAndSend, fee }: { signAndSend?: boolean; fee?: number } = {
     signAndSend: false,
     fee: 100,
-  }
+  },
+  contractId: string
 ): Promise<Buffer> {
-  let invokeArgs: InvokeArgs = {
+  let invokeArgs: invoke.InvokeArgs = {
     signAndSend,
+    contractId,
     fee,
     method: "symbol",
   };
 
   // @ts-ignore Type does exist
-  const response = await invoke(invokeArgs);
+  const response = await invoke.invoke(invokeArgs);
   return scValStrToJs(response.xdr) as Buffer;
 }
 

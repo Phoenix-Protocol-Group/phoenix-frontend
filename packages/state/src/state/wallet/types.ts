@@ -3,6 +3,7 @@ import { Server } from "soroban-client";
 export type Token = {
   id: string;
   balance: bigint;
+  decimals: number;
 };
 
 export type Wallet = {
@@ -12,11 +13,11 @@ export type Wallet = {
 };
 
 export interface WalletActions {
-  connectWallet: () => void;
+  connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   wallet: Wallet;
   tokens: Token[];
-  fetchTokenBalance: (tokenId: string) => void;
+  fetchTokenBalance: (tokenId: string) => Promise<void>;
 }
 
 export interface WalletChain {

@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { Button } from "../../Button/Button";
+import React from "react";
 
 interface CryptoCTAProps {
   onClick: () => void;
