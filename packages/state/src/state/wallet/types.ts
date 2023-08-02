@@ -4,6 +4,8 @@ export type Token = {
   id: string;
   balance: bigint;
   decimals: number;
+  symbol: Buffer;
+  name: Buffer;
 };
 
 export type Wallet = {
