@@ -39,7 +39,6 @@ const TopBar = ({
   );
 
   useEffect(() => {
-    console.log(storePersist.wallet.address)
     fetch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storePersist.wallet.address]);
