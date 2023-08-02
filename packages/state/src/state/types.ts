@@ -1,5 +1,6 @@
 import { Server } from "soroban-client";
 import { WalletActions } from "./wallet/types";
+import {PersistWalletActions} from './persist/types';
 
 interface GeneralStore {
   server: Server;
@@ -7,6 +8,8 @@ interface GeneralStore {
 }
 
 export type AppStore = WalletActions & GeneralStore;
+
+export type AppStorePersist = PersistWalletActions;
 
 export type SetStateType = (
   partial:
