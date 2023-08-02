@@ -13,9 +13,6 @@ export type Wallet = {
 };
 
 export interface WalletActions {
-  connectWallet: () => Promise<void>;
-  disconnectWallet: () => void;
-  wallet: Wallet;
   tokens: Token[];
   fetchTokenBalance: (tokenId: string) => Promise<void>;
 }
