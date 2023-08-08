@@ -198,29 +198,25 @@ export default function Page({ params }: PoolPageProps) {
   const store = useAppStore();
 
   const fetchToken = async (tokenId: string) => {
-    const token = store.tokens.find(
-      (el) => el.id === tokenId
-    );
+    const token = store.tokens.find((el) => el.id === tokenId);
 
-    if(token) {
+    if (token) {
       return token;
     }
-  
-    return await store.fetchTokenBalance(
-      tokenId
-    );
+
+    return await store.fetchTokenBalance(tokenId);
   };
-  
+
   const getPool = async () => {
-    const pairConfigResult = await PhoenixPairContract.query_config({
-      contractId: "CBL2R7RR6DCMNCTBGBXUKWULEP76DCWNKVVFY5DEKRINW3XRNN2ZCOCL",
-    });
+    const pairConfigResult = await PhoenixPairContract.queryConfig(
+      "CBL2R7RR6DCMNCTBGBXUKWULEP76DCWNKVVFY5DEKRINW3XRNN2ZCOCL"
+    );
 
-    const pairInfoResult = await PhoenixPairContract.query_pool_info({
-      contractId: "CBL2R7RR6DCMNCTBGBXUKWULEP76DCWNKVVFY5DEKRINW3XRNN2ZCOCL",
-    });
+    const pairInfoResult = await PhoenixPairContract.queryPoolInfo(
+      "CBL2R7RR6DCMNCTBGBXUKWULEP76DCWNKVVFY5DEKRINW3XRNN2ZCOCL"
+    );
 
-    if(pairConfigResult.isOk() && pairInfoResult.isOk()) {
+    if (pairConfigResult.isOk() && pairInfoResult.isOk()) {
       const pairConfig = pairConfigResult.unwrap();
       const pairInfo = pairInfoResult.unwrap();
 
@@ -235,7 +231,7 @@ export default function Page({ params }: PoolPageProps) {
     getPool();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   return (
     <Box>
       <Button onClick={() => getPool()}>Foo</Button>
