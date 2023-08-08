@@ -26,7 +26,7 @@ const overviewStyles = (
   />
 );
 
-export const testTokens = [
+const testTokens = [
   {
     name: "USDT",
     icon: "cryptoIcons/usdt.svg",
