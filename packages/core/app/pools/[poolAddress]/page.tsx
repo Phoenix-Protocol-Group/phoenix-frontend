@@ -43,18 +43,21 @@ export default function Page({ params }: PoolPageProps) {
   // Fetch pool and balance infos
   const getPool = async () => {
     try {
+      // Fetch pool config and info from chain
       const pairConfigResult = await PhoenixPairContract.queryConfig(
         params.poolAddress
       );
-
       const pairInfoResult = await PhoenixPairContract.queryPoolInfo(
         params.poolAddress
       );
 
+      // When results ok...
       if (pairConfigResult.isOk() && pairInfoResult.isOk()) {
+        // Unwrap results
         const pairConfig = pairConfigResult.unwrap();
         const pairInfo = pairInfoResult.unwrap();
 
+        // Fetch token infos from chain and save in global appstore
         const _tokenA = await store.fetchTokenInfo(pairConfig.token_a);
         const _tokenB = await store.fetchTokenInfo(pairConfig.token_b);
         const _lpToken = await store.fetchTokenInfo(pairConfig.share_token);
@@ -66,7 +69,6 @@ export default function Page({ params }: PoolPageProps) {
           amount: Number(_tokenA?.balance) / 10 ** Number(_tokenA?.decimals),
           category: "none",
         });
-
         setTokenB({
           name: _tokenB?.symbol as string,
           icon: `/${_tokenB?.symbol}`,
@@ -74,7 +76,6 @@ export default function Page({ params }: PoolPageProps) {
           amount: Number(_tokenB?.balance) / 10 ** Number(_tokenB?.decimals),
           category: "none",
         });
-
         setLpToken({
           name: _lpToken?.symbol as string,
           icon: `/${_lpToken?.symbol}`,
@@ -82,12 +83,9 @@ export default function Page({ params }: PoolPageProps) {
           amount: Number(_lpToken?.balance) / 10 ** Number(_lpToken?.decimals),
           category: "none",
         });
-
-        console.log(pairConfig, pairInfo);
-
-        console.log(tokenA, tokenB, lpToken);
       }
     } catch (e) {
+      // If pool not found, set poolNotFound to true
       console.log(e);
       setPoolNotFound(true);
     }
