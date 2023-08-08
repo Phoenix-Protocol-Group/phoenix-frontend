@@ -15,7 +15,7 @@ export type Wallet = {
 
 export interface WalletActions {
   tokens: Token[];
-  fetchTokenBalance: (tokenId: string) => Promise<void>;
+  fetchTokenInfo: (tokenId: string) => Promise<Token | undefined>;
 }
 
 export interface WalletChain {

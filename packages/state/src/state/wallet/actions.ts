@@ -10,7 +10,8 @@ export const createWalletActions = (
   return {
     tokens: [],
 
-    fetchTokenBalance: async (tokenId: string) => {
+    fetchTokenInfo: async (tokenId: string) => {
+      let updatedTokenInfo: Token | undefined;
       // Check if account, server, and network passphrase are set
       if (
         !usePersistStore.getState().wallet ||
@@ -61,8 +62,12 @@ export const createWalletActions = (
             symbol: symbol,
           });
         }
+        updatedTokenInfo = updatedTokens.find(
+          (token: Token) => token.id === tokenId
+        );
         return { tokens: updatedTokens };
       });
+      return updatedTokenInfo;
     },
   };
 };

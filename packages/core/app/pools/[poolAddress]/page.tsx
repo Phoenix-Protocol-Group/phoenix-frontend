@@ -6,11 +6,13 @@ import {
   PoolLiquidity,
   PoolStats,
   StakingList,
+  Token,
 } from "@phoenix-protocol/ui";
 
 import { PhoenixPairContract } from "@phoenix-protocol/contracts";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@phoenix-protocol/state";
+import Link from "next/link";
 
 interface PoolPageProps {
   readonly params: {
@@ -26,204 +28,68 @@ const overviewStyles = (
   />
 );
 
-const testTokens = [
-  {
-    name: "USDT",
-    icon: "cryptoIcons/usdt.svg",
-    amount: 100,
-    category: "Stable",
-    usdValue: 1 * 100,
-  },
-  {
-    name: "USDC",
-    icon: "cryptoIcons/usdc.svg",
-    amount: 50,
-    category: "Stable",
-    usdValue: 1 * 50,
-  },
-  {
-    name: "DAI",
-    icon: "cryptoIcons/dai.svg",
-    amount: 25,
-    category: "Stable",
-    usdValue: 1 * 25,
-  },
-  {
-    name: "XLM",
-    icon: "cryptoIcons/xlm.svg",
-    amount: 200,
-    category: "Non-Stable",
-    usdValue: 0.85 * 200,
-  },
-  {
-    name: "BTC",
-    icon: "cryptoIcons/btc.svg",
-    amount: 0.5,
-    category: "Non-Stable",
-    usdValue: 30000 * 0.5,
-  },
-];
-
-const args = {
-  poolStatArgs: {
-    stats: [
-      {
-        title: "TVL",
-        value: "$100,000.00",
-      },
-      {
-        title: "My Share",
-        value: "$0.00",
-      },
-      {
-        title: "LP tokens",
-        value: "0.00",
-      },
-      {
-        title: "Swap fee",
-        value: "0.3%",
-      },
-    ],
-  },
-  lpArgs: {
-    rewards: [
-      {
-        name: "DAI",
-        icon: "cryptoIcons/dai.svg",
-        amount: 25,
-        category: "Stable",
-        usdValue: 1 * 25,
-      },
-      {
-        name: "XLM",
-        icon: "cryptoIcons/xlm.svg",
-        amount: 200,
-        category: "Non-Stable",
-        usdValue: 0.85 * 200,
-      },
-    ],
-    balance: 800,
-  },
-  stakingListArgs: {
-    entries: [
-      {
-        icon: "cryptoIcons/btc.svg",
-        title: "XLM/USDT",
-        apr: "3.5%",
-        lockedPeriod: "1 day",
-        amount: {
-          tokenAmount: "10,000.5",
-          tokenValueInUsd: "100,000.25",
-        },
-        onClick: () => {
-          // Empty function
-        },
-      },
-      {
-        icon: "cryptoIcons/btc.svg",
-        title: "XLM/USDT",
-        apr: "5.5%",
-        lockedPeriod: "10 days",
-        amount: {
-          tokenAmount: "5,500.75",
-          tokenValueInUsd: "55,000.50",
-        },
-        onClick: () => {
-          // Empty function
-        },
-      },
-      {
-        icon: "cryptoIcons/btc.svg",
-        title: "XLM/USDT",
-        apr: "7.5%",
-        lockedPeriod: "20 days",
-        amount: {
-          tokenAmount: "2,250.25",
-          tokenValueInUsd: "22,502.50",
-        },
-        onClick: () => {
-          // Empty function
-        },
-      },
-      {
-        icon: "cryptoIcons/btc.svg",
-        title: "XLM/USDT",
-        apr: "9.5%",
-        lockedPeriod: "30 days",
-        amount: {
-          tokenAmount: "1,200.35",
-          tokenValueInUsd: "12,003.75",
-        },
-        onClick: () => {
-          // Empty function
-        },
-      },
-      {
-        icon: "cryptoIcons/btc.svg",
-        title: "XLM/USDT",
-        apr: "11.5%",
-        lockedPeriod: "40 days",
-        amount: {
-          tokenAmount: "800.75",
-          tokenValueInUsd: "8,007.50",
-        },
-        onClick: () => {
-          // Empty function
-        },
-      },
-      // Add more entries as needed
-    ],
-  },
-  poolLiquidityArgs: {
-    poolHistory: [
-      [1687392000000, 152000],
-      [1687478400000, 140400],
-      [1687564800000, 160100],
-      [1687651200000, 163300],
-      [1687737600000, 150000],
-      [1687824000000, 180000],
-      [1687859473000, 200000],
-    ],
-    tokenA: testTokens[0],
-    tokenB: testTokens[1],
-    liquidityA: 10000,
-    liquidityB: 20000,
-    liquidityToken: testTokens[0],
-    onAddLiquidity: () => {},
-    onRemoveLiquidity: () => {},
-  },
-};
-
 export default function Page({ params }: PoolPageProps) {
+  // Load App Store
   const store = useAppStore();
 
-  const fetchToken = async (tokenId: string) => {
-    const token = store.tokens.find((el) => el.id === tokenId);
+  // Let's have some variable to see if the pool even exists
+  const [poolNotFound, setPoolNotFound] = useState<boolean>(false);
 
-    if (token) {
-      return token;
-    }
+  // Token Balances
+  const [tokenA, setTokenA] = useState<Token | undefined>(undefined);
+  const [tokenB, setTokenB] = useState<Token | undefined>(undefined);
+  const [lpToken, setLpToken] = useState<Token | undefined>(undefined);
 
-    return await store.fetchTokenBalance(tokenId);
-  };
-
+  // Fetch pool and balance infos
   const getPool = async () => {
-    const pairConfigResult = await PhoenixPairContract.queryConfig(
-      "CBL2R7RR6DCMNCTBGBXUKWULEP76DCWNKVVFY5DEKRINW3XRNN2ZCOCL"
-    );
+    try {
+      const pairConfigResult = await PhoenixPairContract.queryConfig(
+        params.poolAddress
+      );
 
-    const pairInfoResult = await PhoenixPairContract.queryPoolInfo(
-      "CBL2R7RR6DCMNCTBGBXUKWULEP76DCWNKVVFY5DEKRINW3XRNN2ZCOCL"
-    );
+      const pairInfoResult = await PhoenixPairContract.queryPoolInfo(
+        params.poolAddress
+      );
 
-    if (pairConfigResult.isOk() && pairInfoResult.isOk()) {
-      const pairConfig = pairConfigResult.unwrap();
-      const pairInfo = pairInfoResult.unwrap();
+      if (pairConfigResult.isOk() && pairInfoResult.isOk()) {
+        const pairConfig = pairConfigResult.unwrap();
+        const pairInfo = pairInfoResult.unwrap();
 
-      console.log(pairConfig, pairInfo);
+        const _tokenA = await store.fetchTokenInfo(pairConfig.token_a);
+        const _tokenB = await store.fetchTokenInfo(pairConfig.token_b);
+        const _lpToken = await store.fetchTokenInfo(pairConfig.share_token);
 
-      const lpBalance = await fetchToken(pairConfig.token_a);
-      console.log(lpBalance);
+        setTokenA({
+          name: _tokenA?.symbol as string,
+          icon: `/${_tokenA?.symbol}`,
+          usdValue: 0,
+          amount: Number(_tokenA?.balance) / 10 ** Number(_tokenA?.decimals),
+          category: "none",
+        });
+
+        setTokenB({
+          name: _tokenB?.symbol as string,
+          icon: `/${_tokenB?.symbol}`,
+          usdValue: 0,
+          amount: Number(_tokenB?.balance) / 10 ** Number(_tokenB?.decimals),
+          category: "none",
+        });
+
+        setLpToken({
+          name: _lpToken?.symbol as string,
+          icon: `/${_lpToken?.symbol}`,
+          usdValue: 0,
+          amount: Number(_lpToken?.balance) / 10 ** Number(_lpToken?.decimals),
+          category: "none",
+        });
+
+        console.log(pairConfig, pairInfo);
+
+        console.log(tokenA, tokenB, lpToken);
+      }
+    } catch (e) {
+      console.log(e);
+      setPoolNotFound(true);
     }
   };
 
@@ -232,6 +98,16 @@ export default function Page({ params }: PoolPageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  if (!params.poolAddress || poolNotFound) {
+    return (
+      <Box>
+        <Typography>{"The pool you're looking for doesn't exist."}</Typography>
+        <Typography>
+          Return <Link href="/">Home</Link>
+        </Typography>
+      </Box>
+    );
+  }
   return (
     <Box>
       <Button onClick={() => getPool()}>Foo</Button>
@@ -250,25 +126,95 @@ export default function Page({ params }: PoolPageProps) {
           />
         </Box>
         <Typography sx={{ fontSize: "2rem", fontWeight: 700, ml: 1 }}>
-          BTC-USDC
+          {tokenA?.name}-{tokenB?.name}
         </Typography>
       </Box>
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
           <Box sx={{ mb: 2 }}>
-            <PoolStats {...args.poolStatArgs} />
+            <PoolStats
+              stats={[
+                {
+                  title: "TVL",
+                  value: "$100,000.00",
+                },
+                {
+                  title: "My Share",
+                  value: "$0.00",
+                },
+                {
+                  title: "LP tokens",
+                  value: "0.00",
+                },
+                {
+                  title: "Swap fee",
+                  value: "0.3%",
+                },
+              ]}
+            />
           </Box>
           <Box sx={{ mb: 4 }}>
             <LiquidityMining
-              {...args.lpArgs}
+              rewards={[
+                {
+                  name: "DAI",
+                  icon: "cryptoIcons/dai.svg",
+                  amount: 25,
+                  category: "Stable",
+                  usdValue: 1 * 25,
+                },
+                {
+                  name: "XLM",
+                  icon: "cryptoIcons/xlm.svg",
+                  amount: 200,
+                  category: "Non-Stable",
+                  usdValue: 0.85 * 200,
+                },
+              ]}
+              balance={400}
               onClaimRewards={() => {}}
               onStake={() => {}}
             />
           </Box>
-          <StakingList {...args.stakingListArgs} />
+          <StakingList
+            entries={[
+              {
+                icon: "cryptoIcons/btc.svg",
+                title: "XLM/USDT",
+                apr: "3.5%",
+                lockedPeriod: "1 day",
+                amount: {
+                  tokenAmount: "10,000.5",
+                  tokenValueInUsd: "100,000.25",
+                },
+                onClick: () => {
+                  // Empty function
+                },
+              },
+            ]}
+          />
         </Grid>
         <Grid item xs={12} md={4}>
-          <PoolLiquidity {...args.poolLiquidityArgs} />
+          {tokenA && tokenB && lpToken && (
+            <PoolLiquidity
+              poolHistory={[
+                [1687392000000, 152000],
+                [1687478400000, 140400],
+                [1687564800000, 160100],
+                [1687651200000, 163300],
+                [1687737600000, 150000],
+                [1687824000000, 180000],
+                [1687859473000, 200000],
+              ]}
+              tokenA={tokenA}
+              tokenB={tokenB}
+              liquidityA={10000}
+              liquidityB={20000}
+              liquidityToken={lpToken}
+              onAddLiquidity={() => {}}
+              onRemoveLiquidity={() => {}}
+            />
+          )}
         </Grid>
       </Grid>
     </Box>

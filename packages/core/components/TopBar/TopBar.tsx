@@ -34,7 +34,7 @@ const TopBar = ({
     ? Number(token?.balance) / 10 ** token?.decimals
     : 0;
 
-  const fetch = async () => await store.fetchTokenBalance(
+  const fetch = async () => await store.fetchTokenInfo(
     "CB64D3G7SM2RTH6JSGG34DDTFTQ5CFDKVDZJZSODMCX4NJ2HV2KN7OHT"
   );
 
