@@ -29,20 +29,11 @@ export const createWalletActions = (
         await SorobanTokenContract.balance(
           // @ts-ignore
           { id: usePersistStore.getState().wallet.address },
-          {},
           tokenId
         )
       );
 
-      const name = await SorobanTokenContract.name(
-        {},
-        tokenId
-      );
-
-      const symbol = await SorobanTokenContract.symbol(
-        {},
-        tokenId
-      )
+      const symbol = await SorobanTokenContract.symbol(tokenId)
 
       const decimals =
         getState().tokens.find((token: Token) => token.id === tokenId)
@@ -51,11 +42,11 @@ export const createWalletActions = (
       // Update token balance
       setState((state: AppStore) => {
         const updatedTokens = state.tokens.map((token: Token) =>
-          token.id === tokenId ? { ...token, balance, decimals, name, symbol } : token
+          token.id === tokenId ? { ...token, balance, decimals, symbol } : token
         );
         // If token couldnt be found, add it
         if (!updatedTokens.find((token: Token) => token.id === tokenId)) {
-          updatedTokens.push({ id: tokenId, balance, decimals: decimals, name: name, symbol: symbol});
+          updatedTokens.push({ id: tokenId, balance, decimals: decimals, symbol: symbol});
         }
         return { tokens: updatedTokens };
       });
