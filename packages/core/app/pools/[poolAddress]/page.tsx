@@ -41,46 +41,45 @@ export default function Page({ params }: PoolPageProps) {
   const [lpToken, setLpToken] = useState<Token | undefined>(undefined);
 
   // Fetch pool and balance infos
+
+  // Function to fetch pool config and info from chain
   const getPool = async () => {
     try {
       // Fetch pool config and info from chain
-      const pairConfigResult = await PhoenixPairContract.queryConfig(
-        params.poolAddress
-      );
-      const pairInfoResult = await PhoenixPairContract.queryPoolInfo(
-        params.poolAddress
-      );
+      const [pairConfig, pairInfo] = await Promise.all([
+        PhoenixPairContract.queryConfig(params.poolAddress),
+        PhoenixPairContract.queryPoolInfo(params.poolAddress),
+      ]);
 
       // When results ok...
-      if (pairConfigResult.isOk() && pairInfoResult.isOk()) {
-        // Unwrap results
-        const pairConfig = pairConfigResult.unwrap();
-        const pairInfo = pairInfoResult.unwrap();
-
+      if (pairConfig.isOk() && pairInfo.isOk()) {
         // Fetch token infos from chain and save in global appstore
-        const _tokenA = await store.fetchTokenInfo(pairConfig.token_a);
-        const _tokenB = await store.fetchTokenInfo(pairConfig.token_b);
-        const _lpToken = await store.fetchTokenInfo(pairConfig.share_token);
+        const [tokenA, tokenB, lpToken] = await Promise.all([
+          store.fetchTokenInfo(pairConfig.unwrap().token_a),
+          store.fetchTokenInfo(pairConfig.unwrap().token_b),
+          store.fetchTokenInfo(pairConfig.unwrap().share_token),
+        ]);
 
+        // Set token states
         setTokenA({
-          name: _tokenA?.symbol as string,
-          icon: `/${_tokenA?.symbol}`,
+          name: tokenA?.symbol as string,
+          icon: `/${tokenA?.symbol}`,
           usdValue: 0,
-          amount: Number(_tokenA?.balance) / 10 ** Number(_tokenA?.decimals),
+          amount: Number(tokenA?.balance) / 10 ** Number(tokenA?.decimals),
           category: "none",
         });
         setTokenB({
-          name: _tokenB?.symbol as string,
-          icon: `/${_tokenB?.symbol}`,
+          name: tokenB?.symbol as string,
+          icon: `/${tokenB?.symbol}`,
           usdValue: 0,
-          amount: Number(_tokenB?.balance) / 10 ** Number(_tokenB?.decimals),
+          amount: Number(tokenB?.balance) / 10 ** Number(tokenB?.decimals),
           category: "none",
         });
         setLpToken({
-          name: _lpToken?.symbol as string,
-          icon: `/${_lpToken?.symbol}`,
+          name: lpToken?.symbol as string,
+          icon: `/${lpToken?.symbol}`,
           usdValue: 0,
-          amount: Number(_lpToken?.balance) / 10 ** Number(_lpToken?.decimals),
+          amount: Number(lpToken?.balance) / 10 ** Number(lpToken?.decimals),
           category: "none",
         });
       }
