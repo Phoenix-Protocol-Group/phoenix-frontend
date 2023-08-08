@@ -13,7 +13,6 @@ const {
 } = convert;
 
 import { invoke } from "@phoenix-protocol/utils";
-import { server } from "@phoenix-protocol/utils";
 import { ResponseTypes } from "@phoenix-protocol/utils/build/invoke";
 
 export type u32 = number;
