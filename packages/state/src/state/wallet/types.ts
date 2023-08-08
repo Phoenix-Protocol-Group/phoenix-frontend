@@ -4,7 +4,7 @@ export type Token = {
   id: string;
   balance: bigint;
   decimals: number;
-  symbol: Buffer;
+  symbol: string;
 };
 
 export type Wallet = {
