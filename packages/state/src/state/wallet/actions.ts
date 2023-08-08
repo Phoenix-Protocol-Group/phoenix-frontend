@@ -1,10 +1,7 @@
-import { WalletActions, Token, Wallet } from "./types";
-import { Account, Server } from "soroban-client";
+import { WalletActions, Token } from "./types";
 import { AppStore, SetStateType, GetStateType } from "../types";
-import { freighter } from "./freighter";
-import { allChains, networkToActiveChain } from "./chains";
 import { SorobanTokenContract } from "@phoenix-protocol/contracts";
-import {usePersistStore} from '../store';
+import { usePersistStore } from "../store";
 
 export const createWalletActions = (
   setState: SetStateType,
@@ -28,11 +25,13 @@ export const createWalletActions = (
         throw new Error("Missing wallet address");
       }
 
-      const balance = await SorobanTokenContract.balance(
-        // @ts-ignore
-        { id: usePersistStore.getState().wallet.address },
-        {},
-        tokenId
+      const balance: bigint = BigInt(
+        await SorobanTokenContract.balance(
+          // @ts-ignore
+          { id: usePersistStore.getState().wallet.address },
+          {},
+          tokenId
+        )
       );
 
       const name = await SorobanTokenContract.name(
@@ -47,7 +46,7 @@ export const createWalletActions = (
 
       const decimals =
         getState().tokens.find((token: Token) => token.id === tokenId)
-          ?.decimals || (await SorobanTokenContract.decimals({}, tokenId));
+          ?.decimals || Number(await SorobanTokenContract.decimals(tokenId));
 
       // Update token balance
       setState((state: AppStore) => {
