@@ -30,7 +30,7 @@ const Modal = ({
   description,
   tokens,
   setOpen,
-  onTxClick
+  onTxClick,
 }: ModalProps): React.ReactNode => {
   const style = {
     position: "absolute" as "absolute",
@@ -137,9 +137,11 @@ const Modal = ({
             </Typography>
 
             {!!tokens && (
-              <Box sx={{
-                width: "100%",
-              }}>
+              <Box
+                sx={{
+                  width: "100%",
+                }}
+              >
                 <Box
                   sx={{
                     borderRadius: "8px",
@@ -180,13 +182,24 @@ const Modal = ({
                     </Grid>
                   </Grid>
                 </Box>
-                <Button
-                  onClick={onTxClick}
-                  sx={{
-                    width: "100%",
-                  }}
-                  label="Transaction Details"
-                />
+                {onTxClick && (
+                  <Button
+                    onClick={onTxClick}
+                    sx={{
+                      width: "100%",
+                    }}
+                    label="Transaction Details"
+                  />
+                )}
+                {!onTxClick && (
+                  <Button
+                    onClick={() => setOpen(false)}
+                    sx={{
+                      width: "100%",
+                    }}
+                    label="Go Back"
+                  />
+                )}
               </Box>
             )}
 

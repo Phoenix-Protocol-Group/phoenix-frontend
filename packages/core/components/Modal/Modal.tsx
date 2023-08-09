@@ -39,3 +39,39 @@ export const SwapError = ({
     description={error}
   />
 );
+
+export const PoolSuccess = ({
+  setOpen,
+  open,
+  msg,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  msg: string;
+}) => (
+  <ModalUI
+    type="SUCCESS"
+    open={open}
+    title="Success"
+    setOpen={setOpen}
+    description={msg}
+  />
+);
+
+export const PoolError = ({
+  setOpen,
+  open,
+  error,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  error: string;
+}) => (
+  <ModalUI
+    type="ERROR"
+    open={open}
+    title="Error"
+    setOpen={setOpen}
+    description={error}
+  />
+);
