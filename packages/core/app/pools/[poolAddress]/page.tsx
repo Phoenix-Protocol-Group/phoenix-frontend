@@ -94,7 +94,7 @@ export default function Page({ params }: PoolPageProps) {
         // Set token states
         setTokenA({
           name: tokenA?.symbol as string,
-          icon: `/${tokenA?.symbol}`,
+          icon: `/cryptoIcons/${tokenA?.symbol}.svg`.toLowerCase(),
           usdValue: 0,
           amount: Number(tokenA?.balance) / 10 ** Number(tokenA?.decimals),
           category: "none",
@@ -102,7 +102,7 @@ export default function Page({ params }: PoolPageProps) {
         });
         setTokenB({
           name: tokenB?.symbol as string,
-          icon: `/${tokenB?.symbol}`,
+          icon: `/cryptoIcons/${tokenB?.symbol}.svg`.toLowerCase(),
           usdValue: 0,
           amount: Number(tokenB?.balance) / 10 ** Number(tokenB?.decimals),
           category: "none",
@@ -151,12 +151,12 @@ export default function Page({ params }: PoolPageProps) {
           <Box
             sx={{ height: "2.5rem", width: "2.5rem" }}
             component="img"
-            src="cryptoIcons/btc.svg"
+            src={`/cryptoIcons/${tokenA?.name}.svg`.toLowerCase()}
           />
           <Box
             sx={{ ml: -1, height: "2.5rem", width: "2.5rem" }}
             component="img"
-            src="cryptoIcons/usdc.svg"
+            src={`/cryptoIcons/${tokenB?.name}.svg`.toLowerCase()}
           />
         </Box>
         <Typography sx={{ fontSize: "2rem", fontWeight: 700, ml: 1 }}>
