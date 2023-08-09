@@ -12,5 +12,3 @@ export {
 } from "./state/wallet/chains";
 
 export * from "./state";
-
-export * from "./soroban";

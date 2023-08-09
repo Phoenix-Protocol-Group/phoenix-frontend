@@ -65,11 +65,12 @@ export default function Page({ params }: PoolPageProps) {
         sender: storePersist.wallet.address as string,
         desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
         desired_b: BigInt(tokenBAmount * 10 ** (tokenA?.decimals || 7)),
-        min_a: BigInt(0),
-        min_b: BigInt(0),
-        custom_slippage_bps: BigInt(0),
+        min_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
+        min_b: BigInt(tokenBAmount * 10 ** (tokenA?.decimals || 7)),
+        custom_slippage_bps: BigInt(1),
       },
-      params.poolAddress as string
+      params.poolAddress as string,
+      { fee: 500, responseType: "full" }
     );
   };
 
@@ -130,7 +131,7 @@ export default function Page({ params }: PoolPageProps) {
   useEffect(() => {
     getPool();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [storePersist.wallet.address]);
 
   if (!params.poolAddress || poolNotFound) {
     return (
@@ -144,7 +145,6 @@ export default function Page({ params }: PoolPageProps) {
   }
   return (
     <Box>
-      <Button onClick={() => getPool()}>Foo</Button>
       {overviewStyles}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -198,9 +198,10 @@ export default function Page({ params }: PoolPageProps) {
                   usdValue: 1 * 25,
                 },
               ]}
-              balance={400}
+              balance={lpToken?.amount || 0}
               onClaimRewards={() => {}}
               onStake={() => {}}
+              tokenName={lpToken?.name as string}
             />
           </Box>
           <StakingList
