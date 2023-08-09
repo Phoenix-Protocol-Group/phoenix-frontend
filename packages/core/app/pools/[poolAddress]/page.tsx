@@ -60,7 +60,7 @@ export default function Page({ params }: PoolPageProps) {
     tokenAAmount: number,
     tokenBAmount: number
   ) => {
-    PhoenixPairContract.provideLiquidity(
+    await PhoenixPairContract.provideLiquidity(
       {
         sender: storePersist.wallet.address as string,
         desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
