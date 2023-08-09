@@ -11,7 +11,7 @@ import {
 
 import { PhoenixPairContract } from "@phoenix-protocol/contracts";
 import { useEffect, useState } from "react";
-import { useAppStore } from "@phoenix-protocol/state";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import Link from "next/link";
 
 interface PoolPageProps {
@@ -28,19 +28,50 @@ const overviewStyles = (
   />
 );
 
+interface _Token extends Token {
+  readonly decimals: number;
+}
+
 export default function Page({ params }: PoolPageProps) {
   // Load App Store
   const store = useAppStore();
+  const storePersist = usePersistStore();
 
   // Let's have some variable to see if the pool even exists
   const [poolNotFound, setPoolNotFound] = useState<boolean>(false);
 
   // Token Balances
-  const [tokenA, setTokenA] = useState<Token | undefined>(undefined);
-  const [tokenB, setTokenB] = useState<Token | undefined>(undefined);
-  const [lpToken, setLpToken] = useState<Token | undefined>(undefined);
+  const [tokenA, setTokenA] = useState<_Token | undefined>(undefined);
+  const [tokenB, setTokenB] = useState<_Token | undefined>(undefined);
+  const [lpToken, setLpToken] = useState<_Token | undefined>(undefined);
 
-  // Fetch pool and balance infos
+  // Pool Liquidity
+  const [poolLiquidity, setPoolLiquidity] = useState<number>(0);
+  const [poolLiquidityTokenA, setPoolLiquidityTokenA] = useState<bigint>(
+    BigInt(0)
+  );
+  const [poolLiquidityTokenB, setPoolLiquidityTokenB] = useState<bigint>(
+    BigInt(0)
+  );
+  const [assetLpShare, setAssetLpShare] = useState<bigint>(BigInt(0));
+
+  // Provide Liquidity
+  const provideLiquidity = async (
+    tokenAAmount: number,
+    tokenBAmount: number
+  ) => {
+    PhoenixPairContract.provideLiquidity(
+      {
+        sender: storePersist.wallet.address as string,
+        desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
+        desired_b: BigInt(tokenBAmount * 10 ** (tokenA?.decimals || 7)),
+        min_a: BigInt(0),
+        min_b: BigInt(0),
+        custom_slippage_bps: BigInt(0),
+      },
+      params.poolAddress as string
+    );
+  };
 
   // Function to fetch pool config and info from chain
   const getPool = async () => {
@@ -67,6 +98,7 @@ export default function Page({ params }: PoolPageProps) {
           usdValue: 0,
           amount: Number(tokenA?.balance) / 10 ** Number(tokenA?.decimals),
           category: "none",
+          decimals: Number(lpToken?.decimals),
         });
         setTokenB({
           name: tokenB?.symbol as string,
@@ -74,6 +106,7 @@ export default function Page({ params }: PoolPageProps) {
           usdValue: 0,
           amount: Number(tokenB?.balance) / 10 ** Number(tokenB?.decimals),
           category: "none",
+          decimals: Number(lpToken?.decimals),
         });
         setLpToken({
           name: lpToken?.symbol as string,
@@ -81,7 +114,11 @@ export default function Page({ params }: PoolPageProps) {
           usdValue: 0,
           amount: Number(lpToken?.balance) / 10 ** Number(lpToken?.decimals),
           category: "none",
+          decimals: Number(lpToken?.decimals),
         });
+        setAssetLpShare(pairInfo.unwrap().asset_lp_share.amount);
+        setPoolLiquidityTokenA(pairInfo.unwrap().asset_a.amount);
+        setPoolLiquidityTokenB(pairInfo.unwrap().asset_b.amount);
       }
     } catch (e) {
       // If pool not found, set poolNotFound to true
@@ -133,7 +170,7 @@ export default function Page({ params }: PoolPageProps) {
               stats={[
                 {
                   title: "TVL",
-                  value: "$100,000.00",
+                  value: poolLiquidity.toString(),
                 },
                 {
                   title: "My Share",
@@ -141,7 +178,7 @@ export default function Page({ params }: PoolPageProps) {
                 },
                 {
                   title: "LP tokens",
-                  value: "0.00",
+                  value: lpToken?.amount.toString() || "0",
                 },
                 {
                   title: "Swap fee",
@@ -159,13 +196,6 @@ export default function Page({ params }: PoolPageProps) {
                   amount: 25,
                   category: "Stable",
                   usdValue: 1 * 25,
-                },
-                {
-                  name: "XLM",
-                  icon: "cryptoIcons/xlm.svg",
-                  amount: 200,
-                  category: "Non-Stable",
-                  usdValue: 0.85 * 200,
                 },
               ]}
               balance={400}
@@ -205,10 +235,12 @@ export default function Page({ params }: PoolPageProps) {
               ]}
               tokenA={tokenA}
               tokenB={tokenB}
-              liquidityA={10000}
-              liquidityB={20000}
+              liquidityA={tokenA.amount}
+              liquidityB={tokenB.amount}
               liquidityToken={lpToken}
-              onAddLiquidity={() => {}}
+              onAddLiquidity={(tokenAAmount, tokenBAmount) => {
+                provideLiquidity(tokenAAmount, tokenBAmount);
+              }}
               onRemoveLiquidity={() => {}}
             />
           )}

@@ -13,18 +13,10 @@ export const createWalletActions = (
     fetchTokenInfo: async (tokenId: string) => {
       let updatedTokenInfo: Token | undefined;
       // Check if account, server, and network passphrase are set
-      if (
-        !usePersistStore.getState().wallet ||
-        !getState().server ||
-        !getState().networkPassphrase
-      ) {
+      if (!getState().server || !getState().networkPassphrase) {
         throw new Error("Missing account, server, or network passphrase");
       }
 
-      // Create Soroban token query client
-      if (typeof usePersistStore.getState().wallet.address !== "string") {
-        throw new Error("Missing wallet address");
-      }
       let balance: bigint;
       try {
         balance = BigInt(
