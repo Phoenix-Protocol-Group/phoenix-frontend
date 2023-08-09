@@ -1,7 +1,13 @@
 "use client";
 
+import Modal from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
-import { AssetSelector, SlippageSettings, SwapContainer, Token } from "@phoenix-protocol/ui";
+import {
+  AssetSelector,
+  SlippageSettings,
+  SwapContainer,
+  Token,
+} from "@phoenix-protocol/ui";
 import React from "react";
 
 const args = {
@@ -87,10 +93,11 @@ export default function Page() {
     setAssetSelectorOpen(true);
     setIsFrom(isFromToken);
   };
-  
+
   return (
-    <Box>
-      {!optionsOpen && !assetSelectorOpen && (
+    <>
+      <Box>
+        {!optionsOpen && !assetSelectorOpen && (
           <SwapContainer
             {...args.SwapContainerArgs}
             onOptionsClick={() => setOptionsOpen(true)}
@@ -124,6 +131,8 @@ export default function Page() {
             onTokenClick={handleTokenClick}
           />
         )}
-    </Box>
+      </Box>
+      <Modal />
+    </>
   );
 }
