@@ -9,7 +9,10 @@ import {
   Token,
 } from "@phoenix-protocol/ui";
 
-import { PhoenixPairContract } from "@phoenix-protocol/contracts";
+import {
+  PhoenixPairContract,
+  PhoenixStakeContract,
+} from "@phoenix-protocol/contracts";
 import { useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import Link from "next/link";
@@ -67,6 +70,38 @@ export default function Page({ params }: PoolPageProps) {
       },
       params.poolAddress as string,
       { fee: 500, responseType: "full" }
+    );
+  };
+
+  // Remove Liquidity
+  const removeLiquidity = async (lpTokenAmount: number) => {
+    console.log({
+      sender: storePersist.wallet.address as string,
+      share_amount: BigInt(lpTokenAmount * 10 ** (lpToken?.decimals || 7)),
+      min_a: BigInt(0),
+      min_b: BigInt(0),
+    });
+    await PhoenixPairContract.withdrawLiquidity(
+      {
+        sender: storePersist.wallet.address as string,
+        share_amount: BigInt(lpTokenAmount * 10 ** (lpToken?.decimals || 7)),
+        min_a: BigInt(1),
+        min_b: BigInt(1),
+      },
+      params.poolAddress as string
+    );
+  };
+
+  // Stake
+  const stake = async (lpTokenAmount: number) => {
+    await PhoenixStakeContract.bond(
+      {
+        sender: storePersist.wallet.address as string,
+        tokens: BigInt(
+          (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+        ),
+      },
+      params.poolAddress as string
     );
   };
 
@@ -194,38 +229,16 @@ export default function Page({ params }: PoolPageProps) {
           </Box>
           <Box sx={{ mb: 4 }}>
             <LiquidityMining
-              rewards={[
-                {
-                  name: "DAI",
-                  icon: "cryptoIcons/dai.svg",
-                  amount: 25,
-                  category: "Stable",
-                  usdValue: 1 * 25,
-                },
-              ]}
+              rewards={[]}
               balance={lpToken?.amount || 0}
               onClaimRewards={() => {}}
-              onStake={() => {}}
+              onStake={(amount) => {
+                stake(amount);
+              }}
               tokenName={lpToken?.name as string}
             />
           </Box>
-          <StakingList
-            entries={[
-              {
-                icon: "cryptoIcons/btc.svg",
-                title: "XLM/USDT",
-                apr: "3.5%",
-                lockedPeriod: "1 day",
-                amount: {
-                  tokenAmount: "10,000.5",
-                  tokenValueInUsd: "100,000.25",
-                },
-                onClick: () => {
-                  // Empty function
-                },
-              },
-            ]}
-          />
+          <StakingList entries={[]} />
         </Grid>
         <Grid item xs={12} md={4}>
           {tokenA && tokenB && lpToken && (
@@ -247,7 +260,9 @@ export default function Page({ params }: PoolPageProps) {
               onAddLiquidity={(tokenAAmount, tokenBAmount) => {
                 provideLiquidity(tokenAAmount, tokenBAmount);
               }}
-              onRemoveLiquidity={() => {}}
+              onRemoveLiquidity={(liquidityTokenAmount) => {
+                removeLiquidity(liquidityTokenAmount);
+              }}
             />
           )}
         </Grid>
