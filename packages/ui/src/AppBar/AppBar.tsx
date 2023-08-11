@@ -17,7 +17,7 @@ import { MenuButton } from "./MenuButton";
 
 const BalanceChip = ({ balance }: { balance: number }) => (
   <Chip
-    icon={<Box component="img" src="image-103.png" />}
+    icon={<Box component="img" src="/image-103.png" />}
     label={
       <Typography
         sx={{
@@ -158,7 +158,7 @@ const AppBar = ({
             maxHeight: "54px",
           }}
         >
-          <Box component="img" src="logo_icon.svg" />
+          <Box component="img" src="/logo_icon.svg" />
         </Box>
         <Box sx={{ display: "flex" }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
