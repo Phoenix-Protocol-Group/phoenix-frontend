@@ -9,6 +9,8 @@ import {
   Token,
 } from "@phoenix-protocol/ui";
 
+import { time } from "@phoenix-protocol/utils";
+
 import {
   PhoenixPairContract,
   PhoenixStakeContract,
@@ -16,6 +18,18 @@ import {
 import { useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import Link from "next/link";
+
+interface Entry {
+  icon: string;
+  title: string;
+  apr: string;
+  lockedPeriod: string;
+  amount: {
+    tokenAmount: string;
+    tokenValueInUsd: string;
+  };
+  onClick: () => void;
+}
 
 interface PoolPageProps {
   readonly params: {
@@ -53,6 +67,9 @@ export default function Page({ params }: PoolPageProps) {
   const [poolLiquidityTokenA, setPoolLiquidityTokenA] = useState<number>(0);
   const [poolLiquidityTokenB, setPoolLiquidityTokenB] = useState<number>(0);
   const [assetLpShare, setAssetLpShare] = useState<number>(0);
+
+  // Stakes
+  const [userStakes, setUserStakes] = useState<Entry[] | undefined>(undefined);
 
   // Provide Liquidity
   const provideLiquidity = async (
@@ -101,7 +118,7 @@ export default function Page({ params }: PoolPageProps) {
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
         ),
       },
-      params.poolAddress as string
+      "CDFOUB6Z24WZVERRAZBMTFMTWM52OB4FHNLLTX5M5RPDIBZGPEYVYSDH"
     );
   };
 
@@ -160,6 +177,38 @@ export default function Page({ params }: PoolPageProps) {
           Number(pairInfo.unwrap().asset_b.get("amount")) /
             10 ** Number(tokenB?.decimals)
         );
+      }
+
+      // Get user stakes
+      const stakes = await PhoenixStakeContract.queryStaked(
+        {
+          address: storePersist.wallet.address as string,
+        },
+        "CDFOUB6Z24WZVERRAZBMTFMTWM52OB4FHNLLTX5M5RPDIBZGPEYVYSDH"
+      );
+
+      // If stakes are okay
+      if (stakes.isOk()) {
+        // If filled
+        if (stakes.unwrap().stakes.length > 0) {
+          const _stakes: Entry[] = stakes.unwrap().stakes.map((stake: any) => {
+            return {
+              icon: `/cryptoIcons/${lpToken?.name}.svg`.toLowerCase(),
+              title: lpToken?.name,
+              apr: "0",
+              lockedPeriod:
+                time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
+                " days",
+              amount: {
+                tokenAmount:
+                  Number(stake.stake) / 10 ** Number(lpToken?.decimals),
+                tokenValueInUsd: 0,
+              },
+              onClick: () => {},
+            };
+          });
+          setUserStakes(_stakes);
+        }
       }
     } catch (e) {
       // If pool not found, set poolNotFound to true
@@ -238,7 +287,7 @@ export default function Page({ params }: PoolPageProps) {
               tokenName={lpToken?.name as string}
             />
           </Box>
-          <StakingList entries={[]} />
+          {userStakes && <StakingList entries={userStakes} />}
         </Grid>
         <Grid item xs={12} md={4}>
           {tokenA && tokenB && lpToken && (
