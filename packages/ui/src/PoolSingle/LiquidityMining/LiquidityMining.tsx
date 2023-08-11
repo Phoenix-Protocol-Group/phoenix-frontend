@@ -196,18 +196,26 @@ const ClaimRewards = ({
           Total rewards
         </Typography>
 
-        {rewards.map((reward) => (
+        {rewards.length > 0 ? (
+          rewards.map((reward) => (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
+              <Box
+                component="img"
+                src={reward.icon}
+                sx={{ width: "1.125rem", height: "1.125rem" }}
+              />
+              <Typography sx={{ fontSize: "1.125rem", fontWeight: 700 }}>
+                {reward.amount} {reward.name}
+              </Typography>
+            </Box>
+          ))
+        ) : (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
-            <Box
-              component="img"
-              src={reward.icon}
-              sx={{ width: "1.125rem", height: "1.125rem" }}
-            />
             <Typography sx={{ fontSize: "1.125rem", fontWeight: 700 }}>
-              {reward.amount} {reward.name}
+              No rewards
             </Typography>
           </Box>
-        ))}
+        )}
       </Box>
       <Button
         // @ts-ignore
