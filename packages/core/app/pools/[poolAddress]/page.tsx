@@ -92,12 +92,6 @@ export default function Page({ params }: PoolPageProps) {
 
   // Remove Liquidity
   const removeLiquidity = async (lpTokenAmount: number) => {
-    console.log({
-      sender: storePersist.wallet.address as string,
-      share_amount: BigInt(lpTokenAmount * 10 ** (lpToken?.decimals || 7)),
-      min_a: BigInt(0),
-      min_b: BigInt(0),
-    });
     await PhoenixPairContract.withdrawLiquidity(
       {
         sender: storePersist.wallet.address as string,
