@@ -76,14 +76,6 @@ export default function Page({ params }: PoolPageProps) {
     tokenAAmount: number,
     tokenBAmount: number
   ) => {
-    console.log({
-      sender: storePersist.wallet.address as string,
-      desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
-      desired_b: BigInt(tokenBAmount * 10 ** (tokenB?.decimals || 7)),
-      min_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
-      min_b: BigInt(tokenBAmount * 10 ** (tokenB?.decimals || 7)),
-      custom_slippage_bps: BigInt(1),
-    });
     await PhoenixPairContract.provideLiquidity(
       {
         sender: storePersist.wallet.address as string,
