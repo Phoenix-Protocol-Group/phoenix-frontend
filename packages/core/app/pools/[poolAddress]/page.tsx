@@ -118,8 +118,8 @@ export default function Page({ params }: PoolPageProps) {
           decimals: Number(lpToken?.decimals),
         });
         setAssetLpShare(pairInfo.unwrap().asset_lp_share.amount);
-        setPoolLiquidityTokenA(pairInfo.unwrap().asset_a.amount);
-        setPoolLiquidityTokenB(pairInfo.unwrap().asset_b.amount);
+        setPoolLiquidityTokenA(pairInfo.unwrap().asset_a.get("amount"));
+        setPoolLiquidityTokenB(pairInfo.unwrap().asset_b.get("amount"));
       }
     } catch (e) {
       // If pool not found, set poolNotFound to true
@@ -236,8 +236,8 @@ export default function Page({ params }: PoolPageProps) {
               ]}
               tokenA={tokenA}
               tokenB={tokenB}
-              liquidityA={tokenA.amount}
-              liquidityB={tokenB.amount}
+              liquidityA={Number(poolLiquidityTokenA)}
+              liquidityB={Number(poolLiquidityTokenB)}
               liquidityToken={lpToken}
               onAddLiquidity={(tokenAAmount, tokenBAmount) => {
                 provideLiquidity(tokenAAmount, tokenBAmount);
