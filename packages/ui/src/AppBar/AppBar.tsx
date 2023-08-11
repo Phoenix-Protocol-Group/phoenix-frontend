@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   Chip,
@@ -5,6 +7,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  NoSsr,
   Typography,
   useMediaQuery,
   useTheme,
@@ -14,6 +17,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import React from "react";
 import { Button } from "../Button/Button";
 import { MenuButton } from "./MenuButton";
+
 
 const BalanceChip = ({ balance }: { balance: number }) => (
   <Chip
@@ -133,7 +137,7 @@ const AppBar = ({
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
 
   return (
-    <>
+    <NoSsr>
       <Box height="70px" />
       <Box
         sx={{
@@ -197,7 +201,7 @@ const AppBar = ({
           )}
         </Box>
       </Box>
-    </>
+    </NoSsr>
   );
 };
 export { AppBar };
