@@ -47,13 +47,9 @@ export default function Page({ params }: PoolPageProps) {
 
   // Pool Liquidity
   const [poolLiquidity, setPoolLiquidity] = useState<number>(0);
-  const [poolLiquidityTokenA, setPoolLiquidityTokenA] = useState<bigint>(
-    BigInt(0)
-  );
-  const [poolLiquidityTokenB, setPoolLiquidityTokenB] = useState<bigint>(
-    BigInt(0)
-  );
-  const [assetLpShare, setAssetLpShare] = useState<bigint>(BigInt(0));
+  const [poolLiquidityTokenA, setPoolLiquidityTokenA] = useState<number>(0);
+  const [poolLiquidityTokenB, setPoolLiquidityTokenB] = useState<number>(0);
+  const [assetLpShare, setAssetLpShare] = useState<number>(0);
 
   // Provide Liquidity
   const provideLiquidity = async (
@@ -117,9 +113,18 @@ export default function Page({ params }: PoolPageProps) {
           category: "none",
           decimals: Number(lpToken?.decimals),
         });
-        setAssetLpShare(pairInfo.unwrap().asset_lp_share.amount);
-        setPoolLiquidityTokenA(pairInfo.unwrap().asset_a.get("amount"));
-        setPoolLiquidityTokenB(pairInfo.unwrap().asset_b.get("amount"));
+        setAssetLpShare(
+          Number(pairInfo.unwrap().asset_lp_share.get("amount")) /
+            10 ** Number(lpToken?.decimals)
+        );
+        setPoolLiquidityTokenA(
+          Number(pairInfo.unwrap().asset_a.get("amount")) /
+            10 ** Number(tokenA?.decimals)
+        );
+        setPoolLiquidityTokenB(
+          Number(pairInfo.unwrap().asset_b.get("amount")) /
+            10 ** Number(tokenB?.decimals)
+        );
       }
     } catch (e) {
       // If pool not found, set poolNotFound to true

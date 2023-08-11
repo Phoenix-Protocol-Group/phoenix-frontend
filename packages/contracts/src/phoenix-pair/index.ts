@@ -12,7 +12,12 @@ const {
 } = convert;
 
 import { invoke } from "@phoenix-protocol/utils";
-import { Error_, Ok, ResponseTypes, Result } from "@phoenix-protocol/utils/build/invoke";
+import {
+  Error_,
+  Ok,
+  ResponseTypes,
+  Result,
+} from "@phoenix-protocol/utils/build/invoke";
 
 export type u32 = number;
 export type i32 = number;
