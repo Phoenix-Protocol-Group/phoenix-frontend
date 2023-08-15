@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   Chip,
@@ -5,6 +7,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  NoSsr,
   Typography,
   useMediaQuery,
   useTheme,
@@ -15,9 +18,10 @@ import React from "react";
 import { Button } from "../Button/Button";
 import { MenuButton } from "./MenuButton";
 
+
 const BalanceChip = ({ balance }: { balance: number }) => (
   <Chip
-    icon={<Box component="img" src="image-103.png" />}
+    icon={<Box component="img" src="/image-103.png" />}
     label={
       <Typography
         sx={{
@@ -133,7 +137,7 @@ const AppBar = ({
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
 
   return (
-    <>
+    <NoSsr>
       <Box height="70px" />
       <Box
         sx={{
@@ -158,7 +162,7 @@ const AppBar = ({
             maxHeight: "54px",
           }}
         >
-          <Box component="img" src="logo_icon.svg" />
+          <Box component="img" src="/logo_icon.svg" />
         </Box>
         <Box sx={{ display: "flex" }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -197,7 +201,7 @@ const AppBar = ({
           )}
         </Box>
       </Box>
-    </>
+    </NoSsr>
   );
 };
 export { AppBar };

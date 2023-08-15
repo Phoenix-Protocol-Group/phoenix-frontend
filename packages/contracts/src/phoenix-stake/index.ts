@@ -1,6 +1,7 @@
 import * as SorobanClient from "soroban-client";
 import { xdr } from "soroban-client";
 import { Buffer } from "buffer";
+
 import { convert } from "@phoenix-protocol/utils";
 const {
   scValStrToJs,
@@ -12,13 +13,7 @@ const {
 } = convert;
 
 import { invoke } from "@phoenix-protocol/utils";
-import {
-  Error_,
-  Ok,
-  ResponseTypes,
-  Result,
-} from "@phoenix-protocol/utils/build/invoke";
-
+import { Error_, Ok, ResponseTypes, Result } from "@phoenix-protocol/utils/build/invoke";
 export type u32 = number;
 export type i32 = number;
 export type u64 = bigint;
@@ -31,8 +26,6 @@ export type Address = string;
 export type Option<T> = T | undefined;
 export type Typepoint = bigint;
 export type Duration = bigint;
-
-/// Error interface containing the error message
 
 export class Err<T> implements Result<T> {
   constructor(readonly error: Error_) {}
@@ -78,24 +71,18 @@ function getError(err: string): Err<Error_> | undefined {
 export async function initialize<R extends ResponseTypes = undefined>(
   {
     admin,
-    token_wasm_hash,
-    token_a,
-    token_b,
-    share_token_decimals,
-    swap_fee_bps,
-    fee_recipient,
-    max_allowed_slippage_bps,
-    max_allowed_spread_bps,
+    lp_token,
+    token_per_power,
+    min_bond,
+    max_distributions,
+    min_reward,
   }: {
     admin: Address;
-    token_wasm_hash: Buffer;
-    token_a: Address;
-    token_b: Address;
-    share_token_decimals: u32;
-    swap_fee_bps: i64;
-    fee_recipient: Address;
-    max_allowed_slippage_bps: i64;
-    max_allowed_spread_bps: i64;
+    lp_token: Address;
+    token_per_power: u128;
+    min_bond: i128;
+    max_distributions: u32;
+    min_reward: i128;
   },
   contractId: string,
   options: {
@@ -118,23 +105,111 @@ export async function initialize<R extends ResponseTypes = undefined>(
   } = {}
 ) {
   return await invoke.invoke({
-    method: "initialize",
     contractId,
+    method: "initialize",
     args: [
       ((i) => addressToScVal(i))(admin),
-      ((i) => xdr.ScVal.scvBytes(i))(token_wasm_hash),
-      ((i) => addressToScVal(i))(token_a),
-      ((i) => addressToScVal(i))(token_b),
-      ((i) => xdr.ScVal.scvU32(i))(share_token_decimals),
-      ((i) => xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(
-        swap_fee_bps
-      ),
-      ((i) => addressToScVal(i))(fee_recipient),
-      ((i) => xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(
-        max_allowed_slippage_bps
-      ),
-      ((i) => xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(
-        max_allowed_spread_bps
+      ((i) => addressToScVal(i))(lp_token),
+      ((i) => u128ToScVal(i))(token_per_power),
+      ((i) => i128ToScVal(i))(min_bond),
+      ((i) => xdr.ScVal.scvU32(i))(max_distributions),
+      ((i) => i128ToScVal(i))(min_reward),
+    ],
+    ...options,
+    parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
+      try {
+        return new Ok(scValStrToJs(xdr));
+      } catch (e) {
+        //@ts-ignore
+        let err = getError(e.message);
+        if (err) {
+          return err;
+        } else {
+          throw e;
+        }
+      }
+    },
+  });
+}
+
+export async function bond<R extends ResponseTypes = undefined>(
+  { sender, tokens }: { sender: Address; tokens: i128 },
+  contractId: string,
+  options: {
+    /**
+     * The fee to pay for the transaction. Default: 100.
+     */
+    fee?: number;
+    /**
+     * What type of response to return.
+     *
+     *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+     *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
+     *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
+     */
+    responseType?: R;
+    /**
+     * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
+     */
+    secondsToWait?: number;
+  } = {}
+) {
+  return await invoke.invoke({
+    method: "bond",
+    contractId,
+    args: [((i) => addressToScVal(i))(sender), ((i) => i128ToScVal(i))(tokens)],
+    ...options,
+    // @ts-ignore
+    parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
+      try {
+        return new Ok(scValStrToJs(xdr));
+      } catch (e) {
+        //@ts-ignore
+        let err = getError(e.message);
+        if (err) {
+          return err;
+        } else {
+          throw e;
+        }
+      }
+    },
+  });
+}
+
+export async function unbond<R extends ResponseTypes = undefined>(
+  {
+    sender,
+    stake_amount,
+    stake_timestamp,
+  }: { sender: Address; stake_amount: i128; stake_timestamp: u64 },
+  contractId: string,
+  options: {
+    /**
+     * The fee to pay for the transaction. Default: 100.
+     */
+    fee?: number;
+    /**
+     * What type of response to return.
+     *
+     *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+     *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
+     *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
+     */
+    responseType?: R;
+    /**
+     * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
+     */
+    secondsToWait?: number;
+  } = {}
+) {
+  return await invoke.invoke({
+    method: "unbond",
+    contractId,
+    args: [
+      ((i) => addressToScVal(i))(sender),
+      ((i) => i128ToScVal(i))(stake_amount),
+      ((i) => xdr.ScVal.scvU64(xdr.Uint64.fromString(i.toString())))(
+        stake_timestamp
       ),
     ],
     ...options,
@@ -154,21 +229,21 @@ export async function initialize<R extends ResponseTypes = undefined>(
   });
 }
 
-export async function provideLiquidity<R extends ResponseTypes = undefined>(
+export async function createDistributionFlow<
+  R extends ResponseTypes = undefined
+>(
   {
     sender,
-    desired_a,
-    min_a,
-    desired_b,
-    min_b,
-    custom_slippage_bps,
+    manager,
+    asset,
+    amount,
+    distribution_length,
   }: {
     sender: Address;
-    desired_a: Option<i128>;
-    min_a: Option<i128>;
-    desired_b: Option<i128>;
-    min_b: Option<i128>;
-    custom_slippage_bps: Option<i64>;
+    manager: Address;
+    asset: Address;
+    amount: i128;
+    distribution_length: u64;
   },
   contractId: string,
   options: {
@@ -191,19 +266,15 @@ export async function provideLiquidity<R extends ResponseTypes = undefined>(
   } = {}
 ) {
   return await invoke.invoke({
-    method: "provide_liquidity",
+    method: "create_distribution_flow",
     contractId,
     args: [
       ((i) => addressToScVal(i))(sender),
-      ((i) => (!i ? xdr.ScVal.scvVoid() : i128ToScVal(i)))(desired_a),
-      ((i) => (!i ? xdr.ScVal.scvVoid() : i128ToScVal(i)))(min_a),
-      ((i) => (!i ? xdr.ScVal.scvVoid() : i128ToScVal(i)))(desired_b),
-      ((i) => (!i ? xdr.ScVal.scvVoid() : i128ToScVal(i)))(min_b),
-      ((i) =>
-        !i
-          ? xdr.ScVal.scvVoid()
-          : xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(
-        custom_slippage_bps
+      ((i) => addressToScVal(i))(manager),
+      ((i) => addressToScVal(i))(asset),
+      ((i) => i128ToScVal(i))(amount),
+      ((i) => xdr.ScVal.scvU64(xdr.Uint64.fromString(i.toString())))(
+        distribution_length
       ),
     ],
     ...options,
@@ -223,20 +294,7 @@ export async function provideLiquidity<R extends ResponseTypes = undefined>(
   });
 }
 
-export async function swap<R extends ResponseTypes = undefined>(
-  {
-    sender,
-    sell_a,
-    offer_amount,
-    belief_price,
-    max_spread_bps,
-  }: {
-    sender: Address;
-    sell_a: boolean;
-    offer_amount: i128;
-    belief_price: Option<i64>;
-    max_spread_bps: Option<i64>;
-  },
+export async function distributeRewards<R extends ResponseTypes = undefined>(
   contractId: string,
   options: {
     /**
@@ -258,23 +316,8 @@ export async function swap<R extends ResponseTypes = undefined>(
   } = {}
 ) {
   return await invoke.invoke({
-    method: "swap",
     contractId,
-    args: [
-      ((i) => addressToScVal(i))(sender),
-      ((i) => xdr.ScVal.scvBool(i))(sell_a),
-      ((i) => i128ToScVal(i))(offer_amount),
-      ((i) =>
-        !i
-          ? xdr.ScVal.scvVoid()
-          : xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(belief_price),
-      ((i) =>
-        !i
-          ? xdr.ScVal.scvVoid()
-          : xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(
-        max_spread_bps
-      ),
-    ],
+    method: "distribute_rewards",
     ...options,
     parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
       try {
@@ -292,75 +335,8 @@ export async function swap<R extends ResponseTypes = undefined>(
   });
 }
 
-export async function withdrawLiquidity<R extends ResponseTypes = undefined>(
-  {
-    sender,
-    share_amount,
-    min_a,
-    min_b,
-  }: { sender: Address; share_amount: i128; min_a: i128; min_b: i128 },
-  contractId: string,
-  options: {
-    /**
-     * The fee to pay for the transaction. Default: 100.
-     */
-    fee?: number;
-    /**
-     * What type of response to return.
-     *
-     *   - `undefined`, the default, parses the returned XDR as `Ok<[i128, i128]> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-     *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-     *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-     */
-    responseType?: R;
-    /**
-     * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-     */
-    secondsToWait?: number;
-  } = {}
-) {
-  return await invoke.invoke({
-    method: "withdraw_liquidity",
-    contractId,
-    args: [
-      ((i) => addressToScVal(i))(sender),
-      ((i) => i128ToScVal(i))(share_amount),
-      ((i) => i128ToScVal(i))(min_a),
-      ((i) => i128ToScVal(i))(min_b),
-    ],
-    ...options,
-    parseResultXdr: (xdr): Ok<[i128, i128]> | Err<Error_> | undefined => {
-      try {
-        return new Ok(scValStrToJs(xdr));
-      } catch (e) {
-        //@ts-ignore
-        let err = getError(e.message);
-        if (err) {
-          return err;
-        } else {
-          throw e;
-        }
-      }
-    },
-  });
-}
-
-export async function updateConfig<R extends ResponseTypes = undefined>(
-  {
-    sender,
-    new_admin,
-    total_fee_bps,
-    fee_recipient,
-    max_allowed_slippage_bps,
-    max_allowed_spread_bps,
-  }: {
-    sender: Address;
-    new_admin: Option<Address>;
-    total_fee_bps: Option<i64>;
-    fee_recipient: Option<Address>;
-    max_allowed_slippage_bps: Option<i64>;
-    max_allowed_spread_bps: Option<i64>;
-  },
+export async function withdrawRewards<R extends ResponseTypes = undefined>(
+  { _receiver }: { _receiver: Option<Address> },
   contractId: string,
   options: {
     /**
@@ -382,31 +358,9 @@ export async function updateConfig<R extends ResponseTypes = undefined>(
   } = {}
 ) {
   return await invoke.invoke({
-    method: "update_config",
+    method: "withdraw_rewards",
     contractId,
-    args: [
-      ((i) => addressToScVal(i))(sender),
-      ((i) => (!i ? xdr.ScVal.scvVoid() : addressToScVal(i)))(new_admin),
-      ((i) =>
-        !i
-          ? xdr.ScVal.scvVoid()
-          : xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(
-        total_fee_bps
-      ),
-      ((i) => (!i ? xdr.ScVal.scvVoid() : addressToScVal(i)))(fee_recipient),
-      ((i) =>
-        !i
-          ? xdr.ScVal.scvVoid()
-          : xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(
-        max_allowed_slippage_bps
-      ),
-      ((i) =>
-        !i
-          ? xdr.ScVal.scvVoid()
-          : xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(
-        max_allowed_spread_bps
-      ),
-    ],
+    args: [((i) => (!i ? xdr.ScVal.scvVoid() : addressToScVal(i)))(_receiver)],
     ...options,
     parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
       try {
@@ -424,8 +378,12 @@ export async function updateConfig<R extends ResponseTypes = undefined>(
   });
 }
 
-export async function upgrade<R extends ResponseTypes = undefined>(
-  { new_wasm_hash }: { new_wasm_hash: Buffer },
+export async function fundDistribution<R extends ResponseTypes = undefined>(
+  {
+    _start_time,
+    _distribution_duration,
+    _amount,
+  }: { _start_time: u64; _distribution_duration: u64; _amount: u128 },
   contractId: string,
   options: {
     /**
@@ -447,9 +405,17 @@ export async function upgrade<R extends ResponseTypes = undefined>(
   } = {}
 ) {
   return await invoke.invoke({
-    method: "upgrade",
+    method: "fund_distribution",
     contractId,
-    args: [((i) => xdr.ScVal.scvBytes(i))(new_wasm_hash)],
+    args: [
+      ((i) => xdr.ScVal.scvU64(xdr.Uint64.fromString(i.toString())))(
+        _start_time
+      ),
+      ((i) => xdr.ScVal.scvU64(xdr.Uint64.fromString(i.toString())))(
+        _distribution_duration
+      ),
+      ((i) => u128ToScVal(i))(_amount),
+    ],
     ...options,
     parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
       try {
@@ -477,7 +443,7 @@ export async function queryConfig<R extends ResponseTypes = undefined>(
     /**
      * What type of response to return.
      *
-     *   - `undefined`, the default, parses the returned XDR as `Ok<Config> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+     *   - `undefined`, the default, parses the returned XDR as `Ok<ConfigResponse> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
      *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
      *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
      */
@@ -489,10 +455,10 @@ export async function queryConfig<R extends ResponseTypes = undefined>(
   } = {}
 ) {
   return await invoke.invoke({
+    contractId,
     method: "query_config",
     ...options,
-    contractId,
-    parseResultXdr: (xdr): Ok<Config> | Err<Error_> | undefined => {
+    parseResultXdr: (xdr): Ok<ConfigResponse> | Err<Error_> | undefined => {
       try {
         return new Ok(scValStrToJs(xdr));
       } catch (e) {
@@ -508,9 +474,7 @@ export async function queryConfig<R extends ResponseTypes = undefined>(
   });
 }
 
-export async function queryShareTokenAddress<
-  R extends ResponseTypes = undefined
->(
+export async function queryAdmin<R extends ResponseTypes = undefined>(
   contractId: string,
   options: {
     /**
@@ -532,8 +496,8 @@ export async function queryShareTokenAddress<
   } = {}
 ) {
   return await invoke.invoke({
-    method: "query_share_token_address",
     contractId,
+    method: "query_admin",
     ...options,
     parseResultXdr: (xdr): Ok<Address> | Err<Error_> | undefined => {
       try {
@@ -551,7 +515,8 @@ export async function queryShareTokenAddress<
   });
 }
 
-export async function queryPoolInfo<R extends ResponseTypes = undefined>(
+export async function queryStaked<R extends ResponseTypes = undefined>(
+  { address }: { address: Address },
   contractId: string,
   options: {
     /**
@@ -561,7 +526,7 @@ export async function queryPoolInfo<R extends ResponseTypes = undefined>(
     /**
      * What type of response to return.
      *
-     *   - `undefined`, the default, parses the returned XDR as `Ok<PoolResponse> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+     *   - `undefined`, the default, parses the returned XDR as `Ok<StakedResponse> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
      *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
      *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
      */
@@ -573,10 +538,11 @@ export async function queryPoolInfo<R extends ResponseTypes = undefined>(
   } = {}
 ) {
   return await invoke.invoke({
-    method: "query_pool_info",
+    method: "query_staked",
     contractId,
+    args: [((i) => addressToScVal(i))(address)],
     ...options,
-    parseResultXdr: (xdr): Ok<PoolResponse> | Err<Error_> | undefined => {
+    parseResultXdr: (xdr): Ok<StakedResponse> | Err<Error_> | undefined => {
       try {
         return new Ok(scValStrToJs(xdr));
       } catch (e) {
@@ -592,8 +558,9 @@ export async function queryPoolInfo<R extends ResponseTypes = undefined>(
   });
 }
 
-export async function simulateSwap<R extends ResponseTypes = undefined>(
-  { sell_a, offer_amount }: { sell_a: boolean; offer_amount: i128 },
+export async function queryAnnualizedRewards<
+  R extends ResponseTypes = undefined
+>(
   contractId: string,
   options: {
     /**
@@ -603,7 +570,7 @@ export async function simulateSwap<R extends ResponseTypes = undefined>(
     /**
      * What type of response to return.
      *
-     *   - `undefined`, the default, parses the returned XDR as `Ok<SimulateSwapResponse> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+     *   - `undefined`, the default, parses the returned XDR as `Ok<AnnualizedRewardsResponse> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
      *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
      *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
      */
@@ -612,19 +579,16 @@ export async function simulateSwap<R extends ResponseTypes = undefined>(
      * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
      */
     secondsToWait?: number;
-  } = {}
+    contractId: string;
+  }
 ) {
   return await invoke.invoke({
-    method: "simulate_swap",
-    contractId,
-    args: [
-      ((i) => xdr.ScVal.scvBool(i))(sell_a),
-      ((i) => i128ToScVal(i))(offer_amount),
-    ],
+    method: "query_annualized_rewards",
     ...options,
+    contractId,
     parseResultXdr: (
       xdr
-    ): Ok<SimulateSwapResponse> | Err<Error_> | undefined => {
+    ): Ok<AnnualizedRewardsResponse> | Err<Error_> | undefined => {
       try {
         return new Ok(scValStrToJs(xdr));
       } catch (e) {
@@ -640,8 +604,10 @@ export async function simulateSwap<R extends ResponseTypes = undefined>(
   });
 }
 
-export async function simulateReverseSwap<R extends ResponseTypes = undefined>(
-  { sell_a, ask_amount }: { sell_a: boolean; ask_amount: i128 },
+export async function queryWithdrawableRewards<
+  R extends ResponseTypes = undefined
+>(
+  { _address }: { _address: Address },
   contractId: string,
   options: {
     /**
@@ -651,7 +617,7 @@ export async function simulateReverseSwap<R extends ResponseTypes = undefined>(
     /**
      * What type of response to return.
      *
-     *   - `undefined`, the default, parses the returned XDR as `Ok<SimulateReverseSwapResponse> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+     *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
      *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
      *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
      */
@@ -663,16 +629,11 @@ export async function simulateReverseSwap<R extends ResponseTypes = undefined>(
   } = {}
 ) {
   return await invoke.invoke({
-    method: "simulate_reverse_swap",
+    method: "query_withdrawable_rewards",
     contractId,
-    args: [
-      ((i) => xdr.ScVal.scvBool(i))(sell_a),
-      ((i) => i128ToScVal(i))(ask_amount),
-    ],
+    args: [((i) => addressToScVal(i))(_address)],
     ...options,
-    parseResultXdr: (
-      xdr
-    ): Ok<SimulateReverseSwapResponse> | Err<Error_> | undefined => {
+    parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
       try {
         return new Ok(scValStrToJs(xdr));
       } catch (e) {
@@ -686,6 +647,204 @@ export async function simulateReverseSwap<R extends ResponseTypes = undefined>(
       }
     },
   });
+}
+
+export async function queryDistributedRewards<
+  R extends ResponseTypes = undefined
+>(
+  contractId: string,
+  options: {
+    /**
+     * The fee to pay for the transaction. Default: 100.
+     */
+    fee?: number;
+    /**
+     * What type of response to return.
+     *
+     *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+     *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
+     *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
+     */
+    responseType?: R;
+    /**
+     * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
+     */
+    secondsToWait?: number;
+  } = {}
+) {
+  return await invoke.invoke({
+    method: "query_distributed_rewards",
+    contractId,
+    ...options,
+    parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
+      try {
+        return new Ok(scValStrToJs(xdr));
+      } catch (e) {
+        //@ts-ignore
+        let err = getError(e.message);
+        if (err) {
+          return err;
+        } else {
+          throw e;
+        }
+      }
+    },
+  });
+}
+
+export interface StorageCurve {
+  amount_to_distribute: u128;
+  manager: Address;
+  start_timestamp: u64;
+  stop_timestamp: u64;
+}
+
+function StorageCurveToXdr(storageCurve?: StorageCurve): xdr.ScVal {
+  if (!storageCurve) {
+    return xdr.ScVal.scvVoid();
+  }
+  let arr = [
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("amount_to_distribute"),
+      val: ((i) => u128ToScVal(i))(storageCurve["amount_to_distribute"]),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("manager"),
+      val: ((i) => addressToScVal(i))(storageCurve["manager"]),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("start_timestamp"),
+      val: ((i) => xdr.ScVal.scvU64(xdr.Uint64.fromString(i.toString())))(
+        storageCurve["start_timestamp"]
+      ),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("stop_timestamp"),
+      val: ((i) => xdr.ScVal.scvU64(xdr.Uint64.fromString(i.toString())))(
+        storageCurve["stop_timestamp"]
+      ),
+    }),
+  ];
+  return xdr.ScVal.scvMap(arr);
+}
+
+function StorageCurveFromXdr(base64Xdr: string): StorageCurve {
+  let scVal = strToScVal(base64Xdr);
+  let obj: [string, any][] = scVal
+    .map()!
+    .map((e) => [e.key().str() as string, e.val()]);
+  let map = new Map<string, any>(obj);
+  if (!obj) {
+    throw new Error("Invalid XDR");
+  }
+  return {
+    amount_to_distribute: scValToJs(
+      map.get("amount_to_distribute")
+    ) as unknown as u128,
+    manager: scValToJs(map.get("manager")) as unknown as Address,
+    start_timestamp: scValToJs(map.get("start_timestamp")) as unknown as u64,
+    stop_timestamp: scValToJs(map.get("stop_timestamp")) as unknown as u64,
+  };
+}
+
+export interface Distribution {
+  /**
+   * Bonus per staking day
+   */
+  bonus_per_day_bps: u64;
+  /**
+   * Total rewards distributed by this contract.
+   */
+  distributed_total: u128;
+  /**
+   * The manager of this distribution
+   */
+  manager: Address;
+  /**
+   * Max bonus for staking after 60 days
+   */
+  max_bonus_bps: u64;
+  /**
+   * Shares which were not fully distributed on previous distributions, and should be redistributed
+   */
+  shares_leftover: u64;
+  /**
+   * How many shares is single point worth
+   */
+  shares_per_point: u128;
+  /**
+   * Total rewards not yet withdrawn.
+   */
+  withdrawable_total: u128;
+}
+
+function DistributionToXdr(distribution?: Distribution): xdr.ScVal {
+  if (!distribution) {
+    return xdr.ScVal.scvVoid();
+  }
+  let arr = [
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("bonus_per_day_bps"),
+      val: ((i) => xdr.ScVal.scvU64(xdr.Uint64.fromString(i.toString())))(
+        distribution["bonus_per_day_bps"]
+      ),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("distributed_total"),
+      val: ((i) => u128ToScVal(i))(distribution["distributed_total"]),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("manager"),
+      val: ((i) => addressToScVal(i))(distribution["manager"]),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("max_bonus_bps"),
+      val: ((i) => xdr.ScVal.scvU64(xdr.Uint64.fromString(i.toString())))(
+        distribution["max_bonus_bps"]
+      ),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("shares_leftover"),
+      val: ((i) => xdr.ScVal.scvU64(xdr.Uint64.fromString(i.toString())))(
+        distribution["shares_leftover"]
+      ),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("shares_per_point"),
+      val: ((i) => u128ToScVal(i))(distribution["shares_per_point"]),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("withdrawable_total"),
+      val: ((i) => u128ToScVal(i))(distribution["withdrawable_total"]),
+    }),
+  ];
+  return xdr.ScVal.scvMap(arr);
+}
+
+function DistributionFromXdr(base64Xdr: string): Distribution {
+  let scVal = strToScVal(base64Xdr);
+  let obj: [string, any][] = scVal
+    .map()!
+    .map((e) => [e.key().str() as string, e.val()]);
+  let map = new Map<string, any>(obj);
+  if (!obj) {
+    throw new Error("Invalid XDR");
+  }
+  return {
+    bonus_per_day_bps: scValToJs(
+      map.get("bonus_per_day_bps")
+    ) as unknown as u64,
+    distributed_total: scValToJs(
+      map.get("distributed_total")
+    ) as unknown as u128,
+    manager: scValToJs(map.get("manager")) as unknown as Address,
+    max_bonus_bps: scValToJs(map.get("max_bonus_bps")) as unknown as u64,
+    shares_leftover: scValToJs(map.get("shares_leftover")) as unknown as u64,
+    shares_per_point: scValToJs(map.get("shares_per_point")) as unknown as u128,
+    withdrawable_total: scValToJs(
+      map.get("withdrawable_total")
+    ) as unknown as u128,
+  };
 }
 
 const Errors = [
@@ -699,42 +858,121 @@ const Errors = [
   { message: "" },
   { message: "" },
   { message: "" },
-  { message: "" },
-  { message: "" },
-  { message: "" },
-  { message: "" },
 ];
-export enum PairType {
-  Xyk = 0,
+export interface ConfigResponse {
+  config: Config;
 }
 
-function PairTypeFromXdr(base64Xdr: string): PairType {
-  return scValStrToJs(base64Xdr) as PairType;
+function ConfigResponseToXdr(configResponse?: ConfigResponse): xdr.ScVal {
+  if (!configResponse) {
+    return xdr.ScVal.scvVoid();
+  }
+  let arr = [
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("config"),
+      val: ((i) => ConfigToXdr(i))(configResponse["config"]),
+    }),
+  ];
+  return xdr.ScVal.scvMap(arr);
 }
 
-function PairTypeToXdr(val: PairType): xdr.ScVal {
-  return xdr.ScVal.scvI32(val);
+function ConfigResponseFromXdr(base64Xdr: string): ConfigResponse {
+  let scVal = strToScVal(base64Xdr);
+  let obj: [string, any][] = scVal
+    .map()!
+    .map((e) => [e.key().str() as string, e.val()]);
+  let map = new Map<string, any>(obj);
+  if (!obj) {
+    throw new Error("Invalid XDR");
+  }
+  return {
+    config: scValToJs(map.get("config")) as unknown as Config,
+  };
+}
+
+export interface StakedResponse {
+  stakes: Array<Stake>;
+}
+
+function StakedResponseToXdr(stakedResponse?: StakedResponse): xdr.ScVal {
+  if (!stakedResponse) {
+    return xdr.ScVal.scvVoid();
+  }
+  let arr = [
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("stakes"),
+      val: ((i) => xdr.ScVal.scvVec(i.map((i) => StakeToXdr(i))))(
+        stakedResponse["stakes"]
+      ),
+    }),
+  ];
+  return xdr.ScVal.scvMap(arr);
+}
+
+function StakedResponseFromXdr(base64Xdr: string): StakedResponse {
+  let scVal = strToScVal(base64Xdr);
+  let obj: [string, any][] = scVal
+    .map()!
+    .map((e) => [e.key().str() as string, e.val()]);
+  let map = new Map<string, any>(obj);
+  if (!obj) {
+    throw new Error("Invalid XDR");
+  }
+  return {
+    stakes: scValToJs(map.get("stakes")) as unknown as Array<Stake>,
+  };
+}
+
+export interface AnnualizedRewardsResponse {
+  /**
+   * None means contract does not know the value - total_staked or total_power could be 0.
+   */
+  amount: OptionUint;
+  info: Address;
+}
+
+function AnnualizedRewardsResponseToXdr(
+  annualizedRewardsResponse?: AnnualizedRewardsResponse
+): xdr.ScVal {
+  if (!annualizedRewardsResponse) {
+    return xdr.ScVal.scvVoid();
+  }
+  let arr = [
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("amount"),
+      val: ((i) => OptionUintToXdr(i))(annualizedRewardsResponse["amount"]),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("info"),
+      val: ((i) => addressToScVal(i))(annualizedRewardsResponse["info"]),
+    }),
+  ];
+  return xdr.ScVal.scvMap(arr);
+}
+
+function AnnualizedRewardsResponseFromXdr(
+  base64Xdr: string
+): AnnualizedRewardsResponse {
+  let scVal = strToScVal(base64Xdr);
+  let obj: [string, any][] = scVal
+    .map()!
+    .map((e) => [e.key().str() as string, e.val()]);
+  let map = new Map<string, any>(obj);
+  if (!obj) {
+    throw new Error("Invalid XDR");
+  }
+  return {
+    amount: scValToJs(map.get("amount")) as unknown as OptionUint,
+    info: scValToJs(map.get("info")) as unknown as Address,
+  };
 }
 
 export interface Config {
-  fee_recipient: Address;
-  /**
-   * The maximum amount of slippage (in bps) that is tolerated during providing liquidity
-   */
-  max_allowed_slippage_bps: i64;
-  /**
-   * The maximum amount of spread (in bps) that is tolerated during swap
-   */
-  max_allowed_spread_bps: i64;
-  pair_type: PairType;
-  share_token: Address;
-  token_a: Address;
-  token_b: Address;
-  /**
-   * The total fees (in bps) charged by a pair of this type.
-   * In relation to the returned amount of tokens
-   */
-  total_fee_bps: i64;
+  lp_token: Address;
+  max_distributions: u32;
+  min_bond: i128;
+  min_reward: i128;
+  token_per_power: u128;
 }
 
 function ConfigToXdr(config?: Config): xdr.ScVal {
@@ -743,42 +981,24 @@ function ConfigToXdr(config?: Config): xdr.ScVal {
   }
   let arr = [
     new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("fee_recipient"),
-      val: ((i) => addressToScVal(i))(config["fee_recipient"]),
+      key: ((i) => xdr.ScVal.scvSymbol(i))("lp_token"),
+      val: ((i) => addressToScVal(i))(config["lp_token"]),
     }),
     new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("max_allowed_slippage_bps"),
-      val: ((i) => xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(
-        config["max_allowed_slippage_bps"]
-      ),
+      key: ((i) => xdr.ScVal.scvSymbol(i))("max_distributions"),
+      val: ((i) => xdr.ScVal.scvU32(i))(config["max_distributions"]),
     }),
     new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("max_allowed_spread_bps"),
-      val: ((i) => xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(
-        config["max_allowed_spread_bps"]
-      ),
+      key: ((i) => xdr.ScVal.scvSymbol(i))("min_bond"),
+      val: ((i) => i128ToScVal(i))(config["min_bond"]),
     }),
     new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("pair_type"),
-      val: ((i) => PairTypeToXdr(i))(config["pair_type"]),
+      key: ((i) => xdr.ScVal.scvSymbol(i))("min_reward"),
+      val: ((i) => i128ToScVal(i))(config["min_reward"]),
     }),
     new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("share_token"),
-      val: ((i) => addressToScVal(i))(config["share_token"]),
-    }),
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("token_a"),
-      val: ((i) => addressToScVal(i))(config["token_a"]),
-    }),
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("token_b"),
-      val: ((i) => addressToScVal(i))(config["token_b"]),
-    }),
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("total_fee_bps"),
-      val: ((i) => xdr.ScVal.scvI64(xdr.Int64.fromString(i.toString())))(
-        config["total_fee_bps"]
-      ),
+      key: ((i) => xdr.ScVal.scvSymbol(i))("token_per_power"),
+      val: ((i) => u128ToScVal(i))(config["token_per_power"]),
     }),
   ];
   return xdr.ScVal.scvMap(arr);
@@ -794,208 +1014,47 @@ function ConfigFromXdr(base64Xdr: string): Config {
     throw new Error("Invalid XDR");
   }
   return {
-    fee_recipient: scValToJs(map.get("fee_recipient")) as unknown as Address,
-    max_allowed_slippage_bps: scValToJs(
-      map.get("max_allowed_slippage_bps")
-    ) as unknown as i64,
-    max_allowed_spread_bps: scValToJs(
-      map.get("max_allowed_spread_bps")
-    ) as unknown as i64,
-    pair_type: scValToJs(map.get("pair_type")) as unknown as PairType,
-    share_token: scValToJs(map.get("share_token")) as unknown as Address,
-    token_a: scValToJs(map.get("token_a")) as unknown as Address,
-    token_b: scValToJs(map.get("token_b")) as unknown as Address,
-    total_fee_bps: scValToJs(map.get("total_fee_bps")) as unknown as i64,
+    lp_token: scValToJs(map.get("lp_token")) as unknown as Address,
+    max_distributions: scValToJs(
+      map.get("max_distributions")
+    ) as unknown as u32,
+    min_bond: scValToJs(map.get("min_bond")) as unknown as i128,
+    min_reward: scValToJs(map.get("min_reward")) as unknown as i128,
+    token_per_power: scValToJs(map.get("token_per_power")) as unknown as u128,
   };
 }
 
-export interface Asset {
+export interface Stake {
   /**
-   * Address of the asset
+   * The amount of staked tokens
    */
-  address: Address;
+  stake: i128;
   /**
-   * The total amount of those tokens in the pool
+   * The timestamp when the stake was made
    */
-  amount: i128;
+  stake_timestamp: u64;
 }
 
-function AssetToXdr(asset?: Asset): xdr.ScVal {
-  if (!asset) {
+function StakeToXdr(stake?: Stake): xdr.ScVal {
+  if (!stake) {
     return xdr.ScVal.scvVoid();
   }
   let arr = [
     new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("address"),
-      val: ((i) => addressToScVal(i))(asset["address"]),
+      key: ((i) => xdr.ScVal.scvSymbol(i))("stake"),
+      val: ((i) => i128ToScVal(i))(stake["stake"]),
     }),
     new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("amount"),
-      val: ((i) => i128ToScVal(i))(asset["amount"]),
-    }),
-  ];
-  return xdr.ScVal.scvMap(arr);
-}
-
-function AssetFromXdr(base64Xdr: string): Asset {
-  let scVal = strToScVal(base64Xdr);
-  let obj: [string, any][] = scVal
-    .map()!
-    .map((e) => [e.key().str() as string, e.val()]);
-  let map = new Map<string, any>(obj);
-  if (!obj) {
-    throw new Error("Invalid XDR");
-  }
-  return {
-    address: scValToJs(map.get("address")) as unknown as Address,
-    amount: scValToJs(map.get("amount")) as unknown as i128,
-  };
-}
-
-/**
- * This struct is used to return a query result with the total amount of LP tokens and assets in a specific pool.
- */
-export interface PoolResponse {
-  /**
-   * The asset A in the pool together with asset amounts
-   */
-  asset_a: Asset;
-  /**
-   * The asset B in the pool together with asset amounts
-   */
-  asset_b: Asset;
-  /**
-   * The total amount of LP tokens currently issued
-   */
-  asset_lp_share: Asset;
-}
-
-function PoolResponseToXdr(poolResponse?: PoolResponse): xdr.ScVal {
-  if (!poolResponse) {
-    return xdr.ScVal.scvVoid();
-  }
-  let arr = [
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("asset_a"),
-      val: ((i) => AssetToXdr(i))(poolResponse["asset_a"]),
-    }),
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("asset_b"),
-      val: ((i) => AssetToXdr(i))(poolResponse["asset_b"]),
-    }),
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("asset_lp_share"),
-      val: ((i) => AssetToXdr(i))(poolResponse["asset_lp_share"]),
-    }),
-  ];
-  return xdr.ScVal.scvMap(arr);
-}
-
-function PoolResponseFromXdr(base64Xdr: string): PoolResponse {
-  let scVal = strToScVal(base64Xdr);
-  let obj: [string, any][] = scVal
-    .map()!
-    .map((e) => [e.key().str() as string, e.val()]);
-  let map = new Map<string, any>(obj);
-  if (!obj) {
-    throw new Error("Invalid XDR");
-  }
-  return {
-    asset_a: scValToJs(map.get("asset_a")) as unknown as Asset,
-    asset_b: scValToJs(map.get("asset_b")) as unknown as Asset,
-    asset_lp_share: scValToJs(map.get("asset_lp_share")) as unknown as Asset,
-  };
-}
-
-export interface SimulateSwapResponse {
-  ask_amount: i128;
-  commission_amount: i128;
-  spread_amount: i128;
-  total_return: i128;
-}
-
-function SimulateSwapResponseToXdr(
-  simulateSwapResponse?: SimulateSwapResponse
-): xdr.ScVal {
-  if (!simulateSwapResponse) {
-    return xdr.ScVal.scvVoid();
-  }
-  let arr = [
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("ask_amount"),
-      val: ((i) => i128ToScVal(i))(simulateSwapResponse["ask_amount"]),
-    }),
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("commission_amount"),
-      val: ((i) => i128ToScVal(i))(simulateSwapResponse["commission_amount"]),
-    }),
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("spread_amount"),
-      val: ((i) => i128ToScVal(i))(simulateSwapResponse["spread_amount"]),
-    }),
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("total_return"),
-      val: ((i) => i128ToScVal(i))(simulateSwapResponse["total_return"]),
-    }),
-  ];
-  return xdr.ScVal.scvMap(arr);
-}
-
-function SimulateSwapResponseFromXdr(base64Xdr: string): SimulateSwapResponse {
-  let scVal = strToScVal(base64Xdr);
-  let obj: [string, any][] = scVal
-    .map()!
-    .map((e) => [e.key().str() as string, e.val()]);
-  let map = new Map<string, any>(obj);
-  if (!obj) {
-    throw new Error("Invalid XDR");
-  }
-  return {
-    ask_amount: scValToJs(map.get("ask_amount")) as unknown as i128,
-    commission_amount: scValToJs(
-      map.get("commission_amount")
-    ) as unknown as i128,
-    spread_amount: scValToJs(map.get("spread_amount")) as unknown as i128,
-    total_return: scValToJs(map.get("total_return")) as unknown as i128,
-  };
-}
-
-export interface SimulateReverseSwapResponse {
-  commission_amount: i128;
-  offer_amount: i128;
-  spread_amount: i128;
-}
-
-function SimulateReverseSwapResponseToXdr(
-  simulateReverseSwapResponse?: SimulateReverseSwapResponse
-): xdr.ScVal {
-  if (!simulateReverseSwapResponse) {
-    return xdr.ScVal.scvVoid();
-  }
-  let arr = [
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("commission_amount"),
-      val: ((i) => i128ToScVal(i))(
-        simulateReverseSwapResponse["commission_amount"]
-      ),
-    }),
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("offer_amount"),
-      val: ((i) => i128ToScVal(i))(simulateReverseSwapResponse["offer_amount"]),
-    }),
-    new xdr.ScMapEntry({
-      key: ((i) => xdr.ScVal.scvSymbol(i))("spread_amount"),
-      val: ((i) => i128ToScVal(i))(
-        simulateReverseSwapResponse["spread_amount"]
+      key: ((i) => xdr.ScVal.scvSymbol(i))("stake_timestamp"),
+      val: ((i) => xdr.ScVal.scvU64(xdr.Uint64.fromString(i.toString())))(
+        stake["stake_timestamp"]
       ),
     }),
   ];
   return xdr.ScVal.scvMap(arr);
 }
 
-function SimulateReverseSwapResponseFromXdr(
-  base64Xdr: string
-): SimulateReverseSwapResponse {
+function StakeFromXdr(base64Xdr: string): Stake {
   let scVal = strToScVal(base64Xdr);
   let obj: [string, any][] = scVal
     .map()!
@@ -1005,10 +1064,100 @@ function SimulateReverseSwapResponseFromXdr(
     throw new Error("Invalid XDR");
   }
   return {
-    commission_amount: scValToJs(
-      map.get("commission_amount")
-    ) as unknown as i128,
-    offer_amount: scValToJs(map.get("offer_amount")) as unknown as i128,
-    spread_amount: scValToJs(map.get("spread_amount")) as unknown as i128,
+    stake: scValToJs(map.get("stake")) as unknown as i128,
+    stake_timestamp: scValToJs(map.get("stake_timestamp")) as unknown as u64,
   };
+}
+
+export interface BondingInfo {
+  /**
+   * Last time when user has claimed rewards
+   */
+  last_reward_time: u64;
+  /**
+   * The rewards debt is a mechanism to determine how much a user has already been credited in terms of staking rewards.
+   * Whenever a user deposits or withdraws staked tokens to the pool, the rewards for the user is updated based on the
+   * accumulated rewards per share, and the difference is stored as reward debt. When claiming rewards, this reward debt
+   * is used to determine how much rewards a user can actually claim.
+   */
+  reward_debt: u128;
+  /**
+   * Vec of stakes sorted by stake timestamp
+   */
+  stakes: Array<Stake>;
+}
+
+function BondingInfoToXdr(bondingInfo?: BondingInfo): xdr.ScVal {
+  if (!bondingInfo) {
+    return xdr.ScVal.scvVoid();
+  }
+  let arr = [
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("last_reward_time"),
+      val: ((i) => xdr.ScVal.scvU64(xdr.Uint64.fromString(i.toString())))(
+        bondingInfo["last_reward_time"]
+      ),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("reward_debt"),
+      val: ((i) => u128ToScVal(i))(bondingInfo["reward_debt"]),
+    }),
+    new xdr.ScMapEntry({
+      key: ((i) => xdr.ScVal.scvSymbol(i))("stakes"),
+      val: ((i) => xdr.ScVal.scvVec(i.map((i) => StakeToXdr(i))))(
+        bondingInfo["stakes"]
+      ),
+    }),
+  ];
+  return xdr.ScVal.scvMap(arr);
+}
+
+function BondingInfoFromXdr(base64Xdr: string): BondingInfo {
+  let scVal = strToScVal(base64Xdr);
+  let obj: [string, any][] = scVal
+    .map()!
+    .map((e) => [e.key().str() as string, e.val()]);
+  let map = new Map<string, any>(obj);
+  if (!obj) {
+    throw new Error("Invalid XDR");
+  }
+  return {
+    last_reward_time: scValToJs(map.get("last_reward_time")) as unknown as u64,
+    reward_debt: scValToJs(map.get("reward_debt")) as unknown as u128,
+    stakes: scValToJs(map.get("stakes")) as unknown as Array<Stake>,
+  };
+}
+
+export type OptionUint =
+  | { tag: "Some"; values: [u128] }
+  | { tag: "None"; values: void };
+
+function OptionUintToXdr(optionUint?: OptionUint): xdr.ScVal {
+  if (!optionUint) {
+    return xdr.ScVal.scvVoid();
+  }
+  let res: xdr.ScVal[] = [];
+  switch (optionUint.tag) {
+    case "Some":
+      res.push(((i) => xdr.ScVal.scvSymbol(i))("Some"));
+      res.push(((i) => u128ToScVal(i))(optionUint.values[0]));
+      break;
+    case "None":
+      res.push(((i) => xdr.ScVal.scvSymbol(i))("None"));
+      break;
+  }
+  return xdr.ScVal.scvVec(res);
+}
+
+function OptionUintFromXdr(base64Xdr: string): OptionUint {
+  type Tag = OptionUint["tag"];
+  type Value = OptionUint["values"];
+  let [tag, values] = strToScVal(base64Xdr).vec()!.map(scValToJs) as [
+    Tag,
+    Value
+  ];
+  if (!tag) {
+    throw new Error("Missing enum tag when decoding OptionUint from XDR");
+  }
+  return { tag, values } as OptionUint;
 }

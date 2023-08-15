@@ -26,12 +26,6 @@ const args = {
       },
     ],
   },
-  appBarArgs: {
-    balance: 125.5,
-    walletAddress: "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
-    connectWallet: () => {},
-    disconnectWallet: () => {},
-  },
 };
 
 export default function RootLayout({

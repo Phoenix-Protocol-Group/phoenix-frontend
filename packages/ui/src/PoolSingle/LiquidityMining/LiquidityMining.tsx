@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button as MuiButton,
@@ -50,11 +50,13 @@ const StakeInput = ({
   balance,
   amount,
   setAmount,
+  tokenName,
 }: {
   onStake: () => void;
   balance: number;
   amount: number;
   setAmount: (amount: number) => void;
+  tokenName: string;
 }) => {
   const options = [
     {
@@ -112,7 +114,7 @@ const StakeInput = ({
               <Typography
                 sx={{ fontSize: "1rem", color: "#FFF", fontWeight: 700 }}
               >
-                XLM/USDT
+                {tokenName}
               </Typography>
             </Box>
           ),
@@ -194,18 +196,26 @@ const ClaimRewards = ({
           Total rewards
         </Typography>
 
-        {rewards.map((reward) => (
+        {rewards.length > 0 ? (
+          rewards.map((reward) => (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
+              <Box
+                component="img"
+                src={reward.icon}
+                sx={{ width: "1.125rem", height: "1.125rem" }}
+              />
+              <Typography sx={{ fontSize: "1.125rem", fontWeight: 700 }}>
+                {reward.amount} {reward.name}
+              </Typography>
+            </Box>
+          ))
+        ) : (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
-            <Box
-              component="img"
-              src={reward.icon}
-              sx={{ width: "1.125rem", height: "1.125rem" }}
-            />
             <Typography sx={{ fontSize: "1.125rem", fontWeight: 700 }}>
-              {reward.amount} {reward.name}
+              No rewards
             </Typography>
           </Box>
-        ))}
+        )}
       </Box>
       <Button
         // @ts-ignore
@@ -229,7 +239,7 @@ interface LiquidityMiningProps {
   // Rewards
   rewards: Token[];
   onClaimRewards: () => void;
-
+  tokenName: string;
   // Stake LP Tokens
   balance: number;
   onStake: (amount: number) => void;
@@ -239,6 +249,7 @@ const LiquidityMining = ({
   rewards,
   onClaimRewards,
   balance,
+  tokenName,
   onStake,
 }: LiquidityMiningProps) => {
   const [amount, setAmount] = useState<number>(0);
@@ -264,6 +275,7 @@ const LiquidityMining = ({
           setAmount={setAmount}
           amount={amount}
           onStake={() => onStake(amount)}
+          tokenName={tokenName}
         />
       </Grid>
       <Grid item xs={12} sm={4}>

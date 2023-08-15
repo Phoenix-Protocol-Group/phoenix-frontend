@@ -1,6 +1,6 @@
 import freighter from "@stellar/freighter-api";
 // working around ESM compatibility issues
-const { signTransaction } = freighter;
+const { isConnected, isAllowed, getUserInfo, signTransaction } = freighter;
 import * as SorobanClient from "soroban-client";
 import type {
   Account,
@@ -9,52 +9,126 @@ import type {
   Operation,
   Transaction,
 } from "soroban-client";
-import { constants } from ".";
-import { getAccount } from "./account";
+import { NETWORK_PASSPHRASE } from "./constants";
 import { Server } from "./server";
+// defined this way so typeahead shows full union, not named alias
+let responseTypes: "simulated" | "full" | undefined;
+export type ResponseTypes = typeof responseTypes;
+
+export type Options<R extends ResponseTypes> = {
+  /**
+   * The fee to pay for the transaction. Default: 100.
+   */
+  fee?: number;
+  /**
+   * What type of response to return.
+   *
+   *   - `undefined`, the default,  parses the returned XDR as `{RETURN_TYPE}`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+   *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
+   *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
+   */
+  responseType?: R;
+  /**
+   * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
+   */
+  secondsToWait?: number;
+};
+
 export type Tx = Transaction<Memo<MemoType>, Operation[]>;
 
-export type Simulation = NonNullable<
-  SorobanClient.SorobanRpc.SimulateTransactionResponse["results"]
->[0];
-
-export type TxResponse = SorobanClient.SorobanRpc.GetTransactionResponse;
-
-export type InvokeArgs = {
-  method: string;
-  args?: any[];
-  signAndSend?: boolean;
-  fee?: number;
-  contractId: string;
-};
+/**
+ * Get account details from the Soroban network for the publicKey currently
+ * selected in Freighter. If not connected to Freighter, return null.
+ */
+async function getAccount(): Promise<Account | null> {
+  if (!(await isConnected()) || !(await isAllowed())) {
+    return null;
+  }
+  const { publicKey } = await getUserInfo();
+  if (!publicKey) {
+    return null;
+  }
+  return await Server.getAccount(publicKey);
+}
 
 export class NotImplementedError extends Error {}
 
+type Simulation = SorobanClient.SorobanRpc.SimulateTransactionResponse;
+type SendTx = SorobanClient.SorobanRpc.SendTransactionResponse;
+type GetTx = SorobanClient.SorobanRpc.GetTransactionResponse;
+
+// defined this way so typeahead shows full union, not named alias
+let someRpcResponse: Simulation | SendTx | GetTx;
+type SomeRpcResponse = typeof someRpcResponse;
+
+type InvokeArgs<R extends ResponseTypes, T = string> = Options<R> & {
+  method: string;
+  args?: any[];
+  parseResultXdr?: (xdr: string) => any;
+  contractId: string;
+};
+export interface Error_ {
+  message: string;
+}
+export interface Result<T, E = Error_> {
+  unwrap(): T;
+  unwrapErr(): E;
+  isOk(): boolean;
+  isErr(): boolean;
+}
+
+export class Ok<T> implements Result<T> {
+  constructor(readonly value: T) {}
+  unwrapErr(): Error_ {
+    throw new Error("No error");
+  }
+  unwrap(): T {
+    return this.value;
+  }
+
+  isOk(): boolean {
+    return true;
+  }
+
+  isErr(): boolean {
+    return !this.isOk();
+  }
+}
+
 /**
- * Invoke a method on the soroban-token-contract contract.
+ * Invoke a method on the phoenix-stake contract.
  *
  * Uses Freighter to determine the current user and if necessary sign the transaction.
  *
- * @param {string} obj.method - The method to invoke.
- * @param {any[]} obj.args - The arguments to pass to the method.
- * @param {boolean} obj.signAndSend - Whether to sign and send the transaction, or just simulate it. Unless the method requires authentication.
- * @param {number} obj.fee - The fee to pay for the transaction.
- * @returns The transaction response, or the simulation result if signing isn't required.
+ * @returns {T}, by default, the parsed XDR from either the simulation or the full transaction. If `simulateOnly` or `fullRpcResponse` are true, returns either the full simulation or the result of sending/getting the transaction to/from the ledger.
  */
-export async function invoke({
+export async function invoke<R extends ResponseTypes = undefined, T = any>(
+  args: InvokeArgs<R, T>
+): Promise<
+  R extends undefined
+    ? T
+    : R extends "simulated"
+    ? Simulation
+    : R extends "full"
+    ? SomeRpcResponse
+    : T
+>;
+export async function invoke<R extends ResponseTypes, T = any>({
   method,
-  contractId,
   args = [],
   fee = 100,
-  signAndSend = false,
-}: InvokeArgs): Promise<(TxResponse & { xdr: string }) | Simulation> {
+  responseType,
+  parseResultXdr,
+  secondsToWait = 10,
+  contractId,
+}: InvokeArgs<R, T>): Promise<T | string | SomeRpcResponse> {
   const freighterAccount = await getAccount();
 
-  // use a placeholder account if not yet connected to Freighter so that view calls can still work
+  // use a placeholder null account if not yet connected to Freighter so that view calls can still work
   const account =
     freighterAccount ??
     new SorobanClient.Account(
-      "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
+      "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
       "0"
     );
 
@@ -62,7 +136,7 @@ export async function invoke({
 
   let tx = new SorobanClient.TransactionBuilder(account, {
     fee: fee.toString(10),
-    networkPassphrase: constants.NETWORK_PASSPHRASE,
+    networkPassphrase: NETWORK_PASSPHRASE,
   })
     .addOperation(contract.call(method, ...args))
     .setTimeout(SorobanClient.TimeoutInfinite)
@@ -70,7 +144,27 @@ export async function invoke({
 
   const simulated = await Server.simulateTransaction(tx);
 
-  if (!signAndSend) {
+  if (responseType === "simulated") return simulated;
+
+  // is it possible for `auths` to be present but empty? Probably not, but let's be safe.
+  const auths = simulated.results?.[0]?.auth;
+  let authsCount = auths?.length ?? 0;
+
+  const writeLength = SorobanClient.xdr.SorobanTransactionData.fromXDR(
+    simulated.transactionData,
+    "base64"
+  )
+    .resources()
+    .footprint()
+    .readWrite().length;
+
+  const parse = parseResultXdr ?? ((xdr) => xdr);
+
+  const isViewCall = authsCount === 0 && writeLength === 0;
+
+  if (isViewCall) {
+    if (responseType === "full") return simulated;
+
     const { results } = simulated;
     if (!results || results[0] === undefined) {
       if (simulated.error) {
@@ -80,20 +174,13 @@ export async function invoke({
         `Invalid response from simulateTransaction:\n{simulated}`
       );
     }
-    return results[0];
+    return parse(results[0].xdr);
   }
 
-  if (!freighterAccount) {
-    throw new Error("Not connected to Freighter");
-  }
-
-  // is it possible for `auths` to be present but empty? Probably not, but let's be safe.
-  const auths = simulated.results?.[0]?.auth;
-  let auth_len = auths?.length ?? 0;
-
-  if (auth_len > 1) {
+  if (authsCount > 1) {
     throw new NotImplementedError("Multiple auths not yet supported");
-  } else if (auth_len == 1) {
+  }
+  if (authsCount === 1) {
     // TODO: figure out how to fix with new SorobanClient
     // const auth = SorobanClient.xdr.SorobanAuthorizationEntry.fromXDR(auths![0]!, 'base64')
     // if (auth.addressWithNonce() !== undefined) {
@@ -104,19 +191,30 @@ export async function invoke({
     // }
   }
 
+  if (!freighterAccount) {
+    throw new Error("Not connected to Freighter");
+  }
+
   tx = await signTx(
-    SorobanClient.assembleTransaction(
-      tx,
-      constants.NETWORK_PASSPHRASE,
-      simulated
-    ) as Tx
+    SorobanClient.assembleTransaction(tx, NETWORK_PASSPHRASE, simulated) as Tx
   );
 
-  const raw = await sendTx(tx);
-  return {
-    ...raw,
-    xdr: raw.resultXdr!,
-  };
+  const raw = await sendTx(tx, secondsToWait);
+
+  if (responseType === "full") return raw;
+
+  // if `sendTx` awaited the inclusion of the tx in the ledger, it used
+  // `getTransaction`, which has a `resultXdr` field
+  // @ts-ignore
+  if ("resultXdr" in raw) return parse(raw.resultXdr);
+
+  // otherwise, it returned the result of `sendTransaction`
+  // @ts-ignore
+  if ("errorResultXdr" in raw) return parse(raw.errorResultXdr);
+
+  // if neither of these are present, something went wrong
+  console.error("Don't know how to parse result! Returning full RPC response.");
+  return raw;
 }
 
 /**
@@ -129,12 +227,12 @@ export async function invoke({
  */
 export async function signTx(tx: Tx): Promise<Tx> {
   const signed = await signTransaction(tx.toXDR(), {
-    networkPassphrase: constants.NETWORK_PASSPHRASE,
+    networkPassphrase: NETWORK_PASSPHRASE,
   });
 
   return SorobanClient.TransactionBuilder.fromXDR(
     signed,
-    constants.NETWORK_PASSPHRASE
+    NETWORK_PASSPHRASE
   ) as Tx;
 }
 
@@ -148,8 +246,16 @@ export async function signTx(tx: Tx): Promise<Tx> {
  * function for its timeout/`secondsToWait` logic, rather than implementing
  * your own.
  */
-export async function sendTx(tx: Tx, secondsToWait = 10): Promise<TxResponse> {
+export async function sendTx(
+  tx: Tx,
+  secondsToWait: number
+): Promise<SendTx | GetTx> {
   const sendTransactionResponse = await Server.sendTransaction(tx);
+
+  if (sendTransactionResponse.status !== "PENDING" || secondsToWait === 0) {
+    return sendTransactionResponse;
+  }
+
   let getTransactionResponse = await Server.getTransaction(
     sendTransactionResponse.hash
   );

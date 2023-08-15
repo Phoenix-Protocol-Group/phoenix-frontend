@@ -1,6 +1,10 @@
 "use client";
-import { Typography } from "@mui/material";
-import { freighter, useAppStore, usePersistStore } from "@phoenix-protocol/state";
+import { NoSsr, Typography } from "@mui/material";
+import {
+  freighter,
+  useAppStore,
+  usePersistStore,
+} from "@phoenix-protocol/state";
 import { AppBar, ConnectWallet } from "@phoenix-protocol/ui";
 import React, { useEffect, useState } from "react";
 
@@ -17,7 +21,7 @@ const TopBar = ({
 
   const connect = async (connector: any) => {
     await storePersist.connectWallet();
-  
+
     return;
   };
 
@@ -34,18 +38,18 @@ const TopBar = ({
     ? Number(token?.balance) / 10 ** token?.decimals
     : 0;
 
-  const fetch = async () => await store.fetchTokenBalance(
-    "CB64D3G7SM2RTH6JSGG34DDTFTQ5CFDKVDZJZSODMCX4NJ2HV2KN7OHT"
-  );
+  const fetch = async () =>
+    await store.fetchTokenInfo(
+      "CB64D3G7SM2RTH6JSGG34DDTFTQ5CFDKVDZJZSODMCX4NJ2HV2KN7OHT"
+    );
 
   useEffect(() => {
-    console.log(storePersist.wallet.address)
     fetch();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storePersist.wallet.address]);
 
   return (
-    <>
+    <NoSsr>
       <AppBar
         mobileNavOpen={navOpen}
         toggleMobileNav={(open) => setNavOpen(open)}
@@ -61,7 +65,7 @@ const TopBar = ({
         setOpen={() => setConnectWalletOpen(!connectWalletOpen)}
         connect={connect}
       />
-    </>
+    </NoSsr>
   );
 };
 
