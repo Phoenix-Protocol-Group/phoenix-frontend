@@ -120,7 +120,7 @@ export default function Page({ params }: PoolPageProps) {
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
         ),
       },
-      "CDFOUB6Z24WZVERRAZBMTFMTWM52OB4FHNLLTX5M5RPDIBZGPEYVYSDH"
+      "CAIW4SDFLWC243A6VYB65XEUAODLQ3DSXAWVXYI4L766R2ZGDBBVFHNJ"
     );
   };
 
@@ -141,7 +141,7 @@ export default function Page({ params }: PoolPageProps) {
           store.fetchTokenInfo(pairConfig.unwrap().token_b),
           store.fetchTokenInfo(pairConfig.unwrap().share_token),
         ]);
-
+        console.log(1);
         // Set token states
         setTokenA({
           name: tokenA?.symbol as string,
@@ -181,35 +181,39 @@ export default function Page({ params }: PoolPageProps) {
         );
       }
 
-      // Get user stakes
-      const stakes = await PhoenixStakeContract.queryStaked(
-        {
-          address: storePersist.wallet.address as string,
-        },
-        "CDFOUB6Z24WZVERRAZBMTFMTWM52OB4FHNLLTX5M5RPDIBZGPEYVYSDH"
-      );
+      if (storePersist.wallet.address) {
+        // Get user stakes
+        const stakes = await PhoenixStakeContract.queryStaked(
+          {
+            address: storePersist.wallet.address as string,
+          },
+          "CAIW4SDFLWC243A6VYB65XEUAODLQ3DSXAWVXYI4L766R2ZGDBBVFHNJ"
+        );
 
-      // If stakes are okay
-      if (stakes.isOk()) {
-        // If filled
-        if (stakes.unwrap().stakes.length > 0) {
-          const _stakes: Entry[] = stakes.unwrap().stakes.map((stake: any) => {
-            return {
-              icon: `/cryptoIcons/${lpToken?.name}.svg`.toLowerCase(),
-              title: lpToken?.name,
-              apr: "0",
-              lockedPeriod:
-                time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
-                " days",
-              amount: {
-                tokenAmount:
-                  Number(stake.stake) / 10 ** Number(lpToken?.decimals),
-                tokenValueInUsd: 0,
-              },
-              onClick: () => {},
-            };
-          });
-          setUserStakes(_stakes);
+        // If stakes are okay
+        if (stakes.isOk()) {
+          // If filled
+          if (stakes.unwrap().stakes.length > 0) {
+            const _stakes: Entry[] = stakes
+              .unwrap()
+              .stakes.map((stake: any) => {
+                return {
+                  icon: `/cryptoIcons/${lpToken?.name}.svg`.toLowerCase(),
+                  title: lpToken?.name,
+                  apr: "0",
+                  lockedPeriod:
+                    time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
+                    " days",
+                  amount: {
+                    tokenAmount:
+                      Number(stake.stake) / 10 ** Number(lpToken?.decimals),
+                    tokenValueInUsd: 0,
+                  },
+                  onClick: () => {},
+                };
+              });
+            setUserStakes(_stakes);
+          }
         }
       }
     } catch (e) {
