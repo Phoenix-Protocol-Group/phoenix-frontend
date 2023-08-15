@@ -112,7 +112,7 @@ export default function Page({ params }: PoolPageProps) {
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
         ),
       },
-      "CDFOUB6Z24WZVERRAZBMTFMTWM52OB4FHNLLTX5M5RPDIBZGPEYVYSDH"
+      "CAIW4SDFLWC243A6VYB65XEUAODLQ3DSXAWVXYI4L766R2ZGDBBVFHNJ"
     );
   };
 
@@ -178,7 +178,7 @@ export default function Page({ params }: PoolPageProps) {
         {
           address: storePersist.wallet.address as string,
         },
-        "CDFOUB6Z24WZVERRAZBMTFMTWM52OB4FHNLLTX5M5RPDIBZGPEYVYSDH"
+        "CAIW4SDFLWC243A6VYB65XEUAODLQ3DSXAWVXYI4L766R2ZGDBBVFHNJ"
       );
 
       // If stakes are okay
