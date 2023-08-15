@@ -9,6 +9,8 @@ import {
   Token,
 } from "@phoenix-protocol/ui";
 
+import { SwapSuccess, SwapError } from "@/components/Modal/Modal";
+
 import { time } from "@phoenix-protocol/utils";
 
 import {
@@ -57,6 +59,8 @@ export default function Page({ params }: PoolPageProps) {
   // Let's have some variable to see if the pool even exists
   const [poolNotFound, setPoolNotFound] = useState<boolean>(false);
 
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+
   // Token Balances
   const [tokenA, setTokenA] = useState<_Token | undefined>(undefined);
   const [tokenB, setTokenB] = useState<_Token | undefined>(undefined);
@@ -76,7 +80,7 @@ export default function Page({ params }: PoolPageProps) {
     tokenAAmount: number,
     tokenBAmount: number
   ) => {
-    await PhoenixPairContract.provideLiquidity(
+    const provideLiquidityResponse = await PhoenixPairContract.provideLiquidity(
       {
         sender: storePersist.wallet.address as string,
         desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
@@ -88,11 +92,13 @@ export default function Page({ params }: PoolPageProps) {
       params.poolAddress as string,
       { fee: 100, responseType: "full" }
     );
+
+    console.log(provideLiquidityResponse);
   };
 
   // Remove Liquidity
   const removeLiquidity = async (lpTokenAmount: number) => {
-    await PhoenixPairContract.withdrawLiquidity(
+    const removeLiquidityResponse = await PhoenixPairContract.withdrawLiquidity(
       {
         sender: storePersist.wallet.address as string,
         share_amount: BigInt(lpTokenAmount * 10 ** (lpToken?.decimals || 7)),
@@ -101,6 +107,8 @@ export default function Page({ params }: PoolPageProps) {
       },
       params.poolAddress as string
     );
+
+    console.log(removeLiquidityResponse);
   };
 
   // Stake

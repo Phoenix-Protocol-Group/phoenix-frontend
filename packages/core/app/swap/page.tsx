@@ -1,6 +1,5 @@
 "use client";
 
-import Modal from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
 import {
   AssetSelector,
@@ -132,7 +131,6 @@ export default function Page() {
           />
         )}
       </Box>
-      <Modal />
     </>
   );
 }

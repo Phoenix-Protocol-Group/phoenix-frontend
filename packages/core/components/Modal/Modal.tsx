@@ -1,24 +1,45 @@
 import { Modal as ModalUI, Token } from "@phoenix-protocol/ui";
 import { useState } from "react";
 
+const copyToClipBoard = (error: string) => {
+  const el = document.createElement("textarea");
+  el.value = error;
+  el.setAttribute("readonly", "");
+  el.style.position = "absolute";
+  el.style.left = "-9999px";
+  document.body.appendChild(el);
+  const selected =
+    document.getSelection().rangeCount > 0
+      ? document.getSelection().getRangeAt(0)
+      : false;
+  el.select();
+  document.execCommand("copy");
+  document.body.removeChild(el);
+  if (selected) {
+    document.getSelection().removeAllRanges();
+    document.getSelection().addRange(selected);
+  }
+};
+
 export const SwapSuccess = ({
   tokens,
   setOpen,
   open,
-  onTxClick,
+  onButtonClick,
 }: {
   tokens: Token[];
   open: boolean;
   setOpen: (open: boolean) => void;
-  onTxClick: () => void;
+  onButtonClick: () => void;
 }) => (
   <ModalUI
     type="SUCCESS"
     open={open}
     title="Successul Swap"
+    tokenTitles={["From:", "To:"]}
     tokens={tokens}
     setOpen={setOpen}
-    onTxClick={onTxClick}
+    onButtonClick={onButtonClick}
   />
 );
 
@@ -36,25 +57,53 @@ export const SwapError = ({
     open={open}
     title="Unsuccessul Swap"
     setOpen={setOpen}
-    description={error}
+    description="There was a problem with your swap"
+    error={error}
+    onButtonClick={() => copyToClipBoard(error)}
   />
 );
 
 export const PoolSuccess = ({
+  tokens,
   setOpen,
   open,
-  msg,
+  onButtonClick,
 }: {
   open: boolean;
+  tokens: Token[];
   setOpen: (open: boolean) => void;
-  msg: string;
+  onButtonClick: () => void;
 }) => (
   <ModalUI
     type="SUCCESS"
     open={open}
     title="Success"
+    tokenTitles={["Token A:", "Token B:"]}
+    tokens={tokens}
     setOpen={setOpen}
-    description={msg}
+    onButtonClick={onButtonClick}
+  />
+);
+
+export const LiquiditySuccess = ({
+  tokens,
+  setOpen,
+  open,
+  onButtonClick,
+}: {
+  open: boolean;
+  tokens: Token[];
+  setOpen: (open: boolean) => void;
+  onButtonClick: () => void;
+}) => (
+  <ModalUI
+    type="SUCCESS"
+    open={open}
+    title="Success"
+    tokenTitles={["Provided:"]}
+    tokens={tokens}
+    setOpen={setOpen}
+    onButtonClick={onButtonClick}
   />
 );
 
@@ -72,6 +121,7 @@ export const PoolError = ({
     open={open}
     title="Error"
     setOpen={setOpen}
-    description={error}
+    error={error}
+    onButtonClick={() => copyToClipBoard(error)}
   />
 );

@@ -18,9 +18,11 @@ interface ModalProps {
   title: string;
   description?: string;
   tokens?: Token[];
+  tokenTitles?: string[];
   open: boolean;
   setOpen: (open: boolean) => void;
-  onTxClick?: () => void;
+  onButtonClick?: () => void;
+  error?: string;
 }
 
 const Modal = ({
@@ -29,8 +31,10 @@ const Modal = ({
   title,
   description,
   tokens,
+  tokenTitles,
   setOpen,
-  onTxClick,
+  onButtonClick,
+  error,
 }: ModalProps): React.ReactNode => {
   const style = {
     position: "absolute" as "absolute",
@@ -70,9 +74,9 @@ const Modal = ({
     if (type == "SUCCESS") {
       return "check.svg";
     } else if (type == "WARNING") {
-      return "cross.svg";
-    } else if (type == "ERROR") {
       return "warning.svg";
+    } else if (type == "ERROR") {
+      return "cross.svg";
     }
   };
 
@@ -154,8 +158,10 @@ const Modal = ({
                   }}
                 >
                   <Grid container>
-                    <Grid item xs={6}>
-                      <Typography sx={tokenHeaderStyle}>Swaped:</Typography>
+                    <Grid item xs={tokens.length > 1 ? 6 : 12}>
+                      <Typography sx={tokenHeaderStyle}>
+                        {tokenTitles[0]}
+                      </Typography>
                       <Box display="flex" alignItems="center">
                         <Box
                           component="img"
@@ -167,43 +173,29 @@ const Modal = ({
                         </Typography>
                       </Box>
                     </Grid>
-                    <Grid item xs={6}>
-                      <Typography sx={tokenHeaderStyle}>To:</Typography>
-                      <Box display="flex" alignItems="center">
-                        <Box
-                          component="img"
-                          sx={tokenIconStyle}
-                          src={tokens[1].icon}
-                        />
-                        <Typography sx={tokenAmountStyle}>
-                          {tokens[1].amount}
+                    {tokens.length > 1 && (
+                      <Grid item xs={6}>
+                        <Typography sx={tokenHeaderStyle}>
+                          {tokenTitles[1]}
                         </Typography>
-                      </Box>
-                    </Grid>
+                        <Box display="flex" alignItems="center">
+                          <Box
+                            component="img"
+                            sx={tokenIconStyle}
+                            src={tokens[1].icon}
+                          />
+                          <Typography sx={tokenAmountStyle}>
+                            {tokens[1].amount}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    )}
                   </Grid>
                 </Box>
-                {onTxClick && (
-                  <Button
-                    onClick={onTxClick}
-                    sx={{
-                      width: "100%",
-                    }}
-                    label="Transaction Details"
-                  />
-                )}
-                {!onTxClick && (
-                  <Button
-                    onClick={() => setOpen(false)}
-                    sx={{
-                      width: "100%",
-                    }}
-                    label="Go Back"
-                  />
-                )}
               </Box>
             )}
 
-            {!!description && (
+            {description && (
               <Box>
                 <Typography
                   sx={{
@@ -219,14 +211,18 @@ const Modal = ({
                 >
                   {description}
                 </Typography>
-                <Button
-                  onClick={() => setOpen(false)}
-                  sx={{
-                    width: "100%",
-                  }}
-                  label="Go Back"
-                />
               </Box>
+            )}
+            {onButtonClick && (
+              <Button
+                onClick={onButtonClick}
+                sx={{
+                  width: "100%",
+                }}
+                label={
+                  error ? "Copy error to clipboard" : "Transaction Details"
+                }
+              />
             )}
           </Box>
         </Box>
