@@ -8,16 +8,18 @@ const copyToClipBoard = (error: string) => {
   el.style.position = "absolute";
   el.style.left = "-9999px";
   document.body.appendChild(el);
-  const selected =
-    document.getSelection().rangeCount > 0
-      ? document.getSelection().getRangeAt(0)
-      : false;
-  el.select();
-  document.execCommand("copy");
-  document.body.removeChild(el);
-  if (selected) {
-    document.getSelection().removeAllRanges();
-    document.getSelection().addRange(selected);
+
+  const selection = document.getSelection();
+
+  if (selection) {
+    const selected = selection.rangeCount > 0 ? selection.getRangeAt(0) : false;
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+    if (selected) {
+      selection.removeAllRanges();
+      selection.addRange(selected);
+    }
   }
 };
 
