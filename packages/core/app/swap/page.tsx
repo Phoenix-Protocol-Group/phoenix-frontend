@@ -1,5 +1,6 @@
 "use client";
 
+import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
 import {
   AssetSelector,
@@ -78,6 +79,10 @@ export default function Page() {
   const [assetSelectorOpen, setAssetSelectorOpen] = React.useState(false);
   const [isFrom, setIsFrom] = React.useState(true);
 
+  const [sucessModalOpen, setSuccessModalOpen] = React.useState<boolean>(false);
+  const [errorModalOpen, setErrorModalOpen] = React.useState<boolean>(false);
+  const [errorDescription, setErrorDescripption] = React.useState<string>("");
+
   const handleTokenClick = (token: Token) => {
     if (isFrom) {
       args.SwapContainerArgs.fromToken = token;
@@ -95,6 +100,23 @@ export default function Page() {
 
   return (
     <>
+      <SwapSuccess
+        open={sucessModalOpen}
+        setOpen={setSuccessModalOpen}
+        //todo add tokens
+        tokens={[
+          args.SwapContainerArgs.fromToken,
+          args.SwapContainerArgs.toToken,
+        ]}
+        onButtonClick={() => {}}
+      />
+      {errorModalOpen && (
+        <SwapError
+          open={errorModalOpen}
+          setOpen={setErrorModalOpen}
+          error={errorDescription}
+        />
+      )}
       <Box>
         {!optionsOpen && !assetSelectorOpen && (
           <SwapContainer

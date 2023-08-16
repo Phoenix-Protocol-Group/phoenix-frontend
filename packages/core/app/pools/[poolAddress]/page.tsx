@@ -9,7 +9,7 @@ import {
   Token,
 } from "@phoenix-protocol/ui";
 
-import { SwapSuccess, SwapError } from "@/components/Modal/Modal";
+import { PoolSuccess, PoolError, StakeSuccess } from "@/components/Modal/Modal";
 
 import { time } from "@phoenix-protocol/utils";
 
@@ -59,7 +59,10 @@ export default function Page({ params }: PoolPageProps) {
   // Let's have some variable to see if the pool even exists
   const [poolNotFound, setPoolNotFound] = useState<boolean>(false);
 
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [sucessModalOpen, setSuccessModalOpen] = useState<boolean>(false);
+  const [stakeModalOpen, setStakeModalOpen] = useState<boolean>(false);
+  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
+  const [errorDescription, setErrorDescripption] = useState<string>("");
 
   // Token Balances
   const [tokenA, setTokenA] = useState<_Token | undefined>(undefined);
@@ -80,48 +83,65 @@ export default function Page({ params }: PoolPageProps) {
     tokenAAmount: number,
     tokenBAmount: number
   ) => {
-    const provideLiquidityResponse = await PhoenixPairContract.provideLiquidity(
-      {
-        sender: storePersist.wallet.address as string,
-        desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
-        desired_b: BigInt(tokenBAmount * 10 ** (tokenB?.decimals || 7)),
-        min_a: BigInt(1),
-        min_b: BigInt(1),
-        custom_slippage_bps: BigInt(1),
-      },
-      params.poolAddress as string,
-      { fee: 100, responseType: "full" }
-    );
+    try {
+      await PhoenixPairContract.provideLiquidity(
+        {
+          sender: storePersist.wallet.address as string,
+          desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
+          desired_b: BigInt(tokenBAmount * 10 ** (tokenB?.decimals || 7)),
+          min_a: BigInt(1),
+          min_b: BigInt(1),
+          custom_slippage_bps: BigInt(1),
+        },
+        params.poolAddress as string,
+        { fee: 300, responseType: "full" }
+      );
 
-    console.log(provideLiquidityResponse);
+      //!todo view transaction id in blockexplorer
+      setSuccessModalOpen(true);
+    } catch (error: any) {
+      //!todo view transaction id in blockexplorer
+      setErrorDescripption(error);
+      setErrorModalOpen(true);
+    }
   };
 
   // Remove Liquidity
   const removeLiquidity = async (lpTokenAmount: number) => {
-    const removeLiquidityResponse = await PhoenixPairContract.withdrawLiquidity(
-      {
-        sender: storePersist.wallet.address as string,
-        share_amount: BigInt(lpTokenAmount * 10 ** (lpToken?.decimals || 7)),
-        min_a: BigInt(1),
-        min_b: BigInt(1),
-      },
-      params.poolAddress as string
-    );
+    try {
+      await PhoenixPairContract.withdrawLiquidity(
+        {
+          sender: storePersist.wallet.address as string,
+          share_amount: BigInt(lpTokenAmount * 10 ** (lpToken?.decimals || 7)),
+          min_a: BigInt(1),
+          min_b: BigInt(1),
+        },
+        params.poolAddress as string
+      );
 
-    console.log(removeLiquidityResponse);
+      setStakeModalOpen(true);
+    } catch (error: any) {
+      setErrorDescripption(error);
+      setErrorModalOpen(true);
+    }
   };
 
   // Stake
   const stake = async (lpTokenAmount: number) => {
-    await PhoenixStakeContract.bond(
-      {
-        sender: storePersist.wallet.address as string,
-        tokens: BigInt(
-          (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-        ),
-      },
-      "CAIW4SDFLWC243A6VYB65XEUAODLQ3DSXAWVXYI4L766R2ZGDBBVFHNJ"
-    );
+    try {
+      await PhoenixStakeContract.bond(
+        {
+          sender: storePersist.wallet.address as string,
+          tokens: BigInt(
+            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+          ),
+        },
+        "CAIW4SDFLWC243A6VYB65XEUAODLQ3DSXAWVXYI4L766R2ZGDBBVFHNJ"
+      );
+
+      //!todo view transaction id in blockexplorer
+      setStakeModalOpen(true);
+    } catch (error) {}
   };
 
   // Function to fetch pool config and info from chain
@@ -241,6 +261,29 @@ export default function Page({ params }: PoolPageProps) {
   return (
     <Box>
       {overviewStyles}
+      {sucessModalOpen && (
+        <PoolSuccess
+          open={sucessModalOpen}
+          setOpen={setSuccessModalOpen}
+          onButtonClick={() => console.log("click")}
+          tokens={[tokenA as Token, tokenB as Token]}
+        />
+      )}
+      {errorModalOpen && (
+        <PoolError
+          open={errorModalOpen}
+          setOpen={setErrorModalOpen}
+          error={errorDescription}
+        />
+      )}
+      {stakeModalOpen && (
+        <StakeSuccess
+          open={stakeModalOpen}
+          setOpen={setStakeModalOpen}
+          onButtonClick={() => console.log("click")}
+          token={lpToken as Token}
+        />
+      )}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Box

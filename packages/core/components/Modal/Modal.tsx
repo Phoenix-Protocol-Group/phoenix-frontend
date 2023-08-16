@@ -75,26 +75,29 @@ export const PoolSuccess = ({
   tokens: Token[];
   setOpen: (open: boolean) => void;
   onButtonClick: () => void;
-}) => (
-  <ModalUI
-    type="SUCCESS"
-    open={open}
-    title="Success"
-    tokenTitles={["Token A:", "Token B:"]}
-    tokens={tokens}
-    setOpen={setOpen}
-    onButtonClick={onButtonClick}
-  />
-);
+}) => {
+  console.log(tokens);
+  return (
+    <ModalUI
+      type="SUCCESS"
+      open={open}
+      title="Success"
+      tokenTitles={["Token A:", "Token B:"]}
+      tokens={tokens}
+      setOpen={setOpen}
+      onButtonClick={onButtonClick}
+    />
+  );
+};
 
-export const LiquiditySuccess = ({
-  tokens,
+export const StakeSuccess = ({
+  token,
   setOpen,
   open,
   onButtonClick,
 }: {
   open: boolean;
-  tokens: Token[];
+  token: Token;
   setOpen: (open: boolean) => void;
   onButtonClick: () => void;
 }) => (
@@ -102,8 +105,8 @@ export const LiquiditySuccess = ({
     type="SUCCESS"
     open={open}
     title="Success"
-    tokenTitles={["Provided:"]}
-    tokens={tokens}
+    tokenTitles={["Amount:"]}
+    tokens={[token]}
     setOpen={setOpen}
     onButtonClick={onButtonClick}
   />
