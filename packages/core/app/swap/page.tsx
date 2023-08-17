@@ -82,6 +82,7 @@ export default function Page() {
   const [sucessModalOpen, setSuccessModalOpen] = React.useState<boolean>(false);
   const [errorModalOpen, setErrorModalOpen] = React.useState<boolean>(false);
   const [errorDescription, setErrorDescripption] = React.useState<string>("");
+  const [tokenAmounts, setTokenAmounts] = React.useState<number[]>([0]);
 
   const handleTokenClick = (token: Token) => {
     if (isFrom) {
@@ -108,6 +109,7 @@ export default function Page() {
           args.SwapContainerArgs.fromToken,
           args.SwapContainerArgs.toToken,
         ]}
+        tokenAmounts={tokenAmounts}
         onButtonClick={() => {}}
       />
       {errorModalOpen && (

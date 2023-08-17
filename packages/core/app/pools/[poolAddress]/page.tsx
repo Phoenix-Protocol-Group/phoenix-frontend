@@ -63,6 +63,7 @@ export default function Page({ params }: PoolPageProps) {
   const [stakeModalOpen, setStakeModalOpen] = useState<boolean>(false);
   const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
   const [errorDescription, setErrorDescripption] = useState<string>("");
+  const [tokenAmounts, setTokenAmounts] = useState<number[]>([0]);
 
   // Token Balances
   const [tokenA, setTokenA] = useState<_Token | undefined>(undefined);
@@ -98,6 +99,7 @@ export default function Page({ params }: PoolPageProps) {
       );
 
       //!todo view transaction id in blockexplorer
+      setTokenAmounts([tokenAAmount, tokenBAmount]);
       setSuccessModalOpen(true);
     } catch (error: any) {
       //!todo view transaction id in blockexplorer
@@ -119,6 +121,7 @@ export default function Page({ params }: PoolPageProps) {
         params.poolAddress as string
       );
 
+      setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
     } catch (error: any) {
       setErrorDescripption(error);
@@ -140,6 +143,7 @@ export default function Page({ params }: PoolPageProps) {
       );
 
       //!todo view transaction id in blockexplorer
+      setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
     } catch (error) {}
   };
@@ -265,6 +269,7 @@ export default function Page({ params }: PoolPageProps) {
         <PoolSuccess
           open={sucessModalOpen}
           setOpen={setSuccessModalOpen}
+          tokenAmounts={tokenAmounts}
           onButtonClick={() => console.log("click")}
           tokens={[tokenA as Token, tokenB as Token]}
         />
@@ -279,6 +284,7 @@ export default function Page({ params }: PoolPageProps) {
       {stakeModalOpen && (
         <StakeSuccess
           open={stakeModalOpen}
+          tokenAmounts={tokenAmounts}
           setOpen={setStakeModalOpen}
           onButtonClick={() => console.log("click")}
           token={lpToken as Token}

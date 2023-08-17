@@ -1,35 +1,19 @@
 import { Modal as ModalUI, Token } from "@phoenix-protocol/ui";
 import { useState } from "react";
 
-const copyToClipBoard = (error: string) => {
-  const el = document.createElement("textarea");
-  el.value = error;
-  el.setAttribute("readonly", "");
-  el.style.position = "absolute";
-  el.style.left = "-9999px";
-  document.body.appendChild(el);
-
-  const selection = document.getSelection();
-
-  if (selection) {
-    const selected = selection.rangeCount > 0 ? selection.getRangeAt(0) : false;
-    el.select();
-    document.execCommand("copy");
-    document.body.removeChild(el);
-    if (selected) {
-      selection.removeAllRanges();
-      selection.addRange(selected);
-    }
-  }
-};
+function copyToClipBoard(error: string) {
+  navigator.clipboard.writeText(error);
+}
 
 export const SwapSuccess = ({
   tokens,
+  tokenAmounts,
   setOpen,
   open,
   onButtonClick,
 }: {
   tokens: Token[];
+  tokenAmounts: number[];
   open: boolean;
   setOpen: (open: boolean) => void;
   onButtonClick: () => void;
@@ -40,6 +24,7 @@ export const SwapSuccess = ({
     title="Successul Swap"
     tokenTitles={["From:", "To:"]}
     tokens={tokens}
+    tokenAmounts={tokenAmounts}
     setOpen={setOpen}
     onButtonClick={onButtonClick}
   />
@@ -67,12 +52,14 @@ export const SwapError = ({
 
 export const PoolSuccess = ({
   tokens,
+  tokenAmounts,
   setOpen,
   open,
   onButtonClick,
 }: {
   open: boolean;
   tokens: Token[];
+  tokenAmounts: number[];
   setOpen: (open: boolean) => void;
   onButtonClick: () => void;
 }) => {
@@ -84,6 +71,7 @@ export const PoolSuccess = ({
       title="Success"
       tokenTitles={["Token A:", "Token B:"]}
       tokens={tokens}
+      tokenAmounts={tokenAmounts}
       setOpen={setOpen}
       onButtonClick={onButtonClick}
     />
@@ -92,12 +80,14 @@ export const PoolSuccess = ({
 
 export const StakeSuccess = ({
   token,
+  tokenAmounts,
   setOpen,
   open,
   onButtonClick,
 }: {
   open: boolean;
   token: Token;
+  tokenAmounts: number[];
   setOpen: (open: boolean) => void;
   onButtonClick: () => void;
 }) => (
@@ -107,6 +97,7 @@ export const StakeSuccess = ({
     title="Success"
     tokenTitles={["Amount:"]}
     tokens={[token]}
+    tokenAmounts={tokenAmounts}
     setOpen={setOpen}
     onButtonClick={onButtonClick}
   />

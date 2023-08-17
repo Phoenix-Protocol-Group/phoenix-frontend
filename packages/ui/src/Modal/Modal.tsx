@@ -18,6 +18,7 @@ interface ModalProps {
   title: string;
   description?: string;
   tokens?: Token[];
+  tokenAmounts?: number[];
   tokenTitles?: string[];
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -31,6 +32,7 @@ const Modal = ({
   title,
   description,
   tokens,
+  tokenAmounts,
   tokenTitles,
   setOpen,
   onButtonClick,
@@ -169,7 +171,7 @@ const Modal = ({
                           src={tokens[0].icon}
                         />
                         <Typography sx={tokenAmountStyle}>
-                          {tokens[0].amount}
+                          {tokenAmounts[0]}
                         </Typography>
                       </Box>
                     </Grid>
@@ -185,7 +187,7 @@ const Modal = ({
                             src={tokens[1].icon}
                           />
                           <Typography sx={tokenAmountStyle}>
-                            {tokens[1].amount}
+                            {tokenAmounts[1]}
                           </Typography>
                         </Box>
                       </Grid>
