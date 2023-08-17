@@ -121,3 +121,19 @@ export const PoolError = ({
     onButtonClick={() => copyToClipBoard(error)}
   />
 );
+
+export const Loading = ({
+  setOpen,
+  open,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) => (
+  <ModalUI
+    title=""
+    type="LOADING"
+    open={open}
+    description="Transaction broadcasting..."
+    setOpen={setOpen}
+  />
+);

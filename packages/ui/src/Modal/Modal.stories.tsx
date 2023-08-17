@@ -94,3 +94,12 @@ export const Error: Story = {
     error: "foo"
   },
 };
+
+export const Loading: Story = {
+  args: {
+    open: true,
+    type: "LOADING",
+    setOpen: () => {},
+    description: "Transaction broadcasting..."
+  },
+};

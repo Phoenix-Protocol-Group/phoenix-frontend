@@ -9,7 +9,12 @@ import {
   Token,
 } from "@phoenix-protocol/ui";
 
-import { PoolSuccess, PoolError, StakeSuccess } from "@/components/Modal/Modal";
+import {
+  PoolSuccess,
+  PoolError,
+  StakeSuccess,
+  Loading,
+} from "@/components/Modal/Modal";
 
 import { time } from "@phoenix-protocol/utils";
 
@@ -62,6 +67,7 @@ export default function Page({ params }: PoolPageProps) {
   const [sucessModalOpen, setSuccessModalOpen] = useState<boolean>(false);
   const [stakeModalOpen, setStakeModalOpen] = useState<boolean>(false);
   const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [errorDescription, setErrorDescripption] = useState<string>("");
   const [tokenAmounts, setTokenAmounts] = useState<number[]>([0]);
 
@@ -85,6 +91,8 @@ export default function Page({ params }: PoolPageProps) {
     tokenBAmount: number
   ) => {
     try {
+      setLoading(true);
+
       await PhoenixPairContract.provideLiquidity(
         {
           sender: storePersist.wallet.address as string,
@@ -98,11 +106,13 @@ export default function Page({ params }: PoolPageProps) {
         { fee: 300, responseType: "full" }
       );
 
+      setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([tokenAAmount, tokenBAmount]);
       setSuccessModalOpen(true);
     } catch (error: any) {
       //!todo view transaction id in blockexplorer
+      setLoading(false);
       setErrorDescripption(error);
       setErrorModalOpen(true);
     }
@@ -111,6 +121,8 @@ export default function Page({ params }: PoolPageProps) {
   // Remove Liquidity
   const removeLiquidity = async (lpTokenAmount: number) => {
     try {
+      setLoading(true);
+
       await PhoenixPairContract.withdrawLiquidity(
         {
           sender: storePersist.wallet.address as string,
@@ -121,9 +133,11 @@ export default function Page({ params }: PoolPageProps) {
         params.poolAddress as string
       );
 
+      setLoading(false);
       setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
     } catch (error: any) {
+      setLoading(false);
       setErrorDescripption(error);
       setErrorModalOpen(true);
     }
@@ -132,6 +146,8 @@ export default function Page({ params }: PoolPageProps) {
   // Stake
   const stake = async (lpTokenAmount: number) => {
     try {
+      setLoading(true);
+
       await PhoenixStakeContract.bond(
         {
           sender: storePersist.wallet.address as string,
@@ -142,10 +158,15 @@ export default function Page({ params }: PoolPageProps) {
         "CAIW4SDFLWC243A6VYB65XEUAODLQ3DSXAWVXYI4L766R2ZGDBBVFHNJ"
       );
 
+      setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
-    } catch (error) {}
+    } catch (error: any) {
+      setLoading(false);
+      setErrorDescripption(error);
+      setErrorModalOpen(true);
+    }
   };
 
   // Function to fetch pool config and info from chain
@@ -265,6 +286,7 @@ export default function Page({ params }: PoolPageProps) {
   return (
     <Box>
       {overviewStyles}
+      {loading && <Loading open={loading} setOpen={setLoading} />}
       {sucessModalOpen && (
         <PoolSuccess
           open={sucessModalOpen}

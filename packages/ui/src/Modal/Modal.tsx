@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Modal as MuiModal, Grid } from "@mui/material";
+import { Box, Typography, Modal as MuiModal, Grid, CircularProgress } from "@mui/material";
 import Colors from "../Theme/colors";
 import { Button } from "../Button/Button";
 
@@ -11,7 +11,7 @@ export interface Token {
   category: string;
 }
 
-type Type = "SUCCESS" | "WARNING" | "ERROR";
+type Type = "SUCCESS" | "WARNING" | "ERROR" | "LOADING";
 
 interface ModalProps {
   type: Type;
@@ -121,16 +121,32 @@ const Modal = ({
               alignItems: "center",
             }}
           >
-            <Box
-              component="img"
-              sx={{
-                h: "98px",
-                w: "98px",
-                margin: "0 auto",
-                marginBottom: "12px",
-              }}
-              src={getAsset()}
+            {type == "LOADING" ? (
+               <Box
+                sx={{
+                  h: "98px",
+                  w: "98px",
+                  margin: "0 auto",
+                  marginBottom: "12px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+              <CircularProgress />
+              </Box>
+            ) : (
+              <Box
+                component="img"
+                sx={{
+                  h: "98px",
+                  w: "98px",
+                  margin: "0 auto",
+                  marginBottom: "12px",
+                }}
+                src={getAsset()}
             />
+            )}
             <Typography
               sx={{
                 color: "#FFF",
@@ -220,6 +236,7 @@ const Modal = ({
                 onClick={onButtonClick}
                 sx={{
                   width: "100%",
+                  display: type == "LOADING" ? "none" : "block"
                 }}
                 label={
                   error ? "Copy error to clipboard" : "Transaction Details"
