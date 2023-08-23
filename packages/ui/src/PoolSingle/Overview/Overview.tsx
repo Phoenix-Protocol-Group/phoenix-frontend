@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   GlobalStyles,
@@ -251,6 +252,7 @@ const Overview = () => {
                 {...args.lpArgs}
                 onClaimRewards={() => {}}
                 onStake={() => {}}
+                tokenName={"BTC/USDC"}
               />
             </Box>
             <StakingList {...args.stakingListArgs} />

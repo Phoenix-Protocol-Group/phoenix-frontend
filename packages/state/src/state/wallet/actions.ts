@@ -10,29 +10,31 @@ export const createWalletActions = (
   return {
     tokens: [],
 
-    fetchTokenBalance: async (tokenId: string) => {
+    fetchTokenInfo: async (tokenId: string) => {
+      let updatedTokenInfo: Token | undefined;
       // Check if account, server, and network passphrase are set
-      if (
-        !usePersistStore.getState().wallet ||
-        !getState().server ||
-        !getState().networkPassphrase
-      ) {
+      if (!getState().server || !getState().networkPassphrase) {
         throw new Error("Missing account, server, or network passphrase");
       }
 
-      // Create Soroban token query client
-      if (typeof usePersistStore.getState().wallet.address !== "string") {
-        throw new Error("Missing wallet address");
+      let balance: bigint;
+      try {
+        balance = BigInt(
+          await SorobanTokenContract.balance(
+            {
+              id: usePersistStore.getState().wallet.address as string,
+            },
+            tokenId
+          )
+        );
+      } catch (e) {
+        balance = BigInt(0);
+        console.log(e, "User has no balance");
       }
 
-      const balance: bigint = BigInt(
-        await SorobanTokenContract.balance(
-          // @ts-ignore
-          { id: usePersistStore.getState().wallet.address },
-          {},
-          tokenId
-        )
-      );
+      const symbol: string =
+        getState().tokens.find((token: Token) => token.id === tokenId)
+          ?.symbol || (await SorobanTokenContract.symbol(tokenId));
 
       const decimals =
         getState().tokens.find((token: Token) => token.id === tokenId)
@@ -41,14 +43,23 @@ export const createWalletActions = (
       // Update token balance
       setState((state: AppStore) => {
         const updatedTokens = state.tokens.map((token: Token) =>
-          token.id === tokenId ? { ...token, balance, decimals } : token
+          token.id === tokenId ? { ...token, balance, decimals, symbol } : token
         );
         // If token couldnt be found, add it
         if (!updatedTokens.find((token: Token) => token.id === tokenId)) {
-          updatedTokens.push({ id: tokenId, balance, decimals: decimals });
+          updatedTokens.push({
+            id: tokenId,
+            balance,
+            decimals: decimals,
+            symbol: symbol,
+          });
         }
+        updatedTokenInfo = updatedTokens.find(
+          (token: Token) => token.id === tokenId
+        );
         return { tokens: updatedTokens };
       });
+      return updatedTokenInfo;
     },
   };
 };

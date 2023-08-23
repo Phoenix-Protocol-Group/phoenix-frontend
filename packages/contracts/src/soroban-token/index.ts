@@ -10,10 +10,14 @@ const {
   i128ToScVal,
   strToScVal,
 } = convert;
-
+import {
+  Error_,
+  Ok,
+  ResponseTypes,
+  Result,
+} from "@phoenix-protocol/utils/build/invoke";
 import { invoke } from "@phoenix-protocol/utils";
 
-import { ResponseTypes } from "@phoenix-protocol/utils/build/invoke";
 const Errors = [
   { message: "" },
   { message: "" },
@@ -38,36 +42,6 @@ export type Address = string;
 export type Option<T> = T | undefined;
 export type Typepoint = bigint;
 export type Duration = bigint;
-
-/// Error interface containing the error message
-export interface Error_ {
-  message: string;
-}
-
-export interface Result<T, E = Error_> {
-  unwrap(): T;
-  unwrapErr(): E;
-  isOk(): boolean;
-  isErr(): boolean;
-}
-
-export class Ok<T> implements Result<T> {
-  constructor(readonly value: T) {}
-  unwrapErr(): Error_ {
-    throw new Error("No error");
-  }
-  unwrap(): T {
-    return this.value;
-  }
-
-  isOk(): boolean {
-    return true;
-  }
-
-  isErr(): boolean {
-    return !this.isOk();
-  }
-}
 
 export class Err<T> implements Result<T> {
   constructor(readonly error: Error_) {}

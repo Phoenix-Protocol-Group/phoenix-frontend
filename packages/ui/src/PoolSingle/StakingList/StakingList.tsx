@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Grid,
@@ -129,9 +130,17 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
           </Grid>
         </Grid>
       )}
-      {entries.map((entry, index) => (
-        <StakingEntry mobile={!largerThenSm} entry={entry} key={index} />
-      ))}
+      {entries.length > 0 ? (
+        entries.map((entry, index) => (
+          <StakingEntry mobile={!largerThenSm} entry={entry} key={index} />
+        ))
+      ) : (
+        <Typography
+          sx={{ ...typoStyle, textAlign: "center", opacity: 0.5, mt: 2 }}
+        >
+          No stakes
+        </Typography>
+      )}
     </Box>
   );
 };

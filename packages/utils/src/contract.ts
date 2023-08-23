@@ -6,4 +6,4 @@ import { Contract } from "soroban-client";
  * version when making calls to RPC for now.
  */
 export const getContractIdHex = (CONTRACT_ID: string) =>
-  new Contract(CONTRACT_ID).contractId("hex");
+  new Contract(CONTRACT_ID).contractId();

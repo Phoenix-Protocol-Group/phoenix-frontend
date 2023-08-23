@@ -67,6 +67,33 @@ type InvokeArgs<R extends ResponseTypes, T = string> = Options<R> & {
   parseResultXdr?: (xdr: string) => any;
   contractId: string;
 };
+export interface Error_ {
+  message: string;
+}
+export interface Result<T, E = Error_> {
+  unwrap(): T;
+  unwrapErr(): E;
+  isOk(): boolean;
+  isErr(): boolean;
+}
+
+export class Ok<T> implements Result<T> {
+  constructor(readonly value: T) {}
+  unwrapErr(): Error_ {
+    throw new Error("No error");
+  }
+  unwrap(): T {
+    return this.value;
+  }
+
+  isOk(): boolean {
+    return true;
+  }
+
+  isErr(): boolean {
+    return !this.isOk();
+  }
+}
 
 /**
  * Invoke a method on the phoenix-stake contract.
@@ -75,7 +102,7 @@ type InvokeArgs<R extends ResponseTypes, T = string> = Options<R> & {
  *
  * @returns {T}, by default, the parsed XDR from either the simulation or the full transaction. If `simulateOnly` or `fullRpcResponse` are true, returns either the full simulation or the result of sending/getting the transaction to/from the ledger.
  */
-export async function invoke<R extends ResponseTypes = undefined, T = string>(
+export async function invoke<R extends ResponseTypes = undefined, T = any>(
   args: InvokeArgs<R, T>
 ): Promise<
   R extends undefined
@@ -86,7 +113,7 @@ export async function invoke<R extends ResponseTypes = undefined, T = string>(
     ? SomeRpcResponse
     : T
 >;
-export async function invoke<R extends ResponseTypes, T = string>({
+export async function invoke<R extends ResponseTypes, T = any>({
   method,
   args = [],
   fee = 100,
