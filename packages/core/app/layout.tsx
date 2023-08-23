@@ -3,8 +3,8 @@
 import React, { useEffect } from "react";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Providers from "../providers";
-import TopBar from "../components/TopBar/TopBar";
-import SideNav from "../components/SideNav/SideNav";
+import TopBar from "@/components/TopBar/TopBar";
+import SideNav from "@/components/SideNav/SideNav";
 
 const args = {
   mainstatsArgs: {

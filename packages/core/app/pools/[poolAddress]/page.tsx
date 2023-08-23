@@ -9,6 +9,13 @@ import {
   Token,
 } from "@phoenix-protocol/ui";
 
+import {
+  PoolSuccess,
+  PoolError,
+  StakeSuccess,
+  Loading,
+} from "@/components/Modal/Modal";
+
 import { time } from "@phoenix-protocol/utils";
 
 import {
@@ -57,6 +64,13 @@ export default function Page({ params }: PoolPageProps) {
   // Let's have some variable to see if the pool even exists
   const [poolNotFound, setPoolNotFound] = useState<boolean>(false);
 
+  const [sucessModalOpen, setSuccessModalOpen] = useState<boolean>(false);
+  const [stakeModalOpen, setStakeModalOpen] = useState<boolean>(false);
+  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [errorDescription, setErrorDescripption] = useState<string>("");
+  const [tokenAmounts, setTokenAmounts] = useState<number[]>([0]);
+
   // Token Balances
   const [tokenA, setTokenA] = useState<_Token | undefined>(undefined);
   const [tokenB, setTokenB] = useState<_Token | undefined>(undefined);
@@ -76,44 +90,83 @@ export default function Page({ params }: PoolPageProps) {
     tokenAAmount: number,
     tokenBAmount: number
   ) => {
-    await PhoenixPairContract.provideLiquidity(
-      {
-        sender: storePersist.wallet.address as string,
-        desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
-        desired_b: BigInt(tokenBAmount * 10 ** (tokenB?.decimals || 7)),
-        min_a: BigInt(1),
-        min_b: BigInt(1),
-        custom_slippage_bps: BigInt(1),
-      },
-      params.poolAddress as string,
-      { fee: 100, responseType: "full" }
-    );
+    try {
+      setLoading(true);
+
+      await PhoenixPairContract.provideLiquidity(
+        {
+          sender: storePersist.wallet.address as string,
+          desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
+          desired_b: BigInt(tokenBAmount * 10 ** (tokenB?.decimals || 7)),
+          min_a: BigInt(1),
+          min_b: BigInt(1),
+          custom_slippage_bps: BigInt(1),
+        },
+        params.poolAddress as string,
+        { fee: 300, responseType: "full" }
+      );
+
+      setLoading(false);
+      //!todo view transaction id in blockexplorer
+      setTokenAmounts([tokenAAmount, tokenBAmount]);
+      setSuccessModalOpen(true);
+    } catch (error: any) {
+      //!todo view transaction id in blockexplorer
+      setLoading(false);
+      setErrorDescripption(error);
+      setErrorModalOpen(true);
+    }
   };
 
   // Remove Liquidity
   const removeLiquidity = async (lpTokenAmount: number) => {
-    await PhoenixPairContract.withdrawLiquidity(
-      {
-        sender: storePersist.wallet.address as string,
-        share_amount: BigInt(lpTokenAmount * 10 ** (lpToken?.decimals || 7)),
-        min_a: BigInt(1),
-        min_b: BigInt(1),
-      },
-      params.poolAddress as string
-    );
+    try {
+      setLoading(true);
+
+      await PhoenixPairContract.withdrawLiquidity(
+        {
+          sender: storePersist.wallet.address as string,
+          share_amount: BigInt(lpTokenAmount * 10 ** (lpToken?.decimals || 7)),
+          min_a: BigInt(1),
+          min_b: BigInt(1),
+        },
+        params.poolAddress as string
+      );
+
+      setLoading(false);
+      setTokenAmounts([lpTokenAmount]);
+      setStakeModalOpen(true);
+    } catch (error: any) {
+      setLoading(false);
+      setErrorDescripption(error);
+      setErrorModalOpen(true);
+    }
   };
 
   // Stake
   const stake = async (lpTokenAmount: number) => {
-    await PhoenixStakeContract.bond(
-      {
-        sender: storePersist.wallet.address as string,
-        tokens: BigInt(
-          (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-        ),
-      },
-      "CAIW4SDFLWC243A6VYB65XEUAODLQ3DSXAWVXYI4L766R2ZGDBBVFHNJ"
-    );
+    try {
+      setLoading(true);
+
+      await PhoenixStakeContract.bond(
+        {
+          sender: storePersist.wallet.address as string,
+          tokens: BigInt(
+            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+          ),
+        },
+        "CAIW4SDFLWC243A6VYB65XEUAODLQ3DSXAWVXYI4L766R2ZGDBBVFHNJ"
+      );
+
+      setLoading(false);
+      //!todo view transaction id in blockexplorer
+      setTokenAmounts([lpTokenAmount]);
+      setStakeModalOpen(true);
+    } catch (error: any) {
+      setLoading(false);
+      setErrorDescripption(error);
+      setErrorModalOpen(true);
+    }
   };
 
   // Function to fetch pool config and info from chain
@@ -233,6 +286,32 @@ export default function Page({ params }: PoolPageProps) {
   return (
     <Box>
       {overviewStyles}
+      {loading && <Loading open={loading} setOpen={setLoading} />}
+      {sucessModalOpen && (
+        <PoolSuccess
+          open={sucessModalOpen}
+          setOpen={setSuccessModalOpen}
+          tokenAmounts={tokenAmounts}
+          onButtonClick={() => console.log("click")}
+          tokens={[tokenA as Token, tokenB as Token]}
+        />
+      )}
+      {errorModalOpen && (
+        <PoolError
+          open={errorModalOpen}
+          setOpen={setErrorModalOpen}
+          error={errorDescription}
+        />
+      )}
+      {stakeModalOpen && (
+        <StakeSuccess
+          open={stakeModalOpen}
+          tokenAmounts={tokenAmounts}
+          setOpen={setStakeModalOpen}
+          onButtonClick={() => console.log("click")}
+          token={lpToken as Token}
+        />
+      )}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Box

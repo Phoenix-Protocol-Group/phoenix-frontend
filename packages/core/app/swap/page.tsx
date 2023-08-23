@@ -1,7 +1,13 @@
 "use client";
 
+import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
-import { AssetSelector, SlippageSettings, SwapContainer, Token } from "@phoenix-protocol/ui";
+import {
+  AssetSelector,
+  SlippageSettings,
+  SwapContainer,
+  Token,
+} from "@phoenix-protocol/ui";
 import React from "react";
 
 const args = {
@@ -73,6 +79,11 @@ export default function Page() {
   const [assetSelectorOpen, setAssetSelectorOpen] = React.useState(false);
   const [isFrom, setIsFrom] = React.useState(true);
 
+  const [sucessModalOpen, setSuccessModalOpen] = React.useState<boolean>(false);
+  const [errorModalOpen, setErrorModalOpen] = React.useState<boolean>(false);
+  const [errorDescription, setErrorDescripption] = React.useState<string>("");
+  const [tokenAmounts, setTokenAmounts] = React.useState<number[]>([0]);
+
   const handleTokenClick = (token: Token) => {
     if (isFrom) {
       args.SwapContainerArgs.fromToken = token;
@@ -87,10 +98,29 @@ export default function Page() {
     setAssetSelectorOpen(true);
     setIsFrom(isFromToken);
   };
-  
+
   return (
-    <Box>
-      {!optionsOpen && !assetSelectorOpen && (
+    <>
+      <SwapSuccess
+        open={sucessModalOpen}
+        setOpen={setSuccessModalOpen}
+        //todo add tokens
+        tokens={[
+          args.SwapContainerArgs.fromToken,
+          args.SwapContainerArgs.toToken,
+        ]}
+        tokenAmounts={tokenAmounts}
+        onButtonClick={() => {}}
+      />
+      {errorModalOpen && (
+        <SwapError
+          open={errorModalOpen}
+          setOpen={setErrorModalOpen}
+          error={errorDescription}
+        />
+      )}
+      <Box>
+        {!optionsOpen && !assetSelectorOpen && (
           <SwapContainer
             {...args.SwapContainerArgs}
             onOptionsClick={() => setOptionsOpen(true)}
@@ -124,6 +154,7 @@ export default function Page() {
             onTokenClick={handleTokenClick}
           />
         )}
-    </Box>
+      </Box>
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Modal as MuiModal, Grid } from "@mui/material";
+import { Box, Typography, Modal as MuiModal, Grid, CircularProgress } from "@mui/material";
 import Colors from "../Theme/colors";
 import { Button } from "../Button/Button";
 
@@ -11,24 +11,32 @@ export interface Token {
   category: string;
 }
 
-type Type = "SUCCESS" | "WARNING" | "ERROR";
+type Type = "SUCCESS" | "WARNING" | "ERROR" | "LOADING";
 
 interface ModalProps {
   type: Type;
   title: string;
   description?: string;
   tokens?: Token[];
+  tokenAmounts?: number[];
+  tokenTitles?: string[];
   open: boolean;
   setOpen: (open: boolean) => void;
+  onButtonClick?: () => void;
+  error?: string;
 }
 
-const Modal = ({ 
+const Modal = ({
   type,
-  open, 
+  open,
   title,
   description,
   tokens,
-  setOpen 
+  tokenAmounts,
+  tokenTitles,
+  setOpen,
+  onButtonClick,
+  error,
 }: ModalProps): React.ReactNode => {
   const style = {
     position: "absolute" as "absolute",
@@ -48,29 +56,29 @@ const Modal = ({
     fontSize: "12px",
     fontWeight: 400,
     lineHeight: "140%",
-    marginBottom: "8px"
+    marginBottom: "8px",
   };
 
   const tokenIconStyle = {
     w: "24px",
     h: "24px",
-    marginRight: "8px"
+    marginRight: "8px",
   };
 
   const tokenAmountStyle = {
     color: "#FFF",
     fontSize: "14px",
     fontWeight: 700,
-    lineHeight: "140%"
+    lineHeight: "140%",
   };
 
   const getAsset = () => {
-    if(type == "SUCCESS") {
+    if (type == "SUCCESS") {
       return "check.svg";
-    } else if(type == "WARNING") {
-      return "cross.svg";
-    } else if(type == "ERROR") {
+    } else if (type == "WARNING") {
       return "warning.svg";
+    } else if (type == "ERROR") {
+      return "cross.svg";
     }
   };
 
@@ -113,90 +121,128 @@ const Modal = ({
               alignItems: "center",
             }}
           >
-            <Box
-              component="img"
-              sx={{
-                h: "98px",
-                w: "98px",
-                margin: "0 auto",
-                marginBottom: "12px",
-              }}
-              src={getAsset()}
+            {type == "LOADING" ? (
+               <Box
+                sx={{
+                  h: "98px",
+                  w: "98px",
+                  margin: "0 auto",
+                  marginBottom: "12px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+              <CircularProgress />
+              </Box>
+            ) : (
+              <Box
+                component="img"
+                sx={{
+                  h: "98px",
+                  w: "98px",
+                  margin: "0 auto",
+                  marginBottom: "12px",
+                }}
+                src={getAsset()}
             />
+            )}
             <Typography
               sx={{
                 color: "#FFF",
                 textAlign: "center",
                 fontSize: "24px",
-                fontWeight: 700
+                fontWeight: 700,
               }}
             >
-              Unsuccessul Swap
+              {title}
             </Typography>
 
             {!!tokens && (
-              <Box sx={{
-                borderRadius: "8px",
-                width: "100%",
-                background:
-                  "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-                padding: "12px",
-                marginBottom: "16px",
-                marginTop: "20px"
-              }}>
-                <Grid container>
-                  <Grid item xs={6}>
-                    <Typography sx={tokenHeaderStyle}>Swaped:</Typography>
-                    <Box display="flex" alignItems="center">
-                      <Box
-                        component="img"
-                        sx={tokenIconStyle}
-                        src={tokens[0].icon}
-                      />
-                      <Typography sx={tokenAmountStyle}>
-                        {tokens[0].amount}
+              <Box
+                sx={{
+                  width: "100%",
+                }}
+              >
+                <Box
+                  sx={{
+                    borderRadius: "8px",
+                    width: "100%",
+                    background:
+                      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+                    padding: "12px",
+                    marginBottom: "16px",
+                    marginTop: "20px",
+                  }}
+                >
+                  <Grid container>
+                    <Grid item xs={tokens.length > 1 ? 6 : 12}>
+                      <Typography sx={tokenHeaderStyle}>
+                        {tokenTitles[0]}
                       </Typography>
-                    </Box>
+                      <Box display="flex" alignItems="center">
+                        <Box
+                          component="img"
+                          sx={tokenIconStyle}
+                          src={tokens[0].icon}
+                        />
+                        <Typography sx={tokenAmountStyle}>
+                          {tokenAmounts[0]}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    {tokens.length > 1 && (
+                      <Grid item xs={6}>
+                        <Typography sx={tokenHeaderStyle}>
+                          {tokenTitles[1]}
+                        </Typography>
+                        <Box display="flex" alignItems="center">
+                          <Box
+                            component="img"
+                            sx={tokenIconStyle}
+                            src={tokens[1].icon}
+                          />
+                          <Typography sx={tokenAmountStyle}>
+                            {tokenAmounts[1]}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    )}
                   </Grid>
-                  <Grid item xs={6}>
-                    <Typography sx={tokenHeaderStyle}>To:</Typography>
-                    <Box display="flex" alignItems="center">
-                      <Box
-                        component="img"
-                        sx={tokenIconStyle}
-                        src={tokens[1].icon}
-                      />
-                      <Typography sx={tokenAmountStyle}>
-                        {tokens[1].amount}
-                      </Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
+                </Box>
               </Box>
             )}
 
-            {!!description && (
-              <Typography
-                sx={{
-                  color:
-                    "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
-                  textAlign: "center",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  lineHeight: "140%",
-                  marginBottom: "22px",
-                  marginTop: "4px"
-                }}
-              >
-                {description}
-              </Typography>
+            {description && (
+              <Box>
+                <Typography
+                  sx={{
+                    color:
+                      "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
+                    textAlign: "center",
+                    fontSize: "12px",
+                    fontWeight: 400,
+                    lineHeight: "140%",
+                    marginBottom: "22px",
+                    marginTop: "4px",
+                  }}
+                >
+                  {description}
+                </Typography>
+              </Box>
             )}
-            <Button
-              sx={{
-                width: "100%",
-              }}
-              label="Go Back"
-            />
+            {onButtonClick && (
+              <Button
+                onClick={onButtonClick}
+                sx={{
+                  width: "100%",
+                  display: type == "LOADING" ? "none" : "block"
+                }}
+                label={
+                  error ? "Copy error to clipboard" : "Transaction Details"
+                }
+              />
+            )}
           </Box>
         </Box>
       </Box>
