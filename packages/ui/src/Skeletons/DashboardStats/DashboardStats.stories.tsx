@@ -26,7 +26,7 @@ type Story = StoryObj<typeof DashboardStats>;
 export const Main: Story = {
   render: (args) => (
     <Grid item xs={12} md={8}>
-      <DashboardStats {...args} />
+      <DashboardStats />
     </Grid>
   ),
 };
