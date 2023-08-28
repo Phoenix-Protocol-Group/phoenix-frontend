@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Box, Typography, Grid, GlobalStyles, Button } from "@mui/material";
 import {
   LiquidityMining,
@@ -15,7 +16,7 @@ import {
   StakeSuccess,
   Loading,
   UnstakeSuccess,
-} from "@/components/Modal/Modal";
+} from "../../../components/Modal/Modal";
 
 import { time } from "@phoenix-protocol/utils";
 
@@ -253,8 +254,8 @@ export default function Page({ params }: PoolPageProps) {
           Number(pairInfo.unwrap().asset_b.get("amount")) /
             10 ** Number(_tokenB?.decimals)
         );
+        fetchStakes(_lpToken?.symbol);
       }
-      await fetchStakes();
     } catch (e) {
       // If pool not found, set poolNotFound to true
       console.log(e);
@@ -262,7 +263,7 @@ export default function Page({ params }: PoolPageProps) {
     }
   };
 
-  const fetchStakes = async () => {
+  const fetchStakes = async (name = lpToken?.name) => {
     if (storePersist.wallet.address) {
       // Get user stakes
       const stakes: Ok<any> = await PhoenixStakeContract.queryStaked(
@@ -279,7 +280,7 @@ export default function Page({ params }: PoolPageProps) {
           const _stakes: Entry[] = stakes.unwrap().stakes.map((stake: any) => {
             return {
               icon: `/cryptoIcons/poolIcon.png`.toLowerCase(),
-              title: lpToken?.name,
+              title: name,
               apr: "0",
               lockedPeriod:
                 time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
@@ -298,6 +299,7 @@ export default function Page({ params }: PoolPageProps) {
       }
     }
   };
+
   useEffect(() => {
     getPool();
     // eslint-disable-next-line react-hooks/exhaustive-deps

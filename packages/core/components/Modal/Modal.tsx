@@ -1,5 +1,5 @@
 import { Modal as ModalUI, Token } from "@phoenix-protocol/ui";
-import { useState } from "react";
+import React, { useState } from "react";
 
 function copyToClipBoard(error: string) {
   navigator.clipboard.writeText(error);
@@ -93,7 +93,7 @@ export const UnstakeSuccess = ({
   <ModalUI
     type="SUCCESS"
     open={open}
-    title="Successfuly Unstaked"
+    title="Successfulyl Unstaked"
     tokenTitles={["Amount:"]}
     tokens={[token]}
     tokenAmounts={tokenAmounts}
@@ -118,7 +118,7 @@ export const StakeSuccess = ({
   <ModalUI
     type="SUCCESS"
     open={open}
-    title="Successfuly Staked"
+    title="Successfully Staked"
     tokenTitles={["Amount:"]}
     tokens={[token]}
     tokenAmounts={tokenAmounts}
