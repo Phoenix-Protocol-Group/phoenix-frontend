@@ -74,11 +74,11 @@ const Modal = ({
 
   const getAsset = () => {
     if (type == "SUCCESS") {
-      return "check.svg";
+      return "/check.svg";
     } else if (type == "WARNING") {
-      return "warning.svg";
+      return "/warning.svg";
     } else if (type == "ERROR") {
-      return "cross.svg";
+      return "/cross.svg";
     }
   };
 

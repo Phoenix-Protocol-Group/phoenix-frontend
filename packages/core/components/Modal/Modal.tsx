@@ -63,7 +63,6 @@ export const PoolSuccess = ({
   setOpen: (open: boolean) => void;
   onButtonClick: () => void;
 }) => {
-  console.log(tokens);
   return (
     <ModalUI
       type="SUCCESS"
@@ -77,6 +76,31 @@ export const PoolSuccess = ({
     />
   );
 };
+
+export const UnstakeSuccess = ({
+  token,
+  tokenAmounts,
+  setOpen,
+  open,
+  onButtonClick,
+}: {
+  open: boolean;
+  token: Token;
+  tokenAmounts: number[];
+  setOpen: (open: boolean) => void;
+  onButtonClick: () => void;
+}) => (
+  <ModalUI
+    type="SUCCESS"
+    open={open}
+    title="Successfuly Unstaked"
+    tokenTitles={["Amount:"]}
+    tokens={[token]}
+    tokenAmounts={tokenAmounts}
+    setOpen={setOpen}
+    onButtonClick={onButtonClick}
+  />
+);
 
 export const StakeSuccess = ({
   token,
@@ -94,7 +118,7 @@ export const StakeSuccess = ({
   <ModalUI
     type="SUCCESS"
     open={open}
-    title="Success"
+    title="Successfuly Staked"
     tokenTitles={["Amount:"]}
     tokens={[token]}
     tokenAmounts={tokenAmounts}

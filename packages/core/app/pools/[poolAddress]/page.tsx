@@ -14,6 +14,7 @@ import {
   PoolError,
   StakeSuccess,
   Loading,
+  UnstakeSuccess,
 } from "@/components/Modal/Modal";
 
 import { time } from "@phoenix-protocol/utils";
@@ -25,6 +26,7 @@ import {
 import { useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import Link from "next/link";
+import { Ok } from "@phoenix-protocol/utils/build/invoke";
 
 interface Entry {
   icon: string;
@@ -66,6 +68,7 @@ export default function Page({ params }: PoolPageProps) {
 
   const [sucessModalOpen, setSuccessModalOpen] = useState<boolean>(false);
   const [stakeModalOpen, setStakeModalOpen] = useState<boolean>(false);
+  const [unstakeModalOpen, setUnstakeModalOpen] = useState<boolean>(false);
   const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorDescription, setErrorDescripption] = useState<string>("");
@@ -155,13 +158,40 @@ export default function Page({ params }: PoolPageProps) {
             (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
           ),
         },
-        "CAIW4SDFLWC243A6VYB65XEUAODLQ3DSXAWVXYI4L766R2ZGDBBVFHNJ"
+        "CDLDWP5ZZKBUQ6LGBTOI4VSKM537AK2K56CAM2ONYRUOKIPGUFDA4ZUR"
       );
-
+      await fetchStakes();
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
+    } catch (error: any) {
+      setLoading(false);
+      setErrorDescripption(error);
+      setErrorModalOpen(true);
+    }
+  };
+
+  // Stake
+  const unstake = async (lpTokenAmount: number, stake_timestamp: number) => {
+    try {
+      setLoading(true);
+
+      await PhoenixStakeContract.unbond(
+        {
+          sender: storePersist.wallet.address as string,
+          stake_amount: BigInt(
+            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+          ),
+          stake_timestamp: BigInt(stake_timestamp),
+        },
+        "CDLDWP5ZZKBUQ6LGBTOI4VSKM537AK2K56CAM2ONYRUOKIPGUFDA4ZUR"
+      );
+      await fetchStakes();
+      setLoading(false);
+      //!todo view transaction id in blockexplorer
+      setTokenAmounts([lpTokenAmount]);
+      setUnstakeModalOpen(true);
     } catch (error: any) {
       setLoading(false);
       setErrorDescripption(error);
@@ -181,86 +211,50 @@ export default function Page({ params }: PoolPageProps) {
       // When results ok...
       if (pairConfig.isOk() && pairInfo.isOk()) {
         // Fetch token infos from chain and save in global appstore
-        const [tokenA, tokenB, lpToken] = await Promise.all([
+        const [_tokenA, _tokenB, _lpToken] = await Promise.all([
           store.fetchTokenInfo(pairConfig.unwrap().token_a),
           store.fetchTokenInfo(pairConfig.unwrap().token_b),
           store.fetchTokenInfo(pairConfig.unwrap().share_token),
         ]);
-        console.log(1);
         // Set token states
         setTokenA({
-          name: tokenA?.symbol as string,
-          icon: `/cryptoIcons/${tokenA?.symbol}.svg`.toLowerCase(),
+          name: _tokenA?.symbol as string,
+          icon: `/cryptoIcons/${_tokenA?.symbol}.svg`.toLowerCase(),
           usdValue: 0,
-          amount: Number(tokenA?.balance) / 10 ** Number(tokenA?.decimals),
+          amount: Number(_tokenA?.balance) / 10 ** Number(_tokenA?.decimals),
           category: "none",
-          decimals: Number(lpToken?.decimals),
+          decimals: Number(_tokenA?.decimals),
         });
         setTokenB({
-          name: tokenB?.symbol as string,
-          icon: `/cryptoIcons/${tokenB?.symbol}.svg`.toLowerCase(),
+          name: _tokenB?.symbol as string,
+          icon: `/cryptoIcons/${_tokenB?.symbol}.svg`.toLowerCase(),
           usdValue: 0,
-          amount: Number(tokenB?.balance) / 10 ** Number(tokenB?.decimals),
+          amount: Number(_tokenB?.balance) / 10 ** Number(_tokenB?.decimals),
           category: "none",
-          decimals: Number(lpToken?.decimals),
+          decimals: Number(_tokenB?.decimals),
         });
         setLpToken({
-          name: lpToken?.symbol as string,
-          icon: `/${lpToken?.symbol}`,
+          name: _lpToken?.symbol as string,
+          icon: `/cryptoIcons/poolIcon.png`,
           usdValue: 0,
-          amount: Number(lpToken?.balance) / 10 ** Number(lpToken?.decimals),
+          amount: Number(_lpToken?.balance) / 10 ** Number(_lpToken?.decimals),
           category: "none",
-          decimals: Number(lpToken?.decimals),
+          decimals: Number(_lpToken?.decimals),
         });
         setAssetLpShare(
           Number(pairInfo.unwrap().asset_lp_share.get("amount")) /
-            10 ** Number(lpToken?.decimals)
+            10 ** Number(_lpToken?.decimals)
         );
         setPoolLiquidityTokenA(
           Number(pairInfo.unwrap().asset_a.get("amount")) /
-            10 ** Number(tokenA?.decimals)
+            10 ** Number(_tokenA?.decimals)
         );
         setPoolLiquidityTokenB(
           Number(pairInfo.unwrap().asset_b.get("amount")) /
-            10 ** Number(tokenB?.decimals)
+            10 ** Number(_tokenB?.decimals)
         );
       }
-
-      if (storePersist.wallet.address) {
-        // Get user stakes
-        const stakes = await PhoenixStakeContract.queryStaked(
-          {
-            address: storePersist.wallet.address as string,
-          },
-          "CAIW4SDFLWC243A6VYB65XEUAODLQ3DSXAWVXYI4L766R2ZGDBBVFHNJ"
-        );
-
-        // If stakes are okay
-        if (stakes.isOk()) {
-          // If filled
-          if (stakes.unwrap().stakes.length > 0) {
-            const _stakes: Entry[] = stakes
-              .unwrap()
-              .stakes.map((stake: any) => {
-                return {
-                  icon: `/cryptoIcons/${lpToken?.name}.svg`.toLowerCase(),
-                  title: lpToken?.name,
-                  apr: "0",
-                  lockedPeriod:
-                    time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
-                    " days",
-                  amount: {
-                    tokenAmount:
-                      Number(stake.stake) / 10 ** Number(lpToken?.decimals),
-                    tokenValueInUsd: 0,
-                  },
-                  onClick: () => {},
-                };
-              });
-            setUserStakes(_stakes);
-          }
-        }
-      }
+      await fetchStakes();
     } catch (e) {
       // If pool not found, set poolNotFound to true
       console.log(e);
@@ -268,6 +262,42 @@ export default function Page({ params }: PoolPageProps) {
     }
   };
 
+  const fetchStakes = async () => {
+    if (storePersist.wallet.address) {
+      // Get user stakes
+      const stakes: Ok<any> = await PhoenixStakeContract.queryStaked(
+        {
+          address: storePersist.wallet.address as string,
+        },
+        "CDLDWP5ZZKBUQ6LGBTOI4VSKM537AK2K56CAM2ONYRUOKIPGUFDA4ZUR"
+      );
+
+      // If stakes are okay
+      if (stakes.isOk()) {
+        // If filled
+        if (stakes.unwrap().stakes.length > 0) {
+          const _stakes: Entry[] = stakes.unwrap().stakes.map((stake: any) => {
+            return {
+              icon: `/cryptoIcons/poolIcon.png`.toLowerCase(),
+              title: lpToken?.name,
+              apr: "0",
+              lockedPeriod:
+                time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
+                " days",
+              amount: {
+                tokenAmount: Number(stake.stake) / 10 ** 7,
+                tokenValueInUsd: 0,
+              },
+              onClick: () => {
+                unstake(Number(stake.stake) / 10 ** 7, stake.stake_timestamp);
+              },
+            };
+          });
+          setUserStakes(_stakes);
+        }
+      }
+    }
+  };
   useEffect(() => {
     getPool();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -308,6 +338,15 @@ export default function Page({ params }: PoolPageProps) {
           open={stakeModalOpen}
           tokenAmounts={tokenAmounts}
           setOpen={setStakeModalOpen}
+          onButtonClick={() => console.log("click")}
+          token={lpToken as Token}
+        />
+      )}
+      {unstakeModalOpen && (
+        <UnstakeSuccess
+          open={unstakeModalOpen}
+          tokenAmounts={tokenAmounts}
+          setOpen={setUnstakeModalOpen}
           onButtonClick={() => console.log("click")}
           token={lpToken as Token}
         />
