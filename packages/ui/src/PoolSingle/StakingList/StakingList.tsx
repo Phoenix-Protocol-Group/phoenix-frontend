@@ -39,7 +39,12 @@ const StakingEntry = ({ entry, mobile }: { entry: Entry; mobile: boolean }) => (
   >
     <Grid item xs={8} md={3}>
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-        <Box component="img" src="cryptoIcons/btc.svg" />
+        <Box
+          component="img"
+          width={32}
+          maxWidth={"100%"}
+          src="/cryptoIcons/poolIcon.png"
+        />
         <Typography sx={typoStyle}>{entry.title}</Typography>
       </Box>
     </Grid>
@@ -87,7 +92,7 @@ const StakingEntry = ({ entry, mobile }: { entry: Entry; mobile: boolean }) => (
         }}
         onClick={entry.onClick}
       >
-        <Box component="img" src="sliders.svg" />
+        <Box component="img" src="/sliders.svg" />
         {mobile && (
           <Typography sx={{ opacity: "0.7", fontSize: "0.75rem" }}>
             Manage{" "}

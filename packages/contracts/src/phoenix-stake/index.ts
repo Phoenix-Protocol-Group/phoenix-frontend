@@ -13,7 +13,12 @@ const {
 } = convert;
 
 import { invoke } from "@phoenix-protocol/utils";
-import { Error_, Ok, ResponseTypes, Result } from "@phoenix-protocol/utils/build/invoke";
+import {
+  Error_,
+  Ok,
+  ResponseTypes,
+  Result,
+} from "@phoenix-protocol/utils/build/invoke";
 export type u32 = number;
 export type i32 = number;
 export type u64 = bigint;
@@ -162,7 +167,7 @@ export async function bond<R extends ResponseTypes = undefined>(
     // @ts-ignore
     parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
       try {
-        return new Ok(scValStrToJs(xdr));
+        return new Ok(undefined);
       } catch (e) {
         //@ts-ignore
         let err = getError(e.message);
@@ -215,7 +220,7 @@ export async function unbond<R extends ResponseTypes = undefined>(
     ...options,
     parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
       try {
-        return new Ok(scValStrToJs(xdr));
+        return new Ok(undefined);
       } catch (e) {
         //@ts-ignore
         let err = getError(e.message);
