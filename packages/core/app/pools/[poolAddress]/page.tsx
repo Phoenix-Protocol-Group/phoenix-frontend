@@ -8,6 +8,8 @@ import {
   PoolStats,
   StakingList,
   Token,
+  PoolLiquiditySkeleton,
+  LiquidityMiningSkeleton,
 } from "@phoenix-protocol/ui";
 
 import {
@@ -55,6 +57,10 @@ const overviewStyles = (
   />
 );
 
+// !TODO Fetch staking address from chain
+const stakingAddress =
+  "CBPUGZ7V5XGRO5VE6RZ2H3Q44XP6XHU34ZW7DMTC5W7NMZFQAOXGL32Z";
+
 interface _Token extends Token {
   readonly decimals: number;
 }
@@ -74,6 +80,7 @@ export default function Page({ params }: PoolPageProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [errorDescription, setErrorDescripption] = useState<string>("");
   const [tokenAmounts, setTokenAmounts] = useState<number[]>([0]);
+  const [initLoading, setInitLoading] = useState<boolean>(false);
 
   // Token Balances
   const [tokenA, setTokenA] = useState<_Token | undefined>(undefined);
@@ -88,6 +95,9 @@ export default function Page({ params }: PoolPageProps) {
 
   // Stakes
   const [userStakes, setUserStakes] = useState<Entry[] | undefined>(undefined);
+
+  // Rewards
+  const [userRewards, setUserRewards] = useState<Token[]>([]);
 
   // Provide Liquidity
   const provideLiquidity = async (
@@ -159,9 +169,9 @@ export default function Page({ params }: PoolPageProps) {
             (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
           ),
         },
-        "CDLDWP5ZZKBUQ6LGBTOI4VSKM537AK2K56CAM2ONYRUOKIPGUFDA4ZUR"
+        stakingAddress
       );
-      await fetchStakes();
+      await fetchStakes(undefined);
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
@@ -186,9 +196,9 @@ export default function Page({ params }: PoolPageProps) {
           ),
           stake_timestamp: BigInt(stake_timestamp),
         },
-        "CDLDWP5ZZKBUQ6LGBTOI4VSKM537AK2K56CAM2ONYRUOKIPGUFDA4ZUR"
+        stakingAddress
       );
-      await fetchStakes();
+      await fetchStakes(undefined);
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
@@ -254,7 +264,9 @@ export default function Page({ params }: PoolPageProps) {
           Number(pairInfo.unwrap().asset_b.get("amount")) /
             10 ** Number(_tokenB?.decimals)
         );
-        fetchStakes(_lpToken?.symbol);
+        await fetchStakes(_lpToken?.symbol);
+        await fetchStakeRewards();
+        setInitLoading(true);
       }
     } catch (e) {
       // If pool not found, set poolNotFound to true
@@ -263,14 +275,14 @@ export default function Page({ params }: PoolPageProps) {
     }
   };
 
-  const fetchStakes = async (name = lpToken?.name) => {
+  const fetchStakes = async (name: string | undefined) => {
     if (storePersist.wallet.address) {
       // Get user stakes
       const stakes: Ok<any> = await PhoenixStakeContract.queryStaked(
         {
           address: storePersist.wallet.address as string,
         },
-        "CDLDWP5ZZKBUQ6LGBTOI4VSKM537AK2K56CAM2ONYRUOKIPGUFDA4ZUR"
+        stakingAddress
       );
 
       // If stakes are okay
@@ -280,7 +292,7 @@ export default function Page({ params }: PoolPageProps) {
           const _stakes: Entry[] = stakes.unwrap().stakes.map((stake: any) => {
             return {
               icon: `/cryptoIcons/poolIcon.png`.toLowerCase(),
-              title: name,
+              title: name ?? (lpToken?.name as string),
               apr: "0",
               lockedPeriod:
                 time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
@@ -296,6 +308,41 @@ export default function Page({ params }: PoolPageProps) {
           });
           setUserStakes(_stakes);
         }
+      }
+    }
+  };
+
+  const fetchStakeRewards = async () => {
+    if (storePersist.wallet.address) {
+      // Get user stakes
+      const _rewards: Ok<any> =
+        await PhoenixStakeContract.queryWithdrawableRewards(
+          {
+            _address: storePersist.wallet.address as string,
+          },
+          stakingAddress
+        );
+
+      if (_rewards.isOk()) {
+        const _userRewards: Token[] = _rewards
+          .unwrap()
+          ?.rewards.map(async (reward: any) => {
+            const rewardTokenInfo = await store.fetchTokenInfo(
+              reward.reward_address
+            );
+            return {
+              name: rewardTokenInfo?.symbol,
+              icon: `/cryptoIcons/${rewardTokenInfo?.symbol.toLowerCase()}.svg`.toLowerCase(),
+              usdValue: 0,
+              amount:
+                Number(reward.reward_amount) /
+                10 ** (rewardTokenInfo?.decimals || 7),
+              category: "none",
+              decimals: rewardTokenInfo?.decimals || 7,
+            };
+          });
+        const fetchedRewards = await Promise.all(_userRewards);
+        setUserRewards(fetchedRewards);
       }
     }
   };
@@ -395,20 +442,24 @@ export default function Page({ params }: PoolPageProps) {
             />
           </Box>
           <Box sx={{ mb: 4 }}>
-            <LiquidityMining
-              rewards={[]}
-              balance={lpToken?.amount || 0}
-              onClaimRewards={() => {}}
-              onStake={(amount) => {
-                stake(amount);
-              }}
-              tokenName={lpToken?.name as string}
-            />
+            {initLoading ? (
+              <LiquidityMining
+                rewards={userRewards}
+                balance={lpToken?.amount || 0}
+                onClaimRewards={() => {}}
+                onStake={(amount) => {
+                  stake(amount);
+                }}
+                tokenName={lpToken?.name as string}
+              />
+            ) : (
+              <LiquidityMiningSkeleton />
+            )}
           </Box>
           {userStakes && <StakingList entries={userStakes} />}
         </Grid>
         <Grid item xs={12} md={4}>
-          {tokenA && tokenB && lpToken && (
+          {tokenA && tokenB && lpToken ? (
             <PoolLiquidity
               poolHistory={[
                 [1687392000000, 152000],
@@ -431,6 +482,8 @@ export default function Page({ params }: PoolPageProps) {
                 removeLiquidity(liquidityTokenAmount);
               }}
             />
+          ) : (
+            <PoolLiquiditySkeleton />
           )}
         </Grid>
       </Grid>

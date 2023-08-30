@@ -329,9 +329,9 @@ export async function withdrawLiquidity<R extends ResponseTypes = undefined>(
       ((i) => i128ToScVal(i))(min_b),
     ],
     ...options,
-    parseResultXdr: (xdr): Ok<[i128, i128]> | Err<Error_> | undefined => {
+    parseResultXdr: (xdr): Ok<any> | Err<Error_> | undefined => {
       try {
-        return new Ok(scValStrToJs(xdr));
+        return new Ok(undefined);
       } catch (e) {
         //@ts-ignore
         let err = getError(e.message);

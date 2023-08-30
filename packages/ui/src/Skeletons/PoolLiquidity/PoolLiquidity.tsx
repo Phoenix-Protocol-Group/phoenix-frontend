@@ -1,17 +1,5 @@
-import {
-  Box,
-  Button as MuiButton,
-  Divider,
-  Grid,
-  Typography,
-  Skeleton,
-} from "@mui/material";
-import { useState } from "react";
-import TabPanel from "@mui/lab/TabPanel";
-import TabContext from "@mui/lab/TabContext";
-import { TokenBox } from "../../Swap";
-import { Token } from "../../Modal/Modal";
-import { Button } from "../../Button/Button";
+import React from "react";
+import { Box, Divider, Grid, Skeleton } from "@mui/material";
 
 const GlowingChart = () => (
   <Skeleton variant="rectangular" width="100%" height={200} />

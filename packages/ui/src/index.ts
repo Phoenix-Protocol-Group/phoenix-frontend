@@ -9,6 +9,7 @@ export * from "./Pools/Pools";
 export * from "./PoolSingle";
 export * from "./SidebarNavigation/SidebarNavigation";
 export * from "./Theme";
+export * from "./Skeletons";
 
 export * from "./Dashboard";
 export * from "./Swap";
