@@ -99,6 +99,78 @@ export default function Page({ params }: PoolPageProps) {
   // Rewards
   const [userRewards, setUserRewards] = useState<Token[]>([]);
 
+  const fetchStakeRewards = async () => {
+    if (storePersist.wallet.address) {
+      // Get user stakes
+      const _rewards: Ok<any> =
+        await PhoenixStakeContract.queryWithdrawableRewards(
+          {
+            _address: storePersist.wallet.address as string,
+          },
+          stakingAddress
+        );
+
+      if (_rewards.isOk()) {
+        const _userRewards: Token[] = _rewards
+          .unwrap()
+          ?.rewards.map(async (reward: any) => {
+            const rewardTokenInfo = await store.fetchTokenInfo(
+              reward.reward_address
+            );
+            return {
+              name: rewardTokenInfo?.symbol,
+              icon: `/cryptoIcons/${rewardTokenInfo?.symbol.toLowerCase()}.svg`.toLowerCase(),
+              usdValue: 0,
+              amount:
+                Number(reward.reward_amount) /
+                10 ** (rewardTokenInfo?.decimals || 7),
+              category: "none",
+              decimals: rewardTokenInfo?.decimals || 7,
+            };
+          });
+        const fetchedRewards = await Promise.all(_userRewards);
+        setUserRewards(fetchedRewards);
+      }
+    }
+  };
+
+  const fetchStakes = async (name: string | undefined) => {
+    if (storePersist.wallet.address) {
+      // Get user stakes
+      const stakes: Ok<any> = await PhoenixStakeContract.queryStaked(
+        {
+          address: storePersist.wallet.address as string,
+        },
+        stakingAddress
+      );
+
+      // If stakes are okay
+      if (stakes.isOk()) {
+        // If filled
+        if (stakes.unwrap().stakes.length > 0) {
+          const _stakes: Entry[] = stakes.unwrap().stakes.map((stake: any) => {
+            return {
+              icon: `/cryptoIcons/poolIcon.png`.toLowerCase(),
+              title: name ?? (lpToken?.name as string),
+              apr: "0",
+              lockedPeriod:
+                time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
+                " days",
+              amount: {
+                tokenAmount: Number(stake.stake) / 10 ** 7,
+                tokenValueInUsd: 0,
+              },
+              onClick: () => {
+                unstake(Number(stake.stake) / 10 ** 7, stake.stake_timestamp);
+              },
+            };
+          });
+          setUserStakes(_stakes);
+        }
+      }
+    }
+  };
+
   // Provide Liquidity
   const provideLiquidity = async (
     tokenAAmount: number,
@@ -210,6 +282,28 @@ export default function Page({ params }: PoolPageProps) {
     }
   };
 
+  // Withdraw rewards
+  const claimRewards = async () => {
+    try {
+      setLoading(true);
+
+      await PhoenixStakeContract.withdrawRewards(
+        {
+          sender: storePersist.wallet.address as string,
+        },
+        stakingAddress
+      );
+      await fetchStakeRewards();
+      setLoading(false);
+      //!todo view transaction id in blockexplorer
+      setStakeModalOpen(true);
+    } catch (error: any) {
+      setLoading(false);
+      setErrorDescripption(error);
+      setErrorModalOpen(true);
+    }
+  };
+
   // Function to fetch pool config and info from chain
   const getPool = async () => {
     try {
@@ -272,78 +366,6 @@ export default function Page({ params }: PoolPageProps) {
       // If pool not found, set poolNotFound to true
       console.log(e);
       setPoolNotFound(true);
-    }
-  };
-
-  const fetchStakes = async (name: string | undefined) => {
-    if (storePersist.wallet.address) {
-      // Get user stakes
-      const stakes: Ok<any> = await PhoenixStakeContract.queryStaked(
-        {
-          address: storePersist.wallet.address as string,
-        },
-        stakingAddress
-      );
-
-      // If stakes are okay
-      if (stakes.isOk()) {
-        // If filled
-        if (stakes.unwrap().stakes.length > 0) {
-          const _stakes: Entry[] = stakes.unwrap().stakes.map((stake: any) => {
-            return {
-              icon: `/cryptoIcons/poolIcon.png`.toLowerCase(),
-              title: name ?? (lpToken?.name as string),
-              apr: "0",
-              lockedPeriod:
-                time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
-                " days",
-              amount: {
-                tokenAmount: Number(stake.stake) / 10 ** 7,
-                tokenValueInUsd: 0,
-              },
-              onClick: () => {
-                unstake(Number(stake.stake) / 10 ** 7, stake.stake_timestamp);
-              },
-            };
-          });
-          setUserStakes(_stakes);
-        }
-      }
-    }
-  };
-
-  const fetchStakeRewards = async () => {
-    if (storePersist.wallet.address) {
-      // Get user stakes
-      const _rewards: Ok<any> =
-        await PhoenixStakeContract.queryWithdrawableRewards(
-          {
-            _address: storePersist.wallet.address as string,
-          },
-          stakingAddress
-        );
-
-      if (_rewards.isOk()) {
-        const _userRewards: Token[] = _rewards
-          .unwrap()
-          ?.rewards.map(async (reward: any) => {
-            const rewardTokenInfo = await store.fetchTokenInfo(
-              reward.reward_address
-            );
-            return {
-              name: rewardTokenInfo?.symbol,
-              icon: `/cryptoIcons/${rewardTokenInfo?.symbol.toLowerCase()}.svg`.toLowerCase(),
-              usdValue: 0,
-              amount:
-                Number(reward.reward_amount) /
-                10 ** (rewardTokenInfo?.decimals || 7),
-              category: "none",
-              decimals: rewardTokenInfo?.decimals || 7,
-            };
-          });
-        const fetchedRewards = await Promise.all(_userRewards);
-        setUserRewards(fetchedRewards);
-      }
     }
   };
 
@@ -446,7 +468,7 @@ export default function Page({ params }: PoolPageProps) {
               <LiquidityMining
                 rewards={userRewards}
                 balance={lpToken?.amount || 0}
-                onClaimRewards={() => {}}
+                onClaimRewards={() => claimRewards()}
                 onStake={(amount) => {
                   stake(amount);
                 }}
