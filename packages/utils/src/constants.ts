@@ -18,4 +18,4 @@ export const RPC_URL: string = "https://rpc-futurenet.stellar.org:443";
 /**
  * Factory contract address
  */
-export const FACTORY_ADDRESS: string = "";
+export const FACTORY_ADDRESS: string = "CAV36RPUXJ5L7UKFVEDXPZ2J6EC7O3TTIXDMWX6BH2BFWP5CYGIFTEKE";

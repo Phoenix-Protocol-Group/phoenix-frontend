@@ -16,22 +16,24 @@ export const createWalletActions = (
       if (!getState().server || !getState().networkPassphrase) {
         throw new Error("Missing account, server, or network passphrase");
       }
-
       let balance: bigint;
-      try {
-        balance = BigInt(
-          await SorobanTokenContract.balance(
-            {
-              id: usePersistStore.getState().wallet.address as string,
-            },
-            tokenId
-          )
-        );
-      } catch (e) {
+      if (!usePersistStore.getState().wallet.address) {
         balance = BigInt(0);
-        console.log(e, "User has no balance");
+      } else {
+        try {
+          balance = BigInt(
+            await SorobanTokenContract.balance(
+              {
+                id: usePersistStore.getState().wallet.address as string,
+              },
+              tokenId
+            )
+          );
+        } catch (e) {
+          balance = BigInt(0);
+          console.log(e, "User has no balance or is not logged in");
+        }
       }
-
       const symbol: string =
         getState().tokens.find((token: Token) => token.id === tokenId)
           ?.symbol || (await SorobanTokenContract.symbol(tokenId));
