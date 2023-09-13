@@ -1,5 +1,6 @@
 import {Server} from 'soroban-client';
 import {Token, WalletChain} from '../wallet/types';
+import { Connector } from '../wallet/types';
 
 export type Wallet = {
   address: string | undefined;
@@ -8,7 +9,7 @@ export type Wallet = {
 };
 
 export interface PersistWalletActions {
-  connectWallet: () => Promise<void>;
+  connectWallet: (connector: Connector) => Promise<void>;
   disconnectWallet: () => void;
   wallet: Wallet;
 }

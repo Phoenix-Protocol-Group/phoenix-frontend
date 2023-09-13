@@ -1,5 +1,5 @@
 import freighterApi from "@stellar/freighter-api";
-import { NetworkDetails, Connector } from "./types";
+import { NetworkDetails, Connector, UserInfo } from "./types";
 
 export function freighter(): Connector {
   return {
@@ -15,6 +15,9 @@ export function freighter(): Connector {
     isConnected(): boolean {
       return !!freighterApi?.isConnected();
     },
+    isAllowed(): Promise<boolean> {
+      return freighterApi?.isAllowed();
+    },
     async getNetworkDetails(): Promise<NetworkDetails> {
       // !TODO - find a better solution here
       return {
@@ -24,6 +27,9 @@ export function freighter(): Connector {
     },
     getPublicKey(): Promise<string> {
       return freighterApi.getPublicKey();
+    },
+    getUserInfo(): Promise<UserInfo> {
+      return freighterApi.getUserInfo();
     },
     signTransaction(
       xdr: string,

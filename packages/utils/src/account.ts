@@ -1,8 +1,8 @@
-import freighter from "@stellar/freighter-api";
 import { Account } from "soroban-client";
 import { Server } from "./server";
+import { freighter } from '../../state/src/state/wallet/freighter';
 // working around ESM compatibility issues
-const { isConnected, isAllowed, getUserInfo, signTransaction } = freighter;
+const { isConnected, isAllowed, getUserInfo, signTransaction } = freighter();
 
 /**
  * Get account details from the Soroban network for the publicKey currently

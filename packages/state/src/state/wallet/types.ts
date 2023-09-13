@@ -28,6 +28,10 @@ export interface WalletChain {
   unsupported?: boolean;
 }
 
+export interface UserInfo {
+  publicKey: string;
+}
+
 export type Connector = {
   id: string;
   name: string;
@@ -42,8 +46,10 @@ export type Connector = {
     qrCode?: string;
   };
   isConnected: () => boolean;
+  isAllowed: () => Promise<boolean>;
   getNetworkDetails: () => Promise<NetworkDetails>;
   getPublicKey: () => Promise<string>;
+  getUserInfo: () => Promise<UserInfo>;
   signTransaction: (
     xdr: string,
     opts?: {

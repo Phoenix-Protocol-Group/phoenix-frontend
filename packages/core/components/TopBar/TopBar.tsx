@@ -1,6 +1,7 @@
 "use client";
 import { NoSsr, Typography } from "@mui/material";
 import {
+  Connector,
   freighter,
   useAppStore,
   usePersistStore,
@@ -19,8 +20,8 @@ const TopBar = ({
   const storePersist = usePersistStore();
   const [connectWalletOpen, setConnectWalletOpen] = useState(false);
 
-  const connect = async (connector: any) => {
-    await storePersist.connectWallet();
+  const connect = async (connector: Connector) => {
+    await storePersist.connectWallet(connector);
 
     return;
   };

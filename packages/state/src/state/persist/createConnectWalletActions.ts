@@ -1,8 +1,8 @@
 import { Server } from "soroban-client";
 import { AppStore, SetStateType, GetStateType, AppStorePersist } from "../types";
-import { freighter } from "../wallet/freighter";
 import { allChains, networkToActiveChain } from "../wallet/chains";
 import {usePersistStore} from '../store';
+import { Connector } from "../wallet/types";
 
 export const createConnectWalletActions = () => {
   return {
@@ -15,9 +15,9 @@ export const createConnectWalletActions = () => {
     // This function is called when the user clicks the "Connect" button
     // in the wallet modal. It uses the Freighters SDK to get the user's
     // address and network details, and then stores them in the app state.
-    connectWallet: async () => {
+    connectWallet: async (connector: Connector) => {
       // Get the network details from the user's wallet.
-      const networkDetails = await freighter().getNetworkDetails();
+      const networkDetails = await connector.getNetworkDetails();
 
       // Throw an error if the network is not supported.
       if (
@@ -35,7 +35,7 @@ export const createConnectWalletActions = () => {
       const activeChain = networkToActiveChain(networkDetails, allChains);
 
       // Get the user's address from the wallet.
-      const address = await freighter().getPublicKey();
+      const address = await connector.getPublicKey();
 
       // Create a server object to connect to the blockchain.
       let server =
