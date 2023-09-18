@@ -1,0 +1,64 @@
+specVersion: "1.0.0"
+
+name: "stellar-subql-starter"
+version: "0.0.1"
+runner:
+  node:
+    name: "@subql/node-stellar"
+    version: "*"
+  query:
+    name: "@subql/query"
+    version: "*"
+description: "This project can be use as a starting point for developing your new Stellar SubQuery project"
+repository: "https://github.com/subquery/stellar-subql-starter"
+
+schema:
+  file: "./schema.graphql"
+
+network:
+  # Stellar and Soroban uses the network passphrase as the chainId
+  # 'Public Global Stellar Network ; September 2015' for mainnet
+  # 'Test SDF Future Network ; October 2022' for Future Network
+  chainId: "Test SDF Future Network ; October 2022"
+  # This Stellar endpoint must be a public non-pruned archive node
+  # We recommend providing more than one endpoint for improved reliability, performance, and uptime
+  # Public nodes may be rate limited, which can affect indexing speed
+  # When developing your project we suggest getting a private API key
+  endpoint: ["https://horizon-futurenet.stellar.org:443"]
+  # This is a specific Soroban endpoint
+  # It is only required when you are using a soroban/EventHandler
+  sorobanEndpoint: "https://rpc-futurenet.stellar.org"
+  # Recommended to provide the HTTP endpoint of a full chain dictionary to speed up processing
+  # dictionary: "https://gx.api.subquery.network/sq/subquery/eth-dictionary"
+
+dataSources:
+  - kind: stellar/Runtime
+    startBlock: 420060 # Set this as a logical start block, it might be block 1 (genesis) or when your contract was deployed
+    mapping:
+      file: "./dist/index.js"
+      handlers:
+        # - handler: handleBlock
+        #   kind: soroban/BlockHandler
+        # - handler: handleTransaction
+        #  kind: soroban/TransactionHandler
+        #   filter:
+        #    account: "GAKNXHJ5PCZYFIBNBWB4RCQHH6GDEO7Z334N74BOQUQCHKOURQEPMXCH" # The address from
+        - handler: handleOperation
+          kind: stellar/OperationHandler
+          filter:
+            type: "payment"
+        - handler: handleCredit
+          kind: stellar/EffectHandler
+          filter:
+            type: "account_credited"
+        - handler: handleCredit
+          kind: stellar/EffectHandler
+          filter:
+            type: "account_debited"
+        - handler: handleEvent
+          kind: soroban/EventHandler
+          filter:
+            # contractId: "" # You can optionally specify a smart contract address here
+            topics:
+              - "transfer" # Topic signature(s) for the events, there can be up to 4
+
