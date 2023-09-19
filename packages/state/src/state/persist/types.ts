@@ -6,6 +6,7 @@ export type Wallet = {
   address: string | undefined;
   activeChain: WalletChain | undefined;
   server: Server | undefined;
+  connector: Connector | undefined;
 };
 
 export interface PersistWalletActions {

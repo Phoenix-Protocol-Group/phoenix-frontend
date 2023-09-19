@@ -10,6 +10,7 @@ export const createConnectWalletActions = () => {
       address: undefined,
       activeChain: undefined,
       server: undefined,
+      connector: undefined
     },
 
     // This function is called when the user clicks the "Connect" button
@@ -47,7 +48,7 @@ export const createConnectWalletActions = () => {
       // Update the state to store the wallet address and server.
       usePersistStore.setState((state: AppStorePersist) => ({
         ...state,
-        wallet: { address, activeChain, server },
+        wallet: { address, activeChain, server, connector, },
       }));
 
       return;
@@ -62,6 +63,7 @@ export const createConnectWalletActions = () => {
           address: undefined,
           activeChain: undefined,
           server: undefined,
+          connector: undefined,
         },
       }));
     },

@@ -21,6 +21,7 @@
   "dependencies": {
     "big.js": "^6.2.1",
     "bignumber.js": "^9.1.1",
-    "soroban-client": "^0.10.1"
+    "soroban-client": "^0.10.1",
+    "@phoenix-protocol/utils": "^0.0.1"
   }
 }

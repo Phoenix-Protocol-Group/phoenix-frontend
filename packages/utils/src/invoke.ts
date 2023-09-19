@@ -1,6 +1,6 @@
-import freighter from "@stellar/freighter-api";
-// working around ESM compatibility issues
-const { isConnected, isAllowed, getUserInfo, signTransaction } = freighter;
+import {
+  usePersistStore,
+} from "@phoenix-protocol/state";
 import * as SorobanClient from "soroban-client";
 import type {
   Account,
@@ -41,10 +41,16 @@ export type Tx = Transaction<Memo<MemoType>, Operation[]>;
  * selected in Freighter. If not connected to Freighter, return null.
  */
 async function getAccount(): Promise<Account | null> {
-  if (!(await isConnected()) || !(await isAllowed())) {
+  const storePersist = usePersistStore.getState();
+  const connector = storePersist.wallet.connector;
+  console.log(connector);
+
+  if(!connector) return null;
+
+  if (!(await connector.isConnected()) || !(await connector.isAllowed())) {
     return null;
   }
-  const { publicKey } = await getUserInfo();
+  const { publicKey } = await connector.getUserInfo();
   if (!publicKey) {
     return null;
   }
@@ -226,7 +232,18 @@ export async function invoke<R extends ResponseTypes, T = any>({
  * to sign the transaction with Freighter.
  */
 export async function signTx(tx: Tx): Promise<Tx> {
-  const signed = await signTransaction(tx.toXDR(), {
+  const storePersist = usePersistStore.getState();
+  const connector = storePersist.wallet.connector;
+
+  if(connector == undefined) {
+    throw new Error(
+      `Connector is not set`
+    );
+  }
+
+  console.log(connector);
+
+  const signed = await connector.signTransaction(tx.toXDR(), {
     networkPassphrase: NETWORK_PASSPHRASE,
   });
 
