@@ -8,8 +8,6 @@ export type u256 = bigint;
 export type i256 = bigint;
 export type Option<T> = T | undefined;
 export type Typepoint = bigint;
-export type Duration = bigint;
-export { Address };
 
 /// Error interface containing the error message
 export interface Error_ {
