@@ -127,7 +127,7 @@ export async function invoke<R extends ResponseTypes, T = any>({
   contractId,
 }: InvokeArgs<R, T>): Promise<T | string | SomeRpcResponse> {
   const freighterAccount = await getAccount();
-
+  let parse = parseResultXdr;
   // use a placeholder null account if not yet connected to Freighter so that view calls can still work
   const account =
     freighterAccount ??

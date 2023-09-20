@@ -247,12 +247,20 @@ export default function Page({ params }: PoolPageProps) {
             10 ** Number(_lpToken?.decimals)
         );
         setPoolLiquidityTokenA(
-          Number(pairInfo.unwrap().asset_a.amount) /
-            10 ** Number(_tokenA?.decimals)
+          Number(
+            (
+              Number(pairInfo.unwrap().asset_a.amount) /
+              10 ** Number(_tokenA?.decimals)
+            ).toFixed(2)
+          )
         );
         setPoolLiquidityTokenB(
-          Number(pairInfo.unwrap().asset_b.amount) /
-            10 ** Number(_tokenB?.decimals)
+          Number(
+            (
+              Number(pairInfo.unwrap().asset_b.amount) /
+              10 ** Number(_tokenB?.decimals)
+            ).toFixed(2)
+          )
         );
         fetchStakes(_lpToken?.symbol);
       }
@@ -374,11 +382,11 @@ export default function Page({ params }: PoolPageProps) {
               stats={[
                 {
                   title: "TVL",
-                  value: poolLiquidity.toString(),
+                  value: "-",
                 },
                 {
                   title: "My Share",
-                  value: "$0.00",
+                  value: "-",
                 },
                 {
                   title: "LP tokens",

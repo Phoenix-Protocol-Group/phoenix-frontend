@@ -405,7 +405,7 @@ export class Contract {
         ...options,
         ...this.options,
         parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("bond", xdr));
+          return new Ok(void 0);
         },
       });
     } catch (e) {
@@ -453,7 +453,7 @@ export class Contract {
         ...options,
         ...this.options,
         parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("unbond", xdr));
+          return new Ok(void 0);
         },
       });
     } catch (e) {
