@@ -1,4 +1,3 @@
-import { freighter as freighterWallet } from "@phoenix-protocol/state";
 import freighter, { default as wallet } from "@stellar/freighter-api";
 // working around ESM compatibility issues
 const { isConnected, isAllowed, getUserInfo } = freighter;
