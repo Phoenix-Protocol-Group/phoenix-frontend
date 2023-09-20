@@ -1,6 +1,3 @@
-import {
-  usePersistStore,
-} from "@phoenix-protocol/state";
 import * as SorobanClient from "soroban-client";
 import type {
   Account,
@@ -9,8 +6,10 @@ import type {
   Operation,
   Transaction,
 } from "soroban-client";
+import freighterApi from '@stellar/freighter-api';
 import { NETWORK_PASSPHRASE } from "./constants";
 import { Server } from "./server";
+import { getConnector } from "./account";
 // defined this way so typeahead shows full union, not named alias
 let responseTypes: "simulated" | "full" | undefined;
 export type ResponseTypes = typeof responseTypes;
@@ -41,9 +40,7 @@ export type Tx = Transaction<Memo<MemoType>, Operation[]>;
  * selected in Freighter. If not connected to Freighter, return null.
  */
 async function getAccount(): Promise<Account | null> {
-  const storePersist = usePersistStore.getState();
-  const connector = storePersist.wallet.connector;
-  console.log(connector);
+  const connector = getConnector();
 
   if(!connector) return null;
 
@@ -232,20 +229,19 @@ export async function invoke<R extends ResponseTypes, T = any>({
  * to sign the transaction with Freighter.
  */
 export async function signTx(tx: Tx): Promise<Tx> {
-  const storePersist = usePersistStore.getState();
-  const connector = storePersist.wallet.connector;
+  let connector = getConnector();
+
+  let signed;
 
   if(connector == undefined) {
-    throw new Error(
-      `Connector is not set`
-    );
+    signed = await freighterApi.signTransaction(tx.toXDR(), {
+      networkPassphrase: NETWORK_PASSPHRASE,
+    });
+  } else {
+    signed = await connector.signTransaction(tx.toXDR(), {
+      networkPassphrase: NETWORK_PASSPHRASE,
+    });
   }
-
-  console.log(connector);
-
-  const signed = await connector.signTransaction(tx.toXDR(), {
-    networkPassphrase: NETWORK_PASSPHRASE,
-  });
 
   return SorobanClient.TransactionBuilder.fromXDR(
     signed,

@@ -16,9 +16,11 @@ export const createConnectWalletActions = () => {
     // This function is called when the user clicks the "Connect" button
     // in the wallet modal. It uses the Freighters SDK to get the user's
     // address and network details, and then stores them in the app state.
-    connectWallet: async (connector: Connector) => {
+    connectWallet: async (_connector: Connector) => {
       // Get the network details from the user's wallet.
-      const networkDetails = await connector.getNetworkDetails();
+      const networkDetails = await _connector.getNetworkDetails();
+
+      const connector = _connector.id;
 
       // Throw an error if the network is not supported.
       if (
@@ -36,7 +38,7 @@ export const createConnectWalletActions = () => {
       const activeChain = networkToActiveChain(networkDetails, allChains);
 
       // Get the user's address from the wallet.
-      const address = await connector.getPublicKey();
+      const address = await _connector.getPublicKey();
 
       // Create a server object to connect to the blockchain.
       let server =
