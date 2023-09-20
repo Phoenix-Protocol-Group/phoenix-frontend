@@ -7,6 +7,7 @@ import {
 } from "@phoenix-protocol/state";
 import { AppBar, ConnectWallet } from "@phoenix-protocol/ui";
 import React, { useEffect, useState } from "react";
+import { Address } from "soroban-client";
 
 const TopBar = ({
   navOpen,
@@ -40,7 +41,9 @@ const TopBar = ({
 
   const fetch = async () =>
     await store.fetchTokenInfo(
-      "CB64D3G7SM2RTH6JSGG34DDTFTQ5CFDKVDZJZSODMCX4NJ2HV2KN7OHT"
+      Address.fromString(
+        "CB64D3G7SM2RTH6JSGG34DDTFTQ5CFDKVDZJZSODMCX4NJ2HV2KN7OHT"
+      )
     );
 
   useEffect(() => {
