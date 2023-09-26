@@ -81,6 +81,11 @@ export default function Page({ params }: PoolPageProps) {
   const [tokenB, setTokenB] = useState<_Token | undefined>(undefined);
   const [lpToken, setLpToken] = useState<_Token | undefined>(undefined);
 
+  // Stake Contract
+  const [StakeContract, setStakeContract] = useState<
+    PhoenixStakeContract.Contract | undefined
+  >(undefined);
+
   // Pool Liquidity
   const [poolLiquidity, setPoolLiquidity] = useState<number>(0);
   const [poolLiquidityTokenA, setPoolLiquidityTokenA] = useState<number>(0);
@@ -92,12 +97,6 @@ export default function Page({ params }: PoolPageProps) {
 
   const PairContract = new PhoenixPairContract.Contract({
     contractId: params.poolAddress,
-    networkPassphrase: constants.NETWORK_PASSPHRASE,
-    rpcUrl: constants.RPC_URL,
-  });
-
-  const StakeContract = new PhoenixStakeContract.Contract({
-    contractId: "CCSPYRRAQ26R5EDLXBP4GI6GHFI5CMNUZSPAV5KD3MP7OKT3ABDYJBYK",
     networkPassphrase: constants.NETWORK_PASSPHRASE,
     rpcUrl: constants.RPC_URL,
   });
@@ -158,7 +157,7 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await StakeContract.bond({
+      await StakeContract?.bond({
         sender: Address.fromString(storePersist.wallet.address!),
         tokens: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
@@ -181,7 +180,7 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await StakeContract.unbond({
+      await StakeContract?.unbond({
         sender: Address.fromString(storePersist.wallet.address!),
         stake_amount: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
@@ -212,11 +211,19 @@ export default function Page({ params }: PoolPageProps) {
       // When results ok...
       if (pairConfig?.isOk() && pairInfo?.isOk()) {
         // Fetch token infos from chain and save in global appstore
-        const [_tokenA, _tokenB, _lpToken] = await Promise.all([
-          store.fetchTokenInfo(pairConfig.unwrap().token_a),
-          store.fetchTokenInfo(pairConfig.unwrap().token_b),
-          store.fetchTokenInfo(pairConfig.unwrap().share_token),
-        ]);
+        const [_tokenA, _tokenB, _lpToken, stakeContractAddress] =
+          await Promise.all([
+            store.fetchTokenInfo(pairConfig.unwrap().token_a),
+            store.fetchTokenInfo(pairConfig.unwrap().token_b),
+            store.fetchTokenInfo(pairConfig.unwrap().share_token),
+            new PhoenixStakeContract.Contract({
+              contractId: pairConfig.unwrap().stake_contract.toString(),
+              networkPassphrase: constants.NETWORK_PASSPHRASE,
+              rpcUrl: constants.RPC_URL,
+            }),
+          ]);
+
+        setStakeContract(stakeContractAddress);
         // Set token states
         setTokenA({
           name: _tokenA?.symbol as string,
@@ -274,7 +281,7 @@ export default function Page({ params }: PoolPageProps) {
   const fetchStakes = async (name = lpToken?.name) => {
     if (storePersist.wallet.address) {
       // Get user stakes
-      const stakes: any = await StakeContract.queryStaked({
+      const stakes: any = await StakeContract?.queryStaked({
         address: Address.fromString(storePersist.wallet.address),
       });
 
