@@ -235,7 +235,7 @@ const Pools = ({
   const [searchValue, setSearchValue] = React.useState("");
 
   return (
-    <Box>
+    <Box sx={{ flex: 1 }}>
       <Typography
         sx={{
           color: "#FFF",
