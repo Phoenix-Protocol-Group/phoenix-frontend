@@ -3,6 +3,7 @@
 import {
   PhoenixFactoryContract,
   PhoenixPairContract,
+  PhoenixStakeContract,
 } from "@phoenix-protocol/contracts";
 import { useAppStore } from "@phoenix-protocol/state";
 import { Pool, Pools, Token } from "@phoenix-protocol/ui";
@@ -16,6 +17,7 @@ export default function Page() {
   const store = useAppStore();
   const router = useRouter();
   const [allPools, setAllPools] = useState<Pool[]>([]);
+  const [stakeContract, setStakeContract] = useState<PhoenixStakeContract.Contract | undefined>(undefined);
   const fetchPool = async (poolAddress: Address) => {
     try {
       const PairContract = new PhoenixPairContract.Contract({
@@ -33,17 +35,24 @@ export default function Page() {
       // When results ok...
       if (pairConfig?.isOk() && pairInfo?.isOk()) {
         // Fetch token infos from chain and save in global appstore
-        const [tokenA, tokenB, lpToken] = await Promise.all([
+        const [tokenA, tokenB, lpToken, stakeContract] = await Promise.all([
           store.fetchTokenInfo(pairConfig.unwrap().token_a),
           store.fetchTokenInfo(pairConfig.unwrap().token_b),
           store.fetchTokenInfo(pairConfig.unwrap().share_token),
+          new PhoenixStakeContract.Contract({
+            contractId: pairConfig.unwrap().stake_contract.toString(),
+            networkPassphrase: constants.NETWORK_PASSPHRASE,
+            rpcUrl: constants.RPC_URL,
+          }),
         ]);
+
+        setStakeContract(stakeContract);
 
         // Save Token info
         const tokens: Token[] = [
           {
             name: tokenA?.symbol || "",
-            icon: `/cryptoIcons/${tokenA?.symbol}.svg`,
+            icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
             amount:
               Number(pairInfo.unwrap().asset_a.amount) /
               10 ** Number(tokenA?.decimals),
@@ -52,7 +61,7 @@ export default function Page() {
           },
           {
             name: tokenB?.symbol || "",
-            icon: `/cryptoIcons/${tokenB?.symbol}.svg`,
+            icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
             amount:
               Number(pairInfo.unwrap().asset_b.amount) /
               10 ** Number(tokenB?.decimals),
