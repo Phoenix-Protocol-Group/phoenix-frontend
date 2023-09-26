@@ -28,6 +28,7 @@ const testPool: Pool = {
   tvl: "$29,573.57",
   maxApr: "98.65%",
   userLiquidity: 30,
+  poolAddress: "",
 };
 
 const pools: Pool[] = [

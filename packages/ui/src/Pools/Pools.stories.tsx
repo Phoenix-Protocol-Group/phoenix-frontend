@@ -24,7 +24,8 @@ const testPool: Pool = {
   tokens: testTokens,
   tvl: "$29,573.57",
   maxApr: "98.65%",
-  userLiquidity: 30
+  userLiquidity: 30,
+  poolAddress: ""
 }
 
 const pools: Pool[] = [testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool];
