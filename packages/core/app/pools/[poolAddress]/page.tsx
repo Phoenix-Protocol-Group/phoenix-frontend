@@ -18,7 +18,9 @@ import {
   UnstakeSuccess,
 } from "../../../components/Modal/Modal";
 
-import { time } from "@phoenix-protocol/utils";
+import { constants, time } from "@phoenix-protocol/utils";
+
+import { Address } from "soroban-client";
 
 import {
   PhoenixPairContract,
@@ -27,7 +29,6 @@ import {
 import { useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import Link from "next/link";
-import { Ok } from "@phoenix-protocol/utils/build/invoke";
 
 interface Entry {
   icon: string;
@@ -89,6 +90,18 @@ export default function Page({ params }: PoolPageProps) {
   // Stakes
   const [userStakes, setUserStakes] = useState<Entry[] | undefined>(undefined);
 
+  const PairContract = new PhoenixPairContract.Contract({
+    contractId: params.poolAddress,
+    networkPassphrase: constants.NETWORK_PASSPHRASE,
+    rpcUrl: constants.RPC_URL,
+  });
+
+  const StakeContract = new PhoenixStakeContract.Contract({
+    contractId: "CCSPYRRAQ26R5EDLXBP4GI6GHFI5CMNUZSPAV5KD3MP7OKT3ABDYJBYK",
+    networkPassphrase: constants.NETWORK_PASSPHRASE,
+    rpcUrl: constants.RPC_URL,
+  });
+
   // Provide Liquidity
   const provideLiquidity = async (
     tokenAAmount: number,
@@ -97,18 +110,14 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await PhoenixPairContract.provideLiquidity(
-        {
-          sender: storePersist.wallet.address as string,
-          desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
-          desired_b: BigInt(tokenBAmount * 10 ** (tokenB?.decimals || 7)),
-          min_a: BigInt(1),
-          min_b: BigInt(1),
-          custom_slippage_bps: BigInt(1),
-        },
-        params.poolAddress as string,
-        { fee: 300, responseType: "full" }
-      );
+      await PairContract.provideLiquidity({
+        sender: Address.fromString(storePersist.wallet.address!),
+        desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
+        desired_b: BigInt(tokenBAmount * 10 ** (tokenB?.decimals || 7)),
+        min_a: BigInt(1),
+        min_b: BigInt(1),
+        custom_slippage_bps: BigInt(1),
+      });
 
       setLoading(false);
       //!todo view transaction id in blockexplorer
@@ -127,15 +136,12 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await PhoenixPairContract.withdrawLiquidity(
-        {
-          sender: storePersist.wallet.address as string,
-          share_amount: BigInt(lpTokenAmount * 10 ** (lpToken?.decimals || 7)),
-          min_a: BigInt(1),
-          min_b: BigInt(1),
-        },
-        params.poolAddress as string
-      );
+      await PairContract.withdrawLiquidity({
+        sender: Address.fromString(storePersist.wallet.address!),
+        share_amount: BigInt(lpTokenAmount * 10 ** (lpToken?.decimals || 7)),
+        min_a: BigInt(1),
+        min_b: BigInt(1),
+      });
 
       setLoading(false);
       setTokenAmounts([lpTokenAmount]);
@@ -152,15 +158,12 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await PhoenixStakeContract.bond(
-        {
-          sender: storePersist.wallet.address as string,
-          tokens: BigInt(
-            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-          ),
-        },
-        "CDLDWP5ZZKBUQ6LGBTOI4VSKM537AK2K56CAM2ONYRUOKIPGUFDA4ZUR"
-      );
+      await StakeContract.bond({
+        sender: Address.fromString(storePersist.wallet.address!),
+        tokens: BigInt(
+          (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+        ),
+      });
       await fetchStakes();
       setLoading(false);
       //!todo view transaction id in blockexplorer
@@ -178,16 +181,13 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await PhoenixStakeContract.unbond(
-        {
-          sender: storePersist.wallet.address as string,
-          stake_amount: BigInt(
-            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-          ),
-          stake_timestamp: BigInt(stake_timestamp),
-        },
-        "CDLDWP5ZZKBUQ6LGBTOI4VSKM537AK2K56CAM2ONYRUOKIPGUFDA4ZUR"
-      );
+      await StakeContract.unbond({
+        sender: Address.fromString(storePersist.wallet.address!),
+        stake_amount: BigInt(
+          (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+        ),
+        stake_timestamp: BigInt(stake_timestamp),
+      });
       await fetchStakes();
       setLoading(false);
       //!todo view transaction id in blockexplorer
@@ -205,12 +205,12 @@ export default function Page({ params }: PoolPageProps) {
     try {
       // Fetch pool config and info from chain
       const [pairConfig, pairInfo] = await Promise.all([
-        PhoenixPairContract.queryConfig(params.poolAddress),
-        PhoenixPairContract.queryPoolInfo(params.poolAddress),
+        PairContract.queryConfig(),
+        PairContract.queryPoolInfo(),
       ]);
 
       // When results ok...
-      if (pairConfig.isOk() && pairInfo.isOk()) {
+      if (pairConfig?.isOk() && pairInfo?.isOk()) {
         // Fetch token infos from chain and save in global appstore
         const [_tokenA, _tokenB, _lpToken] = await Promise.all([
           store.fetchTokenInfo(pairConfig.unwrap().token_a),
@@ -243,16 +243,24 @@ export default function Page({ params }: PoolPageProps) {
           decimals: Number(_lpToken?.decimals),
         });
         setAssetLpShare(
-          Number(pairInfo.unwrap().asset_lp_share.get("amount")) /
+          Number(pairInfo.unwrap().asset_lp_share.amount) /
             10 ** Number(_lpToken?.decimals)
         );
         setPoolLiquidityTokenA(
-          Number(pairInfo.unwrap().asset_a.get("amount")) /
-            10 ** Number(_tokenA?.decimals)
+          Number(
+            (
+              Number(pairInfo.unwrap().asset_a.amount) /
+              10 ** Number(_tokenA?.decimals)
+            ).toFixed(2)
+          )
         );
         setPoolLiquidityTokenB(
-          Number(pairInfo.unwrap().asset_b.get("amount")) /
-            10 ** Number(_tokenB?.decimals)
+          Number(
+            (
+              Number(pairInfo.unwrap().asset_b.amount) /
+              10 ** Number(_tokenB?.decimals)
+            ).toFixed(2)
+          )
         );
         fetchStakes(_lpToken?.symbol);
       }
@@ -266,12 +274,9 @@ export default function Page({ params }: PoolPageProps) {
   const fetchStakes = async (name = lpToken?.name) => {
     if (storePersist.wallet.address) {
       // Get user stakes
-      const stakes: Ok<any> = await PhoenixStakeContract.queryStaked(
-        {
-          address: storePersist.wallet.address as string,
-        },
-        "CDLDWP5ZZKBUQ6LGBTOI4VSKM537AK2K56CAM2ONYRUOKIPGUFDA4ZUR"
-      );
+      const stakes: any = await StakeContract.queryStaked({
+        address: Address.fromString(storePersist.wallet.address),
+      });
 
       // If stakes are okay
       if (stakes.isOk()) {
@@ -377,11 +382,11 @@ export default function Page({ params }: PoolPageProps) {
               stats={[
                 {
                   title: "TVL",
-                  value: poolLiquidity.toString(),
+                  value: "-",
                 },
                 {
                   title: "My Share",
-                  value: "$0.00",
+                  value: "-",
                 },
                 {
                   title: "LP tokens",
