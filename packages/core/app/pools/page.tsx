@@ -7,21 +7,31 @@ import {
 import { useAppStore } from "@phoenix-protocol/state";
 import { Pool, Pools, Token } from "@phoenix-protocol/ui";
 import { constants } from "@phoenix-protocol/utils";
+import { FACTORY_ADDRESS } from "@phoenix-protocol/utils/build/constants";
 import { useEffect, useState } from "react";
+import { Address } from "stellar-base";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const store = useAppStore();
+  const router = useRouter();
   const [allPools, setAllPools] = useState<Pool[]>([]);
-  const fetchPool = async (poolAddress: string) => {
+  const fetchPool = async (poolAddress: Address) => {
     try {
+      const PairContract = new PhoenixPairContract.Contract({
+        contractId: poolAddress.toString(),
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+
       // Fetch pool config and info from chain
       const [pairConfig, pairInfo] = await Promise.all([
-        PhoenixPairContract.queryConfig(poolAddress),
-        PhoenixPairContract.queryPoolInfo(poolAddress),
+        PairContract.queryConfig(),
+        PairContract.queryPoolInfo(),
       ]);
 
       // When results ok...
-      if (pairConfig.isOk() && pairInfo.isOk()) {
+      if (pairConfig?.isOk() && pairInfo?.isOk()) {
         // Fetch token infos from chain and save in global appstore
         const [tokenA, tokenB, lpToken] = await Promise.all([
           store.fetchTokenInfo(pairConfig.unwrap().token_a),
@@ -35,7 +45,7 @@ export default function Page() {
             name: tokenA?.symbol || "",
             icon: `/cryptoIcons/${tokenA?.symbol}.svg`,
             amount:
-              Number(pairInfo.unwrap().asset_a.get("amount")) /
+              Number(pairInfo.unwrap().asset_a.amount) /
               10 ** Number(tokenA?.decimals),
             category: "",
             usdValue: 0,
@@ -44,7 +54,7 @@ export default function Page() {
             name: tokenB?.symbol || "",
             icon: `/cryptoIcons/${tokenB?.symbol}.svg`,
             amount:
-              Number(pairInfo.unwrap().asset_b.get("amount")) /
+              Number(pairInfo.unwrap().asset_b.amount) /
               10 ** Number(tokenB?.decimals),
             category: "",
             usdValue: 0,
@@ -56,23 +66,43 @@ export default function Page() {
           tvl: "0",
           maxApr: "0",
           userLiquidity: 0,
+          poolAddress: poolAddress.toString(),
         };
       }
+      return {
+        tokens: [],
+        tvl: "0",
+        maxApr: "0",
+        userLiquidity: 0,
+        poolAddress: "",
+      };
     } catch (e) {
       // If pool not found, set poolNotFound to true
       console.log(e);
+      return {
+        tokens: [],
+        tvl: "0",
+        maxApr: "0",
+        userLiquidity: 0,
+        poolAddress: "",
+      };
     }
   };
   const fetchPools = async () => {
-    const pools = await PhoenixFactoryContract.queryPools(
-      {},
-      constants.FACTORY_ADDRESS
-    );
-    const poolWithData = await Promise.all(
-      pools.unwrap().map(async (pool: string) => {
-        return await fetchPool(pool);
-      })
-    );
+    const FactoryContract = new PhoenixFactoryContract.Contract({
+      contractId: FACTORY_ADDRESS,
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
+      rpcUrl: constants.RPC_URL,
+    });
+    const pools = await FactoryContract.queryPools({});
+
+    const poolWithData = pools
+      ? await Promise.all(
+          pools.unwrap().map(async (pool: Address) => {
+            return await fetchPool(pool);
+          })
+        )
+      : [];
     setAllPools(poolWithData);
   };
   useEffect(() => {
@@ -86,7 +116,9 @@ export default function Page() {
       filter="ALL"
       sort="HighAPR"
       onAddLiquidityClick={() => {}}
-      onShowDetailsClick={() => {}}
+      onShowDetailsClick={(pool) => {
+        router.push(`/pools/${pool.poolAddress}`);
+      }}
       onFilterClick={() => {}}
       onSortSelect={() => {}}
     />

@@ -25,6 +25,7 @@ export interface Pool {
   tvl: string;
   maxApr: string;
   userLiquidity: number;
+  poolAddress: string;
 }
 
 export type Sort = "HighTVL" | "HighAPR" | "LowTVL" | "LowAPR";
@@ -349,7 +350,7 @@ const Pools = ({
         {pools.map((pool) => (
           <PoolItem
             filter={filter}
-            onAddLiquidityClick={onAddLiquidityClick}
+            onAddLiquidityClick={() => onAddLiquidityClick(pool)}
             onShowDetailsClick={onShowDetailsClick}
             pool={pool}
           />
