@@ -12,12 +12,16 @@ import { FACTORY_ADDRESS } from "@phoenix-protocol/utils/build/constants";
 import { useEffect, useState } from "react";
 import { Address } from "stellar-base";
 import { useRouter } from "next/navigation";
+import { LinearProgress } from "@mui/material";
 
 export default function Page() {
   const store = useAppStore();
   const router = useRouter();
   const [allPools, setAllPools] = useState<Pool[]>([]);
-  const [stakeContract, setStakeContract] = useState<PhoenixStakeContract.Contract | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [stakeContract, setStakeContract] = useState<
+    PhoenixStakeContract.Contract | undefined
+  >(undefined);
   const fetchPool = async (poolAddress: Address) => {
     try {
       const PairContract = new PhoenixPairContract.Contract({
@@ -69,7 +73,7 @@ export default function Page() {
             usdValue: 0,
           },
         ];
-
+        setLoading(false);
         return {
           tokens,
           tvl: "0",
@@ -88,6 +92,7 @@ export default function Page() {
     } catch (e) {
       // If pool not found, set poolNotFound to true
       console.log(e);
+      setLoading(false);
       return {
         tokens: [],
         tvl: "0",
@@ -119,7 +124,9 @@ export default function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
+  return loading ? (
+    <LinearProgress color="inherit" />
+  ) : (
     <Pools
       pools={allPools}
       filter="ALL"
