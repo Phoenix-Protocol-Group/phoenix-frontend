@@ -13,5 +13,9 @@ export const NETWORK_PASSPHRASE = "Test SDF Future Network ; October 2022";
 /**
  * The Soroban RPC endpoint used to initialize this library.
  */
-export const RPC_URL: string =
-  "https://rpc-futurenet.stellar.org:443";
+export const RPC_URL: string = "https://rpc-futurenet.stellar.org:443";
+
+/**
+ * Factory contract address
+ */
+export const FACTORY_ADDRESS: string = "CAV36RPUXJ5L7UKFVEDXPZ2J6EC7O3TTIXDMWX6BH2BFWP5CYGIFTEKE";
