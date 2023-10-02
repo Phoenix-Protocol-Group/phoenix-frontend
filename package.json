@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "yarn workspaces run build",
+    "build": "yarn workspace @phoenix-protocol/utils run build && yarn workspace @phoenix-protocol/contracts run build && yarn workspace @phoenix-protocol/state run build && yarn workspace @phoenix-protocol/ui run build && yarn workspace @phoenix-protocol/core run build",
     "storybook": "yarn workspace @phoenix-protocol/ui storybook"
   },
   "repository": {

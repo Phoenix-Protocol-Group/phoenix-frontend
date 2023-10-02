@@ -1,4 +1,4 @@
-import { Server } from "soroban-client";
+import { Address, Server } from "soroban-client";
 
 export type Token = {
   id: string;
@@ -15,7 +15,7 @@ export type Wallet = {
 
 export interface WalletActions {
   tokens: Token[];
-  fetchTokenInfo: (tokenId: string) => Promise<Token | undefined>;
+  fetchTokenInfo: (tokenAddress: Address) => Promise<Token | undefined>;
 }
 
 export interface WalletChain {

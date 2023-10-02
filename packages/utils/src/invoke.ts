@@ -1,6 +1,6 @@
-import freighter from "@stellar/freighter-api";
+import freighter, { default as wallet } from "@stellar/freighter-api";
 // working around ESM compatibility issues
-const { isConnected, isAllowed, getUserInfo, signTransaction } = freighter;
+const { isConnected, isAllowed, getUserInfo } = freighter;
 import * as SorobanClient from "soroban-client";
 import type {
   Account,
@@ -11,9 +11,12 @@ import type {
 } from "soroban-client";
 import { NETWORK_PASSPHRASE } from "./constants";
 import { Server } from "./server";
+import { Wallet } from "./method-options";
 // defined this way so typeahead shows full union, not named alias
 let responseTypes: "simulated" | "full" | undefined;
 export type ResponseTypes = typeof responseTypes;
+
+export type XDR_BASE64 = string;
 
 export type Options<R extends ResponseTypes> = {
   /**
@@ -64,7 +67,7 @@ type SomeRpcResponse = typeof someRpcResponse;
 type InvokeArgs<R extends ResponseTypes, T = string> = Options<R> & {
   method: string;
   args?: any[];
-  parseResultXdr?: (xdr: string) => any;
+  parseResultXdr: (xdr: string | SorobanClient.xdr.ScVal) => T;
   contractId: string;
 };
 export interface Error_ {
@@ -123,7 +126,7 @@ export async function invoke<R extends ResponseTypes, T = any>({
   contractId,
 }: InvokeArgs<R, T>): Promise<T | string | SomeRpcResponse> {
   const freighterAccount = await getAccount();
-
+  let parse = parseResultXdr;
   // use a placeholder null account if not yet connected to Freighter so that view calls can still work
   const account =
     freighterAccount ??
@@ -146,35 +149,24 @@ export async function invoke<R extends ResponseTypes, T = any>({
 
   if (responseType === "simulated") return simulated;
 
-  // is it possible for `auths` to be present but empty? Probably not, but let's be safe.
-  const auths = simulated.results?.[0]?.auth;
-  let authsCount = auths?.length ?? 0;
+  if (SorobanClient.SorobanRpc.isSimulationError(simulated)) {
+    throw new Error(simulated.error);
+  } else if (responseType === "simulated") {
+    return simulated;
+  } else if (!simulated.result) {
+    throw new Error(`invalid simulation: no result in ${simulated}`);
+  }
 
-  const writeLength = SorobanClient.xdr.SorobanTransactionData.fromXDR(
-    simulated.transactionData,
-    "base64"
-  )
-    .resources()
-    .footprint()
-    .readWrite().length;
-
-  const parse = parseResultXdr ?? ((xdr) => xdr);
-
+  let authsCount = simulated.result.auth.length;
+  const writeLength = simulated.transactionData.getReadWrite().length;
   const isViewCall = authsCount === 0 && writeLength === 0;
 
   if (isViewCall) {
-    if (responseType === "full") return simulated;
-
-    const { results } = simulated;
-    if (!results || results[0] === undefined) {
-      if (simulated.error) {
-        throw new Error(simulated.error as unknown as string);
-      }
-      throw new Error(
-        `Invalid response from simulateTransaction:\n{simulated}`
-      );
+    if (responseType === "full") {
+      return simulated;
     }
-    return parse(results[0].xdr);
+
+    return parseResultXdr(simulated.result.retval);
   }
 
   if (authsCount > 1) {
@@ -196,7 +188,13 @@ export async function invoke<R extends ResponseTypes, T = any>({
   }
 
   tx = await signTx(
-    SorobanClient.assembleTransaction(tx, NETWORK_PASSPHRASE, simulated) as Tx
+    wallet as Wallet,
+    SorobanClient.assembleTransaction(
+      tx,
+      NETWORK_PASSPHRASE,
+      simulated
+    ).build(),
+    NETWORK_PASSPHRASE
   );
 
   const raw = await sendTx(tx, secondsToWait);
@@ -225,14 +223,18 @@ export async function invoke<R extends ResponseTypes, T = any>({
  * or one of the exported contract methods, you may want to use this function
  * to sign the transaction with Freighter.
  */
-export async function signTx(tx: Tx): Promise<Tx> {
-  const signed = await signTransaction(tx.toXDR(), {
-    networkPassphrase: NETWORK_PASSPHRASE,
+export async function signTx(
+  wallet: Wallet,
+  tx: Tx,
+  networkPassphrase: string
+): Promise<Tx> {
+  const signed = await wallet.signTransaction(tx.toXDR(), {
+    networkPassphrase,
   });
 
   return SorobanClient.TransactionBuilder.fromXDR(
     signed,
-    NETWORK_PASSPHRASE
+    networkPassphrase
   ) as Tx;
 }
 
