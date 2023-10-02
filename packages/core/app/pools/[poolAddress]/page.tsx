@@ -1,13 +1,21 @@
 "use client";
 
 import React from "react";
-import { Box, Typography, Grid, GlobalStyles, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Grid,
+  GlobalStyles,
+  Button,
+  Skeleton,
+} from "@mui/material";
 import {
   LiquidityMining,
   PoolLiquidity,
   PoolStats,
   StakingList,
   Token,
+  Skeleton as PhoenixSkeleton,
 } from "@phoenix-protocol/ui";
 
 import {
@@ -366,21 +374,33 @@ export default function Page({ params }: PoolPageProps) {
         />
       )}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Box
-            sx={{ height: "2.5rem", width: "2.5rem" }}
-            component="img"
-            src={`/cryptoIcons/${tokenA?.name}.svg`.toLowerCase()}
-          />
-          <Box
-            sx={{ ml: -1, height: "2.5rem", width: "2.5rem" }}
-            component="img"
-            src={`/cryptoIcons/${tokenB?.name}.svg`.toLowerCase()}
-          />
-        </Box>
-        <Typography sx={{ fontSize: "2rem", fontWeight: 700, ml: 1 }}>
-          {tokenA?.name}-{tokenB?.name}
-        </Typography>
+        {tokenA?.icon ? (
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box
+              sx={{ height: "2.5rem", width: "2.5rem" }}
+              component="img"
+              src={`/cryptoIcons/${tokenA?.name}.svg`.toLowerCase()}
+            />
+            <Box
+              sx={{ ml: -1, height: "2.5rem", width: "2.5rem" }}
+              component="img"
+              src={`/cryptoIcons/${tokenB?.name}.svg`.toLowerCase()}
+            />
+          </Box>
+        ) : (
+          <>
+            <Skeleton variant="circular" width={60} height={60} />
+            <Skeleton variant="circular" width={60} height={60} />
+          </>
+        )}
+
+        {tokenA?.name ? (
+          <Typography sx={{ fontSize: "2rem", fontWeight: 700, ml: 1 }}>
+            {tokenA?.name}-{tokenB?.name}
+          </Typography>
+        ) : (
+          <Skeleton width={210} height={60}></Skeleton>
+        )}
       </Box>
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
@@ -420,7 +440,7 @@ export default function Page({ params }: PoolPageProps) {
           {userStakes && <StakingList entries={userStakes} />}
         </Grid>
         <Grid item xs={12} md={4}>
-          {tokenA && tokenB && lpToken && (
+          {tokenA && tokenB && lpToken ? (
             <PoolLiquidity
               poolHistory={[
                 [1687392000000, 152000],
@@ -443,6 +463,8 @@ export default function Page({ params }: PoolPageProps) {
                 removeLiquidity(liquidityTokenAmount);
               }}
             />
+          ) : (
+            <PhoenixSkeleton.PoolLiquidity />
           )}
         </Grid>
       </Grid>

@@ -12,3 +12,4 @@ export * from "./Theme";
 
 export * from "./Dashboard";
 export * from "./Swap";
+export * as Skeleton from "./Skeletons";

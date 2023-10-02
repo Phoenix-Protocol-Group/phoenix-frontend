@@ -1,15 +1,4 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  Grid,
-  Input,
-  InputLabel,
-  MenuItem,
-  Select,
-  Skeleton,
-  Typography,
-} from "@mui/material";
+import { Box, Grid, Skeleton } from "@mui/material";
 import React from "react";
 
 const descriptionHeader = {
@@ -128,9 +117,6 @@ const Pools = () => {
       <Grid
         container
         spacing={2}
-        sx={{
-          overflow: "scroll",
-        }}
       >
         <PoolItem/>
         <PoolItem/>

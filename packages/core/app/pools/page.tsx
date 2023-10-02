@@ -6,19 +6,18 @@ import {
   PhoenixStakeContract,
 } from "@phoenix-protocol/contracts";
 import { useAppStore } from "@phoenix-protocol/state";
-import { Pool, Pools, Token } from "@phoenix-protocol/ui";
+import { Pool, Pools, Skeleton, Token } from "@phoenix-protocol/ui";
 import { constants } from "@phoenix-protocol/utils";
 import { FACTORY_ADDRESS } from "@phoenix-protocol/utils/build/constants";
 import { useEffect, useState } from "react";
 import { Address } from "stellar-base";
 import { useRouter } from "next/navigation";
-import { LinearProgress } from "@mui/material";
 
 export default function Page() {
   const store = useAppStore();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
   const [allPools, setAllPools] = useState<Pool[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [stakeContract, setStakeContract] = useState<
     PhoenixStakeContract.Contract | undefined
   >(undefined);
@@ -73,7 +72,6 @@ export default function Page() {
             usdValue: 0,
           },
         ];
-        setLoading(false);
         return {
           tokens,
           tvl: "0",
@@ -92,7 +90,6 @@ export default function Page() {
     } catch (e) {
       // If pool not found, set poolNotFound to true
       console.log(e);
-      setLoading(false);
       return {
         tokens: [],
         tvl: "0",
@@ -120,12 +117,12 @@ export default function Page() {
     setAllPools(poolWithData);
   };
   useEffect(() => {
-    fetchPools();
+    fetchPools().then(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return loading ? (
-    <LinearProgress color="inherit" />
+    <Skeleton.Pools />
   ) : (
     <Pools
       pools={allPools}
