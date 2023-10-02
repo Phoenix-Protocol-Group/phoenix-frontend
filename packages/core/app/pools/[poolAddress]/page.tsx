@@ -299,7 +299,7 @@ export default function Page({ params }: PoolPageProps) {
         if (stakes.unwrap().stakes.length > 0) {
           const _stakes: Entry[] = stakes.unwrap().stakes.map((stake: any) => {
             return {
-              icon: `/cryptoIcons/poolIcon.png`.toLowerCase(),
+              icon: `/cryptoIcons/poolIcon.png`,
               title: name,
               apr: "0",
               lockedPeriod:
@@ -379,12 +379,12 @@ export default function Page({ params }: PoolPageProps) {
             <Box
               sx={{ height: "2.5rem", width: "2.5rem" }}
               component="img"
-              src={`/cryptoIcons/${tokenA?.name}.svg`.toLowerCase()}
+              src={tokenA?.icon}
             />
             <Box
               sx={{ ml: -1, height: "2.5rem", width: "2.5rem" }}
               component="img"
-              src={`/cryptoIcons/${tokenB?.name}.svg`.toLowerCase()}
+              src={tokenB?.icon}
             />
           </Box>
         ) : (
