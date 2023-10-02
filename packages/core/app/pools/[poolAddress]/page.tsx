@@ -235,7 +235,7 @@ export default function Page({ params }: PoolPageProps) {
         // Set token states
         setTokenA({
           name: _tokenA?.symbol as string,
-          icon: `/cryptoIcons/${_tokenA?.symbol.toLowerCase()}.svg`.toLowerCase(),
+          icon: `/cryptoIcons/${_tokenA?.symbol.toLowerCase()}.svg`,
           usdValue: 0,
           amount: Number(_tokenA?.balance) / 10 ** Number(_tokenA?.decimals),
           category: "none",
@@ -243,7 +243,7 @@ export default function Page({ params }: PoolPageProps) {
         });
         setTokenB({
           name: _tokenB?.symbol as string,
-          icon: `/cryptoIcons/${_tokenB?.symbol.toLowerCase()}.svg`.toLowerCase(),
+          icon: `/cryptoIcons/${_tokenB?.symbol.toLowerCase()}.svg`,
           usdValue: 0,
           amount: Number(_tokenB?.balance) / 10 ** Number(_tokenB?.decimals),
           category: "none",
