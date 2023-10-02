@@ -343,9 +343,6 @@ const Pools = ({
       <Grid
         container
         spacing={2}
-        sx={{
-          overflow: "scroll",
-        }}
       >
         {pools.map((pool) => (
           <PoolItem

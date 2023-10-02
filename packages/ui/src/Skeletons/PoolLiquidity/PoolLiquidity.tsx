@@ -1,17 +1,5 @@
-import {
-  Box,
-  Button as MuiButton,
-  Divider,
-  Grid,
-  Typography,
-  Skeleton,
-} from "@mui/material";
-import { useState } from "react";
-import TabPanel from "@mui/lab/TabPanel";
-import TabContext from "@mui/lab/TabContext";
-import { TokenBox } from "../../Swap";
-import { Token } from "../../Modal/Modal";
-import { Button } from "../../Button/Button";
+import { Box, Divider, Grid, Skeleton } from "@mui/material";
+import React from "react";
 
 const GlowingChart = () => (
   <Skeleton variant="rectangular" width="100%" height={200} />
@@ -36,17 +24,46 @@ const LabTabs = () => {
   };
 
   return (
-    <Box sx={{ width: "100%", typography: "body1", mt: 1.8, paddingBottom: "8px"}}>
-      <Box sx={{
-        display: "flex"
-      }}>
-        <Skeleton variant="rounded" width={100} height={40} sx={{marginBottom: "18px", marginRight: "16px"}} />
-        <Skeleton variant="rounded" width={110} height={40} sx={{marginBottom: "18px"}} />
+    <Box
+      sx={{ width: "100%", typography: "body1", mt: 1.8, paddingBottom: "8px" }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+        }}
+      >
+        <Skeleton
+          variant="rounded"
+          width={100}
+          height={40}
+          sx={{ marginBottom: "18px", marginRight: "16px" }}
+        />
+        <Skeleton
+          variant="rounded"
+          width={110}
+          height={40}
+          sx={{ marginBottom: "18px" }}
+        />
       </Box>
 
-      <Skeleton variant="rounded" width="100%" height={86} sx={{borderRadius: "16px", marginBottom: "8px"}} />
-      <Skeleton variant="rounded" width="100%" height={86} sx={{borderRadius: "16px", marginBottom: "8px"}} />
-      <Skeleton variant="rounded" width="100%" height={56} sx={{borderRadius: "16px"}} />
+      <Skeleton
+        variant="rounded"
+        width="100%"
+        height={86}
+        sx={{ borderRadius: "16px", marginBottom: "8px" }}
+      />
+      <Skeleton
+        variant="rounded"
+        width="100%"
+        height={86}
+        sx={{ borderRadius: "16px", marginBottom: "8px" }}
+      />
+      <Skeleton
+        variant="rounded"
+        width="100%"
+        height={56}
+        sx={{ borderRadius: "16px" }}
+      />
     </Box>
   );
 };
@@ -60,14 +77,25 @@ const PoolLiquidity = () => {
       }}
     >
       <Box
-        sx={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "28px" }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "28px",
+        }}
       >
         <Skeleton variant="circular" sx={{ height: "4rem", width: "4rem" }} />
-        <Skeleton variant="circular" sx={{ ml: -1, height: "4rem", width: "4rem" }} />
+        <Skeleton
+          variant="circular"
+          sx={{ ml: -1, height: "4rem", width: "4rem" }}
+        />
       </Box>
       <Divider />
       <Box padding="16px">
-        <Skeleton variant="text" sx={{ fontSize: '2rem', maxWidth: "120px", marginBottom: "8px" }} />
+        <Skeleton
+          variant="text"
+          sx={{ fontSize: "2rem", maxWidth: "120px", marginBottom: "8px" }}
+        />
         <GlowingChart />
         <Grid container>
           <Grid item xs={4}>
@@ -80,7 +108,10 @@ const PoolLiquidity = () => {
               }}
             >
               <Box>
-                <Skeleton height="48px" sx={{ fontSize: '1rem', minWidth: "80px" }} />
+                <Skeleton
+                  height="48px"
+                  sx={{ fontSize: "1rem", minWidth: "80px" }}
+                />
               </Box>
             </Box>
           </Grid>
@@ -94,7 +125,10 @@ const PoolLiquidity = () => {
               }}
             >
               <Box>
-                <Skeleton height="48px" sx={{ fontSize: '1rem', minWidth: "80px" }} />
+                <Skeleton
+                  height="48px"
+                  sx={{ fontSize: "1rem", minWidth: "80px" }}
+                />
               </Box>
             </Box>
           </Grid>
@@ -108,12 +142,15 @@ const PoolLiquidity = () => {
               }}
             >
               <Box>
-                <Skeleton height="48px" sx={{ fontSize: '1rem', minWidth: "80px" }} />
+                <Skeleton
+                  height="48px"
+                  sx={{ fontSize: "1rem", minWidth: "80px" }}
+                />
               </Box>
             </Box>
           </Grid>
         </Grid>
-        <LabTabs/>
+        <LabTabs />
       </Box>
     </Box>
   );

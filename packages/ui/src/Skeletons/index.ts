@@ -2,8 +2,9 @@ import DashboardStats from "./DashboardStats/DashboardStats";
 import DashBoardCharts from "./DashboardCharts/DashboardCharts";
 import LiquidityMining from "./LiquidityMining/LiquidityMining";
 import MainStats from "./MainStats/MainStats";
-import {Pools} from "./Pools/Pools";
+import { Pools } from "./Pools/Pools";
 import WalletBalanceTable from "./WalletBalanceTable/WalletBalanceTable";
+import PoolLiquidity from "./PoolLiquidity/PoolLiquidity";
 
 export {
   DashboardStats,
@@ -11,5 +12,6 @@ export {
   LiquidityMining,
   MainStats,
   Pools,
-  WalletBalanceTable
+  WalletBalanceTable,
+  PoolLiquidity,
 };
