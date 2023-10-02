@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import * as refuse from "react-usestateref";
 import {
   Box,
   Typography,
@@ -90,7 +91,7 @@ export default function Page({ params }: PoolPageProps) {
   const [lpToken, setLpToken] = useState<_Token | undefined>(undefined);
 
   // Stake Contract
-  const [StakeContract, setStakeContract] = useState<
+  const [StakeContract, setStakeContract, StakeContractRef] = refuse.default<
     PhoenixStakeContract.Contract | undefined
   >(undefined);
 
@@ -165,7 +166,7 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await StakeContract?.bond({
+      await StakeContractRef.current?.bond({
         sender: Address.fromString(storePersist.wallet.address!),
         tokens: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
@@ -188,14 +189,14 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await StakeContract?.unbond({
+      await StakeContractRef.current?.unbond({
         sender: Address.fromString(storePersist.wallet.address!),
         stake_amount: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
         ),
         stake_timestamp: BigInt(stake_timestamp),
       });
-      await fetchStakes();
+      console.log(StakeContract);
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
@@ -277,7 +278,7 @@ export default function Page({ params }: PoolPageProps) {
             ).toFixed(2)
           )
         );
-        fetchStakes(_lpToken?.symbol);
+        fetchStakes(_lpToken?.symbol, stakeContractAddress);
       }
     } catch (e) {
       // If pool not found, set poolNotFound to true
@@ -286,10 +287,13 @@ export default function Page({ params }: PoolPageProps) {
     }
   };
 
-  const fetchStakes = async (name = lpToken?.name) => {
+  const fetchStakes = async (
+    name = lpToken?.name,
+    stakeContract = StakeContract
+  ) => {
     if (storePersist.wallet.address) {
       // Get user stakes
-      const stakes: any = await StakeContract?.queryStaked({
+      const stakes: any = await stakeContract?.queryStaked({
         address: Address.fromString(storePersist.wallet.address),
       });
 
