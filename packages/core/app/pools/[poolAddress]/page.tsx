@@ -172,6 +172,7 @@ export default function Page({ params }: PoolPageProps) {
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
         ),
       });
+
       await fetchStakes();
       setLoading(false);
       //!todo view transaction id in blockexplorer
