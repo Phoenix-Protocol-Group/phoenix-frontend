@@ -1,0 +1,28 @@
+{
+  "name": "phoenix-faucet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc && node build/index.js",
+    "start": "node build/index.js"
+  },
+  "dependencies": {
+    "@stellar/typescript-wallet-sdk": "^1.2.0",
+    "@types/express": "^4.17.18",
+    "@types/node": "^20.8.2",
+    "buffer": "6.0.3",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.0",
+    "soroban-client": "1.0.0-beta.2"
+  },
+  "devDependencies": {
+    "typescript": "5.1.6"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
