@@ -1,11 +1,15 @@
 import "dotenv/config";
 import express, { Request, Response } from "express";
+import cors from "cors";
 import { rateLimit } from 'express-rate-limit'
 import { OfflineWallet } from "./wallet";
 import * as SorobanClient from "soroban-client";
 
 const app = express();
+
 app.use(express.json());
+app.use(cors());
+
 const port = process.env.PORT || 3000;
 
 const limiter = rateLimit({
@@ -44,9 +48,7 @@ app.post("/fund", async (req: Request, res: Response) => {
       .setTimeout(SorobanClient.TimeoutInfinite)
       .build();
     transaction.sign(keypair);
-    console.log(transaction);
     const transactionRes = await server.sendTransaction(transaction);
-    console.log(res);
 
     let queryResult;
     do {
