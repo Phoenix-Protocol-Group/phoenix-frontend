@@ -4,6 +4,7 @@ import cors from "cors";
 import { rateLimit } from 'express-rate-limit'
 import { OfflineWallet } from "./wallet";
 import * as SorobanClient from "soroban-client";
+import { nativeTransaction, tokenTransaction } from "./transactions";
 
 const app = express();
 
@@ -24,7 +25,9 @@ app.use(limiter)
 
 const wallet = new OfflineWallet();
 
-let keypair = SorobanClient.Keypair.fromSecret(process.env.SECRET_KEY);
+const tokens = [
+  "CC2AFR54TLYXIPAVIBV4XGTZ6KIPF4HCHZ7YJUS2HYQEDZJ7XKFJLKIE"
+];
 
 app.post("/fund", async (req: Request, res: Response) => {
   const { to, amount } = req.body;
@@ -34,36 +37,23 @@ app.post("/fund", async (req: Request, res: Response) => {
   let account = await server.getAccount(from.publicKey);
 
   try {
-    let transaction = new SorobanClient.TransactionBuilder(account, {
-      fee: "100",
-      networkPassphrase: SorobanClient.Networks.FUTURENET,
-    })
-      .addOperation(
-        SorobanClient.Operation.payment({
-          destination: to,
-          asset: SorobanClient.Asset.native(),
-          amount: amount,
-        })
-      )
-      .setTimeout(SorobanClient.TimeoutInfinite)
-      .build();
-    transaction.sign(keypair);
-    const transactionRes = await server.sendTransaction(transaction);
+    let queryResults: any = [];
 
-    let queryResult;
-    do {
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      queryResult = await server.getTransaction(transactionRes.hash);
-      console.log(queryResult)
+    const nativeTX = await nativeTransaction(account, server, to, amount);
+    queryResults.push(nativeTX);
 
-    } while (queryResult.status !== "SUCCESS");
+    for(const token of tokens) {
+      const tokenTX = await tokenTransaction(account, server, from.publicKey, to, amount, token);
+      queryResults.push(tokenTX);
+    }
 
     res.json({
       status: "SUCCESS",
-      transaction: queryResult,
+      transactions: queryResults,
     });
 
   } catch (error) {
+    console.log(error);
     res.json({
       status: "ERROR",
       error: error,
