@@ -49,6 +49,8 @@ const GlowingChart = ({ data }: { data: Data[] }) => (
 interface LabTabProps {
   tokenA: Token;
   tokenB: Token;
+  liquidityA: number;
+  liquidityB: number;
   liquidityToken: Token;
   onAddLiquidity: (tokenAAmount: number, tokenBAmount: number) => void;
   onRemoveLiquidity: (liquidityTokenAmount: number) => void;
@@ -57,6 +59,8 @@ interface LabTabProps {
 const LabTabs = ({
   tokenA,
   tokenB,
+  liquidityA,
+  liquidityB,
   liquidityToken,
   onAddLiquidity,
   onRemoveLiquidity,
@@ -65,6 +69,22 @@ const LabTabs = ({
   const [tokenAValue, setTokenAValue] = useState<string | undefined>(undefined);
   const [tokenBValue, setTokenBValue] = useState<string | undefined>(undefined);
   const [tokenCValue, setTokenCValue] = useState<string | undefined>(undefined);
+
+  const liquidityRatio = liquidityA / liquidityB;
+
+  const keepRatioA = (val: string) => {
+    setTokenAValue(val);
+
+    const valB = (Number(val) / liquidityRatio);
+    setTokenBValue(valB.toFixed(4))
+  };
+
+  const keepRatioB = (val: string) => {
+    setTokenBValue(val);
+
+    const valA = (Number(val) * liquidityRatio);
+    setTokenAValue(valA.toFixed(4))
+  };
 
   const buttonStyles = {
     display: "flex",
@@ -112,13 +132,13 @@ const LabTabs = ({
         <TabPanel sx={{ padding: "0", mt: "1rem" }} value="1">
           <TokenBox
             value={tokenAValue}
-            onChange={(val) => setTokenAValue(val)}
+            onChange={(val) => keepRatioA(val)}
             token={tokenA}
             hideDropdownButton={true}
           />
           <Box sx={{ mt: "0.5rem" }}>
             <TokenBox
-              onChange={(val) => setTokenBValue(val)}
+              onChange={(val) => keepRatioB(val)}
               value={tokenBValue}
               token={tokenB}
               hideDropdownButton={true}
@@ -277,6 +297,8 @@ const PoolLiquidity = ({
         <LabTabs
           tokenA={tokenA}
           tokenB={tokenB}
+          liquidityA={liquidityA}
+          liquidityB={liquidityB}
           liquidityToken={liquidityToken}
           onAddLiquidity={onAddLiquidity}
           onRemoveLiquidity={onRemoveLiquidity}
