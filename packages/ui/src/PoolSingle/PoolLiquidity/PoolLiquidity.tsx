@@ -76,14 +76,14 @@ const LabTabs = ({
     setTokenAValue(val);
 
     const valB = (Number(val) / liquidityRatio);
-    setTokenBValue(valB.toFixed(2).toString())
+    setTokenBValue(valB.toFixed(4))
   };
 
   const keepRatioB = (val: string) => {
     setTokenBValue(val);
 
     const valA = (Number(val) * liquidityRatio);
-    setTokenAValue(valA.toFixed(2).toString())
+    setTokenAValue(valA.toFixed(4))
   };
 
   const buttonStyles = {
