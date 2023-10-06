@@ -2,13 +2,17 @@
 
 import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
+import { PhoenixMultihopContract } from "@phoenix-protocol/contracts";
+import { usePersistStore } from "@phoenix-protocol/state";
 import {
   AssetSelector,
   SlippageSettings,
   SwapContainer,
   Token,
 } from "@phoenix-protocol/ui";
+import { constants } from "@phoenix-protocol/utils";
 import React from "react";
+import { Address } from "soroban-client";
 
 const args = {
   SwapContainerArgs: {
@@ -74,6 +78,9 @@ const args = {
   },
 };
 
+const testTokenA = "CC2AFR54TLYXIPAVIBV4XGTZ6KIPF4HCHZ7YJUS2HYQEDZJ7XKFJLKIE";
+const testTokenB = "CDPSM5UXATGH4TMNFSWVGMQAGUPPKRCWRX3VIATJBVQ54MYHEXFT3CWQ";
+
 export default function Page() {
   const [optionsOpen, setOptionsOpen] = React.useState(false);
   const [assetSelectorOpen, setAssetSelectorOpen] = React.useState(false);
@@ -83,6 +90,28 @@ export default function Page() {
   const [errorModalOpen, setErrorModalOpen] = React.useState<boolean>(false);
   const [errorDescription, setErrorDescripption] = React.useState<string>("");
   const [tokenAmounts, setTokenAmounts] = React.useState<number[]>([0]);
+  const storePersist = usePersistStore();
+
+  const doSwap = async () => {
+    const contract = new PhoenixMultihopContract.Contract({
+      contractId: "",
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
+      rpcUrl: constants.RPC_URL,
+    });
+
+    const tx = await contract.swap({
+      recipient: Address.fromString(storePersist.wallet.address!),
+      operations: [
+        {
+          ask_asset: Address.fromString(testTokenA),
+          offer_asset: Address.fromString(testTokenB),
+        },
+      ],
+      amount: BigInt(1000),
+    });
+
+    console.log(tx);
+  };
 
   const handleTokenClick = (token: Token) => {
     if (isFrom) {
@@ -128,7 +157,7 @@ export default function Page() {
             onTokenSelectorClick={(isFromToken) =>
               handleSelectorOpen(isFromToken)
             }
-            onSwapButtonClick={() => {}}
+            onSwapButtonClick={() => doSwap()}
             onInputChange={() => {}}
           />
         )}
