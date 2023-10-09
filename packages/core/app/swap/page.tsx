@@ -18,70 +18,6 @@ import { constants } from "@phoenix-protocol/utils";
 import React, { useEffect } from "react";
 import { Address } from "soroban-client";
 
-const args = {
-  SwapContainerArgs: {
-    fromToken: {
-      name: "USDT",
-      icon: "cryptoIcons/usdt.svg",
-      amount: 100,
-      category: "Stable",
-      usdValue: 1 * 100,
-    },
-    toToken: {
-      name: "USDT",
-      icon: "cryptoIcons/usdt.svg",
-      amount: 100,
-      category: "Stable",
-      usdValue: 1 * 100,
-    },
-    exchangeRate: "1 BTC = 26,567 USDT ($26,564)",
-    networkFee: "0.0562 USDT (~$0.0562)",
-    route: "Trycryptousd",
-    estSellPrice: "0.0562 USDT (~$0.0562)",
-    minSellPrice: "0.0562 USDT (~$0.0562)",
-    slippageTolerance: "0.1%",
-  },
-  AssetSelectorArgs: {
-    tokens: [
-      {
-        name: "USDT",
-        icon: "cryptoIcons/usdt.svg",
-        amount: 100,
-        category: "Stable",
-        usdValue: 1 * 100,
-      },
-      {
-        name: "USDC",
-        icon: "cryptoIcons/usdc.svg",
-        amount: 50,
-        category: "Stable",
-        usdValue: 1 * 50,
-      },
-      {
-        name: "DAI",
-        icon: "cryptoIcons/dai.svg",
-        amount: 25,
-        category: "Stable",
-        usdValue: 1 * 25,
-      },
-      {
-        name: "XLM",
-        icon: "cryptoIcons/xlm.svg",
-        amount: 200,
-        category: "Non-Stable",
-        usdValue: 0.85 * 200,
-      },
-      {
-        name: "BTC",
-        icon: "cryptoIcons/btc.svg",
-        amount: 0.5,
-        category: "Non-Stable",
-        usdValue: 30000 * 0.5,
-      },
-    ],
-  },
-};
-
 const testTokenA = "CC5BDQ7J2VK4TQHHIMFNVMV5ZJZYDXDZN7XQ7IM73XKKPYF2KKARCOIW";
 const testTokenB = "CC6HQVYSKVFCKWU6EKYDILHFOV5DC26VICEUYAMKTIDS4XZPYMDP3WOS";
 
@@ -95,6 +31,8 @@ export default function Page() {
   const [errorDescription, setErrorDescripption] = React.useState<string>("");
   const [tokenAmounts, setTokenAmounts] = React.useState<number[]>([0]);
   const [tokens, setTokens] = React.useState<any>([]);
+  const [fromToken, setFromToken] = React.useState<Token>();
+  const [toToken, setToToken] = React.useState<Token>();
   const storePersist = usePersistStore();
   const appStore = useAppStore();
 
@@ -121,9 +59,18 @@ export default function Page() {
 
   const handleTokenClick = (token: Token) => {
     if (isFrom) {
-      args.SwapContainerArgs.fromToken = token;
+      setTokens([
+        ...tokens.filter((el: Token) => el.name !== token.name),
+        fromToken,
+      ]);
+      setFromToken(token);
     } else {
-      args.SwapContainerArgs.toToken = token;
+      setTokens([
+        ...tokens.filter((el: Token) => el.name !== token.name),
+        ,
+        toToken,
+      ]);
+      setToToken(token);
     }
 
     setAssetSelectorOpen(false);
@@ -137,7 +84,9 @@ export default function Page() {
   useEffect(() => {
     const getAllTokens = async () => {
       const allTokens = await appStore.getAllTokens();
-      setTokens(allTokens);
+      setTokens(allTokens.slice(2));
+      setFromToken(allTokens[0]);
+      setToToken(allTokens[1]);
     };
     getAllTokens();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -145,17 +94,16 @@ export default function Page() {
 
   return (
     <Box sx={{ width: "100%", maxWidth: "600px" }}>
-      <SwapSuccess
-        open={sucessModalOpen}
-        setOpen={setSuccessModalOpen}
-        //todo add tokens
-        tokens={[
-          args.SwapContainerArgs.fromToken,
-          args.SwapContainerArgs.toToken,
-        ]}
-        tokenAmounts={tokenAmounts}
-        onButtonClick={() => {}}
-      />
+      {fromToken && toToken && (
+        <SwapSuccess
+          open={sucessModalOpen}
+          setOpen={setSuccessModalOpen}
+          //todo add tokens
+          tokens={[fromToken, toToken]}
+          tokenAmounts={tokenAmounts}
+          onButtonClick={() => {}}
+        />
+      )}
       {errorModalOpen && (
         <SwapError
           open={errorModalOpen}
@@ -164,16 +112,23 @@ export default function Page() {
         />
       )}
       <Box>
-        {!optionsOpen && !assetSelectorOpen && (
+        {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (
           <SwapContainer
-            {...args.SwapContainerArgs}
             onOptionsClick={() => setOptionsOpen(true)}
             onSwapTokensClick={() => {}}
+            fromToken={fromToken}
+            toToken={toToken}
             onTokenSelectorClick={(isFromToken) =>
               handleSelectorOpen(isFromToken)
             }
             onSwapButtonClick={() => doSwap()}
             onInputChange={() => {}}
+            exchangeRate={"1 BTC = 26,567 USDT ($26,564)"}
+            networkFee={"0.0562 USDT (~$0.0562)"}
+            route={"Trycryptousd"}
+            estSellPrice={"0.0562 USDT (~$0.0562)"}
+            minSellPrice={"0.0562 USDT (~$0.0562)"}
+            slippageTolerance={"0.1%"}
           />
         )}
 
