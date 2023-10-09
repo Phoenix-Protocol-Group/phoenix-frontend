@@ -1,6 +1,9 @@
 import { WalletActions, Token } from "./types";
 import { AppStore, SetStateType, GetStateType } from "../types";
-import { SorobanTokenContract } from "@phoenix-protocol/contracts";
+import {
+  PhoenixFactoryContract,
+  SorobanTokenContract,
+} from "@phoenix-protocol/contracts";
 import { usePersistStore } from "../store";
 import { Address } from "soroban-client";
 import { constants } from "@phoenix-protocol/utils";
@@ -11,6 +14,54 @@ export const createWalletActions = (
 ): WalletActions => {
   return {
     tokens: [],
+    allTokens: [],
+
+    getAllTokens: async () => {
+      // Factory contract
+      const factoryContract = new PhoenixFactoryContract.Contract({
+        contractId: constants.FACTORY_ADDRESS,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+
+      // Fetch all available tokens from chain
+
+      const allPoolsDetails = await factoryContract.queryAllPoolsDetails();
+      // Loop through all pools and get asset_a and asset_b addresses in an array
+      const _allAssets = allPoolsDetails
+        ?.unwrap()
+        .map((pool) => [
+          pool.pool_response.asset_a.address.toString(),
+          pool.pool_response.asset_b.address.toString(),
+        ])
+        // Flatten the array
+        .reduce((acc: string[], curr: string[]) => [...acc, ...curr], [])
+        // Remove duplicates
+        .filter((address, index, self) => self.indexOf(address) === index);
+
+      const allAssets = _allAssets
+        ? _allAssets.map(async (asset) => {
+            await getState().fetchTokenInfo(Address.fromString(asset));
+          })
+        : [];
+
+      await Promise.all(allAssets);
+      const _tokens = getState().tokens.map((token) => {
+        return {
+          name: token?.symbol === "native" ? "xlm" : token?.symbol,
+          icon: `/cryptoIcons/${
+            token?.symbol === "native" ? "xlm" : token?.symbol.toLowerCase()
+          }.svg`,
+          amount: 0,
+          category: "Non-Stable", // todo: add category
+          usdValue: 0, // todo: add usdValue
+        };
+      });
+      setState((state: AppStore) => {
+        return { allTokens: _tokens };
+      });
+      return _tokens;
+    },
 
     fetchTokenInfo: async (tokenAddress: Address) => {
       let updatedTokenInfo: Token | undefined;

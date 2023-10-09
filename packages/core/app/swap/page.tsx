@@ -2,8 +2,11 @@
 
 import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
-import { PhoenixMultihopContract } from "@phoenix-protocol/contracts";
-import { usePersistStore } from "@phoenix-protocol/state";
+import {
+  PhoenixFactoryContract,
+  PhoenixMultihopContract,
+} from "@phoenix-protocol/contracts";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
   AssetSelector,
   SlippageSettings,
@@ -11,7 +14,7 @@ import {
   Token,
 } from "@phoenix-protocol/ui";
 import { constants } from "@phoenix-protocol/utils";
-import React from "react";
+import React, { useEffect } from "react";
 import { Address } from "soroban-client";
 
 const args = {
@@ -90,7 +93,9 @@ export default function Page() {
   const [errorModalOpen, setErrorModalOpen] = React.useState<boolean>(false);
   const [errorDescription, setErrorDescripption] = React.useState<string>("");
   const [tokenAmounts, setTokenAmounts] = React.useState<number[]>([0]);
+  const [tokens, setTokens] = React.useState<any>([]);
   const storePersist = usePersistStore();
+  const appStore = useAppStore();
 
   const doSwap = async () => {
     const contract = new PhoenixMultihopContract.Contract({
@@ -107,7 +112,7 @@ export default function Page() {
           offer_asset: Address.fromString(testTokenA),
         },
       ],
-      amount: BigInt(10000),
+      amount: BigInt(1000),
     });
 
     console.log(tx);
@@ -128,8 +133,17 @@ export default function Page() {
     setIsFrom(isFromToken);
   };
 
+  useEffect(() => {
+    const getAllTokens = async () => {
+      const allTokens = await appStore.getAllTokens();
+      setTokens(allTokens);
+    };
+    getAllTokens();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storePersist.wallet.address]);
+
   return (
-    <>
+    <Box sx={{ width: "100%", maxWidth: "600px" }}>
       <SwapSuccess
         open={sucessModalOpen}
         setOpen={setSuccessModalOpen}
@@ -173,17 +187,13 @@ export default function Page() {
 
         {assetSelectorOpen && (
           <AssetSelector
-            tokens={args.AssetSelectorArgs.tokens}
-            tokensAll={[
-              ...args.AssetSelectorArgs.tokens,
-              ...args.AssetSelectorArgs.tokens,
-              ...args.AssetSelectorArgs.tokens,
-            ]}
+            tokens={tokens}
+            tokensAll={tokens}
             onClose={() => setAssetSelectorOpen(false)}
             onTokenClick={handleTokenClick}
           />
         )}
       </Box>
-    </>
+    </Box>
   );
 }
