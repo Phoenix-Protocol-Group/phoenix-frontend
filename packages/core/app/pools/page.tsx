@@ -4,7 +4,6 @@ import {
   PhoenixFactoryContract,
   PhoenixPairContract,
   PhoenixStakeContract,
-  SorobanTokenContract,
 } from "@phoenix-protocol/contracts";
 import { useAppStore } from "@phoenix-protocol/state";
 import { Pool, Pools, Skeleton, Token } from "@phoenix-protocol/ui";
