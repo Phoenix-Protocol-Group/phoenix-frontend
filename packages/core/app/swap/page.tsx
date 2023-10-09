@@ -78,8 +78,8 @@ const args = {
   },
 };
 
-const testTokenA = "CC2AFR54TLYXIPAVIBV4XGTZ6KIPF4HCHZ7YJUS2HYQEDZJ7XKFJLKIE";
-const testTokenB = "CDPSM5UXATGH4TMNFSWVGMQAGUPPKRCWRX3VIATJBVQ54MYHEXFT3CWQ";
+const testTokenA = "CC5BDQ7J2VK4TQHHIMFNVMV5ZJZYDXDZN7XQ7IM73XKKPYF2KKARCOIW";
+const testTokenB = "CC6HQVYSKVFCKWU6EKYDILHFOV5DC26VICEUYAMKTIDS4XZPYMDP3WOS";
 
 export default function Page() {
   const [optionsOpen, setOptionsOpen] = React.useState(false);
@@ -94,7 +94,7 @@ export default function Page() {
 
   const doSwap = async () => {
     const contract = new PhoenixMultihopContract.Contract({
-      contractId: "",
+      contractId: constants.MULTIHOP_ADDRESS,
       networkPassphrase: constants.NETWORK_PASSPHRASE,
       rpcUrl: constants.RPC_URL,
     });
@@ -103,11 +103,11 @@ export default function Page() {
       recipient: Address.fromString(storePersist.wallet.address!),
       operations: [
         {
-          ask_asset: Address.fromString(testTokenA),
-          offer_asset: Address.fromString(testTokenB),
+          ask_asset: Address.fromString(testTokenB),
+          offer_asset: Address.fromString(testTokenA),
         },
       ],
-      amount: BigInt(1000),
+      amount: BigInt(10000),
     });
 
     console.log(tx);
