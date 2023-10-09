@@ -9,6 +9,7 @@ import {
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
   AssetSelector,
+  Skeleton,
   SlippageSettings,
   SwapContainer,
   Token,
@@ -185,14 +186,19 @@ export default function Page() {
           />
         )}
 
-        {assetSelectorOpen && (
-          <AssetSelector
-            tokens={tokens}
-            tokensAll={tokens}
-            onClose={() => setAssetSelectorOpen(false)}
-            onTokenClick={handleTokenClick}
-          />
-        )}
+        {assetSelectorOpen &&
+          (tokens.length > 0 ? (
+            <AssetSelector
+              tokens={tokens}
+              tokensAll={tokens}
+              onClose={() => setAssetSelectorOpen(false)}
+              onTokenClick={handleTokenClick}
+            />
+          ) : (
+            <Skeleton.AssetSelector
+              onClose={() => setAssetSelectorOpen(false)}
+            />
+          ))}
       </Box>
     </Box>
   );

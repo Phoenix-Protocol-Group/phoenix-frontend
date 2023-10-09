@@ -5,6 +5,7 @@ import MainStats from "./MainStats/MainStats";
 import { Pools } from "./Pools/Pools";
 import WalletBalanceTable from "./WalletBalanceTable/WalletBalanceTable";
 import PoolLiquidity from "./PoolLiquidity/PoolLiquidity";
+import { AssetSelector } from "./AssetSelector/AssetSelector";
 
 export {
   DashboardStats,
@@ -14,4 +15,5 @@ export {
   Pools,
   WalletBalanceTable,
   PoolLiquidity,
+  AssetSelector,
 };
