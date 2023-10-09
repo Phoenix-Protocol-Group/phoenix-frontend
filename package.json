@@ -22,7 +22,6 @@
     "packages/utils",
     "packages/contracts",
     "packages/state",
-    "packages/contracts",
     "packages/ui",
     "packages/*"
   ],

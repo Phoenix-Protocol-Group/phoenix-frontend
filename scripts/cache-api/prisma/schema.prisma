@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Token {
+  id          Int           @id @default(autoincrement())
+  address     String
+  timestamp   Int
+  TokenInPair TokenInPair[]
+}
+
+model Pair {
+  id        Int    @id @default(autoincrement())
+  address   String
+  timestamp Int
+
+  TokenInPair TokenInPair[]
+}
+
+model TokenInPair {
+  type    String
+  tokenId Int
+  post    Token  @relation(fields: [tokenId], references: [id])
+
+  pairId Int
+  pair   Pair @relation(fields: [pairId], references: [id])
+
+  @@id([tokenId, pairId])
+}
