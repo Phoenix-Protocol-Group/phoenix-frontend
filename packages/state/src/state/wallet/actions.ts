@@ -46,17 +46,19 @@ export const createWalletActions = (
         : [];
 
       await Promise.all(allAssets);
-      const _tokens = getState().tokens.map((token) => {
-        return {
-          name: token?.symbol === "native" ? "xlm" : token?.symbol,
-          icon: `/cryptoIcons/${
-            token?.symbol === "native" ? "xlm" : token?.symbol.toLowerCase()
-          }.svg`,
-          amount: 0,
-          category: "Non-Stable", // todo: add category
-          usdValue: 0, // todo: add usdValue
-        };
-      });
+      const _tokens = getState()
+        .tokens.filter((token) => token?.symbol !== "POOL")
+        .map((token) => {
+          return {
+            name: token?.symbol === "native" ? "xlm" : token?.symbol,
+            icon: `/cryptoIcons/${
+              token?.symbol === "native" ? "xlm" : token?.symbol.toLowerCase()
+            }.svg`,
+            amount: 0,
+            category: "Non-Stable", // todo: add category
+            usdValue: 0, // todo: add usdValue
+          };
+        });
       setState((state: AppStore) => {
         return { allTokens: _tokens };
       });
