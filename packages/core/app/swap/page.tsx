@@ -115,7 +115,10 @@ export default function Page() {
         {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (
           <SwapContainer
             onOptionsClick={() => setOptionsOpen(true)}
-            onSwapTokensClick={() => {}}
+            onSwapTokensClick={() => {
+              setFromToken(toToken);
+              setToToken(fromToken);
+            }}
             fromToken={fromToken}
             toToken={toToken}
             onTokenSelectorClick={(isFromToken) =>
