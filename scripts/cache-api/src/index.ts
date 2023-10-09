@@ -11,7 +11,10 @@ fetch.startFetch();
 
 const resolvers = {
   Query: {
-    allUsers: () => {
+    allPairs: () => {
+      return prisma.pair.findMany();
+    },
+    allTokens: () => {
       return prisma.token.findMany();
     }
   }
