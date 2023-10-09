@@ -32,6 +32,7 @@ export default function Page() {
   const [tokenAmounts, setTokenAmounts] = React.useState<number[]>([0]);
   const [tokens, setTokens] = React.useState<any>([]);
   const [fromToken, setFromToken] = React.useState<Token>();
+  const [maxSpread, setMaxSpread] = React.useState<number>(0);
   const [toToken, setToToken] = React.useState<Token>();
   const storePersist = usePersistStore();
   const appStore = useAppStore();
@@ -131,16 +132,18 @@ export default function Page() {
             route={"Trycryptousd"}
             estSellPrice={"0.0562 USDT (~$0.0562)"}
             minSellPrice={"0.0562 USDT (~$0.0562)"}
-            slippageTolerance={"0.1%"}
+            slippageTolerance={`${maxSpread + 1}%`}
           />
         )}
 
         {optionsOpen && (
           <SlippageSettings
-            options={["0.1%", "0.5%", "2%"]}
-            selectedOption={0}
+            options={["1%", "2%", "3%"]}
+            selectedOption={maxSpread}
             onClose={() => setOptionsOpen(false)}
-            onChange={() => {}}
+            onChange={(e) => {
+              setMaxSpread(Number(e.target.value));
+            }}
           />
         )}
 

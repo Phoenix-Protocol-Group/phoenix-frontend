@@ -228,22 +228,6 @@ const SwapContainer = ({
               </ListItem>
               <ListItem sx={listItemContainer}>
                 <Typography sx={listItemNameStyle}>
-                  Est. BTC sell price
-                </Typography>
-                <Typography sx={listItemContentStyle}>
-                  {estSellPrice}
-                </Typography>
-              </ListItem>
-              <ListItem sx={listItemContainer}>
-                <Typography sx={listItemNameStyle}>
-                  Min. BTC sell price
-                </Typography>
-                <Typography sx={listItemContentStyle}>
-                  {minSellPrice}
-                </Typography>
-              </ListItem>
-              <ListItem sx={listItemContainer}>
-                <Typography sx={listItemNameStyle}>
                   Slippage tolerance
                 </Typography>
                 <Typography sx={listItemContentStyle}>
