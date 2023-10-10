@@ -18,7 +18,6 @@ import React from "react";
 import { Button } from "../Button/Button";
 import { MenuButton } from "./MenuButton";
 
-
 const BalanceChip = ({ balance }: { balance: number }) => (
   <Chip
     icon={<Box component="img" src="/image-103.png" />}
@@ -138,7 +137,6 @@ const AppBar = ({
 
   return (
     <NoSsr>
-      <Box height="70px" />
       <Box
         sx={{
           display: "flex",

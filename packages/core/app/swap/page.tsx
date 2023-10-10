@@ -1,5 +1,6 @@
 "use client";
 
+import Loader from "@/components/Loader/Loader";
 import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
 import {
@@ -34,6 +35,7 @@ export default function Page() {
   const [fromToken, setFromToken] = React.useState<Token>();
   const [maxSpread, setMaxSpread] = React.useState<number>(0);
   const [toToken, setToToken] = React.useState<Token>();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const storePersist = usePersistStore();
   const appStore = useAppStore();
 
@@ -84,16 +86,20 @@ export default function Page() {
 
   useEffect(() => {
     const getAllTokens = async () => {
+      setIsLoading(true);
       const allTokens = await appStore.getAllTokens();
       setTokens(allTokens.slice(2));
       setFromToken(allTokens[0]);
       setToToken(allTokens[1]);
+      setIsLoading(false);
     };
     getAllTokens();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storePersist.wallet.address]);
 
-  return (
+  return isLoading ? (
+    <Loader />
+  ) : (
     <Box sx={{ width: "100%", maxWidth: "600px" }}>
       {fromToken && toToken && (
         <SwapSuccess

@@ -5,6 +5,7 @@ import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Providers from "../providers";
 import TopBar from "@/components/TopBar/TopBar";
 import SideNav from "@/components/SideNav/SideNav";
+import { usePathname } from "next/navigation";
 
 const args = {
   mainstatsArgs: {
@@ -36,10 +37,18 @@ export default function RootLayout({
   const theme = useTheme();
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
   const [navOpen, setNavOpen] = React.useState(false);
-
+  const pathname = usePathname();
   useEffect(() => {
     setNavOpen(largerThenMd ? true : false);
   }, [largerThenMd]);
+
+  const swapPageStyle = {
+    backgroundImage: `url("/swapBg.png")`,
+    backgroundRepeat: "no-repeat",
+    backgroundAttachment: "fixed",
+    backgroundPosition: "center",
+    backgroundSize: "50% 100%",
+  };
 
   return (
     <html lang="en">
@@ -63,10 +72,16 @@ export default function RootLayout({
                 : navOpen
                 ? "0"
                 : "100%",
+              minHeight: "100vh",
               transition: "all 0.2s ease-in-out",
               display: "flex",
               justifyContent: "center",
               padding: "16px",
+              ...(() => {
+                if (pathname === "/swap") {
+                  return swapPageStyle;
+                }
+              })(),
             }}
           >
             {children}
