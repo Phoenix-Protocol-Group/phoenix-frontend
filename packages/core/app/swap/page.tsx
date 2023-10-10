@@ -98,7 +98,7 @@ export default function Page() {
   }, [storePersist.wallet.address]);
 
   return isLoading ? (
-    <Loader />
+    <Skeleton.Swap />
   ) : (
     <Box sx={{ width: "100%", maxWidth: "600px" }}>
       {fromToken && toToken && (
