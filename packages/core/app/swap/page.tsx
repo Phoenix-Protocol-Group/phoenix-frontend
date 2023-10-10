@@ -19,8 +19,8 @@ import { constants } from "@phoenix-protocol/utils";
 import React, { useEffect } from "react";
 import { Address } from "soroban-client";
 
-const testTokenA = "CC5BDQ7J2VK4TQHHIMFNVMV5ZJZYDXDZN7XQ7IM73XKKPYF2KKARCOIW";
-const testTokenB = "CC6HQVYSKVFCKWU6EKYDILHFOV5DC26VICEUYAMKTIDS4XZPYMDP3WOS";
+const testTokenA = "CBWK2ZG5YWF6ZMLVEKTN4LZZKOHRD6UNS356AGFQKZGPMR3HUGZ6NKVT";
+const testTokenB = "CD2QZU2HFAV37GTZBRBXA7RDWI2JD4UPIQGDSVM2DGNVMZUQ4VPFLDQZ";
 
 export default function Page() {
   const [optionsOpen, setOptionsOpen] = React.useState(false);
@@ -54,7 +54,7 @@ export default function Page() {
           offer_asset: Address.fromString(testTokenA),
         },
       ],
-      amount: BigInt(1000),
+      amount: BigInt(100000000),
     });
 
     console.log(tx);
