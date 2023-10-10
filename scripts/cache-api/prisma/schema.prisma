@@ -11,17 +11,8 @@ datasource db {
 }
 
 model Token {
-  id        Int         @id @default(autoincrement())
-  address   String
-  PairToken PairToken[]
-}
-
-model PairToken {
-  id     Int @id @default(autoincrement())
-  amount Int
-
-  token   Token @relation(fields: [tokenId], references: [id])
-  tokenId Int
+  id      Int    @id @default(autoincrement())
+  address String
 
   assetA     Pair[] @relation("assetA")
   assetB     Pair[] @relation("assetB")
@@ -32,10 +23,15 @@ model Pair {
   id      Int    @id @default(autoincrement())
   address String
 
-  assetA       PairToken @relation("assetA", fields: [assetAId], references: [id])
+  assetA       Token @relation("assetA", fields: [assetAId], references: [id])
   assetAId     Int
-  assetB       PairToken @relation("assetB", fields: [assetBId], references: [id])
+  assetAAmount Int
+
+  assetB       Token @relation("assetB", fields: [assetBId], references: [id])
   assetBId     Int
-  assetShare   PairToken @relation("assetShare", fields: [assetShareId], references: [id])
-  assetShareId Int
+  assetBAmount Int
+
+  assetShare       Token @relation("assetShare", fields: [assetShareId], references: [id])
+  assetShareId     Int
+  assetShareAmount Int
 }

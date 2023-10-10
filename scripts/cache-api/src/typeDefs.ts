@@ -1,11 +1,18 @@
 const typeDefs = `
-  type User {
-    email: String!
-    name: String
+  type Token {
+    address: String
+  }
+
+  type Pair {
+    address: String
   }
 
   type Query {
-    allUsers: [User!]!
+    getPairs: [Pair!]!
+    getPair(id: Int!): Pair
+
+    getTokens: [Token!]!
+    getToken(id: Int!): Token
   }
 `;
 
