@@ -1,13 +1,9 @@
 "use client";
 
-import Loader from "@/components/Loader/Loader";
-import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
-import { Box } from "@mui/material";
-import {
-  PhoenixFactoryContract,
-  PhoenixMultihopContract,
-} from "@phoenix-protocol/contracts";
-import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
+// React-related imports
+import React, { useEffect, useState } from "react";
+
+// Component and utility imports
 import {
   AssetSelector,
   Skeleton,
@@ -15,43 +11,51 @@ import {
   SwapContainer,
   Token,
 } from "@phoenix-protocol/ui";
+import { PhoenixMultihopContract } from "@phoenix-protocol/contracts";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { constants } from "@phoenix-protocol/utils";
-import React, { useEffect } from "react";
+import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
+import { Box } from "@mui/material";
 import { Address } from "soroban-client";
 
-const testTokenA = "CBWK2ZG5YWF6ZMLVEKTN4LZZKOHRD6UNS356AGFQKZGPMR3HUGZ6NKVT";
-const testTokenB = "CD2QZU2HFAV37GTZBRBXA7RDWI2JD4UPIQGDSVM2DGNVMZUQ4VPFLDQZ";
+const TEST_TOKEN_A = "CBWK2ZG5YWF6ZMLVEKTN4LZZKOHRD6UNS356AGFQKZGPMR3HUGZ6NKVT";
+const TEST_TOKEN_B = "CD2QZU2HFAV37GTZBRBXA7RDWI2JD4UPIQGDSVM2DGNVMZUQ4VPFLDQZ";
 
-export default function Page() {
-  const [optionsOpen, setOptionsOpen] = React.useState(false);
-  const [assetSelectorOpen, setAssetSelectorOpen] = React.useState(false);
-  const [isFrom, setIsFrom] = React.useState(true);
+export default function SwapPage() {
+  // State variables declaration and initialization
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const [assetSelectorOpen, setAssetSelectorOpen] = useState(false);
+  const [isFrom, setIsFrom] = useState(true);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [errorDescription, setErrorDescription] = useState("");
+  const [tokenAmounts, setTokenAmounts] = useState<number[]>([0]);
+  const [tokens, setTokens] = useState<Token[]>([]);
+  const [fromToken, setFromToken] = useState<Token>();
+  const [maxSpread, setMaxSpread] = useState<number>(0);
+  const [toToken, setToToken] = useState<Token>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [sucessModalOpen, setSuccessModalOpen] = React.useState<boolean>(false);
-  const [errorModalOpen, setErrorModalOpen] = React.useState<boolean>(false);
-  const [errorDescription, setErrorDescripption] = React.useState<string>("");
-  const [tokenAmounts, setTokenAmounts] = React.useState<number[]>([0]);
-  const [tokens, setTokens] = React.useState<any>([]);
-  const [fromToken, setFromToken] = React.useState<Token>();
-  const [maxSpread, setMaxSpread] = React.useState<number>(0);
-  const [toToken, setToToken] = React.useState<Token>();
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  // Using the store
   const storePersist = usePersistStore();
   const appStore = useAppStore();
 
+  // Function for handling token swapping logic
   const doSwap = async () => {
+    // Create contract instance
     const contract = new PhoenixMultihopContract.Contract({
       contractId: constants.MULTIHOP_ADDRESS,
       networkPassphrase: constants.NETWORK_PASSPHRASE,
       rpcUrl: constants.RPC_URL,
     });
 
+    // Execute swap
     const tx = await contract.swap({
       recipient: Address.fromString(storePersist.wallet.address!),
       operations: [
         {
-          ask_asset: Address.fromString(testTokenB),
-          offer_asset: Address.fromString(testTokenA),
+          ask_asset: Address.fromString(TEST_TOKEN_B),
+          offer_asset: Address.fromString(TEST_TOKEN_A),
         },
       ],
       amount: BigInt(100000000),
@@ -60,30 +64,33 @@ export default function Page() {
     console.log(tx);
   };
 
+  // Function for handling token click
   const handleTokenClick = (token: Token) => {
+    // Update tokens based on selected token and close the asset selector
     if (isFrom) {
       setTokens([
-        ...tokens.filter((el: Token) => el.name !== token.name),
-        fromToken,
+        ...tokens.filter((el) => el.name !== token.name),
+        ...(fromToken ? [fromToken] : []),
       ]);
       setFromToken(token);
     } else {
       setTokens([
-        ...tokens.filter((el: Token) => el.name !== token.name),
-        ,
-        toToken,
+        ...tokens.filter((el) => el.name !== token.name),
+        ...(toToken ? [toToken] : []),
       ]);
+
       setToToken(token);
     }
-
     setAssetSelectorOpen(false);
   };
 
+  // Function for handling the opening of the selector with state management
   const handleSelectorOpen = (isFromToken: boolean) => {
     setAssetSelectorOpen(true);
     setIsFrom(isFromToken);
   };
 
+  // Effect hook to fetch all tokens once the component mounts
   useEffect(() => {
     const getAllTokens = async () => {
       setIsLoading(true);
@@ -93,24 +100,28 @@ export default function Page() {
       setToToken(allTokens[1]);
       setIsLoading(false);
     };
+
     getAllTokens();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storePersist.wallet.address]);
 
+  // Return statement for rendering components conditionally based on state
   return isLoading ? (
     <Skeleton.Swap />
   ) : (
+    // JSX for UI when data is loaded
     <Box sx={{ width: "100%", maxWidth: "600px" }}>
+      {/* Success Modal */}
       {fromToken && toToken && (
         <SwapSuccess
-          open={sucessModalOpen}
+          open={successModalOpen}
           setOpen={setSuccessModalOpen}
-          //todo add tokens
           tokens={[fromToken, toToken]}
           tokenAmounts={tokenAmounts}
           onButtonClick={() => {}}
         />
       )}
+      {/* Error Modal */}
       {errorModalOpen && (
         <SwapError
           open={errorModalOpen}
@@ -119,6 +130,7 @@ export default function Page() {
         />
       )}
       <Box>
+        {/* Main Swap Container */}
         {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (
           <SwapContainer
             onOptionsClick={() => setOptionsOpen(true)}
@@ -141,7 +153,7 @@ export default function Page() {
             slippageTolerance={`${maxSpread + 1}%`}
           />
         )}
-
+        {/* Options Modal for Setting Slippage Tolerance */}
         {optionsOpen && (
           <SlippageSettings
             options={["1%", "2%", "3%"]}
@@ -152,7 +164,7 @@ export default function Page() {
             }}
           />
         )}
-
+        {/* Asset Selector UI */}
         {assetSelectorOpen &&
           (tokens.length > 0 ? (
             <AssetSelector
