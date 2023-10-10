@@ -1,27 +1,58 @@
 import "dotenv/config";
+import express, {Request, Response} from "express"
+import { Context, createContext } from "./context";
+import * as db from "./db";
 import * as fetch from "./fetch";
-import * as db from "./db"
-import typeDefs from "./typeDefs";
-import { ApolloServer } from 'apollo-server'
+import cors from 'cors';
 
+const app = express();
 const port = process.env.PORT || 3000;
 
-fetch.startFetch();
+if(process.env.FETCH == "true") fetch.startFetch();
 
-db.mockData();
+app.use(express.json());
+app.use(cors());
 
-db.getTokens().then((pairs) => {
-  console.log(pairs);
+app.get("/", async (req: Request, res: Response) => {
+  res.send("Cache API is running");
 });
 
-const resolvers = {
-  Query: {
-    getPairs: () => db.getPairs(),
-    getPair: (id: number) => db.getPair(id),
-    getTokens: () => db.getTokens(),
-    getToken: (id: number) => db.getToken(id),
-  }
-};
+app.get("/pairs", async (req: Request, res: Response) => {
+  const pairs = await db.getPairs();
 
-const server = new ApolloServer({ resolvers, typeDefs });
-server.listen({ port: port });
+  res.json(pairs);
+});
+
+app.get("/pair/:address", async (req: Request, res: Response) => {
+  if(!req.params.address) res.status(400).send("Missing pair address");
+
+  const pair = await db.getPair(req.params.address);
+  return res.json(pair);
+});
+
+app.get("/pair/:address/:days", async (req: Request, res: Response) => {
+  const address = req.params.address;
+  const days = req.params.days;
+
+  if(!address) res.status(400).send("Missing pair address");
+  if(!days) res.status(400).send("Missing days parameter");
+
+  const liquidity = await db.getPairLiquidity(address, Number(days));
+
+  res.json(liquidity);
+});
+
+app.get("/tokens", async (req: Request, res: Response) => {
+  const tokens = await db.getTokens();
+
+  res.json(tokens);
+});
+
+app.get("/token/:address", async (req: Request, res: Response) => {
+  if(!req.params.address) res.status(400).send("Missing token address");
+
+  const token = await db.getToken(req.params.address);
+  return res.json(token);
+});
+
+const server = app.listen(port, () => { console.log(`Listening on port ${port}`) });

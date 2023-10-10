@@ -6,9 +6,12 @@ import {
 } from "@phoenix-protocol/contracts";
 import { constants } from '@phoenix-protocol/utils';
 import { FACTORY_ADDRESS } from '@phoenix-protocol/utils/build/constants';
+import * as db from "./db";
 import { Address } from "stellar-base";
 
 export function startFetch() {
+  console.log("Starting fetch");
+
   const job: nodeSchedule.Job = nodeSchedule.scheduleJob('*/10 * * * * *', async () => {
     const pairRes = await fetchPairs();
   });
@@ -41,8 +44,7 @@ async function fetchPool(poolAddress: Address) {
       const pairConfig = pairConfigRes.unwrap();
       const pairInfo = pairInfoRes.unwrap();
 
-      console.log("config", pairConfig);
-      console.log("info", pairInfo);
+      console.log(pairInfo);
     }
   } catch (e) {
     // If pool not found, set poolNotFound to true
@@ -51,8 +53,6 @@ async function fetchPool(poolAddress: Address) {
 }
 
 async function fetchPairs() {
-  console.log("fetching pairs");
-
   const FactoryContract = new PhoenixFactoryContract.Contract({
     contractId: FACTORY_ADDRESS,
     networkPassphrase: constants.NETWORK_PASSPHRASE,
@@ -69,5 +69,5 @@ async function fetchPairs() {
         )
       : [];
 
-  return "SUCCESS";
+  return poolWithData;
 }
