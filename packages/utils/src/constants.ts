@@ -8,7 +8,8 @@ export const TESTING_SOURCE: Account = new Account(
 /**
  * The Soroban network passphrase used to initialize this library.
  */
-export const NETWORK_PASSPHRASE = "Test SDF Future Network ; October 2022";
+export const NETWORK_PASSPHRASE: string =
+  "Test SDF Future Network ; October 2022";
 
 /**
  * The Soroban RPC endpoint used to initialize this library.
@@ -18,4 +19,11 @@ export const RPC_URL: string = "https://rpc-futurenet.stellar.org:443";
 /**
  * Factory contract address
  */
-export const FACTORY_ADDRESS: string = "CA7SQZE3NK5KLDQPI6EYJTF5YSEBPVGQBOESLLCVIQGAZYXWHU2I7WDI";
+export const FACTORY_ADDRESS: string =
+  "CBVAKSDMJ5RHBOXFOL2JIGTYVMSHF2TMIU7CRIFF3WH4Q7GELVFH2QTE";
+
+/**
+ * Multihop contract address
+ */
+export const MULTIHOP_ADDRESS: string =
+  "CC74RE5WFYUE7XBWCIVWR577HD4NFG2THLAB33YQOQQOZ22TUD2DRU5F";

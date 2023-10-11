@@ -18,7 +18,7 @@ interface SlippageOptionsProps {
   options: string[];
   selectedOption: number;
   onClose: () => void;
-  onChange: () => void;
+  onChange: (e: any) => void;
 }
 
 const SlippageSettings = ({
