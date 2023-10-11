@@ -12,7 +12,7 @@ datasource db {
 
 model Token {
   id      Int    @id @default(autoincrement())
-  address String @unique
+  address String
 
   assetA     Pair[] @relation("assetA")
   assetB     Pair[] @relation("assetB")
@@ -21,18 +21,18 @@ model Token {
 
 model Pair {
   id        Int    @id @default(autoincrement())
-  address   String @unique
+  address   String
   timestamp BigInt
 
-  assetA       Token @relation("assetA", fields: [assetAId], references: [id])
+  assetA       Token  @relation("assetA", fields: [assetAId], references: [id])
   assetAId     Int
-  assetAAmount Int
+  assetAAmount BigInt
 
-  assetB       Token @relation("assetB", fields: [assetBId], references: [id])
+  assetB       Token  @relation("assetB", fields: [assetBId], references: [id])
   assetBId     Int
-  assetBAmount Int
+  assetBAmount BigInt
 
-  assetShare       Token @relation("assetShare", fields: [assetShareId], references: [id])
+  assetShare       Token  @relation("assetShare", fields: [assetShareId], references: [id])
   assetShareId     Int
-  assetShareAmount Int
+  assetShareAmount BigInt
 }

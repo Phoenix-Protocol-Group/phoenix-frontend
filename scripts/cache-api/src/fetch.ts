@@ -11,10 +11,25 @@ import { Address } from "stellar-base";
 
 export function startFetch() {
   console.log("Starting fetch");
+  fetchPairs();
 
-  const job: nodeSchedule.Job = nodeSchedule.scheduleJob('*/10 * * * * *', async () => {
+  const job: nodeSchedule.Job = nodeSchedule.scheduleJob('*/15 * * * *', async () => {
     const pairRes = await fetchPairs();
   });
+}
+
+function roundDownToNearest15Minutes(): number {
+  const currentDate = new Date();
+  const minutes = currentDate.getMinutes();
+  const remainder = minutes % 15;
+
+  if (remainder > 0) {
+    currentDate.setMinutes(minutes - remainder);
+  }
+  currentDate.setSeconds(0);
+  currentDate.setMilliseconds(0);
+
+  return currentDate.getTime();
 }
 
 async function fetchTokenInfo(tokenAddress: Address) {
@@ -44,7 +59,32 @@ async function fetchPool(poolAddress: Address) {
       const pairConfig = pairConfigRes.unwrap();
       const pairInfo = pairInfoRes.unwrap();
 
-      console.log(pairInfo);
+      const tokenA = await db.getOrCreateToken(pairInfo.asset_a.address.toString());
+      const tokenB = await db.getOrCreateToken(pairInfo.asset_b.address.toString());
+      const tokenShare = await db.getOrCreateToken(pairInfo.asset_lp_share.address.toString());
+
+      const newPair = await db.createPair({
+        timestamp: roundDownToNearest15Minutes(),
+        address: poolAddress.toString(),
+        assetA: {
+          connect: {
+            id: tokenA.id,
+          }
+        },
+        assetAAmount: pairInfo.asset_a.amount,
+        assetB: {
+          connect: {
+            id: tokenB.id,
+          }
+        },
+        assetBAmount: pairInfo.asset_b.amount,
+        assetShare: {
+          connect: {
+            id: tokenShare.id,
+          }
+        },
+        assetShareAmount: pairInfo.asset_lp_share.amount,
+      });
     }
   } catch (e) {
     // If pool not found, set poolNotFound to true

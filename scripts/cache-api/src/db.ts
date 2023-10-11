@@ -21,8 +21,22 @@ export async function createPair(pair: any) {
   return newPair;
 }
 
+export async function getOrCreateToken(address: string) {
+  const token = await getToken(address);
+
+  if(token !== null) return token;
+
+  const newToken = await prisma.token.create({
+    data: {
+      address: address
+    },
+  });
+
+  return newToken;
+}
+
 export async function getPair(address: string) {
-  const pair = await prisma.pair.findUnique({
+  const pair = await prisma.pair.findMany({
     where: {
       address: address,
     },
@@ -47,7 +61,7 @@ export async function getPairLiquidity(address: string, days: number) {
   });
 
   //fix bigint json serialization problem
-  const pairs = pairEntries.map((pair) => {
+  const pairs = pairEntries.map((pair: any) => {
     return JSON.parse(JSON.stringify(pair, (key, value) =>
       typeof value === 'bigint'
           ? value.toString()
@@ -65,57 +79,11 @@ export async function getTokens() {
 }
 
 export async function getToken(address: string) {
-  const token = await prisma.token.findUnique({
+  const token = await prisma.token.findFirst({
     where: {
       address: address
     }
   });
 
   return token;
-}
-
-
-export async function mockData() {
-  const tokenA = await prisma.token.create({
-    data: {
-      address: "CC5BDQ7J2VK4TQHHIMFNVMV5ZJZYDXDZN7XQ7IM73XKKPYF2KKARCOIW"
-    },
-  });
-
-  const tokenB = await prisma.token.create({
-    data: {
-      address: "CC6HQVYSKVFCKWU6EKYDILHFOV5DC26VICEUYAMKTIDS4XZPYMDP3WOS"
-    },
-  });
-
-  const tokenShare = await prisma.token.create({
-    data: {
-      address: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-    },
-  });
-
-  const pair = await prisma.pair.create({
-    data: {
-      address: "paircontractaddress",
-      timestamp: Date.now(),
-      assetA: {
-        connect: {
-          id: tokenA.id,
-        },
-      },
-      assetAAmount: 100,
-      assetB: {
-        connect: {
-          id: tokenB.id,
-        },
-      },
-      assetBAmount: 200,
-      assetShare: {
-        connect: {
-          id: tokenShare.id,
-        },
-      },
-      assetShareAmount: 300,
-    },
-  });
 }

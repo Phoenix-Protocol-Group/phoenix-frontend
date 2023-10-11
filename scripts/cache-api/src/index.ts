@@ -8,7 +8,7 @@ import cors from 'cors';
 const app = express();
 const port = process.env.PORT || 3000;
 
-if(process.env.FETCH == "true") fetch.startFetch();
+fetch.startFetch();
 
 app.use(express.json());
 app.use(cors());
@@ -23,23 +23,23 @@ app.get("/pairs", async (req: Request, res: Response) => {
   res.json(pairs);
 });
 
-app.get("/pair/:address", async (req: Request, res: Response) => {
+app.get("/pairs/:address", async (req: Request, res: Response) => {
   if(!req.params.address) res.status(400).send("Missing pair address");
 
   const pair = await db.getPair(req.params.address);
   return res.json(pair);
 });
 
-app.get("/pair/:address/:days", async (req: Request, res: Response) => {
+app.get("/pairs/:address/:days", async (req: Request, res: Response) => {
   const address = req.params.address;
   const days = req.params.days;
 
   if(!address) res.status(400).send("Missing pair address");
   if(!days) res.status(400).send("Missing days parameter");
 
-  const liquidity = await db.getPairLiquidity(address, Number(days));
+  const pairs = await db.getPairLiquidity(address, Number(days));
 
-  res.json(liquidity);
+  res.json(pairs);
 });
 
 app.get("/tokens", async (req: Request, res: Response) => {
@@ -48,7 +48,7 @@ app.get("/tokens", async (req: Request, res: Response) => {
   res.json(tokens);
 });
 
-app.get("/token/:address", async (req: Request, res: Response) => {
+app.get("/tokens/:address", async (req: Request, res: Response) => {
   if(!req.params.address) res.status(400).send("Missing token address");
 
   const token = await db.getToken(req.params.address);
