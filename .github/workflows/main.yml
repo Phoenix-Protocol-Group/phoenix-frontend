@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x]
+        node-version: [18.x, 20.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -27,13 +27,11 @@ jobs:
       - name: Install dependencies
         run: npm install -g yarn
 
-      - name: Lint, test and build (push)
-        if: ${{ github.event_name == 'push' }}
+      - name: Build
         run: yarn && yarn build
 
-      - name: Lint, test and build (pull request)
-        if: ${{ github.event_name == 'pull_request' }}
-        run: yarn && yarn build
+      - name: Jest Tests
+        run: yarn && yarn test
 
       - name: Lint Action
         uses: wearerequired/lint-action@v2.3.0
