@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.json",
   "include": ["./src"],
   "compilerOptions": {
+    "jsx": "react",
     "outDir": "./build",
-    "target": "ES2020"
+    "target": "ES5"
   }
 }
