@@ -17,7 +17,7 @@
     "url": "https://github.com/Phoenix-Protocol-Group/phoenix-frontend/issues"
   },
   "homepage": "https://github.com/Phoenix-Protocol-Group/phoenix-frontend",
-  "private": true,
+  "private": false,
   "workspaces": [
     "packages/utils",
     "packages/contracts",
@@ -30,5 +30,6 @@
     "@tsconfig/recommended": "^1.0.2",
     "@types/jest": "^29.5.2",
     "jest": "^29.5.0"
-  }
+  },
+  "packageManager": "yarn@3.6.4"
 }
