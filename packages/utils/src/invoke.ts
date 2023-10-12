@@ -1,6 +1,4 @@
 import freighter, { default as wallet } from "@stellar/freighter-api";
-// working around ESM compatibility issues
-const { isConnected, isAllowed, getUserInfo } = freighter;
 import * as SorobanClient from "soroban-client";
 import type {
   Account,
@@ -12,6 +10,9 @@ import type {
 import { NETWORK_PASSPHRASE } from "./constants";
 import { Server } from "./server";
 import { Wallet } from "./method-options";
+
+const { isConnected, isAllowed, getUserInfo } = freighter;
+
 // defined this way so typeahead shows full union, not named alias
 let responseTypes: "simulated" | "full" | undefined;
 export type ResponseTypes = typeof responseTypes;
@@ -44,6 +45,8 @@ export type Tx = Transaction<Memo<MemoType>, Operation[]>;
  * selected in Freighter. If not connected to Freighter, return null.
  */
 async function getAccount(): Promise<Account | null> {
+  if(typeof window === 'undefined') return null;
+
   if (!(await isConnected()) || !(await isAllowed())) {
     return null;
   }
@@ -125,11 +128,11 @@ export async function invoke<R extends ResponseTypes, T = any>({
   secondsToWait = 10,
   contractId,
 }: InvokeArgs<R, T>): Promise<T | string | SomeRpcResponse> {
-  const freighterAccount = await getAccount();
+  const walletAccount = await getAccount();
   let parse = parseResultXdr;
   // use a placeholder null account if not yet connected to Freighter so that view calls can still work
   const account =
-    freighterAccount ??
+    walletAccount ??
     new SorobanClient.Account(
       "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
       "0"
@@ -183,7 +186,7 @@ export async function invoke<R extends ResponseTypes, T = any>({
     // }
   }
 
-  if (!freighterAccount) {
+  if (!walletAccount) {
     throw new Error("Not connected to Freighter");
   }
 
