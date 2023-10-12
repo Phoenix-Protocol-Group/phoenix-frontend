@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@phoenix-protocol/contracts": "^0.0.3",
-    "@phoenix-protocol/utils": "^0.0.2",
+    "@phoenix-protocol/utils": "^0.0.3",
     "@prisma/client": "5.4.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

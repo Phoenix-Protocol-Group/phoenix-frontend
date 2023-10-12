@@ -6,20 +6,32 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - my_network
     environment:
-      - NODE_ENV=production
-      - APP_SECRET=your-secret-key
-    command: npm start
+      - DATABASE_URL=postgresql://your_db_user:your_db_password@postgres:5432/your_db_name?schema=public
+    command: sh -c "npm install && npm run migrate && npm start"
+
   postgres:
     image: postgres:latest
     networks:
-      - mynetwork
+      - my_network
     environment:
       POSTGRES_USER: your_db_user
       POSTGRES_PASSWORD: your_db_password
       POSTGRES_DB: your_db_name
     ports:
       - "5432:5432"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U your_db_user -d your_db_name -h localhost -p 5432",
+        ]
+      interval: 10s
+      retries: 5
 
 networks:
-  mynetwork:
+  my_network:
