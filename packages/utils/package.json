@@ -18,6 +18,7 @@
   "author": "Phoenix Protocol Group",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "jest": "^29.7.0",
     "jest-mock": "^29.7.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.1.3"
