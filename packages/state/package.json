@@ -1,9 +1,12 @@
 {
   "name": "@phoenix-protocol/state",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "files": [
+    "build/**/*"
+  ],
   "scripts": {
     "test": "tsc && jest",
     "build": "tsc"
@@ -15,13 +18,13 @@
   "author": "Phoenix Protocol Group",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@types/glob": "^7.1.3",
     "@types/urijs": "^1.19.19",
     "ts-jest": "^29.1.0",
-    "typescript": "^5.1.3",
-    "@types/glob": "^7.1.3"
+    "typescript": "^5.1.3"
   },
   "dependencies": {
-    "@phoenix-protocol/contracts": "^0.0.1",
+    "@phoenix-protocol/contracts": "workspace:^",
     "@stellar/freighter-api": "^1.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

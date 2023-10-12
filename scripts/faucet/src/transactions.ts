@@ -7,10 +7,18 @@ function i128ToScVal(i: bigint): SorobanClient.xdr.ScVal {
 }
 
 function addressToScVal(addr: string): SorobanClient.xdr.ScVal {
-  return SorobanClient.nativeToScVal(addr, { type: "address" } as any /* bug workaround */);
+  return SorobanClient.nativeToScVal(
+    addr,
+    { type: "address" } as any /* bug workaround */
+  );
 }
 
-export async function nativeTransaction(account: SorobanClient.Account, server: SorobanClient.Server, to: string, amount: string) {
+export async function nativeTransaction(
+  account: SorobanClient.Account,
+  server: SorobanClient.Server,
+  to: string,
+  amount: string
+) {
   let transaction = new SorobanClient.TransactionBuilder(account, {
     fee: "100",
     networkPassphrase: SorobanClient.Networks.FUTURENET,
@@ -19,7 +27,7 @@ export async function nativeTransaction(account: SorobanClient.Account, server: 
       SorobanClient.Operation.payment({
         destination: to,
         asset: SorobanClient.Asset.native(),
-        amount: amount,
+        amount: (Number(amount) / 10 ** 7).toString(),
       })
     )
     .setTimeout(SorobanClient.TimeoutInfinite)
@@ -27,32 +35,46 @@ export async function nativeTransaction(account: SorobanClient.Account, server: 
   transaction.sign(keypair);
 
   const txResult = await server.sendTransaction(transaction);
+  console.log(JSON.stringify(txResult));
   return waitForResult(server, txResult.hash);
 }
 
-export async function tokenTransaction(account: SorobanClient.Account, server: SorobanClient.Server,from: string, to: string, amount: string, token: string) {
+export async function tokenTransaction(
+  account: SorobanClient.Account,
+  server: SorobanClient.Server,
+  from: string,
+  to: string,
+  amount: string,
+  token: string
+) {
   const contract = new SorobanClient.Contract(token);
 
   const transaction = new SorobanClient.TransactionBuilder(account, {
     fee: "200",
     networkPassphrase: SorobanClient.Networks.FUTURENET,
   })
-  .addOperation(
-    contract.call(
-      "transfer",
-      new SorobanClient.Address(from).toScVal(),
-      new SorobanClient.Address(to).toScVal(),
-      i128ToScVal(BigInt(amount))
+    .addOperation(
+      contract.call(
+        "transfer",
+        new SorobanClient.Address(from).toScVal(),
+        new SorobanClient.Address(to).toScVal(),
+        i128ToScVal(BigInt(amount))
+      )
     )
-  )
-  .setTimeout(SorobanClient.TimeoutInfinite)
-  .build();
+    .setTimeout(SorobanClient.TimeoutInfinite)
+    .build();
 
-  const preparedTX= await server.prepareTransaction(transaction, SorobanClient.Networks.FUTURENET);
+  const preparedTX = await server.prepareTransaction(
+    transaction,
+    SorobanClient.Networks.FUTURENET
+  );
   const xdr = preparedTX.toXDR();
 
-  const tx = SorobanClient.TransactionBuilder.fromXDR(xdr, SorobanClient.Networks.FUTURENET);
-  tx.sign(keypair)
+  const tx = SorobanClient.TransactionBuilder.fromXDR(
+    xdr,
+    SorobanClient.Networks.FUTURENET
+  );
+  tx.sign(keypair);
 
   const txResult = await server.sendTransaction(tx);
   return waitForResult(server, txResult.hash);
@@ -65,7 +87,11 @@ async function waitForResult(server: SorobanClient.Server, hash: string) {
     await new Promise((resolve) => setTimeout(resolve, 500));
     queryResult = await server.getTransaction(hash);
 
+    console.log(`Transaction Status: ${queryResult.status}`);
+    if (queryResult.status === "FAILED") {
+      throw new Error(JSON.stringify(queryResult));
+    }
   } while (queryResult.status !== "SUCCESS");
-  
+
   return queryResult;
 }

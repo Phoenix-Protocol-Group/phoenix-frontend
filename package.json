@@ -3,7 +3,7 @@
   "description": "The Phoenix Frontend is a TypeScript-based web application utilizing yarn workspaces. It includes a UI kit (MUI-based), state management, utility functions, and a core package for seamless integration. It's written to use it with phoenix-contracts on Stellar's soroban platform.",
   "version": "0.0.1",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "yarn workspace @phoenix-protocol/utils run test",
     "build": "yarn workspace @phoenix-protocol/utils run build && yarn workspace @phoenix-protocol/contracts run build && yarn workspace @phoenix-protocol/state run build && yarn workspace @phoenix-protocol/ui run build && yarn workspace @phoenix-protocol/core run build",
     "storybook": "yarn workspace @phoenix-protocol/ui storybook"
   },
@@ -17,7 +17,6 @@
     "url": "https://github.com/Phoenix-Protocol-Group/phoenix-frontend/issues"
   },
   "homepage": "https://github.com/Phoenix-Protocol-Group/phoenix-frontend",
-  "private": true,
   "workspaces": [
     "packages/utils",
     "packages/contracts",
@@ -29,5 +28,6 @@
     "@tsconfig/recommended": "^1.0.2",
     "@types/jest": "^29.5.2",
     "jest": "^29.5.0"
-  }
+  },
+  "packageManager": "yarn@3.6.4"
 }

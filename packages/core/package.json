@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@mui/material": "^5.14.1",
-    "@phoenix-protocol/state": "^0.0.1",
-    "@phoenix-protocol/ui": "^0.0.1",
-    "@phoenix-protocol/utils": "^0.0.1",
+    "@phoenix-protocol/state": "workspace:^",
+    "@phoenix-protocol/ui": "workspace:^",
+    "@phoenix-protocol/utils": "workspace:^",
     "eslint": "8.45.0",
     "eslint-config-next": "13.4.10",
     "next": "13.4.10",

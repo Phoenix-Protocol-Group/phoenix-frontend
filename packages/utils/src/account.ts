@@ -12,13 +12,13 @@ export async function getAccount(): Promise<Account | null> {
   if (!(await isConnected()) || !(await isAllowed())) {
     return null;
   }
-
   const { publicKey } = await getUserInfo();
   if (!publicKey) {
     return null;
   }
   try {
-    return await Server.getAccount(publicKey);
+    const account = await Server.getAccount(publicKey);
+    return account || null;
   } catch (e) {
     return null;
   }

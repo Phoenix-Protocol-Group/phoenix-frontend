@@ -3,124 +3,110 @@
 import {
   PhoenixFactoryContract,
   PhoenixPairContract,
-  PhoenixStakeContract,
 } from "@phoenix-protocol/contracts";
 import { useAppStore } from "@phoenix-protocol/state";
-import { Pool, Pools, Skeleton, Token } from "@phoenix-protocol/ui";
+import { Pool, Pools, Skeleton } from "@phoenix-protocol/ui";
 import { constants } from "@phoenix-protocol/utils";
-import { FACTORY_ADDRESS } from "@phoenix-protocol/utils/build/constants";
 import { useEffect, useState } from "react";
-import { Address } from "stellar-base";
 import { useRouter } from "next/navigation";
+import { Address } from "soroban-client";
 
 export default function Page() {
-  const store = useAppStore();
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [allPools, setAllPools] = useState<Pool[]>([]);
-  const [stakeContract, setStakeContract] = useState<
-    PhoenixStakeContract.Contract | undefined
-  >(undefined);
-  const fetchPool = async (poolAddress: Address) => {
+  const store = useAppStore(); // Global state management
+  const router = useRouter(); // Next.js router
+  const [loading, setLoading] = useState(true); // Loading state for async operations
+  const [allPools, setAllPools] = useState<Pool[]>([]); // State to hold pool data
+
+  // Fetch pool information by its address
+  const fetchPool = async (poolAddress: string) => {
     try {
       const PairContract = new PhoenixPairContract.Contract({
-        contractId: poolAddress.toString(),
+        contractId: poolAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
       });
 
-      // Fetch pool config and info from chain
       const [pairConfig, pairInfo] = await Promise.all([
         PairContract.queryConfig(),
         PairContract.queryPoolInfo(),
       ]);
 
-      // When results ok...
       if (pairConfig?.isOk() && pairInfo?.isOk()) {
-        // Fetch token infos from chain and save in global appstore
-        const [tokenA, tokenB, lpToken, stakeContract] = await Promise.all([
+        const [tokenA, tokenB] = await Promise.all([
           store.fetchTokenInfo(pairConfig.unwrap().token_a),
           store.fetchTokenInfo(pairConfig.unwrap().token_b),
-          store.fetchTokenInfo(pairConfig.unwrap().share_token),
-          new PhoenixStakeContract.Contract({
-            contractId: pairConfig.unwrap().stake_contract.toString(),
-            networkPassphrase: constants.NETWORK_PASSPHRASE,
-            rpcUrl: constants.RPC_URL,
-          }),
         ]);
 
-        setStakeContract(stakeContract);
-
-        // Save Token info
-        const tokens: Token[] = [
-          {
-            name: tokenA?.symbol || "",
-            icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
-            amount:
-              Number(pairInfo.unwrap().asset_a.amount) /
-              10 ** Number(tokenA?.decimals),
-            category: "",
-            usdValue: 0,
-          },
-          {
-            name: tokenB?.symbol || "",
-            icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
-            amount:
-              Number(pairInfo.unwrap().asset_b.amount) /
-              10 ** Number(tokenB?.decimals),
-            category: "",
-            usdValue: 0,
-          },
-        ];
+        // Construct and return pool object if all fetches are successful
         return {
-          tokens,
+          tokens: [
+            {
+              name: tokenA?.symbol || "",
+              icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
+              amount:
+                Number(pairInfo.unwrap().asset_a.amount) /
+                10 ** Number(tokenA?.decimals),
+              category: "",
+              usdValue: 0,
+            },
+            {
+              name: tokenB?.symbol || "",
+              icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
+              amount:
+                Number(pairInfo.unwrap().asset_b.amount) /
+                10 ** Number(tokenB?.decimals),
+              category: "",
+              usdValue: 0,
+            },
+          ],
           tvl: "0",
           maxApr: "0",
           userLiquidity: 0,
-          poolAddress: poolAddress.toString(),
+          poolAddress: poolAddress,
         };
       }
-      return {
-        tokens: [],
-        tvl: "0",
-        maxApr: "0",
-        userLiquidity: 0,
-        poolAddress: "",
-      };
     } catch (e) {
-      // If pool not found, set poolNotFound to true
       console.log(e);
-      return {
-        tokens: [],
-        tvl: "0",
-        maxApr: "0",
-        userLiquidity: 0,
-        poolAddress: "",
-      };
     }
+
+    // Fallback pool object for error or unsuccessful fetch
+    return {
+      tokens: [],
+      tvl: "0",
+      maxApr: "0",
+      userLiquidity: 0,
+      poolAddress: "",
+    };
   };
+
+  // Fetch all pools' data
   const fetchPools = async () => {
     const FactoryContract = new PhoenixFactoryContract.Contract({
-      contractId: FACTORY_ADDRESS,
+      contractId: constants.FACTORY_ADDRESS,
       networkPassphrase: constants.NETWORK_PASSPHRASE,
       rpcUrl: constants.RPC_URL,
     });
+
     const pools = await FactoryContract.queryPools({});
 
     const poolWithData = pools
       ? await Promise.all(
           pools.unwrap().map(async (pool: Address) => {
-            return await fetchPool(pool);
+            return await fetchPool(pool.toString());
           })
         )
       : [];
+
     setAllPools(poolWithData);
   };
+
+  // On component mount, fetch pools and update loading state
   useEffect(() => {
     fetchPools().then(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Render: conditionally display skeleton loader or pool data
   return loading ? (
     <Skeleton.Pools />
   ) : (

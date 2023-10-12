@@ -1,12 +1,15 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.3",
   "name": "@phoenix-protocol/contracts",
+  "files": [
+    "build/**/*"
+  ],
   "dependencies": {
-    "@phoenix-protocol/utils": "^0.0.1",
+    "@phoenix-protocol/utils": "workspace:^",
     "@stellar/freighter-api": "1.5.0",
+    "bigint-conversion": "2.4.1",
     "buffer": "6.0.3",
-    "soroban-client": "1.0.0-beta.2",
-    "bigint-conversion": "2.4.1"
+    "soroban-client": "1.0.0-beta.2"
   },
   "scripts": {
     "test": "tsc && jest",
