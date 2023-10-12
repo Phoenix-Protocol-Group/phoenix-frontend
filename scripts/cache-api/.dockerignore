@@ -1,1 +1,36 @@
-node_modules/
+# Exclude Node.js modules and dependencies
+node_modules
+
+# Exclude development and build files
+npm-debug.log
+yarn-error.log
+Dockerfile
+docker-compose.yml
+
+# Exclude version control files
+.git
+.gitignore
+.gitattributes
+.gitmodules
+
+# Exclude temporary and build directories
+.tmp
+dist
+build
+
+# Exclude log files and other generated files
+*.log
+*.pid
+*.lock
+*.sqlite
+
+# Exclude editor and IDE files
+.vscode
+.idea
+
+# Exclude system and hidden files
+.DS_Store
+Thumbs.db
+
+# Exclude configuration files
+*.config.js

@@ -10,7 +10,7 @@ export async function getPairs() {
     }
   });
 
-  return pairs;
+  return serializeBigInt(pairs);
 }
 
 export async function createPair(pair: any) {
@@ -60,16 +60,7 @@ export async function getPairLiquidity(address: string, days: number) {
     },
   });
 
-  //fix bigint json serialization problem
-  const pairs = pairEntries.map((pair: any) => {
-    return JSON.parse(JSON.stringify(pair, (key, value) =>
-      typeof value === 'bigint'
-          ? value.toString()
-          : value // 
-    ));
-  });
-
-  return pairs;
+  return serializeBigInt(pairEntries);
 }
 
 export async function getTokens() {
@@ -86,4 +77,16 @@ export async function getToken(address: string) {
   });
 
   return token;
+}
+
+function serializeBigInt(arr: any) {
+  const parsed = arr.map((pair: any) => {
+    return JSON.parse(JSON.stringify(pair, (key, value) =>
+      typeof value === 'bigint'
+          ? value.toString()
+          : value // 
+    ));
+  });
+
+  return parsed
 }

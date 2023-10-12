@@ -1,14 +1,21 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine
+# Set the working directory in the container
 WORKDIR /app
+
+# Copy the package.json and package-lock.json files to the container
 COPY package*.json ./
+
+# Install application dependencies
 RUN npm install
+
+# Copy the rest of your application source code to the container
 COPY . .
+
+# Build TypeScript code (if applicable)
 RUN npm run build
 
-FROM node:20-alpine AS server
-WORKDIR /app
-COPY package* ./
-RUN npm install --production
-COPY --from=builder ./app/build ./build
+# Expose port 3000 for the application
 EXPOSE 3000
+
+# Start your application using npm start
 CMD ["npm", "start"]

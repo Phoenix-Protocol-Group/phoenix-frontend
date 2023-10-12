@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express, {Request, Response} from "express"
-import { Context, createContext } from "./context";
 import * as db from "./db";
 import * as fetch from "./fetch";
 import cors from 'cors';

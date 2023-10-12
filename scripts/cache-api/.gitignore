@@ -19,3 +19,5 @@ experimental/**/*.db
 .nuxt
 dev.db
 *.env*
+.yarn/
+.yarnrc.yml
