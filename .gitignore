@@ -31,5 +31,3 @@ next-env.d.ts
 .vscode/
 
 .env
-
-.yarn
