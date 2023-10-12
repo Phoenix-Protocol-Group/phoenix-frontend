@@ -3129,11 +3129,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@phoenix-protocol/contracts@^0.0.1, @phoenix-protocol/contracts@workspace:packages/contracts":
+"@phoenix-protocol/contracts@^0.0.3, @phoenix-protocol/contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/contracts@workspace:packages/contracts"
   dependencies:
-    "@phoenix-protocol/utils": ^0.0.1
+    "@phoenix-protocol/utils": ^0.0.2
     "@stellar/freighter-api": 1.5.0
     bigint-conversion: 2.4.1
     buffer: 6.0.3
@@ -3141,6 +3141,19 @@ __metadata:
     typescript: 5.0.4
   languageName: unknown
   linkType: soft
+
+"@phoenix-protocol/contracts@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "@phoenix-protocol/contracts@npm:0.0.1"
+  dependencies:
+    "@phoenix-protocol/utils": ^0.0.1
+    "@stellar/freighter-api": 1.5.0
+    bigint-conversion: 2.4.1
+    buffer: 6.0.3
+    soroban-client: 1.0.0-beta.2
+  checksum: dc100c7c06cf2d2007d1cbf0e6a5124084da703ffe5a3b48ca6a8b6503f87eb3e1f3c6a99872abbaf765491f45ad781e25a7bbcc8360948761e7b5e0f6a7a901
+  languageName: node
+  linkType: hard
 
 "@phoenix-protocol/core@workspace:packages/core":
   version: 0.0.0-use.local
@@ -3176,11 +3189,26 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@phoenix-protocol/state@^0.0.1, @phoenix-protocol/state@workspace:packages/state":
+"@phoenix-protocol/state@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "@phoenix-protocol/state@npm:0.0.1"
+  dependencies:
+    "@phoenix-protocol/contracts": ^0.0.1
+    "@stellar/freighter-api": ^1.4.0
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-query: ^3.39.3
+    soroban-client: 1.0.0-beta.2
+    zustand: ^4.3.9
+  checksum: 5b0b7aaf062f796a0ed88cbde70e2ffee88249e317ed02720b8959ba5f23aff40e10b4a4197a44be05cc99ae3140be965e36196509210627ed6bfa233c10e5c3
+  languageName: node
+  linkType: hard
+
+"@phoenix-protocol/state@workspace:packages/state":
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/state@workspace:packages/state"
   dependencies:
-    "@phoenix-protocol/contracts": ^0.0.1
+    "@phoenix-protocol/contracts": ^0.0.3
     "@stellar/freighter-api": ^1.4.0
     "@types/glob": ^7.1.3
     "@types/urijs": ^1.19.19
@@ -3256,7 +3284,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@phoenix-protocol/utils@^0.0.1, @phoenix-protocol/utils@workspace:packages/utils":
+"@phoenix-protocol/utils@^0.0.2, @phoenix-protocol/utils@workspace:packages/utils":
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/utils@workspace:packages/utils"
   dependencies:
@@ -3267,6 +3295,17 @@ __metadata:
     typescript: ^5.1.3
   languageName: unknown
   linkType: soft
+
+"@phoenix-protocol/utils@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "@phoenix-protocol/utils@npm:0.0.1"
+  dependencies:
+    big.js: ^6.2.1
+    bignumber.js: ^9.1.1
+    soroban-client: 1.0.0-beta.2
+  checksum: 05d31dd78c0fa76f26000995f31e5a0a8d77d8185f24d7a6f2be5640d4e6f9a2c7baf7b0275213633cec2a0b1d7ec0a14ed4ee0a080e490db8279d4eb5efb4c3
+  languageName: node
+  linkType: hard
 
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0

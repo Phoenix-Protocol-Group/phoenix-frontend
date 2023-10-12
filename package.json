@@ -17,7 +17,6 @@
     "url": "https://github.com/Phoenix-Protocol-Group/phoenix-frontend/issues"
   },
   "homepage": "https://github.com/Phoenix-Protocol-Group/phoenix-frontend",
-  "private": false,
   "workspaces": [
     "packages/utils",
     "packages/contracts",

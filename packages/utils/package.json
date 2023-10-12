@@ -4,7 +4,9 @@
   "description": "",
   "main": "build/index.js",
   "types": "build/index.d.ts",
-  "files": ["build/**/*"],
+  "files": [
+    "build/**/*"
+  ],
   "scripts": {
     "test": "jest",
     "build": "tsc"

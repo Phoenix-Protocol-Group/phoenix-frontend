@@ -15,7 +15,6 @@
     "test": "tsc && jest",
     "build": "tsc"
   },
-  "private": "false",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "devDependencies": {
