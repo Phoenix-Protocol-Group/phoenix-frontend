@@ -11,7 +11,7 @@
     "migrate": "npx prisma migrate dev --name init"
   },
   "dependencies": {
-    "@phoenix-protocol/contracts": "^0.0.3",
+    "@phoenix-protocol/contracts": "^0.0.5",
     "@phoenix-protocol/utils": "^0.0.3",
     "@prisma/client": "5.4.1",
     "cors": "^2.8.5",
