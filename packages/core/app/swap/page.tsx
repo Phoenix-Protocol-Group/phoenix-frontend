@@ -13,13 +13,10 @@ import {
 } from "@phoenix-protocol/ui";
 import { PhoenixMultihopContract } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import { constants } from "@phoenix-protocol/utils";
+import { constants, findBestPath } from "@phoenix-protocol/utils";
 import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
-import { Box } from "@mui/material";
+import { Alert, Box } from "@mui/material";
 import { Address } from "soroban-client";
-
-const TEST_TOKEN_A = "CBWK2ZG5YWF6ZMLVEKTN4LZZKOHRD6UNS356AGFQKZGPMR3HUGZ6NKVT";
-const TEST_TOKEN_B = "CD2QZU2HFAV37GTZBRBXA7RDWI2JD4UPIQGDSVM2DGNVMZUQ4VPFLDQZ";
 
 export default function SwapPage() {
   // State variables declaration and initialization
@@ -35,6 +32,8 @@ export default function SwapPage() {
   const [maxSpread, setMaxSpread] = useState<number>(0);
   const [toToken, setToToken] = useState<Token>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [swapRoute, setSwapRoute] = useState<string>("");
+  const [operations, setOperations] = useState<any[]>([]);
 
   // Using the store
   const storePersist = usePersistStore();
@@ -42,26 +41,34 @@ export default function SwapPage() {
 
   // Function for handling token swapping logic
   const doSwap = async () => {
-    // Create contract instance
-    const contract = new PhoenixMultihopContract.Contract({
-      contractId: constants.MULTIHOP_ADDRESS,
-      networkPassphrase: constants.NETWORK_PASSPHRASE,
-      rpcUrl: constants.RPC_URL,
-    });
+    try {
+      // Create contract instance
+      const contract = new PhoenixMultihopContract.Contract({
+        contractId: constants.MULTIHOP_ADDRESS,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
 
-    // Execute swap
-    const tx = await contract.swap({
-      recipient: Address.fromString(storePersist.wallet.address!),
-      operations: [
-        {
-          ask_asset: Address.fromString(TEST_TOKEN_B),
-          offer_asset: Address.fromString(TEST_TOKEN_A),
-        },
-      ],
-      amount: BigInt(100000000),
-    });
+      // Execute swap
+      const tx = await contract.swap({
+        recipient: Address.fromString(storePersist.wallet.address!),
+        operations: operations,
+        amount: BigInt(tokenAmounts[0] * 10 ** 7),
+      });
 
-    console.log(tx);
+      // @ts-ignore
+      if (tx?.status === "FAILED") {
+        setErrorModalOpen(true);
+
+        // @ts-ignore
+        setErrorDescription(tx?.resultXdr);
+
+        return;
+      }
+      setSuccessModalOpen(true);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   // Function for handling token click
@@ -102,8 +109,39 @@ export default function SwapPage() {
     };
 
     getAllTokens();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storePersist.wallet.address]);
+
+  useEffect(() => {
+    if (fromToken && toToken) {
+      const fromTokenContractID = appStore.allTokens.find(
+        (token: any) => token.name === fromToken.name
+      )?.contractId;
+
+      const toTokenContractID = appStore.allTokens.find(
+        (token: any) => token.name === toToken.name
+      )?.contractId;
+
+      if (!fromTokenContractID || !toTokenContractID) {
+        return;
+      }
+
+      const { operations: _operations } = findBestPath(
+        fromTokenContractID,
+        toTokenContractID
+      );
+      const _swapRoute: string[] = _operations.map((op, index) => {
+        const toAssetName = appStore.allTokens.find(
+          (token: any) => token.contractId === op.offer_asset
+        )?.name;
+
+        return toAssetName;
+      });
+      setOperations(_operations);
+      const swapRoute_ = fromToken.name + " -> " + _swapRoute.join(" -> ");
+      setSwapRoute(swapRoute_);
+    }
+  }, [fromToken, toToken, appStore.allTokens]);
 
   // Return statement for rendering components conditionally based on state
   return isLoading ? (
@@ -111,6 +149,11 @@ export default function SwapPage() {
   ) : (
     // JSX for UI when data is loaded
     <Box sx={{ width: "100%", maxWidth: "600px" }}>
+      <Alert severity="warning">
+        Only direct pool swaps work for now! Unfortunately we are reaching
+        memory limits on the testnet with multi-pool swaps. Stay tuned for
+        updates!
+      </Alert>
       {/* Success Modal */}
       {fromToken && toToken && (
         <SwapSuccess
@@ -144,13 +187,22 @@ export default function SwapPage() {
               handleSelectorOpen(isFromToken)
             }
             onSwapButtonClick={() => doSwap()}
-            onInputChange={() => {}}
-            exchangeRate={"1 BTC = 26,567 USDT ($26,564)"}
-            networkFee={"0.0562 USDT (~$0.0562)"}
-            route={"Trycryptousd"}
-            estSellPrice={"0.0562 USDT (~$0.0562)"}
-            minSellPrice={"0.0562 USDT (~$0.0562)"}
+            onInputChange={(isFrom, value) => {
+              if (isFrom) {
+                setTokenAmounts([Number(value), 0]);
+              } else {
+                setTokenAmounts([0, Number(value)]);
+              }
+            }}
+            exchangeRate={"TODO"}
+            networkFee={"TODO"}
+            route={swapRoute}
+            estSellPrice={"TODO"}
+            minSellPrice={"TODO"}
             slippageTolerance={`${maxSpread + 1}%`}
+            swapButtonDisabled={
+              tokenAmounts[0] <= 0 || storePersist.wallet.address === undefined
+            }
           />
         )}
         {/* Options Modal for Setting Slippage Tolerance */}

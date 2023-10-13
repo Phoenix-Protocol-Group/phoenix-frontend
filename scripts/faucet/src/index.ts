@@ -26,8 +26,9 @@ app.use(limiter);
 const wallet = new OfflineWallet();
 
 const tokens = [
-  "CC5BDQ7J2VK4TQHHIMFNVMV5ZJZYDXDZN7XQ7IM73XKKPYF2KKARCOIW",
-  "CC6HQVYSKVFCKWU6EKYDILHFOV5DC26VICEUYAMKTIDS4XZPYMDP3WOS",
+  "CCHEE2LEYD2QUESNKCUAQNXXQ3VYFL3XGI5CEZDHDT7NXKPEWQ6TFJVZ",
+  "CDDDTR6DVLDFMCDHLXEJIDY6P4IADIM6HCM3QBHAR763YAWUJ6DZUV2P",
+  "CCHEE2LEYD2QUESNKCUAQNXXQ3VYFL3XGI5CEZDHDT7NXKPEWQ6TFJVZ",
 ];
 
 app.get("/fund/:walletId", async (req: Request, res: Response) => {
@@ -39,17 +40,6 @@ app.get("/fund/:walletId", async (req: Request, res: Response) => {
 
   try {
     let queryResults: any = [];
-    console.log("Start Processing!");
-    console.log("Crafting TX for Native Asset");
-    const nativeTX = await nativeTransaction(
-      account,
-      server,
-      to,
-      amount.toString()
-    );
-    console.log(`Native TX: ${JSON.stringify(nativeTX)}`);
-    queryResults.push(nativeTX);
-
     for (const token of tokens) {
       console.log(`Processing Token: ${token}`);
       const tokenTX = await tokenTransaction(

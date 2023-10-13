@@ -6,3 +6,4 @@ export * as account from "./account";
 export * as convert from "./convert";
 export * as time from "./time";
 export * as methodOptions from "./method-options";
+export { findBestPath } from "./demoFindPaths";

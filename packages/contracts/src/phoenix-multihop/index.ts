@@ -223,7 +223,7 @@ export class Contract {
         ...options,
         ...this.options,
         parseResultXdr: (xdr: any): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("swap", xdr));
+          return new Ok(void 0);
         },
       });
     } catch (e) {
