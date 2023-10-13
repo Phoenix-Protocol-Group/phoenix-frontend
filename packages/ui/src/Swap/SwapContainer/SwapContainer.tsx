@@ -135,7 +135,7 @@ const SwapContainer = ({
               marginTop: "8px",
             }}
           >
-            <Box component={"img"} src="/Gearsix.svg" />
+            <Box component={"img"} src="/GearSix.svg" />
           </IconButton>
         </Box>
       </Box>
