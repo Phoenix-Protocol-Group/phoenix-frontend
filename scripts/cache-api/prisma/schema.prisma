@@ -14,15 +14,23 @@ model Token {
   id      Int    @id @default(autoincrement())
   address String
 
-  assetA     Pair[] @relation("assetA")
-  assetB     Pair[] @relation("assetB")
-  assetShare Pair[] @relation("assetShare")
+  assetA     Pair[]         @relation("assetA")
+  assetB     Pair[]         @relation("assetB")
+  assetShare Pair[]         @relation("assetShare")
+  TokenPrice TokenHistory[]
+}
+
+model TokenHistory {
+  id        Int    @id @default(autoincrement())
+  createdAt BigInt
+  price     BigInt
+  token     Token  @relation(fields: [tokenId], references: [id])
+  tokenId   Int
 }
 
 model Pair {
-  id        Int    @id @default(autoincrement())
-  address   String
-  timestamp BigInt
+  id      Int    @id @default(autoincrement())
+  address String
 
   assetA       Token  @relation("assetA", fields: [assetAId], references: [id])
   assetAId     Int
@@ -32,7 +40,15 @@ model Pair {
   assetBId     Int
   assetBAmount BigInt
 
-  assetShare       Token  @relation("assetShare", fields: [assetShareId], references: [id])
+  assetShare       Token         @relation("assetShare", fields: [assetShareId], references: [id])
   assetShareId     Int
   assetShareAmount BigInt
+  PairHistory      PairHistory[]
+}
+
+model PairHistory {
+  id        Int    @id @default(autoincrement())
+  createdAt BigInt
+  pair      Pair   @relation(fields: [pairId], references: [id])
+  pairId    Int
 }

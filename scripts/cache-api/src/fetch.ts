@@ -7,14 +7,21 @@ import {
 import { constants } from '@phoenix-protocol/utils';
 import { FACTORY_ADDRESS } from '@phoenix-protocol/utils/build/constants';
 import * as db from "./db";
+import * as price from "./price";
 import { Address } from "stellar-base";
+import { findBestPath } from './demoFindPaths';
 
-export function startFetch() {
+export async function startFetch() {
   console.log("Starting fetch");
-  fetchPairs();
+  //const pairRes = await fetchPairs();
 
+  fetchPrices();
+
+  return;
   const job: nodeSchedule.Job = nodeSchedule.scheduleJob('*/15 * * * *', async () => {
     const pairRes = await fetchPairs();
+
+    db.deleteOldEntries();
   });
 }
 
@@ -63,33 +70,66 @@ async function fetchPool(poolAddress: Address) {
       const tokenB = await db.getOrCreateToken(pairInfo.asset_b.address.toString());
       const tokenShare = await db.getOrCreateToken(pairInfo.asset_lp_share.address.toString());
 
-      const newPair = await db.createPair({
-        timestamp: roundDownToNearest15Minutes(),
-        address: poolAddress.toString(),
-        assetA: {
+      const pair = await db.getPair(poolAddress.toString());
+      let pairId = pair?.id;
+
+      if(!pair) {
+        const newPair = await db.createPair({
+          address: poolAddress.toString(),
+          assetA: {
+            connect: {
+              id: tokenA.id,
+            }
+          },
+          assetAAmount: pairInfo.asset_a.amount,
+          assetB: {
+            connect: {
+              id: tokenB.id,
+            }
+          },
+          assetBAmount: pairInfo.asset_b.amount,
+          assetShare: {
+            connect: {
+              id: tokenShare.id,
+            }
+          },
+          assetShareAmount: pairInfo.asset_lp_share.amount,
+        });
+
+        pairId = newPair.id;
+      }
+
+      const newPairHistory = await db.createPairHistory({
+        createdAt: roundDownToNearest15Minutes(),
+        pair: {
           connect: {
-            id: tokenA.id,
+            id: pairId,
           }
         },
-        assetAAmount: pairInfo.asset_a.amount,
-        assetB: {
-          connect: {
-            id: tokenB.id,
-          }
-        },
-        assetBAmount: pairInfo.asset_b.amount,
-        assetShare: {
-          connect: {
-            id: tokenShare.id,
-          }
-        },
-        assetShareAmount: pairInfo.asset_lp_share.amount,
       });
+
+      return newPairHistory
     }
   } catch (e) {
     // If pool not found, set poolNotFound to true
     console.log(e);
   }
+}
+
+async function fetchPrices() {
+  const pairEntries = await db.getPairs();
+  const pairs = pairEntries.map((pair: any) => {
+    return {
+      asset_a: pair.assetA.address, 
+      asset_b: pair.assetB.address}
+  });
+
+  for(let pair of pairs) {
+    const bestPath = findBestPath(pair.asset_a, pair.asset_b, pairs);
+    console.log(bestPath);
+  }
+
+  return pairs;
 }
 
 async function fetchPairs() {
