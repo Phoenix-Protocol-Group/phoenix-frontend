@@ -6,11 +6,7 @@ interface Graph {
   [key: string]: string[];
 }
 
-export function findBestPath(
-  pair: Pair,
-  pairArray: Pair[],
-  stringArray: string[]
-): string[] | null {
+function findBestPath(pairArray: Pair[], stringArray: string[]): string[] | null {
   const graph: Graph = {};
 
   for (const p of pairArray) {
@@ -25,31 +21,29 @@ export function findBestPath(
     graph[address2].push(address1);
   }
 
-  const visited: { [key: string]: boolean } = {};
-  const path: string[] = [];
+  const queue: { node: string; path: string[] }[] = pairArray.map(([a, b]) => ({
+    node: a,
+    path: [a],
+  }));
 
-  const dfs = (node: string, target: string, path: string[]): string[] | null => {
-    if (node === target) {
+  const visited: { [key: string]: boolean } = {};
+
+  while (queue.length > 0) {
+    const { node, path } = queue.shift()!;
+    if (stringArray.includes(node)) {
       return path;
     }
     if (!graph[node] || visited[node]) {
-      return null;
+      continue;
     }
     visited[node] = true;
     for (const neighbor of graph[node]) {
-      const result = dfs(neighbor, target, [...path, neighbor]);
-      if (result) {
-        return result;
-      }
+      queue.push({ node: neighbor, path: [...path, neighbor] });
     }
-    return null;
-  };
+  }
 
-  const [source, target] = pair;
-  const result = dfs(source, target, [source]);
-  return result;
+  return null;
 }
-
 
 const coinGecko = new CoinGeckoClient({
   timeout: 10000,
