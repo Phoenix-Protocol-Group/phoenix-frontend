@@ -12,7 +12,6 @@ import * as pair from "./pair/db";
 import * as pairHistory from "./pairHistory/db";
 import * as price from "./price";
 import { Address } from "stellar-base";
-import { findBestPath } from './demoFindPaths';
 
 export async function startFetch() {
   console.log("Starting fetch");
@@ -129,7 +128,7 @@ async function fetchPrices() {
   });
 
   for(let pair of pairs) {
-    const bestPath = findBestPath(pair.asset_a, pair.asset_b, pairs);
+    const bestPath = price.findBestPath(pair.asset_a, pair.asset_b, pairs);
     console.log(bestPath);
   }
 
