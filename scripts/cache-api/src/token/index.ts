@@ -1,8 +1,8 @@
-import {Request, Response} from "express"
-import prisma from "../prisma";
+import {Request, Response} from "express";
+import * as db from "./db";
 
 export async function getAll(req: Request, res: Response) {
-  const tokens = await prisma.token.findMany();
+  const tokens = await db.getAll();
 
   res.json(tokens);
 }
@@ -10,11 +10,7 @@ export async function getAll(req: Request, res: Response) {
 export async function getByAddress(req: Request, res: Response) {
   if(!req.params.address) res.status(400).send("Missing token address");
 
-  const token = await prisma.token.findFirst({
-    where: {
-      address: req.params.address
-    }
-  });
+  const token = await db.getByAddress(req.params.address);
 
   return res.json(token);
 }

@@ -6,22 +6,26 @@ import {
 } from "@phoenix-protocol/contracts";
 import { constants } from '@phoenix-protocol/utils';
 import { FACTORY_ADDRESS } from '@phoenix-protocol/utils/build/constants';
-import * as db from "./db";
+import * as token from "./token/db";
+import * as tokenHistory from "./tokenHistory/db";
+import * as pair from "./pair/db";
+import * as pairHistory from "./pairHistory/db";
 import * as price from "./price";
 import { Address } from "stellar-base";
 import { findBestPath } from './demoFindPaths';
 
 export async function startFetch() {
   console.log("Starting fetch");
-  //const pairRes = await fetchPairs();
+  const pairRes = await fetchPairs();
 
-  fetchPrices();
+  //fetchPrices();
 
-  return;
+  //return;
   const job: nodeSchedule.Job = nodeSchedule.scheduleJob('*/15 * * * *', async () => {
     const pairRes = await fetchPairs();
 
-    db.deleteOldEntries();
+    tokenHistory.deleteOldEntries();
+    pairHistory.deleteOldEntries();
   });
 }
 
@@ -66,15 +70,15 @@ async function fetchPool(poolAddress: Address) {
       const pairConfig = pairConfigRes.unwrap();
       const pairInfo = pairInfoRes.unwrap();
 
-      const tokenA = await db.getOrCreateToken(pairInfo.asset_a.address.toString());
-      const tokenB = await db.getOrCreateToken(pairInfo.asset_b.address.toString());
-      const tokenShare = await db.getOrCreateToken(pairInfo.asset_lp_share.address.toString());
+      const tokenA = await token.getOrCreate(pairInfo.asset_a.address.toString());
+      const tokenB = await token.getOrCreate(pairInfo.asset_b.address.toString());
+      const tokenShare = await token.getOrCreate(pairInfo.asset_lp_share.address.toString());
 
-      const pair = await db.getPair(poolAddress.toString());
-      let pairId = pair?.id;
+      const existingPair = await pair.getByAddress(poolAddress.toString());
+      let pairId = existingPair?.id;
 
       if(!pair) {
-        const newPair = await db.createPair({
+        const newPair = await pair.create({
           address: poolAddress.toString(),
           assetA: {
             connect: {
@@ -99,7 +103,7 @@ async function fetchPool(poolAddress: Address) {
         pairId = newPair.id;
       }
 
-      const newPairHistory = await db.createPairHistory({
+      const newPairHistory = await pairHistory.create({
         createdAt: roundDownToNearest15Minutes(),
         pair: {
           connect: {
@@ -117,7 +121,7 @@ async function fetchPool(poolAddress: Address) {
 }
 
 async function fetchPrices() {
-  const pairEntries = await db.getPairs();
+  const pairEntries = await pair.getAll();
   const pairs = pairEntries.map((pair: any) => {
     return {
       asset_a: pair.assetA.address, 
