@@ -6,7 +6,7 @@ interface Graph {
   [key: string]: string[];
 }
 
-function findBestPath(
+export function findBestPath(
   pair: Pair,
   pairArray: Pair[],
   stringArray: string[]
