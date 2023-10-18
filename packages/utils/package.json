@@ -25,7 +25,6 @@
   },
   "dependencies": {
     "big.js": "^6.2.1",
-    "bignumber.js": "^9.1.1",
-    "soroban-client": "1.0.0-beta.2"
+    "bignumber.js": "^9.1.1"
   }
 }

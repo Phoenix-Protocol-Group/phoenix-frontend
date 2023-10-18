@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Token {
+  id       Int    @id @default(autoincrement())
+  address  String @unique
+  name     String
+  symbol   String
+  decimals Int
+
+  assetA     Pair[]         @relation("assetA")
+  assetB     Pair[]         @relation("assetB")
+  assetShare Pair[]         @relation("assetShare")
+  TokenPrice TokenHistory[]
+}
+
+model TokenHistory {
+  id        Int    @id @default(autoincrement())
+  createdAt BigInt
+  price     BigInt
+  token     Token  @relation(fields: [tokenId], references: [id])
+  tokenId   Int
+}
+
+model Pair {
+  id      Int    @id @default(autoincrement())
+  address String
+
+  assetA       Token  @relation("assetA", fields: [assetAId], references: [id])
+  assetAId     Int
+  assetAAmount BigInt
+
+  assetB       Token  @relation("assetB", fields: [assetBId], references: [id])
+  assetBId     Int
+  assetBAmount BigInt
+
+  assetShare       Token         @relation("assetShare", fields: [assetShareId], references: [id])
+  assetShareId     Int
+  assetShareAmount BigInt
+  PairHistory      PairHistory[]
+}
+
+model PairHistory {
+  id        Int    @id @default(autoincrement())
+  createdAt BigInt
+  pair      Pair   @relation(fields: [pairId], references: [id])
+  pairId    Int
+}
