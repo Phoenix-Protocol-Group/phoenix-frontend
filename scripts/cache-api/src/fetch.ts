@@ -15,7 +15,7 @@ import { Address } from "stellar-base";
 
 export async function startFetch() {
   console.log("Starting fetch");
-  const pairRes = await fetchPairs();
+  //const pairRes = await fetchPairs();
 
   fetchPrices();
   return;
@@ -130,33 +130,34 @@ async function fetchPool(poolAddress: Address) {
 }
 
 async function fetchPrices() {
+  const targetArray = ["EURC"];
   const pairEntries = await pair.getAll();
   const pairs = pairEntries.map((pair) => ({
     id: pair.id,
-    ratio: 0, //Number(pair.assetAAmount / pair.assetBAmount), //doesnt work with mock pairs
-    tokenAAddress: pair.assetA.address,
-    tokenBAddress: pair.assetB.address,
+    ratio: Number(pair.assetAAmount / pair.assetBAmount), //doesnt work with mock pairs
+    tokenA: pair.assetA.symbol,
+    tokenB: pair.assetB.symbol,
   }));
+
+  console.log(pairs);
 
   let pricedTokens: string[] = [];
 
   for(const pair of pairs) {
-    console.log(pair);
+    if(pricedTokens.includes(pair.tokenA) || targetArray.includes(pair.tokenA)) {
+
+    }
+
+    if(pricedTokens.includes(pair.tokenB) || targetArray.includes(pair.tokenB)) {
+      
+    }
+
+    const bestPathA = price.findBestPath(pair.tokenA, pairs, targetArray);
+    const bestPathB = price.findBestPath(pair.tokenB, pairs, targetArray);
+  
+    console.log(pair.tokenA, bestPathA);
+    console.log(pair.tokenB, bestPathB);
   }
-
-  return;
-
-  const testPair = {
-    id: 1,
-    ratio: 0.5,
-    tokenAAddress: "foo",
-    tokenBAddress: "bar",
-  };
-
-  const targetArray = ["stellar"];
-
-  const bestPath = price.findBestPath(testPair, pairs, targetArray);
-  console.log(bestPath);
 }
 
 async function fetchPairs() {
