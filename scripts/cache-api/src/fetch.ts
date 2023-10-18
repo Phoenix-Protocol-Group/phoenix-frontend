@@ -15,9 +15,9 @@ import { Address } from "stellar-base";
 
 export async function startFetch() {
   console.log("Starting fetch");
-  //const pairRes = await fetchPairs();
+  const pairRes = await fetchPairs();
 
-  fetchPrices();
+  //fetchPrices();
   return;
 
   const job: nodeSchedule.Job = nodeSchedule.scheduleJob('*/15 * * * *', async () => {
@@ -42,12 +42,18 @@ function roundDownToNearest15Minutes(): number {
   return currentDate.getTime();
 }
 
-async function fetchTokenInfo(tokenAddress: Address) {
+async function fetchTokenInfo(tokenAddress: string) {
   const TokenContract = new SorobanTokenContract.Contract({
-    contractId: tokenAddress.toString(),
+    contractId: tokenAddress,
     networkPassphrase: constants.NETWORK_PASSPHRASE,
     rpcUrl: constants.RPC_URL,
   });
+
+  return {
+    name: await TokenContract.name(),
+    symbol: await TokenContract.symbol(),
+    decimals: await TokenContract.decimals(),
+  }
 }
 
 async function fetchPool(poolAddress: Address) {
@@ -69,14 +75,18 @@ async function fetchPool(poolAddress: Address) {
       const pairConfig = pairConfigRes.unwrap();
       const pairInfo = pairInfoRes.unwrap();
 
-      const tokenA = await token.getOrCreate(pairInfo.asset_a.address.toString());
-      const tokenB = await token.getOrCreate(pairInfo.asset_b.address.toString());
-      const tokenShare = await token.getOrCreate(pairInfo.asset_lp_share.address.toString());
+      const tokenAInfo = await fetchTokenInfo(pairInfo.asset_a.address.toString());
+      const tokenBInfo = await fetchTokenInfo(pairInfo.asset_b.address.toString());
+      const tokenSharedInfo = await fetchTokenInfo(pairInfo.asset_lp_share.address.toString());
+
+      const tokenA = await token.getOrCreate(pairInfo.asset_a.address.toString(), tokenAInfo);
+      const tokenB = await token.getOrCreate(pairInfo.asset_b.address.toString(), tokenBInfo);
+      const tokenShare = await token.getOrCreate(pairInfo.asset_lp_share.address.toString(), tokenSharedInfo);
 
       const existingPair = await pair.getByAddress(poolAddress.toString());
       let pairId = existingPair?.id;
 
-      if(!pair) {
+      if(!pairId) {
         const newPair = await pair.create({
           address: poolAddress.toString(),
           assetA: {
@@ -123,9 +133,18 @@ async function fetchPrices() {
   const pairEntries = await pair.getAll();
   const pairs = pairEntries.map((pair) => ({
     id: pair.id,
+    ratio: 0, //Number(pair.assetAAmount / pair.assetBAmount), //doesnt work with mock pairs
     tokenAAddress: pair.assetA.address,
     tokenBAddress: pair.assetB.address,
   }));
+
+  let pricedTokens: string[] = [];
+
+  for(const pair of pairs) {
+
+  }
+
+  return;
 
   const testPair = {
     id: 1,
@@ -134,26 +153,9 @@ async function fetchPrices() {
     tokenBAddress: "bar",
   };
 
-  const mockPairArray = [{
-    id: 1,
-    ratio: 0.5,
-    tokenAAddress: "foo",
-    tokenBAddress: "bar",
-  },{
-    id: 2,
-    ratio: 2,
-    tokenAAddress: "bar",
-    tokenBAddress: "ethereum",
-  }, {
-    id: 3,
-    ratio: -0.5,
-    tokenAAddress: "ethereum",
-    tokenBAddress: "stellar",
-  }];
-
   const targetArray = ["stellar"];
 
-  const bestPath = price.findBestPath(testPair, mockPairArray, targetArray);
+  const bestPath = price.findBestPath(testPair, pairs, targetArray);
   console.log(bestPath);
 }
 

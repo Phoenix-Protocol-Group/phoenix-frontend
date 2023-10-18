@@ -26,7 +26,7 @@ export async function getByAddress(address: string) {
   return token;
 }
 
-export async function getOrCreate(address: string, isSharedToken: boolean) {
+export async function getOrCreate(address: string, { name, symbol, decimals }: { name: string, symbol: string, decimals: number }) {
   const token = await getByAddress(address);
 
   if(token !== null) return token;
@@ -34,7 +34,9 @@ export async function getOrCreate(address: string, isSharedToken: boolean) {
   const newToken = await prisma.token.create({
     data: {
       address: address,
-      isSharedToken: isSharedToken,
+      name: name,
+      symbol: symbol,
+      decimals: decimals,
     },
   });
 
