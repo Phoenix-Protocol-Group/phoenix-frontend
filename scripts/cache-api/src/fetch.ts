@@ -15,11 +15,11 @@ import { Address } from "stellar-base";
 
 export async function startFetch() {
   console.log("Starting fetch");
-  const pairRes = await fetchPairs();
+  //const pairRes = await fetchPairs();
 
-  //fetchPrices();
+  fetchPrices();
+  return;
 
-  //return;
   const job: nodeSchedule.Job = nodeSchedule.scheduleJob('*/15 * * * *', async () => {
     const pairRes = await fetchPairs();
 
@@ -121,18 +121,40 @@ async function fetchPool(poolAddress: Address) {
 
 async function fetchPrices() {
   const pairEntries = await pair.getAll();
-  const pairs = pairEntries.map((pair: any) => {
-    return {
-      asset_a: pair.assetA.address, 
-      asset_b: pair.assetB.address}
-  });
+  const pairs = pairEntries.map((pair) => ({
+    id: pair.id,
+    tokenAAddress: pair.assetA.address,
+    tokenBAddress: pair.assetB.address,
+  }));
 
-  for(let pair of pairs) {
-    const bestPath = price.findBestPath(pair.asset_a, pair.asset_b, pairs);
-    console.log(bestPath);
-  }
+  const testPair = {
+    id: 1,
+    ratio: 0.5,
+    tokenAAddress: "foo",
+    tokenBAddress: "bar",
+  };
 
-  return pairs;
+  const mockPairArray = [{
+    id: 1,
+    ratio: 0.5,
+    tokenAAddress: "foo",
+    tokenBAddress: "bar",
+  },{
+    id: 2,
+    ratio: 2,
+    tokenAAddress: "bar",
+    tokenBAddress: "ethereum",
+  }, {
+    id: 3,
+    ratio: -0.5,
+    tokenAAddress: "ethereum",
+    tokenBAddress: "stellar",
+  }];
+
+  const targetArray = ["stellar"];
+
+  const bestPath = price.findBestPath(testPair, mockPairArray, targetArray);
+  console.log(bestPath);
 }
 
 async function fetchPairs() {
