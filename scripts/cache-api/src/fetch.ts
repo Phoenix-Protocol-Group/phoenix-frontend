@@ -15,7 +15,7 @@ import { Address } from "stellar-base";
 
 export async function startFetch() {
   console.log("Starting fetch");
-  //const pairRes = await fetchPairs();
+  const pairRes = await fetchPairs();
 
   fetchPrices();
   return;
