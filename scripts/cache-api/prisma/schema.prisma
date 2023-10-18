@@ -11,8 +11,9 @@ datasource db {
 }
 
 model Token {
-  id      Int    @id @default(autoincrement())
-  address String
+  id            Int     @id @default(autoincrement())
+  address       String
+  isSharedToken Boolean
 
   assetA     Pair[]         @relation("assetA")
   assetB     Pair[]         @relation("assetB")
