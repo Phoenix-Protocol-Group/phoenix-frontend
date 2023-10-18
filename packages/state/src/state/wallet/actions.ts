@@ -46,17 +46,19 @@ export const createWalletActions = (
         : [];
 
       await Promise.all(allAssets);
+
       const _tokens = getState()
         .tokens.filter((token) => token?.symbol !== "POOL")
         .map((token) => {
           return {
-            name: token?.symbol === "native" ? "xlm" : token?.symbol,
+            name: token?.symbol === "native" ? "XLM" : token?.symbol,
             icon: `/cryptoIcons/${
-              token?.symbol === "native" ? "xlm" : token?.symbol.toLowerCase()
+              token?.symbol === "native" ? "XLM" : token?.symbol.toLowerCase()
             }.svg`,
-            amount: 0,
+            amount: Number(token?.balance) / 10 ** token?.decimals,
             category: "Non-Stable", // todo: add category
             usdValue: 0, // todo: add usdValue
+            contractId: token?.id,
           };
         });
       setState((state: AppStore) => {
@@ -90,10 +92,11 @@ export const createWalletActions = (
         console.log(e, "User has no balance");
       }
 
-      const symbol: string =
+      const _symbol: string =
         getState().tokens.find(
           (token: Token) => token.id === tokenAddress.toString()
         )?.symbol || (await TokenContract.symbol());
+      const symbol: string = _symbol === "native" ? "XLM" : _symbol;
 
       const decimals =
         getState().tokens.find(
@@ -117,7 +120,7 @@ export const createWalletActions = (
             id: tokenAddress.toString(),
             balance,
             decimals: decimals,
-            symbol: symbol,
+            symbol: symbol === "native" ? "XLM" : symbol,
           });
         }
         updatedTokenInfo = updatedTokens.find(

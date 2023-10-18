@@ -1,7 +1,15 @@
 "use client";
 
-import { Grid, useMediaQuery, useTheme } from "@mui/material";
-import { CryptoCTA, DashboardPriceCharts, DashboardStats, MainStats, WalletBalanceTable } from "@phoenix-protocol/ui";
+import { Alert, Grid, useMediaQuery, useTheme } from "@mui/material";
+import {
+  CryptoCTA,
+  DashboardPriceCharts,
+  DashboardStats,
+  MainStats,
+  WalletBalanceTable,
+} from "@phoenix-protocol/ui";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const stellarGainerAsset = {
@@ -73,7 +81,8 @@ const args = {
         amount: 50,
         category: "Stable",
         usdValue: 1 * 50,
-      }],
+      },
+    ],
   },
   dashboardStatsArgs: {
     gainer: stellarGainerAsset,
@@ -86,33 +95,47 @@ const args = {
 export default function Page() {
   const theme = useTheme();
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
-  
+  const router = useRouter();
   return (
     <Grid
-        sx={{
-          transition: "all 0.2s ease-in-out",
-        }}
-        container
-        spacing={largerThenMd ? 3 : 1}
-      >
-        <Grid item xs={12}>
-          <MainStats {...args.mainstatsArgs} />
-        </Grid>
-        <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
-          <DashboardStats {...args.dashboardStatsArgs} />
-        </Grid>
-        <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
-          <DashboardPriceCharts {...args.dashboardArgs} />
-        </Grid>
-        <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
-          <DashboardPriceCharts {...args.dashboardArgs} />
-        </Grid>
-        <Grid item xs={12} md={4} mt={!largerThenMd ? 2 : undefined}>
-          <CryptoCTA onClick={() => {}} />
-        </Grid>
-        <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
-          <WalletBalanceTable {...args.walletBalanceArgs} />
-        </Grid>
+      sx={{
+        transition: "all 0.2s ease-in-out",
+      }}
+      container
+      spacing={largerThenMd ? 3 : 1}
+    >
+      <Grid item xs={12}>
+        <Alert severity="warning" sx={{ zIndex: 2, mt: 6 }}>
+          This dashboard is currently work in progress. The data you see here is just
+          mocked. Follow our next{" "}
+          <Link
+            href="https://dashboard.communityfund.stellar.org/scfawards/scf-test/submission/suggestion/34"
+            target="_blank"
+            color="white"
+          >
+            grant submission
+          </Link>{" "}
+          to see the progress on this.
+        </Alert>
       </Grid>
+      <Grid item xs={12}>
+        <MainStats {...args.mainstatsArgs} />
+      </Grid>
+      <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
+        <DashboardStats {...args.dashboardStatsArgs} />
+      </Grid>
+      <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
+        <DashboardPriceCharts {...args.dashboardArgs} />
+      </Grid>
+      <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
+        <DashboardPriceCharts {...args.dashboardArgs} />
+      </Grid>
+      <Grid item xs={12} md={4} mt={!largerThenMd ? 2 : undefined}>
+        <CryptoCTA onClick={() => {}} />
+      </Grid>
+      <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
+        <WalletBalanceTable {...args.walletBalanceArgs} />
+      </Grid>
+    </Grid>
   );
 }

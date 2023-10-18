@@ -1,19 +1,36 @@
 # Utils Package
 
-The Utils package is a collection of utility and helper functions for the Phoenix Frontend project. It provides various helpful functions that can be used across the application for common tasks, data manipulation, and other operations.
+The `Utils` package offers a range of utility and helper functions tailored for the Phoenix Frontend application. It covers various tasks like data manipulation, string operations, and more.
 
 ## Installation
 
-To install the Utils package, follow these steps:
+1. Make sure Node.js and yarn are installed on your system.
+2. Navigate to the Phoenix Frontend project root directory.
+3. Run the following command to install all dependencies:
 
-1. Ensure that you have Node.js and yarn installed on your machine.
-2. Navigate to the root directory of the Phoenix Frontend project.
-3. Run `yarn install` to install all project dependencies.
+    ```bash
+    yarn install
+    ```
 
 ## Usage
 
-To use the Utils package in your application, follow these steps:
+To incorporate the Utils package into your project:
 
-1. Import the desired utility functions from the Utils package into your project.
-2. Utilize the imported utility functions for common tasks, data transformations, validation, or other operations as needed.
-3. Customize and extend the functionality of the Utils package by modifying or adding additional utility functions to suit your project requirements.
+1. Import the required utility functions:
+
+    ```javascript
+    import { someUtilityFunction } from '@phoenix-frontend/utils';
+    ```
+
+2. Use the imported functions for tasks like data manipulation, string operations, and other tasks as needed.
+
+3. You can also extend the Utils package with additional functions to meet the specific needs of your project.
+
+## Testing
+
+To run tests for the Utils package, navigate to its directory under `/packages` and execute:
+```bash
+yarn test
+```
+
+This will run all test cases for the utility functions, ensuring they operate as expected.

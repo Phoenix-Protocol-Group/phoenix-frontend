@@ -22,6 +22,7 @@ interface TokenBoxProps {
   onChange: (value: string) => void;
   hideDropdownButton?: boolean;
   value: string | undefined;
+  disabled?: boolean;
 }
 
 const AssetButton = ({
@@ -78,6 +79,7 @@ const TokenBox = ({
   onChange,
   value,
   hideDropdownButton = false,
+  disabled = false,
 }: TokenBoxProps) => {
   const [usdPrice, setUsdPrice] = React.useState(
     Number(value) * Number(token.usdValue) || 0
@@ -96,6 +98,7 @@ const TokenBox = ({
       <Grid container>
         <Grid item xs={6}>
           <Input
+            disabled={disabled}
             value={value}
             onChange={(e) => {
               onChange(e.target.value);

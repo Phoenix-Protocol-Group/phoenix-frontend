@@ -35,6 +35,7 @@ interface SwapContainerProps {
   slippageTolerance: string;
   fromTokenValue?: string;
   toTokenValue?: string;
+  swapButtonDisabled?: boolean;
   onOptionsClick: () => void;
   onSwapTokensClick: () => void;
   onSwapButtonClick: () => void;
@@ -98,6 +99,7 @@ const SwapContainer = ({
   onSwapTokensClick,
   onSwapButtonClick,
   onInputChange,
+  swapButtonDisabled,
   onTokenSelectorClick,
 }: SwapContainerProps) => {
   const [expanded, setExpanded] = React.useState(true);
@@ -133,7 +135,7 @@ const SwapContainer = ({
               marginTop: "8px",
             }}
           >
-            <Box component={"img"} src="/Gearsix.svg" />
+            <Box component={"img"} src="/GearSix.svg" />
           </IconButton>
         </Box>
       </Box>
@@ -157,9 +159,11 @@ const SwapContainer = ({
         token={toToken}
         onAssetClick={() => onTokenSelectorClick(false)}
         onChange={(value) => onInputChange(false, value)}
+        disabled={true}
       />
       <CustomButton
         onClick={onSwapButtonClick}
+        disabled={swapButtonDisabled}
         type="primary"
         label="Swap"
         sx={{
