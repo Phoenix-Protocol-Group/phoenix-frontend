@@ -168,6 +168,8 @@ async function fetchPairs() {
 
   const pools = await FactoryContract.queryPools({});
 
+  console.log(pools.unwrap())
+
   const poolWithData = pools
       ? await Promise.all(
           pools.unwrap().map(async (pool: Address) => {

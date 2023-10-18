@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@phoenix-protocol/contracts": "^0.0.5",
-    "@phoenix-protocol/utils": "^0.0.3",
+    "@phoenix-protocol/utils": "^0.0.5",
     "@prisma/client": "5.4.1",
     "coingecko-api-v3": "^0.0.29",
     "cors": "^2.8.5",
