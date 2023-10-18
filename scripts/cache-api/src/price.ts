@@ -1,6 +1,6 @@
 import { CoinGeckoClient } from 'coingecko-api-v3';
 
-interface Pair {
+export interface Pair {
   id: number;
   ratio: number;
   tokenAAddress: string;
@@ -12,8 +12,13 @@ interface PathNode {
   token: string;
 }
 
-export function findBestPath(pair: Pair, pairsArray: Pair[], targets: string[]): PathNode[] | null {
+export function findBestPath(
+    pair: Pair, 
+    pairsArray: Pair[], 
+    targets: string[]
+  ): PathNode[] | null {
   const graph: { [key: string]: { [key: string]: number } } = {};
+
   pairsArray.forEach((item) => {
     const tokenA = item.tokenAAddress;
     const tokenB = item.tokenBAddress;

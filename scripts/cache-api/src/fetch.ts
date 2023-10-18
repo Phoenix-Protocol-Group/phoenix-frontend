@@ -15,9 +15,9 @@ import { Address } from "stellar-base";
 
 export async function startFetch() {
   console.log("Starting fetch");
-  const pairRes = await fetchPairs();
+  //const pairRes = await fetchPairs();
 
-  //fetchPrices();
+  fetchPrices();
   return;
 
   const job: nodeSchedule.Job = nodeSchedule.scheduleJob('*/15 * * * *', async () => {
@@ -141,7 +141,7 @@ async function fetchPrices() {
   let pricedTokens: string[] = [];
 
   for(const pair of pairs) {
-
+    console.log(pair);
   }
 
   return;

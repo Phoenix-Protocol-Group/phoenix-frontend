@@ -6,16 +6,6 @@ export async function getAll() {
   return tokens;
 }
 
-export async function getAllExceptShared() {
-  const tokens = await prisma.token.findMany({
-    where: {
-      isSharedToken: false,
-    }
-  });
-
-  return tokens;
-}
-
 export async function getByAddress(address: string) {
   const token = await prisma.token.findFirst({
     where: {
