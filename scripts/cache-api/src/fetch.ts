@@ -139,24 +139,17 @@ async function fetchPrices() {
     tokenB: pair.assetB.symbol,
   }));
 
-  console.log(pairs);
-
   let pricedTokens: string[] = [];
 
   for(const pair of pairs) {
-    if(pricedTokens.includes(pair.tokenA) || targetArray.includes(pair.tokenA)) {
+    if(pair.id !== 1) continue;
+    //const bestPathA = price.findBestPath(pair.tokenA, pairs, targetArray);
+    
+    const tokenAPrice = price.calculateTokenValue(pair.tokenA, ["EURC"], pairs, targetArray);
+    console.log(tokenAPrice);
 
-    }
 
-    if(pricedTokens.includes(pair.tokenB) || targetArray.includes(pair.tokenB)) {
-      
-    }
-
-    const bestPathA = price.findBestPath(pair.tokenA, pairs, targetArray);
-    const bestPathB = price.findBestPath(pair.tokenB, pairs, targetArray);
-  
-    console.log(pair.tokenA, bestPathA);
-    console.log(pair.tokenB, bestPathB);
+    //const bestPathB = price.findBestPath(pair.tokenB, pairs, targetArray);
   }
 }
 
