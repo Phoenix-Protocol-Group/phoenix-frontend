@@ -15,19 +15,20 @@ import { Address } from "stellar-base";
 
 export async function startFetch() {
   console.log("Starting fetch");
-  //const pairRes = await fetchPairs();
-
+  const pairRes = await fetchPairs();
   fetchPrices();
-  return;
 
+  //create cronjob to fetch factory contract, its pairs, tokens and their prices every 15 minutes
   const job: nodeSchedule.Job = nodeSchedule.scheduleJob('*/15 * * * *', async () => {
     const pairRes = await fetchPairs();
+    fetchPrices();
 
     tokenHistory.deleteOldEntries();
     pairHistory.deleteOldEntries();
   });
 }
 
+// Round down to nearest 15 minutes to make the timestamps easier to work with
 function roundDownToNearest15Minutes(): number {
   const currentDate = new Date();
   const minutes = currentDate.getMinutes();
@@ -42,6 +43,7 @@ function roundDownToNearest15Minutes(): number {
   return currentDate.getTime();
 }
 
+// Fetch token info from chain
 async function fetchTokenInfo(tokenAddress: string) {
   const TokenContract = new SorobanTokenContract.Contract({
     contractId: tokenAddress,
@@ -56,6 +58,7 @@ async function fetchTokenInfo(tokenAddress: string) {
   }
 }
 
+// Use Pair Contract to fetch pool and token info from chain
 async function fetchPool(poolAddress: Address) {
   try {
     const PairContract = new PhoenixPairContract.Contract({
@@ -75,10 +78,12 @@ async function fetchPool(poolAddress: Address) {
       const pairConfig = pairConfigRes.unwrap();
       const pairInfo = pairInfoRes.unwrap();
 
+      //fetch token info from chain
       const tokenAInfo = await fetchTokenInfo(pairInfo.asset_a.address.toString());
       const tokenBInfo = await fetchTokenInfo(pairInfo.asset_b.address.toString());
       const tokenSharedInfo = await fetchTokenInfo(pairInfo.asset_lp_share.address.toString());
 
+      // create token entries if not exist in database
       const tokenA = await token.getOrCreate(pairInfo.asset_a.address.toString(), tokenAInfo);
       const tokenB = await token.getOrCreate(pairInfo.asset_b.address.toString(), tokenBInfo);
       const tokenShare = await token.getOrCreate(pairInfo.asset_lp_share.address.toString(), tokenSharedInfo);
@@ -86,6 +91,7 @@ async function fetchPool(poolAddress: Address) {
       const existingPair = await pair.getByAddress(poolAddress.toString());
       let pairId = existingPair?.id;
 
+      // create pair entry if not exist in database
       if(!pairId) {
         const newPair = await pair.create({
           address: poolAddress.toString(),
@@ -112,6 +118,7 @@ async function fetchPool(poolAddress: Address) {
         pairId = newPair.id;
       }
 
+      // create pair history entry
       const newPairHistory = await pairHistory.create({
         createdAt: roundDownToNearest15Minutes(),
         pair: {
@@ -130,7 +137,10 @@ async function fetchPool(poolAddress: Address) {
 }
 
 async function fetchPrices() {
+  //array of tokens with known prices
   const targetArray = ["EURC"];
+
+  // get pairs and parse them to easier format
   const pairEntries = await pair.getAll();
   const pairs = pairEntries.map((pair) => ({
     id: pair.id,
@@ -139,20 +149,35 @@ async function fetchPrices() {
     tokenB: pair.assetB.symbol,
   }));
 
-  let pricedTokens: string[] = [];
-
   for(const pair of pairs) {
-    if(pair.id !== 1) continue;
-    //const bestPathA = price.findBestPath(pair.tokenA, pairs, targetArray);
-    
-    const tokenAPrice = price.calculateTokenValue(pair.tokenA, ["EURC"], pairs, targetArray);
-    console.log(tokenAPrice);
+    // calculate token prices for token A and B
+    const tokenPrices = [price.calculateTokenValue(pair.tokenA, pairs, targetArray), price.calculateTokenValue(pair.tokenB, pairs, targetArray)];
+  
+    // loop for token a and b
+    for(const tokenPrice of tokenPrices) {
+      if(tokenPrice !== undefined) {
+        const _token = await token.getBySymbol(pair.tokenA);
+        
+        // create token history entry
+        const tokenEntry = await tokenHistory.create({
+          createdAt: roundDownToNearest15Minutes(),
+          price: tokenPrice,
+          token: {
+            connect: {
+              id: _token.id,
+            }
+          },
+        });
 
+        continue;
+      }
 
-    //const bestPathB = price.findBestPath(pair.tokenB, pairs, targetArray);
+      // @TODO else: get coin gecko price if possible
+    }
   }
 }
 
+// Use Factory Contract to fetch pools from chain
 async function fetchPairs() {
   const FactoryContract = new PhoenixFactoryContract.Contract({
     contractId: FACTORY_ADDRESS,
@@ -162,8 +187,7 @@ async function fetchPairs() {
 
   const pools = await FactoryContract.queryPools({});
 
-  console.log(pools.unwrap())
-
+  //loop through pools and fetch pool info from chain
   const poolWithData = pools
       ? await Promise.all(
           pools.unwrap().map(async (pool: Address) => {

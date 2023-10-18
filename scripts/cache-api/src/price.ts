@@ -7,11 +7,6 @@ export interface Pair {
   tokenB: string;
 }
 
-interface PathNode {
-  id: number;
-  token: string;
-}
-
 export function findBestPath(tokenSymbol: string, pairsArray: Pair[], targets: string[]): { ratio: number, path: Pair[] } {
   const graph: { [key: string]: { [key: string]: Pair } } = {};
   pairsArray.forEach((item) => {
@@ -49,11 +44,11 @@ export function findBestPath(tokenSymbol: string, pairsArray: Pair[], targets: s
   return { ratio: finalRatio, path: [] };
 }
 
-export function calculateTokenValue(tokenSymbol: string, targetTokens: string[], pairsArray: Pair[], targetArray: string[]): number {
-  let value = 0;
+export function calculateTokenValue(tokenSymbol: string, pairsArray: Pair[], targetTokens: string[]): number | undefined {
+  let value;
   let found = false;
   for (const targetToken of targetTokens) {
-    const { ratio, path } = findBestPath(tokenSymbol, pairsArray, targetArray);
+    const { ratio, path } = findBestPath(tokenSymbol, pairsArray, targetTokens);
     if (path.length > 0) {
       for (let i = 0; i < path.length; i++) {
         if (path[i].tokenA === tokenSymbol && path[i].tokenB === targetToken) {
@@ -79,7 +74,7 @@ export function calculateTokenValue(tokenSymbol: string, targetTokens: string[],
       break;
     }
   }
-  return value;
+  return found ? value : undefined;
 }
 
 const coinGecko = new CoinGeckoClient({

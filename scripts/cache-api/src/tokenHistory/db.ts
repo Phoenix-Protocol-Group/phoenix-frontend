@@ -19,12 +19,12 @@ export async function getByAddress(address: string) {
   return tokenEntries;
 }
 
-export async function create(pair: any) {
-  const newPair = await prisma.pairHistory.create({
-    data: pair,
+export async function create(token: any) {
+  const newToken = await prisma.tokenHistory.create({
+    data: token,
   });
 
-  return newPair;
+  return newToken;
 }
 
 export async function deleteOldEntries() {

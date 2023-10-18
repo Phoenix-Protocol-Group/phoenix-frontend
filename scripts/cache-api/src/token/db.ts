@@ -16,6 +16,16 @@ export async function getByAddress(address: string) {
   return token;
 }
 
+export async function getBySymbol(symbol: string) {
+  const token = await prisma.token.findFirst({
+    where: {
+      symbol: symbol
+    }
+  });
+
+  return token;
+}
+
 export async function getOrCreate(address: string, { name, symbol, decimals }: { name: string, symbol: string, decimals: number }) {
   const token = await getByAddress(address);
 
