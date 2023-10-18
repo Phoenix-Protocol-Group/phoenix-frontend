@@ -21,10 +21,10 @@ app.get("/", async (req: Request, res: Response) => {
 
 app.get("/pairs", pair.getAll);
 app.get("/pairs/:address", pair.getByAddress);
-app.get("/pairs/:address/:history", pairHistory.getByAddress);
+app.get("/pairs/:address/history", pairHistory.getByAddress);
 
 app.get("/tokens", token.getAll);
 app.get("/tokens/:address", token.getByAddress);
-app.get("/tokens/:address/:history", tokenHistory.getByAddress);
+app.get("/tokens/:address/history", tokenHistory.getByAddress);
 
 const server = app.listen(port, () => { console.log(`Listening on port ${port}`) });
