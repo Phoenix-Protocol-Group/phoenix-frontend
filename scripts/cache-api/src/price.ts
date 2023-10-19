@@ -7,6 +7,12 @@ export interface Pair {
   tokenB: string;
 }
 
+type Target = {
+  [key: string]: {
+    [key: string]: number;
+  };
+};
+
 export function findBestPath(tokenSymbol: string, pairsArray: Pair[], targets: string[]): { ratio: number, path: Pair[] } {
   const graph: { [key: string]: { [key: string]: Pair } } = {};
   pairsArray.forEach((item) => {
@@ -44,26 +50,28 @@ export function findBestPath(tokenSymbol: string, pairsArray: Pair[], targets: s
   return { ratio: finalRatio, path: [] };
 }
 
-export function calculateTokenValue(tokenSymbol: string, pairsArray: Pair[], targetTokens: string[]): number | undefined {
+export function calculateTokenValue(baseToken: string, pairsArray: Pair[], targets: Target[]): number | undefined {
   let value;
   let found = false;
-  for (const targetToken of targetTokens) {
-    const { ratio, path } = findBestPath(tokenSymbol, pairsArray, targetTokens);
+  for (const target of targets) {
+    const targetToken = Object.keys(target)[0];
+    const targetPrice = target[targetToken].usd;
+    const { ratio, path } = findBestPath(baseToken, pairsArray, [targetToken]);
     if (path.length > 0) {
       for (let i = 0; i < path.length; i++) {
-        if (path[i].tokenA === tokenSymbol && path[i].tokenB === targetToken) {
+        if (path[i].tokenA === baseToken && path[i].tokenB === targetToken) {
           if (path[i].ratio > 0) {
-            value = 1 * path[i].ratio;
+            value = 1 * path[i].ratio * targetPrice;
           } else {
-            value = 1 / -path[i].ratio;
+            value = 1 / -path[i].ratio * targetPrice;
           }
           found = true;
           break;
-        } else if (path[i].tokenB === tokenSymbol && path[i].tokenA === targetToken) {
+        } else if (path[i].tokenB === baseToken && path[i].tokenA === targetToken) {
           if (path[i].ratio > 0) {
-            value = 1 / path[i].ratio;
+            value = 1 / path[i].ratio * targetPrice;
           } else {
-            value = 1 * -path[i].ratio;
+            value = 1 * -path[i].ratio * targetPrice;
           }
           found = true;
           break;

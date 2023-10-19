@@ -15,7 +15,8 @@ import { Address } from "stellar-base";
 
 export async function startFetch() {
   console.log("Starting fetch");
-  const pairRes = await fetchPairs();
+
+  //const pairRes = await fetchPairs();
   fetchPrices();
 
   //create cronjob to fetch factory contract, its pairs, tokens and their prices every 15 minutes
@@ -138,8 +139,14 @@ async function fetchPool(poolAddress: Address) {
 
 async function fetchPrices() {
   //array of tokens with known prices
-  const targetArray = ["EURC"];
+  const targetArray = ["Stellar"];
 
+  let targetPrices = [];
+  for(const target of targetArray) {
+    const targetPrice = await price.getPrices(target);
+    targetPrices.push(targetPrice);
+  }
+  
   // get pairs and parse them to easier format
   const pairEntries = await pair.getAll();
   const pairs = pairEntries.map((pair) => ({
@@ -151,8 +158,11 @@ async function fetchPrices() {
 
   for(const pair of pairs) {
     // calculate token prices for token A and B
-    const tokenPrices = [price.calculateTokenValue(pair.tokenA, pairs, targetArray), price.calculateTokenValue(pair.tokenB, pairs, targetArray)];
-  
+    const tokenPrices = [
+      price.calculateTokenValue(pair.tokenA, pairs, targetPrices), 
+      price.calculateTokenValue(pair.tokenB, pairs, targetPrices)
+    ];
+    
     // loop for token a and b
     for(const tokenPrice of tokenPrices) {
       if(tokenPrice !== undefined) {
@@ -171,8 +181,6 @@ async function fetchPrices() {
 
         continue;
       }
-
-      // @TODO else: get coin gecko price if possible
     }
   }
 }
