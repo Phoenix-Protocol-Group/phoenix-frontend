@@ -2,7 +2,9 @@
 CREATE TABLE "Token" (
     "id" SERIAL NOT NULL,
     "address" TEXT NOT NULL,
-    "isSharedToken" BOOLEAN NOT NULL,
+    "name" TEXT NOT NULL,
+    "symbol" TEXT NOT NULL,
+    "decimals" INTEGER NOT NULL,
 
     CONSTRAINT "Token_pkey" PRIMARY KEY ("id")
 );
@@ -22,11 +24,8 @@ CREATE TABLE "Pair" (
     "id" SERIAL NOT NULL,
     "address" TEXT NOT NULL,
     "assetAId" INTEGER NOT NULL,
-    "assetAAmount" BIGINT NOT NULL,
     "assetBId" INTEGER NOT NULL,
-    "assetBAmount" BIGINT NOT NULL,
     "assetShareId" INTEGER NOT NULL,
-    "assetShareAmount" BIGINT NOT NULL,
 
     CONSTRAINT "Pair_pkey" PRIMARY KEY ("id")
 );
@@ -36,9 +35,15 @@ CREATE TABLE "PairHistory" (
     "id" SERIAL NOT NULL,
     "createdAt" BIGINT NOT NULL,
     "pairId" INTEGER NOT NULL,
+    "assetAAmount" BIGINT NOT NULL,
+    "assetBAmount" BIGINT NOT NULL,
+    "assetShareAmount" BIGINT NOT NULL,
 
     CONSTRAINT "PairHistory_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Token_address_key" ON "Token"("address");
 
 -- AddForeignKey
 ALTER TABLE "TokenHistory" ADD CONSTRAINT "TokenHistory_tokenId_fkey" FOREIGN KEY ("tokenId") REFERENCES "Token"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
