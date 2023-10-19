@@ -45,7 +45,7 @@ export type Tx = Transaction<Memo<MemoType>, Operation[]>;
  * selected in Freighter. If not connected to Freighter, return null.
  */
 async function getAccount(): Promise<Account | null> {
-  if(typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
 
   if (!(await isConnected()) || !(await isAllowed())) {
     return null;
@@ -232,6 +232,7 @@ export async function signTx(
   networkPassphrase: string
 ): Promise<Tx> {
   const signed = await wallet.signTransaction(tx.toXDR(), {
+    network: "futurenet",
     networkPassphrase,
   });
 

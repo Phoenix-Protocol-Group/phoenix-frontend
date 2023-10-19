@@ -73,6 +73,5 @@ export function findBestPath(
     }
   }
 
-  const ops = operations.reverse();
-  return { operations: ops };
+  return { operations };
 }

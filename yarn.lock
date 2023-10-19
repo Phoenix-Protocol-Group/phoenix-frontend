@@ -3364,7 +3364,7 @@ __metadata:
   resolution: "@phoenix-protocol/contracts@workspace:packages/contracts"
   dependencies:
     "@phoenix-protocol/utils": "workspace:^"
-    "@stellar/freighter-api": 1.5.0
+    "@stellar/freighter-api": 1.7.1
     bigint-conversion: 2.4.1
     buffer: 6.0.3
     soroban-client: 1.0.0-beta.2
@@ -3411,7 +3411,7 @@ __metadata:
   resolution: "@phoenix-protocol/state@workspace:packages/state"
   dependencies:
     "@phoenix-protocol/contracts": "workspace:^"
-    "@stellar/freighter-api": ^1.4.0
+    "@stellar/freighter-api": 1.7.1
     "@types/glob": ^7.1.3
     "@types/urijs": ^1.19.19
     react: ^18.2.0
@@ -3672,17 +3672,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stellar/freighter-api@npm:1.5.0":
-  version: 1.5.0
-  resolution: "@stellar/freighter-api@npm:1.5.0"
-  checksum: 3bef8202641ca3ca1b4160214bb9a135fc1922f0c2cdaeff0fb930865a8931b830be8dbadda38a2fa97c97038d51c670289118e06b5ca95a91e18feec129592e
-  languageName: node
-  linkType: hard
-
-"@stellar/freighter-api@npm:^1.4.0":
-  version: 1.5.1
-  resolution: "@stellar/freighter-api@npm:1.5.1"
-  checksum: ec1cb9d4bf3e7e09df277930571a5a2a60eed0707e12075e911b2905d5a97fa93a22492a27bab9992eebfe8566bb489493dd1774eea123ceaabe439c89d636fc
+"@stellar/freighter-api@npm:1.7.1":
+  version: 1.7.1
+  resolution: "@stellar/freighter-api@npm:1.7.1"
+  checksum: 02ff598d67e57bbadf24ab807b61045a8d6bbaa6d82dd25168793716eb960911a3fbbeac9cc59f610336a31d19a41de3fef8dd6a6d02826a241fed1615b36847
   languageName: node
   linkType: hard
 
