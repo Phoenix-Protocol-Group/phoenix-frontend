@@ -43,16 +43,15 @@ export async function getTopGainers() {
       },
     });
 
-    //const gain = ((pairEntries[pairEntries.length - 1] - pairEntries[0]) / pairEntries[0]) * 100;
+    const gain = ((pairEntries[pairEntries.length - 1].assetAAmount - pairEntries[0].assetAAmount) / pairEntries[0].assetAAmount) * BigInt(100);
 
     topGainers.push({
       pair: pair.id,
-      pairEntries: [
-        pairEntries[0],
-        pairEntries[pairEntries.length - 1],
-      ],
+      gain: gain,
     });
   }
+
+  return topGainers;
 }
 
 export async function deleteOldEntries() {
