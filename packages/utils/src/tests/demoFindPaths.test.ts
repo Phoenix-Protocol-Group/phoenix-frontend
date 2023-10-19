@@ -3,8 +3,8 @@ import { findBestPath } from "../demoFindPaths";
 describe("findBestPath", () => {
   it("should return a direct route if available", () => {
     const fromAsset =
-      "CCHEE2LEYD2QUESNKCUAQNXXQ3VYFL3XGI5CEZDHDT7NXKPEWQ6TFJVZ";
-    const toAsset = "CDDDTR6DVLDFMCDHLXEJIDY6P4IADIM6HCM3QBHAR763YAWUJ6DZUV2P";
+      "CCF34UHY3YWEXTXJMSCYAPDEX4WMIFC3DT2PR2X7PWSUXLE2XXQSVU37";
+    const toAsset = "CA5F2XGO4TFHBIJIZ3A7XISPI4DUQGBS77PRUM3Q7SFPBLLVPDCAUTWB";
 
     const result = findBestPath(fromAsset, toAsset);
 
