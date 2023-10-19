@@ -11,3 +11,9 @@ export async function getByAddress(req: Request, res: Response) {
 
   res.json(serializeBigInt(pairEntries));
 }
+
+export async function getTopGainers(req: Request, res: Response) {
+  const pairEntries = await db.getTopGainers();
+
+  res.json(serializeBigInt(pairEntries));
+}

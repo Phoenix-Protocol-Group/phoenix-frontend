@@ -16,7 +16,7 @@ import { Address } from "stellar-base";
 export async function startFetch() {
   console.log("Starting fetch");
 
-  //const pairRes = await fetchPairs();
+  const pairRes = await fetchPairs();
   fetchPrices();
 
   //create cronjob to fetch factory contract, its pairs, tokens and their prices every 15 minutes
@@ -101,19 +101,16 @@ async function fetchPool(poolAddress: Address) {
               id: tokenA.id,
             }
           },
-          assetAAmount: pairInfo.asset_a.amount,
           assetB: {
             connect: {
               id: tokenB.id,
             }
           },
-          assetBAmount: pairInfo.asset_b.amount,
           assetShare: {
             connect: {
               id: tokenShare.id,
             }
           },
-          assetShareAmount: pairInfo.asset_lp_share.amount,
         });
 
         pairId = newPair.id;
@@ -122,6 +119,9 @@ async function fetchPool(poolAddress: Address) {
       // create pair history entry
       const newPairHistory = await pairHistory.create({
         createdAt: roundDownToNearest15Minutes(),
+        assetAAmount: pairInfo.asset_a.amount,
+        assetBAmount: pairInfo.asset_b.amount,
+        assetShareAmount: pairInfo.asset_lp_share.amount,
         pair: {
           connect: {
             id: pairId,
@@ -149,7 +149,7 @@ async function fetchPrices() {
   
   // get pairs and parse them to easier format
   const pairEntries = await pair.getAll();
-  const pairs = pairEntries.map((pair) => ({
+  const pairs = pairEntries.map((pair: any) => ({
     id: pair.id,
     ratio: Number(pair.assetAAmount / pair.assetBAmount), //doesnt work with mock pairs
     tokenA: pair.assetA.symbol,

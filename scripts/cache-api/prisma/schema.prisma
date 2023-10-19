@@ -35,18 +35,15 @@ model Pair {
   id      Int    @id @default(autoincrement())
   address String
 
-  assetA       Token  @relation("assetA", fields: [assetAId], references: [id])
-  assetAId     Int
-  assetAAmount BigInt
+  assetA   Token @relation("assetA", fields: [assetAId], references: [id])
+  assetAId Int
 
-  assetB       Token  @relation("assetB", fields: [assetBId], references: [id])
-  assetBId     Int
-  assetBAmount BigInt
+  assetB   Token @relation("assetB", fields: [assetBId], references: [id])
+  assetBId Int
 
-  assetShare       Token         @relation("assetShare", fields: [assetShareId], references: [id])
-  assetShareId     Int
-  assetShareAmount BigInt
-  PairHistory      PairHistory[]
+  assetShare   Token         @relation("assetShare", fields: [assetShareId], references: [id])
+  assetShareId Int
+  PairHistory  PairHistory[]
 }
 
 model PairHistory {
@@ -54,4 +51,8 @@ model PairHistory {
   createdAt BigInt
   pair      Pair   @relation(fields: [pairId], references: [id])
   pairId    Int
+
+  assetAAmount     BigInt
+  assetBAmount     BigInt
+  assetShareAmount BigInt
 }
