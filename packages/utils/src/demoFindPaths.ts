@@ -72,6 +72,6 @@ export function findBestPath(
       }
     }
   }
-
+  
   return { operations };
 }

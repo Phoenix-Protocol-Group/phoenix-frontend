@@ -48,6 +48,7 @@ export default function SwapPage() {
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
       });
+      console.log(operations);
 
       // Execute swap
       const tx = await contract.swap({
@@ -126,13 +127,17 @@ export default function SwapPage() {
         return;
       }
 
-      const { operations: _operations } = findBestPath(
-        fromTokenContractID,
-        toTokenContractID
+      const { operations: ops } = findBestPath(
+        toTokenContractID,
+        fromTokenContractID
       );
+
+      const _operations = ops.reverse();
+
+      console.log(_operations);
       const _swapRoute: string[] = _operations.map((op, index) => {
         const toAssetName = appStore.allTokens.find(
-          (token: any) => token.contractId === op.offer_asset
+          (token: any) => token.contractId === op.ask_asset
         )?.name;
 
         return toAssetName;
