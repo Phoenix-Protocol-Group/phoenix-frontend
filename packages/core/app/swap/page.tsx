@@ -48,7 +48,6 @@ export default function SwapPage() {
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
       });
-      console.log(operations);
 
       // Execute swap
       const tx = await contract.swap({
