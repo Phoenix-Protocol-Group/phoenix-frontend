@@ -1,0 +1,13 @@
+{
+  "name": "types",
+  "version": "0.0.1",
+  "description": "",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "rm -rf ./build/ && tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
