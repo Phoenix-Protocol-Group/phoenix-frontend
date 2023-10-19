@@ -82,13 +82,6 @@ export const networks = {
   },
 } as const;
 
-const Errors: Record<number, any> = {
-  0: { message: "" },
-  1: { message: "" },
-  2: { message: "" },
-  555: { message: "" },
-  4: { message: "" },
-};
 export interface Swap {
   ask_asset: Address;
   offer_asset: Address;
@@ -102,7 +95,8 @@ export interface Pair {
 export type DataKey =
   | { tag: "PairKey"; values: readonly [Pair] }
   | { tag: "FactoryKey"; values: void }
-  | { tag: "Admin"; values: void };
+  | { tag: "Admin"; values: void }
+  | { tag: "Initialized"; values: void };
 
 export interface Asset {
   /**
@@ -133,18 +127,33 @@ export interface PoolResponse {
   asset_lp_share: Asset;
 }
 
+export interface SimulateSwapResponse {
+  ask_amount: i128;
+  total_commission_amount: i128;
+}
+
+export interface SimulateReverseSwapResponse {
+  offer_amount: i128;
+  total_commission_amount: i128;
+}
+
+const Errors: Record<number, any> = {};
+
 export class Contract {
   spec: ContractSpec;
   constructor(public readonly options: methodOptions.ClassOptions) {
     this.spec = new ContractSpec([
-      "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAdmYWN0b3J5AAAAABMAAAABAAAD6QAAA+0AAAAAAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
-      "AAAAAAAAAAAAAAAEc3dhcAAAAAMAAAAAAAAACXJlY2lwaWVudAAAAAAAABMAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAABmFtb3VudAAAAAAACwAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
-      "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAFAAAAAAAAAAxVbmF1dGhvcml6ZWQAAAAAAAAAAAAAAA1BZG1pbk5vdEZvdW5kAAAAAAAAAQAAAAAAAAAPRmFjdG9yeU5vdEZvdW5kAAAAAAIAAAAAAAAAEFJlbW90ZUNhbGxGYWlsZWQAAAIrAAAAAAAAAA9PcGVyYXRpb25zRW1wdHkAAAAABA==",
+      "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAdmYWN0b3J5AAAAABMAAAAA",
+      "AAAAAAAAAAAAAAAEc3dhcAAAAAMAAAAAAAAACXJlY2lwaWVudAAAAAAAABMAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAABmFtb3VudAAAAAAACwAAAAA=",
+      "AAAAAAAAAAAAAAANc2ltdWxhdGVfc3dhcAAAAAAAAAIAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAABmFtb3VudAAAAAAACwAAAAEAAAfQAAAAFFNpbXVsYXRlU3dhcFJlc3BvbnNl",
+      "AAAAAAAAAAAAAAAVc2ltdWxhdGVfcmV2ZXJzZV9zd2FwAAAAAAAAAgAAAAAAAAAKb3BlcmF0aW9ucwAAAAAD6gAAB9AAAAAEU3dhcAAAAAAAAAAGYW1vdW50AAAAAAALAAAAAQAAB9AAAAAbU2ltdWxhdGVSZXZlcnNlU3dhcFJlc3BvbnNlAA==",
       "AAAAAQAAAAAAAAAAAAAABFN3YXAAAAACAAAAAAAAAAlhc2tfYXNzZXQAAAAAAAATAAAAAAAAAAtvZmZlcl9hc3NldAAAAAAT",
       "AAAAAQAAAAAAAAAAAAAABFBhaXIAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
-      "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAAAwAAAAEAAAAAAAAAB1BhaXJLZXkAAAAAAQAAB9AAAAAEUGFpcgAAAAAAAAAAAAAACkZhY3RvcnlLZXkAAAAAAAAAAAAAAAAABUFkbWluAAAA",
+      "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAABAAAAAEAAAAAAAAAB1BhaXJLZXkAAAAAAQAAB9AAAAAEUGFpcgAAAAAAAAAAAAAACkZhY3RvcnlLZXkAAAAAAAAAAAAAAAAABUFkbWluAAAAAAAAAAAAAAAAAAALSW5pdGlhbGl6ZWQA",
       "AAAAAQAAAAAAAAAAAAAABUFzc2V0AAAAAAAAAgAAABRBZGRyZXNzIG9mIHRoZSBhc3NldAAAAAdhZGRyZXNzAAAAABMAAAAsVGhlIHRvdGFsIGFtb3VudCBvZiB0aG9zZSB0b2tlbnMgaW4gdGhlIHBvb2wAAAAGYW1vdW50AAAAAAAL",
       "AAAAAQAAAG5UaGlzIHN0cnVjdCBpcyB1c2VkIHRvIHJldHVybiBhIHF1ZXJ5IHJlc3VsdCB3aXRoIHRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGFuZCBhc3NldHMgaW4gYSBzcGVjaWZpYyBwb29sLgAAAAAAAAAAAAxQb29sUmVzcG9uc2UAAAADAAAAM1RoZSBhc3NldCBBIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYQAAAAfQAAAABUFzc2V0AAAAAAAAM1RoZSBhc3NldCBCIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYgAAAAfQAAAABUFzc2V0AAAAAAAALlRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGN1cnJlbnRseSBpc3N1ZWQAAAAAAA5hc3NldF9scF9zaGFyZQAAAAAH0AAAAAVBc3NldAAAAA==",
+      "AAAAAQAAAAAAAAAAAAAAFFNpbXVsYXRlU3dhcFJlc3BvbnNlAAAAAgAAAAAAAAAKYXNrX2Ftb3VudAAAAAAACwAAAAAAAAAXdG90YWxfY29tbWlzc2lvbl9hbW91bnQAAAAACw==",
+      "AAAAAQAAAAAAAAAAAAAAG1NpbXVsYXRlUmV2ZXJzZVN3YXBSZXNwb25zZQAAAAACAAAAAAAAAAxvZmZlcl9hbW91bnQAAAALAAAAAAAAABd0b3RhbF9jb21taXNzaW9uX2Ftb3VudAAAAAAL",
     ]);
   }
   async initialize<R extends methodOptions.ResponseTypes = undefined>(
@@ -157,7 +166,7 @@ export class Contract {
       /**
        * What type of response to return.
        *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+       *   - `undefined`, the default, parses the returned XDR as `void`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
        *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
        *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
        */
@@ -168,23 +177,13 @@ export class Contract {
       secondsToWait?: number;
     } = {}
   ) {
-    try {
-      return await Invoke.invoke({
-        method: "initialize",
-        args: this.spec.funcArgsToScVals("initialize", { admin, factory }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr: any): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("initialize", xdr));
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
+    return await Invoke.invoke({
+      method: "initialize",
+      args: this.spec.funcArgsToScVals("initialize", { admin, factory }),
+      ...options,
+      ...this.options,
+      parseResultXdr: () => {},
+    });
   }
 
   async swap<R extends methodOptions.ResponseTypes = undefined>(
@@ -201,7 +200,7 @@ export class Contract {
       /**
        * What type of response to return.
        *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+       *   - `undefined`, the default, parses the returned XDR as `void`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
        *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
        *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
        */
@@ -212,26 +211,83 @@ export class Contract {
       secondsToWait?: number;
     } = {}
   ) {
-    try {
-      return await Invoke.invoke({
-        method: "swap",
-        args: this.spec.funcArgsToScVals("swap", {
-          recipient,
-          operations,
-          amount,
-        }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr: any): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(void 0);
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
+    return await Invoke.invoke({
+      method: "swap",
+      args: this.spec.funcArgsToScVals("swap", {
+        recipient,
+        operations,
+        amount,
+      }),
+      ...options,
+      ...this.options,
+      parseResultXdr: () => {},
+    });
+  }
+
+  async simulateSwap<R extends methodOptions.ResponseTypes = undefined>(
+    { operations, amount }: { operations: Array<Swap>; amount: i128 },
+    options: {
+      /**
+       * The fee to pay for the transaction. Default: 100.
+       */
+      fee?: number;
+      /**
+       * What type of response to return.
+       *
+       *   - `undefined`, the default, parses the returned XDR as `SimulateSwapResponse`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
+       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
+       */
+      responseType?: R;
+      /**
+       * If the simulation shows that this invocation requires auth/signing, `Invoke.invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
+       */
+      secondsToWait?: number;
+    } = {}
+  ) {
+    return await Invoke.invoke({
+      method: "simulate_swap",
+      args: this.spec.funcArgsToScVals("simulate_swap", { operations, amount }),
+      ...options,
+      ...this.options,
+      parseResultXdr: (xdr): SimulateSwapResponse => {
+        return this.spec.funcResToNative("simulate_swap", xdr);
+      },
+    });
+  }
+
+  async simulateReverseSwap<R extends methodOptions.ResponseTypes = undefined>(
+    { operations, amount }: { operations: Array<Swap>; amount: i128 },
+    options: {
+      /**
+       * The fee to pay for the transaction. Default: 100.
+       */
+      fee?: number;
+      /**
+       * What type of response to return.
+       *
+       *   - `undefined`, the default, parses the returned XDR as `SimulateReverseSwapResponse`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
+       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
+       */
+      responseType?: R;
+      /**
+       * If the simulation shows that this invocation requires auth/signing, `Invoke.invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
+       */
+      secondsToWait?: number;
+    } = {}
+  ) {
+    return await Invoke.invoke({
+      method: "simulate_reverse_swap",
+      args: this.spec.funcArgsToScVals("simulate_reverse_swap", {
+        operations,
+        amount,
+      }),
+      ...options,
+      ...this.options,
+      parseResultXdr: (xdr): SimulateReverseSwapResponse => {
+        return this.spec.funcResToNative("simulate_reverse_swap", xdr);
+      },
+    });
   }
 }

@@ -3,6 +3,7 @@ import {
   Button,
   Grid,
   Input,
+  Skeleton,
   Typography,
   makeStyles,
 } from "@mui/material";
@@ -23,6 +24,7 @@ interface TokenBoxProps {
   hideDropdownButton?: boolean;
   value: string | undefined;
   disabled?: boolean;
+  loadingValues?: boolean;
 }
 
 const AssetButton = ({
@@ -80,6 +82,7 @@ const TokenBox = ({
   value,
   hideDropdownButton = false,
   disabled = false,
+  loadingValues = false,
 }: TokenBoxProps) => {
   const [usdPrice, setUsdPrice] = React.useState(
     Number(value) * Number(token.usdValue) || 0
@@ -97,47 +100,51 @@ const TokenBox = ({
     >
       <Grid container>
         <Grid item xs={6}>
-          <Input
-            disabled={disabled}
-            value={value}
-            onChange={(e) => {
-              onChange(e.target.value);
-              setUsdPrice(Number(e.target.value) * Number(token.usdValue));
-            }}
-            inputProps={{ min: 0, max: token.amount }}
-            type="number"
-            placeholder="0.00"
-            sx={{
-              color: "#FFF",
-              fontSize: "24px",
-              fontWeight: 700,
-              lineHeight: "140%",
-              "&:before": {
-                content: "none",
-              },
-              "&:after": {
-                content: "none",
-              },
-              "&:hover fieldset": {
-                border: "1px solid #E2621B!important",
-              },
-              "&:focus-within fieldset, &:focus-visible fieldset": {
-                border: "1px solid #E2621B!important",
-                color: "white!important",
-              },
-              "& input[type=number]": {
-                "-moz-appearance": "textfield",
-              },
-              "& input[type=number]::-webkit-outer-spin-button": {
-                "-webkit-appearance": "none",
-                margin: 0,
-              },
-              "& input[type=number]::-webkit-inner-spin-button": {
-                "-webkit-appearance": "none",
-                margin: 0,
-              },
-            }}
-          />
+          {loadingValues ? (
+            <Skeleton variant="text" width="80" animation="wave" />
+          ) : (
+            <Input
+              disabled={disabled}
+              value={value}
+              onChange={(e) => {
+                onChange(e.target.value);
+                setUsdPrice(Number(e.target.value) * Number(token.usdValue));
+              }}
+              inputProps={{ min: 0, max: token.amount }}
+              type="number"
+              placeholder="0.00"
+              sx={{
+                color: "#FFF",
+                fontSize: "24px",
+                fontWeight: 700,
+                lineHeight: "140%",
+                "&:before": {
+                  content: "none",
+                },
+                "&:after": {
+                  content: "none",
+                },
+                "&:hover fieldset": {
+                  border: "1px solid #E2621B!important",
+                },
+                "&:focus-within fieldset, &:focus-visible fieldset": {
+                  border: "1px solid #E2621B!important",
+                  color: "white!important",
+                },
+                "& input[type=number]": {
+                  "-moz-appearance": "textfield",
+                },
+                "& input[type=number]::-webkit-outer-spin-button": {
+                  "-webkit-appearance": "none",
+                  margin: 0,
+                },
+                "& input[type=number]::-webkit-inner-spin-button": {
+                  "-webkit-appearance": "none",
+                  margin: 0,
+                },
+              }}
+            />
+          )}
         </Grid>
         <Grid
           item
@@ -161,7 +168,11 @@ const TokenBox = ({
             color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70));",
           }}
         >
-          ${usdPrice.toFixed(2)}
+          {loadingValues ? (
+            <Skeleton variant="text" width="80" animation="wave" />
+          ) : (
+            usdPrice.toFixed(2)
+          )}
         </Grid>
         <Grid
           item
