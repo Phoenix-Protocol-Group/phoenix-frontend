@@ -20,6 +20,7 @@ app.get("/", async (req: Request, res: Response) => {
 });
 
 app.get("/pairs", pair.getAll);
+app.get("/pairs/topgainers", pairHistory.getTopGainers);
 app.get("/pairs/:address", pair.getByAddress);
 app.get("/pairs/:address/history", pairHistory.getByAddress);
 
