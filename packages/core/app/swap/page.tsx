@@ -49,6 +49,8 @@ export default function SwapPage() {
         rpcUrl: constants.RPC_URL,
       });
 
+      console.log(JSON.stringify(operations));
+
       // Execute swap
       const tx = await contract.swap({
         recipient: Address.fromString(storePersist.wallet.address!),
