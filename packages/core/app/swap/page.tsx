@@ -134,7 +134,6 @@ export default function SwapPage() {
 
       const _operations = ops.reverse();
 
-      console.log(_operations);
       const _swapRoute: string[] = _operations.map((op, index) => {
         const toAssetName = appStore.allTokens.find(
           (token: any) => token.contractId === op.ask_asset
