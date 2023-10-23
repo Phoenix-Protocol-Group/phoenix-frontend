@@ -9,7 +9,7 @@ services:
     depends_on:
       - postgres
     networks:
-      - my_network
+      - app-network
     environment:
       - DATABASE_URL=postgresql://your_db_user:your_db_password@postgres:5432/your_db_name?schema=public
     command: sh -c "npm install && npm run migrate && npm start"
@@ -17,13 +17,53 @@ services:
   postgres:
     image: postgres:latest
     networks:
-      - my_network
+      - app-network
     environment:
       POSTGRES_USER: your_db_user
       POSTGRES_PASSWORD: your_db_password
       POSTGRES_DB: your_db_name
+    volumes:
+      - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - proxy-network
+    labels:
+      - "com.github.nginx-proxy.nginx-proxy=true"
+
+  nginx-proxy-acme:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    environment:
+      - DEFAULT_EMAIL=your-email@domain.com
+    volumes:
+      - acme:/etc/acme.sh
+    depends_on:
+      - nginx-proxy
+    networks:
+      - proxy-network
+
 networks:
-  my_network:
+  app-network:
+    driver: bridge
+  proxy-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  certs:
+  vhost:
+  html:
+  acme:
