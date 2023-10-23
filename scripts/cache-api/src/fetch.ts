@@ -171,10 +171,6 @@ async function fetchPrices() {
     const tokenAPrice = price.calculateTokenValue(pair.tokenA, pairs, targetPrices);
     const tokenBPrice = price.calculateTokenValue(pair.tokenB, pairs, targetPrices);
 
-    console.log(pair.tokenA, pair.tokenB);
-    console.log(tokenAPrice, tokenBPrice);
-    console.log("-----");
-
     const _tokenA = await token.getBySymbol(changeIfStellarToken(pair.tokenA));
     const _tokenB = await token.getBySymbol(changeIfStellarToken(pair.tokenB));
         
