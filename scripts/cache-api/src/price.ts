@@ -13,7 +13,7 @@ type Target = {
   };
 };
 
-export function findBestPath(tokenSymbol: string, pairsArray: Pair[], targets: string[]): { ratio: number, path: Pair[] } {
+export function findBestPath(tokenSymbol: string, pairsArray: Pair[], targets: string[]): Pair[] {
   const graph: { [key: string]: { [key: string]: Pair } } = {};
   pairsArray.forEach((item) => {
     const tokenA = item.tokenA;
@@ -25,29 +25,25 @@ export function findBestPath(tokenSymbol: string, pairsArray: Pair[], targets: s
   });
 
   const visited: Set<string> = new Set();
-  const queue: { node: string; path: Pair[], ratio: number }[] = [{ node: tokenSymbol, path: [], ratio: 1 }];
-  let finalRatio = 1;
+  const queue: { node: string; path: Pair[] }[] = [{ node: tokenSymbol, path: [] }];
+  const finalPath: Pair[] = [];
 
   while (queue.length > 0) {
-    const { node, path, ratio } = queue.shift()!;
+    const { node, path } = queue.shift()!;
     if (targets.includes(node)) {
-      finalRatio = ratio;
-      return { ratio: finalRatio, path };
+      finalPath.push(...path);
+      return finalPath;
     }
     if (!visited.has(node)) {
       visited.add(node);
       for (const neighbor in graph[node]) {
-        let nextRatio = ratio;
-        if (graph[node][neighbor].tokenB === node) {
-          nextRatio *= graph[node][neighbor].ratio;
-        } else {
-          nextRatio *= 1 / graph[node][neighbor].ratio;
-}
-        queue.push({ node: neighbor, path: [...path, graph[node][neighbor]], ratio: nextRatio });
+        const pair = graph[node][neighbor];
+        const nextPath = [...path, { ...pair, ratio: pair.tokenB === node ? pair.ratio : 1 / pair.ratio }];
+        queue.push({ node: neighbor, path: nextPath });
       }
     }
   }
-  return { ratio: finalRatio, path: [] };
+  return finalPath;
 }
 
 export function calculateTokenValue(baseToken: string, pairsArray: Pair[], targets: Target[]): number | undefined {
@@ -59,7 +55,7 @@ export function calculateTokenValue(baseToken: string, pairsArray: Pair[], targe
       return target[targetToken].usd;
     }
 
-    const { ratio, path } = findBestPath(baseToken, pairsArray, [targetToken]);
+    const path = findBestPath(baseToken, pairsArray, [targetToken]);
 
     if (path.length > 0) {
       let value = 1;
