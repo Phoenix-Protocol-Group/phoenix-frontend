@@ -13,7 +13,7 @@ const port = process.env.PORT || 3000;
 fetch.startFetch();
 
 app.use(express.json());
-app.use(cors());
+//app.use(cors());
 
 app.get("/", async (req: Request, res: Response) => {
   res.send("Cache API is running");
