@@ -20,6 +20,19 @@ export async function getByAddress(address: string) {
   return pairEntries;
 }
 
+export async function getLatestByPairId(id: number) {
+  const pairEntries = await prisma.pairHistory.findFirst({
+    where: {
+      pairId: id,
+    },
+    orderBy: {
+      id: 'desc',
+    },
+  });
+
+  return pairEntries;
+}
+
 export async function create(pair: any) {
   const newPair = await prisma.pairHistory.create({
     data: pair,

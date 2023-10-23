@@ -42,7 +42,7 @@ export function findBestPath(tokenSymbol: string, pairsArray: Pair[], targets: s
           nextRatio *= graph[node][neighbor].ratio;
         } else {
           nextRatio *= 1 / graph[node][neighbor].ratio;
-        }
+}
         queue.push({ node: neighbor, path: [...path, graph[node][neighbor]], ratio: nextRatio });
       }
     }
@@ -51,38 +51,31 @@ export function findBestPath(tokenSymbol: string, pairsArray: Pair[], targets: s
 }
 
 export function calculateTokenValue(baseToken: string, pairsArray: Pair[], targets: Target[]): number | undefined {
-  let value;
-  let found = false;
   for (const target of targets) {
     const targetToken = Object.keys(target)[0];
     const targetPrice = target[targetToken].usd;
+
+    if (targetToken === baseToken) {
+      return target[targetToken].usd;
+    }
+
     const { ratio, path } = findBestPath(baseToken, pairsArray, [targetToken]);
+
     if (path.length > 0) {
+      let value = 1;
       for (let i = 0; i < path.length; i++) {
-        if (path[i].tokenA === baseToken && path[i].tokenB === targetToken) {
-          if (path[i].ratio > 0) {
-            value = 1 * path[i].ratio * targetPrice;
-          } else {
-            value = 1 / -path[i].ratio * targetPrice;
-          }
-          found = true;
-          break;
-        } else if (path[i].tokenB === baseToken && path[i].tokenA === targetToken) {
-          if (path[i].ratio > 0) {
-            value = 1 / path[i].ratio * targetPrice;
-          } else {
-            value = 1 * -path[i].ratio * targetPrice;
-          }
-          found = true;
-          break;
+        const currentPair = path[i];
+        if (currentPair.tokenA === baseToken) {
+          value *= currentPair.ratio;
+        } else {
+          value /= currentPair.ratio;
         }
       }
-    }
-    if (found) {
-      break;
+      value *= targetPrice;
+      return value;
     }
   }
-  return found ? value : undefined;
+  return undefined;
 }
 
 const coinGecko = new CoinGeckoClient({

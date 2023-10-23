@@ -26,7 +26,7 @@ model Token {
 model TokenHistory {
   id        Int    @id @default(autoincrement())
   createdAt BigInt
-  price     BigInt
+  price     Float
   token     Token  @relation(fields: [tokenId], references: [id])
   tokenId   Int
 }

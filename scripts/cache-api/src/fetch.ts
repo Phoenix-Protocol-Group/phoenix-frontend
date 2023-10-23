@@ -139,48 +139,67 @@ async function fetchPool(poolAddress: Address) {
 
 async function fetchPrices() {
   //array of tokens with known prices
-  const targetArray = ["Stellar"];
+  const targetArray = ["stellar"];
 
   let targetPrices = [];
   for(const target of targetArray) {
     const targetPrice = await price.getPrices(target);
     targetPrices.push(targetPrice);
   }
+
+  const changeIfNativeToken = (token: any) => (token === "native" ? "stellar" : token);
+  const changeIfStellarToken = (token: any) => (token === "stellar" ? "native" : token);
   
   // get pairs and parse them to easier format
   const pairEntries = await pair.getAll();
-  const pairs = pairEntries.map((pair: any) => ({
-    id: pair.id,
-    ratio: Number(pair.assetAAmount / pair.assetBAmount), //doesnt work with mock pairs
-    tokenA: pair.assetA.symbol,
-    tokenB: pair.assetB.symbol,
-  }));
+  
+  let pairs = [];
+  for(const pair of pairEntries) {
+    const history = await pairHistory.getLatestByPairId(pair.id);
+
+    const ratio = Number(history.assetAAmount) / Number(history.assetBAmount);
+
+    pairs.push({
+      id: pair.id,
+      ratio: ratio,
+      tokenA: changeIfNativeToken(pair.assetA.symbol),
+      tokenB: changeIfNativeToken(pair.assetB.symbol),
+    });
+  }
 
   for(const pair of pairs) {
-    // calculate token prices for token A and B
-    const tokenPrices = [
-      price.calculateTokenValue(pair.tokenA, pairs, targetPrices), 
-      price.calculateTokenValue(pair.tokenB, pairs, targetPrices)
-    ];
-    
-    // loop for token a and b
-    for(const tokenPrice of tokenPrices) {
-      if(tokenPrice !== undefined) {
-        const _token = await token.getBySymbol(pair.tokenA);
-        
-        // create token history entry
-        const tokenEntry = await tokenHistory.create({
-          createdAt: roundDownToNearest15Minutes(),
-          price: tokenPrice,
-          token: {
-            connect: {
-              id: _token.id,
-            }
-          },
-        });
+    const tokenAPrice = price.calculateTokenValue(pair.tokenA, pairs, targetPrices);
+    const tokenBPrice = price.calculateTokenValue(pair.tokenB, pairs, targetPrices);
 
-        continue;
-      }
+    console.log(pair.tokenA, pair.tokenB);
+    console.log(tokenAPrice, tokenBPrice);
+    console.log("-----");
+
+    const _tokenA = await token.getBySymbol(changeIfStellarToken(pair.tokenA));
+    const _tokenB = await token.getBySymbol(changeIfStellarToken(pair.tokenB));
+        
+    if(tokenAPrice !== undefined) {
+      const tokenAEntry = await tokenHistory.create({
+        createdAt: roundDownToNearest15Minutes(),
+        price: tokenAPrice,
+        token: {
+          connect: {
+            id: _tokenA.id,
+          }
+        },
+      });
+    }
+
+    if(tokenBPrice !== undefined) {
+      const tokenBEntry = await tokenHistory.create({
+        createdAt: roundDownToNearest15Minutes(),
+        price: tokenBPrice,
+        token: {
+          connect: {
+            id: _tokenB.id,
+          }
+        },
+      });
     }
   }
 }
