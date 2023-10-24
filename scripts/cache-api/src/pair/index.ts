@@ -13,5 +13,5 @@ export async function getByAddress(req: Request, res: Response) {
 
   const pair = await db.getByAddress(req.params.address);
 
-  res.json(serializeBigInt(pair));
+  res.json(pair);
 }
