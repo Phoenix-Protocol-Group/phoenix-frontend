@@ -36,6 +36,7 @@ interface SwapContainerProps {
   fromTokenValue?: string;
   toTokenValue?: string;
   swapButtonDisabled?: boolean;
+  loadingSimulate?: boolean;
   onOptionsClick: () => void;
   onSwapTokensClick: () => void;
   onSwapButtonClick: () => void;
@@ -101,6 +102,7 @@ const SwapContainer = ({
   onInputChange,
   swapButtonDisabled,
   onTokenSelectorClick,
+  loadingSimulate = false,
 }: SwapContainerProps) => {
   const [expanded, setExpanded] = React.useState(true);
 
@@ -140,7 +142,7 @@ const SwapContainer = ({
         </Box>
       </Box>
       <TokenBox
-        value={toTokenValue}
+        value={fromTokenValue}
         token={fromToken}
         onAssetClick={() => onTokenSelectorClick(true)}
         onChange={(value) => onInputChange(true, value)}
@@ -155,11 +157,12 @@ const SwapContainer = ({
         <SwapAssetsButton onClick={onSwapTokensClick} />
       </Box>
       <TokenBox
-        value={fromTokenValue}
+        value={toTokenValue}
         token={toToken}
         onAssetClick={() => onTokenSelectorClick(false)}
         onChange={(value) => onInputChange(false, value)}
         disabled={true}
+        loadingValues={loadingSimulate}
       />
       <CustomButton
         onClick={onSwapButtonClick}

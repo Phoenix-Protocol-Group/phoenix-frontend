@@ -26,7 +26,7 @@ export default function SwapPage() {
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [errorDescription, setErrorDescription] = useState("");
-  const [tokenAmounts, setTokenAmounts] = useState<number[]>([0]);
+  const [tokenAmounts, setTokenAmounts] = useState<number[]>([0, 0]);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [fromToken, setFromToken] = useState<Token>();
   const [maxSpread, setMaxSpread] = useState<number>(0);
@@ -34,6 +34,11 @@ export default function SwapPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [swapRoute, setSwapRoute] = useState<string>("");
   const [operations, setOperations] = useState<any[]>([]);
+
+  // Simulate swap states
+  const [loadingSimulate, setLoadingSimulate] = useState<boolean>(false);
+  const [exchangeRate, setExchangeRate] = useState<string>("");
+  const [networkFee, setNetworkFee] = useState<string>("");
 
   // Using the store
   const storePersist = usePersistStore();
@@ -48,8 +53,6 @@ export default function SwapPage() {
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
       });
-
-      console.log(JSON.stringify(operations));
 
       // Execute swap
       const tx = await contract.swap({
@@ -71,6 +74,45 @@ export default function SwapPage() {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  // Function for simulating swap
+  const doSimulateSwap = async () => {
+    setLoadingSimulate(true);
+    try {
+      const contract = new PhoenixMultihopContract.Contract({
+        contractId: constants.MULTIHOP_ADDRESS,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+
+      const tx = await contract.simulateSwap({
+        operations: operations,
+        amount: BigInt(tokenAmounts[0] * 10 ** 7),
+      });
+
+      if (tx.ask_amount && tx.total_commission_amount) {
+        const _exchangeRate =
+          (Number(tx.ask_amount) - Number(tx.total_commission_amount)) /
+          Number(tokenAmounts[0]);
+
+        setExchangeRate(
+          `${(_exchangeRate / 10 ** 7).toFixed(2)} ${toToken?.name} per ${
+            fromToken?.name
+          }`
+        );
+        setNetworkFee(
+          `${Number(tx.total_commission_amount) / 10 ** 7} ${fromToken?.name}`
+        );
+
+        setTokenAmounts([tokenAmounts[0], Number(tx.ask_amount) / 10 ** 7]);
+      }
+
+      console.log(tx);
+    } catch (e) {
+      console.log(e);
+    }
+    setLoadingSimulate(false);
   };
 
   // Function for handling token click
@@ -113,6 +155,14 @@ export default function SwapPage() {
     getAllTokens();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storePersist.wallet.address]);
+
+  // Effect hook to simualte swaps on token change
+  useEffect(() => {
+    if (fromToken && toToken) {
+      doSimulateSwap();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromToken, toToken, tokenAmounts[0]]);
 
   useEffect(() => {
     if (fromToken && toToken) {
@@ -186,6 +236,8 @@ export default function SwapPage() {
               setFromToken(toToken);
               setToToken(fromToken);
             }}
+            fromTokenValue={tokenAmounts[0].toString()}
+            toTokenValue={tokenAmounts[1].toString()}
             fromToken={fromToken}
             toToken={toToken}
             onTokenSelectorClick={(isFromToken) =>
@@ -194,14 +246,15 @@ export default function SwapPage() {
             onSwapButtonClick={() => doSwap()}
             onInputChange={(isFrom, value) => {
               if (isFrom) {
-                setTokenAmounts([Number(value), 0]);
+                setTokenAmounts([Number(value), tokenAmounts[1]]);
               } else {
                 setTokenAmounts([0, Number(value)]);
               }
             }}
-            exchangeRate={"TODO"}
-            networkFee={"TODO"}
+            exchangeRate={exchangeRate}
+            networkFee={networkFee}
             route={swapRoute}
+            loadingSimulate={loadingSimulate}
             estSellPrice={"TODO"}
             minSellPrice={"TODO"}
             slippageTolerance={`${maxSpread + 1}%`}
