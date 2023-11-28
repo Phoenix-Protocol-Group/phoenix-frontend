@@ -109,6 +109,17 @@ export interface Asset {
   amount: i128;
 }
 
+export interface Referral {
+  /**
+   * Address of the referral
+   */
+  address: Address;
+  /**
+   * fee in bps, later parsed to percentage
+   */
+  fee: i64;
+}
+
 /**
  * This struct is used to return a query result with the total amount of LP tokens and assets in a specific pool.
  */
@@ -189,9 +200,19 @@ export class Contract {
   async swap<R extends methodOptions.ResponseTypes = undefined>(
     {
       recipient,
+      referral,
       operations,
+      max_belief_price,
+      max_spread_bps,
       amount,
-    }: { recipient: Address; operations: Array<Swap>; amount: i128 },
+    }: {
+      recipient: Address;
+      referral: Option<Referral>;
+      operations: Array<Swap>;
+      max_belief_price: Option<i64>;
+      max_spread_bps: Option<i64>;
+      amount: i128;
+    },
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
@@ -206,7 +227,7 @@ export class Contract {
        */
       responseType?: R;
       /**
-       * If the simulation shows that this invocation requires auth/signing, `Invoke.invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
+       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
        */
       secondsToWait?: number;
     } = {}
@@ -215,7 +236,10 @@ export class Contract {
       method: "swap",
       args: this.spec.funcArgsToScVals("swap", {
         recipient,
+        referral,
         operations,
+        max_belief_price,
+        max_spread_bps,
         amount,
       }),
       ...options,
