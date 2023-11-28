@@ -3393,6 +3393,7 @@ __metadata:
     soroban-client: 1.0.0-beta.4
     style-loader: ^3.3.3
     typescript: 5.1.6
+    use-debounce: ^10.0.0
   languageName: unknown
   linkType: soft
 
@@ -16269,6 +16270,15 @@ __metadata:
     punycode: ^1.4.1
     qs: ^6.11.0
   checksum: a7de4b37bbcbe60ef199acda4ce437ef843c0ef3a4b34ec3e3d97e0446a5f50dc7bfeafbe33ad118cf4e5aa04805e1328f0d0126e254f2b77bb8498fa395c596
+  languageName: node
+  linkType: hard
+
+"use-debounce@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "use-debounce@npm:10.0.0"
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: b296fedba916ca721eeb7117f29a13c252966d03411abccc5e5894ed4de0f32b9cb6f6b150555b8b4cb9b0acf53b84022ad4cd43b89253389e9cd13779eebca7
   languageName: node
   linkType: hard
 

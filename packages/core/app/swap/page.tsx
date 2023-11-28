@@ -2,6 +2,7 @@
 
 // React-related imports
 import React, { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
 
 // Component and utility imports
 import {
@@ -44,6 +45,8 @@ export default function SwapPage() {
   const storePersist = usePersistStore();
   const appStore = useAppStore();
 
+  const [fromAmount] = useDebounce(tokenAmounts[0], 200);
+
   // Function for handling token swapping logic
   const doSwap = async () => {
     try {
@@ -59,6 +62,9 @@ export default function SwapPage() {
         recipient: Address.fromString(storePersist.wallet.address!),
         operations: operations,
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
+        referral: undefined,
+        max_spread_bps: BigInt(maxSpread * 1000),
+        max_belief_price: undefined,
       });
 
       // @ts-ignore
@@ -162,7 +168,7 @@ export default function SwapPage() {
       doSimulateSwap();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromToken, toToken, tokenAmounts[0]]);
+  }, [toToken, fromToken, fromAmount]);
 
   useEffect(() => {
     if (fromToken && toToken) {
@@ -233,6 +239,7 @@ export default function SwapPage() {
           <SwapContainer
             onOptionsClick={() => setOptionsOpen(true)}
             onSwapTokensClick={() => {
+              setTokenAmounts([tokenAmounts[1], tokenAmounts[0]]);
               setFromToken(toToken);
               setToToken(fromToken);
             }}
