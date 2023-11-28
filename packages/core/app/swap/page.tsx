@@ -63,7 +63,7 @@ export default function SwapPage() {
         operations: operations,
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
         referral: undefined,
-        max_spread_bps: BigInt(maxSpread * 1000),
+        max_spread_bps: BigInt((maxSpread + 1) * 100),
         max_belief_price: undefined,
       });
 
