@@ -4,6 +4,7 @@ import { Buffer } from "buffer";
 import { invoke as Invoke } from "@phoenix-protocol/utils";
 import { methodOptions } from "@phoenix-protocol/utils";
 import { Option, i128, i64, u32 } from "../types";
+import { scValToJs } from "@phoenix-protocol/utils/build/convert";
 
 /// Error interface containing the error message
 export interface Error_ {
@@ -581,7 +582,8 @@ export class Contract {
         ...options,
         ...this.options,
         parseResultXdr: (xdr: any): Ok<Config> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("query_config", xdr));
+          const res = scValToJs(xdr);
+          return new Ok(res as Config);
         },
       });
     } catch (e) {

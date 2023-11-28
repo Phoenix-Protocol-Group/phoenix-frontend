@@ -32,7 +32,7 @@ const TopBar = ({
   };
 
   const token = store.tokens.find(
-    (el) => el.id === "CB64D3G7SM2RTH6JSGG34DDTFTQ5CFDKVDZJZSODMCX4NJ2HV2KN7OHT"
+    (el) => el.id === "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC"
   );
 
   const tokenBalance = token
@@ -42,7 +42,7 @@ const TopBar = ({
   const fetch = async () =>
     await store.fetchTokenInfo(
       Address.fromString(
-        "CB64D3G7SM2RTH6JSGG34DDTFTQ5CFDKVDZJZSODMCX4NJ2HV2KN7OHT"
+        "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC"
       )
     );
 

@@ -19,7 +19,7 @@ export function freighter(): Connector {
       // !TODO - find a better solution here
       return {
         ...(await freighterApi.getNetworkDetails()),
-        networkUrl: "https://rpc-futurenet.stellar.org/",
+        networkUrl: "https://soroban-testnet.stellar.org/",
       };
     },
     getPublicKey(): Promise<string> {

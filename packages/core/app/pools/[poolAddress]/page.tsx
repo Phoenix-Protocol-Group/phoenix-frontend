@@ -197,7 +197,6 @@ export default function Page({ params }: PoolPageProps) {
         ),
         stake_timestamp: BigInt(stake_timestamp),
       });
-      console.log(StakeContract);
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
@@ -220,6 +219,7 @@ export default function Page({ params }: PoolPageProps) {
 
       // When results ok...
       if (pairConfig?.isOk() && pairInfo?.isOk()) {
+        console.log(pairConfig.unwrap());
         // Fetch token infos from chain and save in global appstore
         const [_tokenA, _tokenB, _lpToken, stakeContractAddress] =
           await Promise.all([

@@ -148,6 +148,7 @@ export async function invoke<R extends ResponseTypes, T = any>({
     .setTimeout(SorobanClient.TimeoutInfinite)
     .build();
 
+
   const simulated = await Server.simulateTransaction(tx);
 
   if (responseType === "simulated") return simulated;
@@ -232,7 +233,7 @@ export async function signTx(
   networkPassphrase: string
 ): Promise<Tx> {
   const signed = await wallet.signTransaction(tx.toXDR(), {
-    network: "futurenet",
+    network: "testnet",
     networkPassphrase,
   });
 
