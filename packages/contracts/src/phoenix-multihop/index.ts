@@ -5,6 +5,7 @@ import { invoke as Invoke } from "@phoenix-protocol/utils";
 import { methodOptions } from "@phoenix-protocol/utils";
 import { Option, i128, i64, u32 } from "../types";
 /// Error interface containing the error message
+/// Error interface containing the error message
 export interface Error_ {
   message: string;
 }
@@ -68,6 +69,7 @@ function parseError(message: string): Err | undefined {
     return undefined;
   }
   let i = parseInt(match[1], 10);
+  //@ts-ignore
   let err = Errors[i];
   if (err) {
     return new Err(err);
@@ -81,6 +83,17 @@ export const networks = {
     contractId: "0",
   },
 } as const;
+
+export interface Referral {
+  /**
+   * Address of the referral
+   */
+  address: Address;
+  /**
+   * fee in bps, later parsed to percentage
+   */
+  fee: i64;
+}
 
 export interface Swap {
   ask_asset: Address;
@@ -107,17 +120,6 @@ export interface Asset {
    * The total amount of those tokens in the pool
    */
   amount: i128;
-}
-
-export interface Referral {
-  /**
-   * Address of the referral
-   */
-  address: Address;
-  /**
-   * fee in bps, later parsed to percentage
-   */
-  fee: i64;
 }
 
 /**
@@ -148,16 +150,18 @@ export interface SimulateReverseSwapResponse {
   total_commission_amount: i128;
 }
 
-const Errors: Record<number, any> = {};
+const Errors = {};
 
 export class Contract {
   spec: ContractSpec;
   constructor(public readonly options: methodOptions.ClassOptions) {
     this.spec = new ContractSpec([
       "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAdmYWN0b3J5AAAAABMAAAAA",
-      "AAAAAAAAAAAAAAAEc3dhcAAAAAMAAAAAAAAACXJlY2lwaWVudAAAAAAAABMAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAABmFtb3VudAAAAAAACwAAAAA=",
+      "AAAAAAAAAAAAAAAEc3dhcAAAAAYAAAAAAAAACXJlY2lwaWVudAAAAAAAABMAAAAAAAAACHJlZmVycmFsAAAD6AAAB9AAAAAIUmVmZXJyYWwAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAAEG1heF9iZWxpZWZfcHJpY2UAAAPoAAAABwAAAAAAAAAObWF4X3NwcmVhZF9icHMAAAAAA+gAAAAHAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAA",
       "AAAAAAAAAAAAAAANc2ltdWxhdGVfc3dhcAAAAAAAAAIAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAABmFtb3VudAAAAAAACwAAAAEAAAfQAAAAFFNpbXVsYXRlU3dhcFJlc3BvbnNl",
       "AAAAAAAAAAAAAAAVc2ltdWxhdGVfcmV2ZXJzZV9zd2FwAAAAAAAAAgAAAAAAAAAKb3BlcmF0aW9ucwAAAAAD6gAAB9AAAAAEU3dhcAAAAAAAAAAGYW1vdW50AAAAAAALAAAAAQAAB9AAAAAbU2ltdWxhdGVSZXZlcnNlU3dhcFJlc3BvbnNlAA==",
+      "AAAAAAAAAAAAAAAJZ2V0X2FkbWluAAAAAAAAAAAAAAEAAAAT",
+      "AAAAAQAAAAAAAAAAAAAACFJlZmVycmFsAAAAAgAAABdBZGRyZXNzIG9mIHRoZSByZWZlcnJhbAAAAAAHYWRkcmVzcwAAAAATAAAAJmZlZSBpbiBicHMsIGxhdGVyIHBhcnNlZCB0byBwZXJjZW50YWdlAAAAAAADZmVlAAAAAAc=",
       "AAAAAQAAAAAAAAAAAAAABFN3YXAAAAACAAAAAAAAAAlhc2tfYXNzZXQAAAAAAAATAAAAAAAAAAtvZmZlcl9hc3NldAAAAAAT",
       "AAAAAQAAAAAAAAAAAAAABFBhaXIAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
       "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAABAAAAAEAAAAAAAAAB1BhaXJLZXkAAAAAAQAAB9AAAAAEUGFpcgAAAAAAAAAAAAAACkZhY3RvcnlLZXkAAAAAAAAAAAAAAAAABUFkbWluAAAAAAAAAAAAAAAAAAALSW5pdGlhbGl6ZWQA",
@@ -227,7 +231,7 @@ export class Contract {
        */
       responseType?: R;
       /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
+       * If the simulation shows that this invocation requires auth/signing, `Invoke.invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
        */
       secondsToWait?: number;
     } = {}
@@ -311,6 +315,37 @@ export class Contract {
       ...this.options,
       parseResultXdr: (xdr): SimulateReverseSwapResponse => {
         return this.spec.funcResToNative("simulate_reverse_swap", xdr);
+      },
+    });
+  }
+
+  async getAdmin<R extends methodOptions.ResponseTypes = undefined>(
+    options: {
+      /**
+       * The fee to pay for the transaction. Default: 100.
+       */
+      fee?: number;
+      /**
+       * What type of response to return.
+       *
+       *   - `undefined`, the default, parses the returned XDR as `Address`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
+       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
+       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
+       */
+      responseType?: R;
+      /**
+       * If the simulation shows that this invocation requires auth/signing, `Invoke.invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
+       */
+      secondsToWait?: number;
+    } = {}
+  ) {
+    return await Invoke.invoke({
+      method: "get_admin",
+      args: this.spec.funcArgsToScVals("get_admin", {}),
+      ...options,
+      ...this.options,
+      parseResultXdr: (xdr): Address => {
+        return this.spec.funcResToNative("get_admin", xdr);
       },
     });
   }
