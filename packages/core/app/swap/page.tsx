@@ -210,6 +210,11 @@ export default function SwapPage() {
   ) : (
     // JSX for UI when data is loaded
     <Box sx={{ width: "100%", maxWidth: "600px" }}>
+      <Alert severity="warning">
+        Only direct pool swaps work for now! Unfortunately we are reaching
+        memory limits on the testnet with multi-pool swaps. Stay tuned for
+        updates!
+      </Alert>
       {/* Success Modal */}
       {fromToken && toToken && (
         <SwapSuccess
