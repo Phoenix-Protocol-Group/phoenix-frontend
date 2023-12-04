@@ -150,7 +150,9 @@ export default function Page({ params }: PoolPageProps) {
 
       await PairContract.withdrawLiquidity({
         sender: Address.fromString(storePersist.wallet.address!),
-        share_amount: BigInt(lpTokenAmount * 10 ** (lpToken?.decimals || 7)),
+        share_amount: BigInt(
+          (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+        ),
         min_a: BigInt(1),
         min_b: BigInt(1),
       });
