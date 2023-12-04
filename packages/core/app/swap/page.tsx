@@ -45,7 +45,7 @@ export default function SwapPage() {
   const storePersist = usePersistStore();
   const appStore = useAppStore();
 
-  const [fromAmount] = useDebounce(tokenAmounts[0], 200);
+  const [fromAmount] = useDebounce(tokenAmounts[0], 500);
 
   // Function for handling token swapping logic
   const doSwap = async () => {
