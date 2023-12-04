@@ -120,8 +120,12 @@ export default function Page({ params }: PoolPageProps) {
 
       await PairContract.provideLiquidity({
         sender: Address.fromString(storePersist.wallet.address!),
-        desired_a: BigInt(tokenAAmount * 10 ** (tokenA?.decimals || 7)),
-        desired_b: BigInt(tokenBAmount * 10 ** (tokenB?.decimals || 7)),
+        desired_a: BigInt(
+          (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
+        ),
+        desired_b: BigInt(
+          (tokenBAmount * 10 ** (tokenB?.decimals || 7)).toFixed(0)
+        ),
         min_a: BigInt(1),
         min_b: BigInt(1),
         custom_slippage_bps: BigInt(1),
