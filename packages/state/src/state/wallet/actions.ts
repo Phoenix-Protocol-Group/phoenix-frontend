@@ -5,8 +5,8 @@ import {
   SorobanTokenContract,
 } from "@phoenix-protocol/contracts";
 import { usePersistStore } from "../store";
-import { Address } from "soroban-client";
 import { constants } from "@phoenix-protocol/utils";
+import { Address } from "stellar-sdk";
 
 export const createWalletActions = (
   setState: SetStateType,
