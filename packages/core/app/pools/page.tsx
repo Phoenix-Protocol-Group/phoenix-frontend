@@ -9,7 +9,7 @@ import { Pool, Pools, Skeleton } from "@phoenix-protocol/ui";
 import { constants } from "@phoenix-protocol/utils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Address } from "soroban-client";
+import { Address } from "stellar-sdk";
 
 export default function Page() {
   const store = useAppStore(); // Global state management

@@ -29,7 +29,7 @@ import {
 
 import { constants, time } from "@phoenix-protocol/utils";
 
-import { Address } from "soroban-client";
+import { Address } from "stellar-sdk";
 
 import {
   PhoenixPairContract,
