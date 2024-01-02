@@ -25,11 +25,9 @@ export const createWalletActions = (
       });
 
       // Fetch all available tokens from chain
-
       const allPoolsDetails = await factoryContract.queryAllPoolsDetails();
       // Loop through all pools and get asset_a and asset_b addresses in an array
-      const _allAssets = allPoolsDetails
-        ?.unwrap()
+      const _allAssets = allPoolsDetails.result
         .map((pool) => [
           pool.pool_response.asset_a.address.toString(),
           pool.pool_response.asset_b.address.toString(),
@@ -83,9 +81,11 @@ export const createWalletActions = (
       let balance: bigint;
       try {
         balance = BigInt(
-          await TokenContract.balance({
-            id: Address.fromString(usePersistStore.getState().wallet.address!),
-          })
+          (
+            await TokenContract.balance({
+              id: usePersistStore.getState().wallet.address!,
+            })
+          ).result
         );
       } catch (e) {
         balance = BigInt(0);
@@ -95,7 +95,7 @@ export const createWalletActions = (
       const _symbol: string =
         getState().tokens.find(
           (token: Token) => token.id === tokenAddress.toString()
-        )?.symbol || (await TokenContract.symbol());
+        )?.symbol || (await TokenContract.symbol()).result;
       const symbol: string = _symbol === "native" ? "XLM" : _symbol;
 
       const decimals =
