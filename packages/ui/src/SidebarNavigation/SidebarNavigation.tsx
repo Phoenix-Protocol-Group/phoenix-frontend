@@ -171,17 +171,18 @@ const SidebarNavigation = ({
           <ListItem
             key={item.label}
             disablePadding
+            className={item.label}
             sx={{
               margin: "0 16px",
               width: "unset",
               borderRadius: "12px",
               overflow: "hidden",
-              border: item.active && open
-                ? "1px solid #E2491A"
-                : "1px solid transparent",
-              background: item.active && open
-                ? "rgba(226, 73, 26, 0.10)"
-                : "transparent",
+              border:
+                item.active && open
+                  ? "1px solid #E2491A"
+                  : "1px solid transparent",
+              background:
+                item.active && open ? "rgba(226, 73, 26, 0.10)" : "transparent",
               height: open ? "unset" : "32px",
               marginBottom: open ? 0 : "16px",
             }}
@@ -212,7 +213,7 @@ const SidebarNavigation = ({
                 }}
                 sx={{
                   padding: "16px 24px 16px 20px",
-                  opacity: item.active ? 1 :0.6000000238418579
+                  opacity: item.active ? 1 : 0.6000000238418579,
                 }}
                 primary={item.label}
               />
@@ -242,4 +243,3 @@ const SidebarNavigation = ({
 };
 
 export { SidebarNavigation };
-

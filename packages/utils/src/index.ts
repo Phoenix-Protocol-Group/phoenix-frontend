@@ -6,4 +6,5 @@ export * as account from "./account";
 export * as convert from "./convert";
 export * as time from "./time";
 export * as methodOptions from "./method-options";
+export * as joyride from "./joyride";
 export { findBestPath } from "./demoFindPaths";

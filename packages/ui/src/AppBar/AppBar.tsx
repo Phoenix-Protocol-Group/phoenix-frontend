@@ -174,6 +174,7 @@ const AppBar = ({
               </>
             ) : (
               <Button
+                className={"connect-wallet"}
                 size="small"
                 sx={{ marginRight: 1 }}
                 // @ts-ignore

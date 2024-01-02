@@ -68,6 +68,7 @@ const SwapAssetsButton = ({ onClick }: { onClick: () => void }) => {
   return (
     <Button
       onClick={onClick}
+      className="swap-assets-button"
       sx={{
         padding: "4px",
         borderRadius: "8px",
