@@ -106,8 +106,8 @@ export default function Page() {
     >
       <Grid item xs={12}>
         <Alert severity="warning" sx={{ zIndex: 2, mt: 6 }}>
-          This dashboard is currently work in progress. The data you see here is just
-          mocked. Follow our next{" "}
+          This dashboard is currently work in progress. The data you see here is
+          just mocked. Follow our next{" "}
           <Link
             href="https://dashboard.communityfund.stellar.org/scfawards/scf-test/submission/suggestion/34"
             target="_blank"
