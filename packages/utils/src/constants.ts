@@ -1,4 +1,4 @@
-import { Account } from "soroban-client";
+import { Account } from "stellar-sdk";
 
 export const TESTING_SOURCE: Account = new Account(
   "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
