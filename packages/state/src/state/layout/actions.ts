@@ -1,5 +1,9 @@
-import { AppStore, GetStateType, SetStateType } from "../types";
-import { LayoutActions } from "./types";
+import {
+  LayoutActions,
+  AppStore,
+  GetStateType,
+  SetStateType,
+} from "@phoenix-protocol/types";
 
 export const createLayoutActions = (
   setState: SetStateType,
