@@ -1,4 +1,4 @@
-import { Address, Server } from "soroban-client";
+import { Address, Horizon } from "stellar-sdk";
 
 export type Token = {
   id: string;
@@ -10,7 +10,7 @@ export type Token = {
 export type Wallet = {
   address: string | undefined;
   activeChain: WalletChain | undefined;
-  server: Server | undefined;
+  server: Horizon.Server | undefined;
 };
 
 export interface WalletActions {

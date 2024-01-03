@@ -1,10 +1,10 @@
-import {Server} from 'soroban-client';
-import {Token, WalletChain} from '../wallet/types';
+import { Horizon } from "stellar-sdk";
+import { Token, WalletChain } from "../wallet/types";
 
 export type Wallet = {
   address: string | undefined;
   activeChain: WalletChain | undefined;
-  server: Server | undefined;
+  server: Horizon.Server | undefined;
 };
 
 export interface PersistWalletActions {

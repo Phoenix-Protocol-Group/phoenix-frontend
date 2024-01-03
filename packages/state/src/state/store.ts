@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { createWalletActions } from "./wallet/actions";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { Server } from "soroban-client";
+import { Horizon } from "stellar-sdk";
 import { AppStore, AppStorePersist } from "./types";
 import { createConnectWalletActions } from "./persist/createConnectWalletActions";
 
 export const useAppStore = create<AppStore>()((set, get) => {
   // Create a new server instance.
-  const server = new Server("https://soroban-rpc.stellar.org");
+  const server = new Horizon.Server("https://soroban-rpc.stellar.org");
 
   // The network passphrase for the test network.
   const networkPassphrase = "Test SDF Network ; September 2015";
@@ -26,7 +26,7 @@ export const usePersistStore = create<AppStorePersist>()(
   persist(
     (set, get) => {
       // Create a new server instance.
-      const server = new Server("https://soroban-rpc.stellar.org");
+      const server = new Horizon.Server("https://soroban-rpc.stellar.org");
 
       // The network passphrase for the test network.
       const networkPassphrase = "Test SDF Network ; September 2015";

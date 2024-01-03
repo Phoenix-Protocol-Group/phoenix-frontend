@@ -29,7 +29,7 @@ import {
 
 import { constants, time } from "@phoenix-protocol/utils";
 
-import { Address } from "soroban-client";
+import { Address } from "stellar-sdk";
 
 import {
   PhoenixPairContract,
@@ -119,7 +119,7 @@ export default function Page({ params }: PoolPageProps) {
       setLoading(true);
 
       await PairContract.provideLiquidity({
-        sender: Address.fromString(storePersist.wallet.address!),
+        sender: storePersist.wallet.address!,
         desired_a: BigInt(
           (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
         ),
@@ -149,7 +149,7 @@ export default function Page({ params }: PoolPageProps) {
       setLoading(true);
 
       await PairContract.withdrawLiquidity({
-        sender: Address.fromString(storePersist.wallet.address!),
+        sender: storePersist.wallet.address!,
         share_amount: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
         ),
@@ -173,7 +173,7 @@ export default function Page({ params }: PoolPageProps) {
       setLoading(true);
 
       await StakeContractRef.current?.bond({
-        sender: Address.fromString(storePersist.wallet.address!),
+        sender: storePersist.wallet.address!,
         tokens: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
         ),
@@ -197,7 +197,7 @@ export default function Page({ params }: PoolPageProps) {
       setLoading(true);
 
       await StakeContractRef.current?.unbond({
-        sender: Address.fromString(storePersist.wallet.address!),
+        sender: storePersist.wallet.address!,
         stake_amount: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
         ),
@@ -224,16 +224,22 @@ export default function Page({ params }: PoolPageProps) {
       ]);
 
       // When results ok...
-      if (pairConfig?.isOk() && pairInfo?.isOk()) {
-        console.log(pairConfig.unwrap());
+      if (pairConfig?.result.isOk() && pairInfo?.result.isOk()) {
+        console.log(pairConfig.result.unwrap());
         // Fetch token infos from chain and save in global appstore
         const [_tokenA, _tokenB, _lpToken, stakeContractAddress] =
           await Promise.all([
-            store.fetchTokenInfo(pairConfig.unwrap().token_a),
-            store.fetchTokenInfo(pairConfig.unwrap().token_b),
-            store.fetchTokenInfo(pairConfig.unwrap().share_token),
+            store.fetchTokenInfo(
+              Address.fromString(pairConfig.result.unwrap().token_a)
+            ),
+            store.fetchTokenInfo(
+              Address.fromString(pairConfig.result.unwrap().token_b)
+            ),
+            store.fetchTokenInfo(
+              Address.fromString(pairConfig.result.unwrap().share_token)
+            ),
             new PhoenixStakeContract.Contract({
-              contractId: pairConfig.unwrap().stake_contract.toString(),
+              contractId: pairConfig.result.unwrap().stake_contract.toString(),
               networkPassphrase: constants.NETWORK_PASSPHRASE,
               rpcUrl: constants.RPC_URL,
             }),
@@ -266,13 +272,13 @@ export default function Page({ params }: PoolPageProps) {
           decimals: Number(_lpToken?.decimals),
         });
         setAssetLpShare(
-          Number(pairInfo.unwrap().asset_lp_share.amount) /
+          Number(pairInfo.result.unwrap().asset_lp_share.amount) /
             10 ** Number(_lpToken?.decimals)
         );
         setPoolLiquidityTokenA(
           Number(
             (
-              Number(pairInfo.unwrap().asset_a.amount) /
+              Number(pairInfo.result.unwrap().asset_a.amount) /
               10 ** Number(_tokenA?.decimals)
             ).toFixed(2)
           )
@@ -280,7 +286,7 @@ export default function Page({ params }: PoolPageProps) {
         setPoolLiquidityTokenB(
           Number(
             (
-              Number(pairInfo.unwrap().asset_b.amount) /
+              Number(pairInfo.result.unwrap().asset_b.amount) /
               10 ** Number(_tokenB?.decimals)
             ).toFixed(2)
           )
@@ -301,7 +307,7 @@ export default function Page({ params }: PoolPageProps) {
     if (storePersist.wallet.address) {
       // Get user stakes
       const stakes: any = await stakeContract?.queryStaked({
-        address: Address.fromString(storePersist.wallet.address),
+        address: storePersist.wallet.address!,
       });
 
       // If stakes are okay

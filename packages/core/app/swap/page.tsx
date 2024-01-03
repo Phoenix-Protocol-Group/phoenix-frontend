@@ -17,7 +17,7 @@ import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { constants, findBestPath } from "@phoenix-protocol/utils";
 import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Alert, Box } from "@mui/material";
-import { Address } from "soroban-client";
+import { Address } from "stellar-sdk";
 
 export default function SwapPage() {
   // State variables declaration and initialization
@@ -59,7 +59,7 @@ export default function SwapPage() {
 
       // Execute swap
       const tx = await contract.swap({
-        recipient: Address.fromString(storePersist.wallet.address!),
+        recipient: storePersist.wallet.address!,
         operations: operations,
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
         referral: undefined,
@@ -97,9 +97,10 @@ export default function SwapPage() {
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
       });
 
-      if (tx.ask_amount && tx.total_commission_amount) {
+      if (tx.result.ask_amount && tx.result.total_commission_amount) {
         const _exchangeRate =
-          (Number(tx.ask_amount) - Number(tx.total_commission_amount)) /
+          (Number(tx.result.ask_amount) -
+            Number(tx.result.total_commission_amount)) /
           Number(tokenAmounts[0]);
 
         setExchangeRate(
@@ -108,10 +109,15 @@ export default function SwapPage() {
           }`
         );
         setNetworkFee(
-          `${Number(tx.total_commission_amount) / 10 ** 7} ${fromToken?.name}`
+          `${Number(tx.result.total_commission_amount) / 10 ** 7} ${
+            fromToken?.name
+          }`
         );
 
-        setTokenAmounts([tokenAmounts[0], Number(tx.ask_amount) / 10 ** 7]);
+        setTokenAmounts([
+          tokenAmounts[0],
+          Number(tx.result.ask_amount) / 10 ** 7,
+        ]);
       }
 
       console.log(tx);

@@ -1,28 +1,28 @@
-import * as SorobanClient from "soroban-client";
 import { WalletChain } from "./types";
+import { Networks } from "stellar-sdk";
 
 export const public_chain: WalletChain = {
   id: "public",
   name: "Public",
-  networkPassphrase: SorobanClient.Networks.PUBLIC,
+  networkPassphrase: Networks.PUBLIC,
 };
 
 export const futurenet: WalletChain = {
   id: "public",
   name: "Futurenet",
-  networkPassphrase: SorobanClient.Networks.FUTURENET,
+  networkPassphrase: Networks.FUTURENET,
 };
 
 export const testnet: WalletChain = {
   id: "public",
   name: "Testnet",
-  networkPassphrase: SorobanClient.Networks.TESTNET,
+  networkPassphrase: Networks.TESTNET,
 };
 
 export const sandbox: WalletChain = {
   id: "public",
   name: "Sandbox",
-  networkPassphrase: SorobanClient.Networks.SANDBOX,
+  networkPassphrase: Networks.SANDBOX,
 };
 
 export const standalone: WalletChain = {
