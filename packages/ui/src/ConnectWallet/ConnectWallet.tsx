@@ -1,14 +1,12 @@
 import React from "react";
-import { Connector } from "@phoenix-protocol/state";
+import {
+  ConnectWalletProps,
+  OptionComponentProps,
+  Connector,
+} from "@phoenix-protocol/types";
 import { Box, Typography, Modal, Button } from "@mui/material";
 import { Button as PhoenixButton } from "../Button/Button";
 import Colors from "../Theme/colors";
-
-interface OptionComponentProps {
-  connector: Connector;
-  onClick: () => void;
-  selected: boolean;
-}
 
 const OptionComponent = ({
   connector,
@@ -50,13 +48,6 @@ const OptionComponent = ({
     </Box>
   );
 };
-
-interface ConnectWalletProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  connectors: Connector[];
-  connect: (connector: Connector) => Promise<void>;
-}
 
 const ConnectWallet = ({
   open,

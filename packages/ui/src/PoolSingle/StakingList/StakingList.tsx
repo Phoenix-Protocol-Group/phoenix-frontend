@@ -7,24 +7,13 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { StakingListEntry as Entry } from "@phoenix-protocol/types";
 
 const typoStyle = {
   fontSize: "0.875rem",
   fontWeight: 700,
   lineHeight: "140%",
 };
-
-interface Entry {
-  icon: string;
-  title: string;
-  apr: string;
-  lockedPeriod: string;
-  amount: {
-    tokenAmount: string;
-    tokenValueInUsd: string;
-  };
-  onClick: () => void;
-}
 
 const StakingEntry = ({ entry, mobile }: { entry: Entry; mobile: boolean }) => (
   <Grid

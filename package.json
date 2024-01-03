@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Phoenix-Protocol-Group/phoenix-frontend",
   "workspaces": [
+    "packages/types",
     "packages/utils",
     "packages/contracts",
     "packages/state",

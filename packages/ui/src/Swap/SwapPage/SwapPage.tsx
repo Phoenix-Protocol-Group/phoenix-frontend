@@ -6,7 +6,7 @@ import MailIcon from "@mui/icons-material/Mail";
 import { SwapContainer } from "../SwapContainer/SwapContainer";
 import { SlippageSettings } from "../SlippageSettings/SlippageSettings";
 import { AssetSelector } from "../AssetSelector/AssetSelector";
-import { Token } from "../../Modal/Modal";
+import { Token } from "@phoenix-protocol/types"
 
 const args = {
   navItems: [

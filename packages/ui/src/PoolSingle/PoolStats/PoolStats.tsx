@@ -1,10 +1,6 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
-
-interface PoolStatsBoxProps {
-  title: string;
-  value: string;
-}
+import { PoolStatsProps, PoolStatsBoxProps } from "@phoenix-protocol/types";
 
 const PoolStatsBox = ({ title, value }: PoolStatsBoxProps) => {
   return (
@@ -45,15 +41,6 @@ const PoolStatsBox = ({ title, value }: PoolStatsBoxProps) => {
     </Grid>
   );
 };
-
-interface Stats {
-  title: string;
-  value: string;
-}
-
-interface PoolStatsProps {
-  stats: Stats[];
-}
 
 const PoolStats = ({ stats }: PoolStatsProps) => {
   return (

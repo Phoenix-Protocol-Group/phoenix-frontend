@@ -1,14 +1,9 @@
 import { Box, Grid, Typography } from "@mui/material";
 import React from "react";
-
-interface GainerOrLooserAsset {
-  name: string;
-  symbol: string;
-  price: string;
-  change: number;
-  icon: string;
-  volume: string;
-}
+import {
+  DashboardStatsProps,
+  GainerOrLooserAsset,
+} from "@phoenix-protocol/types";
 
 const AssetStat = ({
   title,
@@ -144,13 +139,6 @@ const GainerAndLooser = ({
     </Box>
   </Box>
 );
-
-interface DashboardStatsProps {
-  lockedAssets: string;
-  availableAssets: string;
-  loser: GainerOrLooserAsset;
-  gainer: GainerOrLooserAsset;
-}
 
 const DashboardStats = ({
   lockedAssets,

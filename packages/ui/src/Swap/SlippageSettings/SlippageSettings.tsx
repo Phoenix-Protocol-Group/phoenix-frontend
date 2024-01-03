@@ -13,13 +13,7 @@ import {
 } from "@mui/material";
 import { KeyboardArrowLeft } from "@mui/icons-material";
 import Colors from "../../Theme/colors";
-
-interface SlippageOptionsProps {
-  options: string[];
-  selectedOption: number;
-  onClose: () => void;
-  onChange: (e: any) => void;
-}
+import { SlippageOptionsProps } from "@phoenix-protocol/types";
 
 const SlippageSettings = ({
   options,

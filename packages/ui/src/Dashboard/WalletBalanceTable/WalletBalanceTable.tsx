@@ -18,31 +18,17 @@ import React, { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarIcon from "@mui/icons-material/Star";
+import {
+  FilterAndTabPanelProps,
+  ListItemProps,
+  WalletBalanceTableProps,
+} from "@phoenix-protocol/types";
 
 function a11yProps(index: number) {
   return {
     id: `category-tab-${index}`,
     "aria-controls": `category-tabpanel-${index}`,
   };
-}
-
-interface Token {
-  name: string;
-  icon: string;
-  usdValue: number;
-  amount: number;
-  category: string;
-}
-
-interface FilterAndTabPanelProps {
-  categories: string[];
-  searchTerm: string;
-  sort: string;
-  category: string;
-  setCategory: (category: string) => void;
-  setSearchTerm: (searchTerm: string) => void;
-  setSort: (sort: "highest" | "lowest") => void;
-  isMobile: boolean;
 }
 
 const FilterAndTabPanel = ({
@@ -255,10 +241,6 @@ const FilterAndTabPanel = ({
   }
 };
 
-interface ListItemProps {
-  token: Token;
-}
-
 const ListItem = ({
   token: { name, icon, usdValue, amount },
 }: ListItemProps) => {
@@ -340,9 +322,6 @@ const ListItem = ({
   );
 };
 
-interface WalletBalanceTableProps {
-  tokens: Token[];
-}
 const scrollbarStyles = {
   /* Firefox */
   scrollbarWidth: "thin",

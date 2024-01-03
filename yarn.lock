@@ -3425,6 +3425,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@phoenix-protocol/types@workspace:^, @phoenix-protocol/types@workspace:packages/types":
+  version: 0.0.0-use.local
+  resolution: "@phoenix-protocol/types@workspace:packages/types"
+  dependencies:
+    "@mui/material": ^5.13.5
+    stellar-sdk: ^11.1.0
+    typescript: 5.0.4
+  languageName: unknown
+  linkType: soft
+
 "@phoenix-protocol/ui@workspace:^, @phoenix-protocol/ui@workspace:packages/ui":
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/ui@workspace:packages/ui"
@@ -3450,6 +3460,7 @@ __metadata:
     "@mui/lab": ^5.0.0-alpha.137
     "@mui/material": ^5.13.5
     "@phoenix-protocol/state": "workspace:^"
+    "@phoenix-protocol/types": "workspace:^"
     "@rollup/plugin-commonjs": ^25.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
     "@rollup/plugin-typescript": ^11.1.1

@@ -9,7 +9,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { Button } from "../../Button/Button";
-import { Token } from "../../Modal/Modal";
+import { Token, LiquidityMiningProps } from "@phoenix-protocol/types";
 
 const OptionButton = ({
   value,
@@ -234,16 +234,6 @@ const ClaimRewards = ({
     </Box>
   );
 };
-
-interface LiquidityMiningProps {
-  // Rewards
-  rewards: Token[];
-  onClaimRewards: () => void;
-  tokenName: string;
-  // Stake LP Tokens
-  balance: number;
-  onStake: (amount: number) => void;
-}
 
 const LiquidityMining = ({
   rewards,

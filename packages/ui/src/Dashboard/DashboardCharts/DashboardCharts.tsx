@@ -8,17 +8,10 @@ import {
 } from "@mui/material";
 import React from "react";
 import { AreaChart, Area, YAxis, ResponsiveContainer } from "recharts";
-
-type Data = number[];
-
-interface DashboardChartsProps {
-  data: Data[];
-  assetName: string;
-  icon: {
-    large: string;
-    small: string;
-  };
-}
+import {
+  DashboardChartsProps,
+  DashboardData as Data,
+} from "@phoenix-protocol/types";
 
 const GlowingChart = ({ data }: { data: Data[] }) => (
   <ResponsiveContainer width="100%" height={250}>
