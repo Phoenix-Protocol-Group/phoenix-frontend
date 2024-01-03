@@ -3412,6 +3412,7 @@ __metadata:
   resolution: "@phoenix-protocol/state@workspace:packages/state"
   dependencies:
     "@phoenix-protocol/contracts": "workspace:^"
+    "@phoenix-protocol/types": "workspace:^"
     "@stellar/freighter-api": 1.7.1
     "@types/glob": ^7.1.3
     "@types/urijs": ^1.19.19

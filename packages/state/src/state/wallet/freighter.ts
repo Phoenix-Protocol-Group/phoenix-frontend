@@ -1,5 +1,5 @@
 import freighterApi from "@stellar/freighter-api";
-import { NetworkDetails, Connector } from "./types";
+import { NetworkDetails, Connector } from "@phoenix-protocol/types";
 
 export function freighter(): Connector {
   return {
