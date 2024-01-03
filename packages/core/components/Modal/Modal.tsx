@@ -1,5 +1,5 @@
-import { Modal as ModalUI, Token } from "@phoenix-protocol/ui";
-import React, { useState } from "react";
+import { Modal as ModalUI } from "@phoenix-protocol/ui";
+import { Token } from "@phoenix-protocol/types";
 
 function copyToClipBoard(error: string) {
   navigator.clipboard.writeText(error);
