@@ -96,17 +96,21 @@ export const createWalletActions = (
         balance = BigInt(0);
         console.log(e, "User has no balance");
       }
-
-      const _symbol: string =
-        getState().tokens.find(
-          (token: Token) => token.id === tokenAddress.toString()
-        )?.symbol || (await TokenContract.symbol()).result;
-      const symbol: string = _symbol === "native" ? "XLM" : _symbol;
-
+      let symbol: string;
+      try {
+        const _symbol: string =
+          getState().tokens.find(
+            (token: Token) => token.id === tokenAddress.toString()
+          )?.symbol || (await TokenContract.symbol()).result;
+        symbol = _symbol === "native" ? "XLM" : _symbol;
+      } catch (e) {
+        console.log(e, "Token seems to be invalid");
+        return;
+      }
       const decimals =
         getState().tokens.find(
           (token: Token) => token.id === tokenAddress.toString()
-        )?.decimals || Number(await TokenContract.decimals());
+        )?.decimals || Number((await TokenContract.decimals()).result);
 
       // Update token balance
       setState((state: AppStore) => {

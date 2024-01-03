@@ -73,15 +73,7 @@ export default function Page() {
     } catch (e) {
       console.log(e);
     }
-
-    // Fallback pool object for error or unsuccessful fetch
-    return {
-      tokens: [],
-      tvl: "0",
-      maxApr: "0",
-      userLiquidity: 0,
-      poolAddress: "",
-    };
+    return;
   };
 
   // Fetch all pools' data
@@ -102,7 +94,14 @@ export default function Page() {
         )
       : [];
 
-    setAllPools(poolWithData);
+    const poolsFiltered = poolWithData.filter(
+      (el: any) =>
+        el !== undefined ||
+        el?.tokens.length >= 2 ||
+        el.poolAddress !== "CBXBKAB6QIRUGTG77OQZHC46BIIPA5WDKIKZKPA2H7Q7CPKQ555W3EVB" // TODO TESTNET DEBUG
+    );
+    console.log(poolsFiltered);
+    setAllPools(poolsFiltered as Pool[]);
   };
 
   // On component mount, fetch pools and update loading state

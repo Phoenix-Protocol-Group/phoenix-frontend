@@ -66,8 +66,9 @@ export default function SwapPage() {
         max_belief_price: undefined,
       });
 
-      // @ts-ignore
-      if (tx?.status === "FAILED") {
+      const result = await tx.signAndSend();
+
+      if (result.getTransactionResponse?.status === "FAILED") {
         setErrorModalOpen(true);
 
         // @ts-ignore
@@ -215,11 +216,6 @@ export default function SwapPage() {
   ) : (
     // JSX for UI when data is loaded
     <Box sx={{ width: "100%", maxWidth: "600px" }}>
-      <Alert severity="warning">
-        Only direct pool swaps work for now! Unfortunately we are reaching
-        memory limits on the testnet with multi-pool swaps. Stay tuned for
-        updates!
-      </Alert>
       {/* Success Modal */}
       {fromToken && toToken && (
         <SwapSuccess

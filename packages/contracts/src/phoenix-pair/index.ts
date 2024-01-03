@@ -17,7 +17,7 @@ import type {
   Result,
 } from "@phoenix-protocol/utils";
 import type { ClassOptions, XDR_BASE64 } from "@phoenix-protocol/utils";
-
+import { scValToJs } from "@phoenix-protocol/utils";
 export * from "@phoenix-protocol/utils";
 
 if (typeof window !== "undefined") {
@@ -346,7 +346,7 @@ export class Contract {
       result: string | xdr.ScVal | Err
     ): Ok<Config> | Err<Error_> => {
       if (result instanceof Err) return result;
-      return new Ok(this.spec.funcResToNative("query_config", result));
+      return new Ok(scValToJs(result as xdr.ScVal));
     },
     queryShareTokenAddress: (
       result: string | xdr.ScVal | Err

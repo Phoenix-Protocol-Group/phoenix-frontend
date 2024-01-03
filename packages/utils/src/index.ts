@@ -5,3 +5,4 @@ export * as account from "./account";
 export * as time from "./time";
 export * from "./method-options";
 export { findBestPath } from "./demoFindPaths";
+export * from "./convert";

@@ -3507,6 +3507,7 @@ __metadata:
     bignumber.js: ^9.1.1
     jest: ^29.7.0
     jest-mock: ^29.7.0
+    soroban-client: ^1.0.0
     stellar-sdk: ^11.1.0
     ts-jest: ^29.1.0
     typescript: ^5.1.3
@@ -15142,6 +15143,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"soroban-client@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "soroban-client@npm:1.0.0"
+  dependencies:
+    axios: ^1.6.0
+    bignumber.js: ^9.1.1
+    buffer: ^6.0.3
+    stellar-base: 10.0.0
+    urijs: ^1.19.1
+  checksum: a29ef148168ad340cc9feddf6c71b8ec343522ef50a817c7067d3eb926fdf7f63fc26e293827beb38878c819c491a856a7b2d854281ac16bc2a053b531b9e9d7
+  languageName: node
+  linkType: hard
+
 "source-map-js@npm:^1.0.2":
   version: 1.0.2
   resolution: "source-map-js@npm:1.0.2"
@@ -15274,6 +15288,24 @@ __metadata:
   version: 2.0.1
   resolution: "statuses@npm:2.0.1"
   checksum: 18c7623fdb8f646fb213ca4051be4df7efb3484d4ab662937ca6fbef7ced9b9e12842709872eb3020cc3504b93bde88935c9f6417489627a7786f24f8031cbcb
+  languageName: node
+  linkType: hard
+
+"stellar-base@npm:10.0.0":
+  version: 10.0.0
+  resolution: "stellar-base@npm:10.0.0"
+  dependencies:
+    "@stellar/js-xdr": ^3.0.1
+    base32.js: ^0.1.0
+    bignumber.js: ^9.1.2
+    buffer: ^6.0.3
+    sha.js: ^2.3.6
+    sodium-native: ^4.0.1
+    tweetnacl: ^1.0.3
+  dependenciesMeta:
+    sodium-native:
+      optional: true
+  checksum: 92b00bf5ba681fa7a33ee8fd9b19ef9bfe37380634e721b5656e02802b94fc0415faf370f35e4876c4b3efbcae1ed25cc332d7eb173a054fa456465e0eac0a66
   languageName: node
   linkType: hard
 

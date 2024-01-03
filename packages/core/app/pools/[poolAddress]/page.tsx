@@ -117,7 +117,7 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await PairContract.provideLiquidity({
+      const tx = await PairContract.provideLiquidity({
         sender: storePersist.wallet.address!,
         desired_a: BigInt(
           (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
@@ -129,7 +129,8 @@ export default function Page({ params }: PoolPageProps) {
         min_b: BigInt(1),
         custom_slippage_bps: BigInt(1),
       });
-
+      await tx.signAndSend();
+      console.log(tx);
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([tokenAAmount, tokenBAmount]);
@@ -147,7 +148,7 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await PairContract.withdrawLiquidity({
+      const tx = await PairContract.withdrawLiquidity({
         sender: storePersist.wallet.address!,
         share_amount: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
@@ -155,7 +156,7 @@ export default function Page({ params }: PoolPageProps) {
         min_a: BigInt(1),
         min_b: BigInt(1),
       });
-
+      await tx.signAndSend();
       setLoading(false);
       setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
@@ -171,13 +172,13 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await StakeContractRef.current?.bond({
+      const tx = await StakeContractRef.current?.bond({
         sender: storePersist.wallet.address!,
         tokens: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
         ),
       });
-
+      await tx?.signAndSend();
       await fetchStakes();
       setLoading(false);
       //!todo view transaction id in blockexplorer
@@ -195,13 +196,14 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      await StakeContractRef.current?.unbond({
+      const tx = await StakeContractRef.current?.unbond({
         sender: storePersist.wallet.address!,
         stake_amount: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
         ),
         stake_timestamp: BigInt(stake_timestamp),
       });
+      await tx?.signAndSend();
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
@@ -224,7 +226,6 @@ export default function Page({ params }: PoolPageProps) {
 
       // When results ok...
       if (pairConfig?.result.isOk() && pairInfo?.result.isOk()) {
-        console.log(pairConfig.result.unwrap());
         // Fetch token infos from chain and save in global appstore
         const [_tokenA, _tokenB, _lpToken, stakeContractAddress] =
           await Promise.all([
@@ -305,18 +306,19 @@ export default function Page({ params }: PoolPageProps) {
   ) => {
     if (storePersist.wallet.address) {
       // Get user stakes
-      const stakes: any = await stakeContract?.queryStaked({
+      const stakes = await stakeContract?.queryStaked({
         address: storePersist.wallet.address!,
       });
 
       // If stakes are okay
-      if (stakes.isOk()) {
+      if (stakes?.result) {
         // If filled
-        if (stakes.unwrap().stakes.length > 0) {
-          const _stakes: Entry[] = stakes.unwrap().stakes.map((stake: any) => {
+        if (stakes.result.stakes.length > 0) {
+          //@ts-ignore
+          const _stakes: Entry[] = stakes.result.stakes.map((stake: any) => {
             return {
               icon: `/cryptoIcons/poolIcon.png`,
-              title: name,
+              title: name!,
               apr: "0",
               lockedPeriod:
                 time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
