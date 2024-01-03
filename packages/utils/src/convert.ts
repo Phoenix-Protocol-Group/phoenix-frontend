@@ -1,10 +1,4 @@
-import {
-  xdr,
-  Address,
-  nativeToScVal,
-  scValToBigInt,
-  ScInt,
-} from "soroban-client";
+import { xdr, Address, nativeToScVal, scValToBigInt, ScInt } from "stellar-sdk";
 
 export function strToScVal(base64Xdr: string): xdr.ScVal {
   return xdr.ScVal.fromXDR(base64Xdr, "base64");

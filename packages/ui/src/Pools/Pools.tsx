@@ -11,35 +11,11 @@ import {
 } from "@mui/material";
 import React from "react";
 import { Button as CustomButton } from "../Button/Button";
-
-interface Token {
-  name: string;
-  icon: string;
-  usdValue: number;
-  amount: number;
-  category: string;
-}
-
-export interface Pool {
-  tokens: Token[];
-  tvl: string;
-  maxApr: string;
-  userLiquidity: number;
-  poolAddress: string;
-}
-
-export type Sort = "HighTVL" | "HighAPR" | "LowTVL" | "LowAPR";
-export type Filter = "ALL" | "MY";
-
-interface PoolsProps {
-  pools: Pool[];
-  onAddLiquidityClick: (pool: Pool) => void;
-  onShowDetailsClick: (pool: Pool) => void;
-  filter: Filter;
-  sort: Sort;
-  onSortSelect: (by: Sort) => void;
-  onFilterClick: (by: Filter) => void;
-}
+import {
+  Pool,
+  PoolsProps,
+  PoolsFilter as Filter,
+} from "@phoenix-protocol/types";
 
 const descriptionHeader = {
   color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
@@ -340,10 +316,7 @@ const Pools = ({
           </FormControl>
         </Grid>
       </Grid>
-      <Grid
-        container
-        spacing={2}
-      >
+      <Grid container spacing={2}>
         {pools.map((pool) => (
           <PoolItem
             filter={filter}

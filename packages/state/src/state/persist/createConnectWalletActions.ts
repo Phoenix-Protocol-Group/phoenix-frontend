@@ -1,8 +1,13 @@
-import { Server } from "soroban-client";
-import { AppStore, SetStateType, GetStateType, AppStorePersist } from "../types";
+import { Horizon } from "stellar-sdk";
+import {
+  AppStore,
+  SetStateType,
+  GetStateType,
+  AppStorePersist,
+} from "@phoenix-protocol/types";
 import { freighter } from "../wallet/freighter";
 import { allChains, networkToActiveChain } from "../wallet/chains";
-import {usePersistStore} from '../store';
+import { usePersistStore } from "../store";
 
 export const createConnectWalletActions = () => {
   return {
@@ -40,7 +45,7 @@ export const createConnectWalletActions = () => {
       // Create a server object to connect to the blockchain.
       let server =
         networkDetails &&
-        new Server(networkDetails.networkUrl, {
+        new Horizon.Server(networkDetails.networkUrl, {
           allowHttp: networkDetails.networkUrl.startsWith("http://"),
         });
 

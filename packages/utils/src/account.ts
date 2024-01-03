@@ -1,5 +1,5 @@
 import freighter from "@stellar/freighter-api";
-import { Account } from "soroban-client";
+import { Account, Horizon } from "stellar-sdk";
 import { Server } from "./server";
 // working around ESM compatibility issues
 const { isConnected, isAllowed, getUserInfo, signTransaction } = freighter;
@@ -17,7 +17,10 @@ export async function getAccount(): Promise<Account | null> {
     return null;
   }
   try {
-    const account = await Server.getAccount(publicKey);
+    const account = new Account(
+      publicKey,
+      (await Server.accounts().accountId(publicKey).call()).sequence
+    );
     return account || null;
   } catch (e) {
     return null;

@@ -10,14 +10,13 @@ import {
   Skeleton,
   SlippageSettings,
   SwapContainer,
-  Token,
 } from "@phoenix-protocol/ui";
+import { Token } from "@phoenix-protocol/types";
 import { PhoenixMultihopContract } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { constants, findBestPath } from "@phoenix-protocol/utils";
 import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Alert, Box } from "@mui/material";
-import { Address } from "soroban-client";
 
 export default function SwapPage() {
   // State variables declaration and initialization
@@ -59,7 +58,7 @@ export default function SwapPage() {
 
       // Execute swap
       const tx = await contract.swap({
-        recipient: Address.fromString(storePersist.wallet.address!),
+        recipient: storePersist.wallet.address!,
         operations: operations,
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
         referral: undefined,
@@ -67,8 +66,9 @@ export default function SwapPage() {
         max_belief_price: undefined,
       });
 
-      // @ts-ignore
-      if (tx?.status === "FAILED") {
+      const result = await tx.signAndSend();
+
+      if (result.getTransactionResponse?.status === "FAILED") {
         setErrorModalOpen(true);
 
         // @ts-ignore
@@ -97,9 +97,10 @@ export default function SwapPage() {
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
       });
 
-      if (tx.ask_amount && tx.total_commission_amount) {
+      if (tx.result.ask_amount && tx.result.total_commission_amount) {
         const _exchangeRate =
-          (Number(tx.ask_amount) - Number(tx.total_commission_amount)) /
+          (Number(tx.result.ask_amount) -
+            Number(tx.result.total_commission_amount)) /
           Number(tokenAmounts[0]);
 
         setExchangeRate(
@@ -108,10 +109,15 @@ export default function SwapPage() {
           }`
         );
         setNetworkFee(
-          `${Number(tx.total_commission_amount) / 10 ** 7} ${fromToken?.name}`
+          `${Number(tx.result.total_commission_amount) / 10 ** 7} ${
+            fromToken?.name
+          }`
         );
 
-        setTokenAmounts([tokenAmounts[0], Number(tx.ask_amount) / 10 ** 7]);
+        setTokenAmounts([
+          tokenAmounts[0],
+          Number(tx.result.ask_amount) / 10 ** 7,
+        ]);
       }
 
       console.log(tx);
@@ -210,11 +216,6 @@ export default function SwapPage() {
   ) : (
     // JSX for UI when data is loaded
     <Box sx={{ width: "100%", maxWidth: "600px" }}>
-      <Alert severity="warning">
-        Only direct pool swaps work for now! Unfortunately we are reaching
-        memory limits on the testnet with multi-pool swaps. Stay tuned for
-        updates!
-      </Alert>
       {/* Success Modal */}
       {fromToken && toToken && (
         <SwapSuccess

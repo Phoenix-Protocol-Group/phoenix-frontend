@@ -1,79 +1,28 @@
-import * as SorobanClient from "soroban-client";
-import { ContractSpec, Address } from "soroban-client";
+import { ContractSpec, Address, xdr } from "stellar-sdk";
 import { Buffer } from "buffer";
-import { invoke as Invoke } from "@phoenix-protocol/utils";
-import { methodOptions } from "@phoenix-protocol/utils";
-import { i128, u128, u32, u64 } from "../types";
+import { AssembledTransaction, Ok, Err } from "@phoenix-protocol/utils";
+import type {
+  u32,
+  i32,
+  u64,
+  i64,
+  u128,
+  i128,
+  u256,
+  i256,
+  Option,
+  Typepoint,
+  Duration,
+  Error_,
+  Result,
+} from "@phoenix-protocol/utils";
+import type { ClassOptions, XDR_BASE64 } from "@phoenix-protocol/utils";
 
-/// Error interface containing the error message
-export interface Error_ {
-  message: string;
-}
-
-export interface Result<T, E extends Error_> {
-  unwrap(): T;
-  unwrapErr(): E;
-  isOk(): boolean;
-  isErr(): boolean;
-}
-
-export class Ok<T, E extends Error_ = Error_> implements Result<T, E> {
-  constructor(readonly value: T) {}
-  unwrapErr(): E {
-    throw new Error("No error");
-  }
-  unwrap(): T {
-    return this.value;
-  }
-
-  isOk(): boolean {
-    return true;
-  }
-
-  isErr(): boolean {
-    return !this.isOk();
-  }
-}
-
-export class Err<E extends Error_ = Error_> implements Result<any, E> {
-  constructor(readonly error: E) {}
-  unwrapErr(): E {
-    return this.error;
-  }
-  unwrap(): never {
-    throw new Error(this.error.message);
-  }
-
-  isOk(): boolean {
-    return false;
-  }
-
-  isErr(): boolean {
-    return !this.isOk();
-  }
-}
+export * from "@phoenix-protocol/utils";
 
 if (typeof window !== "undefined") {
   //@ts-ignore Buffer exists
   window.Buffer = window.Buffer || Buffer;
-}
-
-const regex = /Error\(Contract, #(\d+)\)/;
-
-function parseError(message: string): Err | undefined {
-  const match = message.match(regex);
-  if (!match) {
-    return undefined;
-  }
-  if (Errors === undefined) {
-    return undefined;
-  }
-  let i = parseInt(match[1], 10);
-  let err: any = Errors[i];
-  if (err) {
-    return new Err(err);
-  }
-  return undefined;
 }
 
 export const networks = {
@@ -83,230 +32,313 @@ export const networks = {
   },
 } as const;
 
-export type DistributionDataKey =
-  | { tag: "Curve"; values: readonly [Address] }
-  | { tag: "Distribution"; values: readonly [Address] }
-  | { tag: "WithdrawAdjustment"; values: readonly [Address] };
+/**
+    
+    */
+export interface WithdrawAdjustmentKey {
+  /**
+    
+    */
+  asset: string;
+  /**
+    
+    */
+  user: string;
+}
 
+/**
+    
+    */
+export type DistributionDataKey =
+  | { tag: "Curve"; values: readonly [string] }
+  | { tag: "Distribution"; values: readonly [string] }
+  | { tag: "WithdrawAdjustment"; values: readonly [WithdrawAdjustmentKey] };
+
+/**
+    
+    */
 export interface Distribution {
   /**
-   * Bonus per staking day
-   */
+    Bonus per staking day
+    */
   bonus_per_day_bps: u64;
   /**
-   * Total rewards distributed by this contract.
-   */
+    Total rewards distributed by this contract.
+    */
   distributed_total: u128;
   /**
-   * The manager of this distribution
-   */
-  manager: Address;
+    The manager of this distribution
+    */
+  manager: string;
   /**
-   * Max bonus for staking after 60 days
-   */
+    Max bonus for staking after 60 days
+    */
   max_bonus_bps: u64;
   /**
-   * Shares which were not fully distributed on previous distributions, and should be redistributed
-   */
+    Shares which were not fully distributed on previous distributions, and should be redistributed
+    */
   shares_leftover: u64;
   /**
-   * How many shares is single point worth
-   */
+    How many shares is single point worth
+    */
   shares_per_point: u128;
   /**
-   * Total rewards not yet withdrawn.
-   */
+    Total rewards not yet withdrawn.
+    */
   withdrawable_total: u128;
 }
 
+/**
+    
+    */
 export interface WithdrawAdjustment {
   /**
-   * Represents a correction to the reward points for the user. This can be positive or negative.
-   * A positive value indicates that the user should receive additional points (e.g., from a bonus or an error correction),
-   * while a negative value signifies a reduction (e.g., due to a penalty or an adjustment for past over-allocations).
-   */
-  shared_correction: i128;
+    Represents a correction to the reward points for the user. This can be positive or negative.
+    * A positive value indicates that the user should receive additional points (e.g., from a bonus or an error correction),
+    * while a negative value signifies a reduction (e.g., due to a penalty or an adjustment for past over-allocations).
+    */
+  shares_correction: i128;
   /**
-   * Represents the total amount of rewards that the user has withdrawn so far.
-   * This value ensures that a user doesn't withdraw more than they are owed and is used to
-   * calculate the net rewards a user can withdraw at any given time.
-   */
+    Represents the total amount of rewards that the user has withdrawn so far.
+    * This value ensures that a user doesn't withdraw more than they are owed and is used to
+    * calculate the net rewards a user can withdraw at any given time.
+    */
   withdrawn_rewards: u128;
 }
 
-const Errors: Record<number, any> = {
-  1: { message: "Initialization errors" },
-  2: { message: "Reward errors" },
-  3: { message: "" },
-  4: { message: "" },
-  12: { message: "" },
-  13: { message: "" },
-  14: { message: "" },
-  15: { message: "" },
-  16: { message: "" },
-  17: { message: "" },
-  5: { message: "Stake errros" },
-  6: { message: "" },
-  7: { message: "" },
-  8: { message: "" },
-  9: { message: "Storage errors" },
-  10: { message: "" },
-  11: { message: "Other errors" },
-};
+/**
+    
+    */
 export interface ConfigResponse {
+  /**
+    
+    */
   config: Config;
 }
 
+/**
+    
+    */
 export interface StakedResponse {
+  /**
+    
+    */
   stakes: Array<Stake>;
 }
 
-export interface AnnualizedRewardsResponse {
+/**
+    
+    */
+export interface AnnualizedReward {
   /**
-   * None means contract does not know the value - total_staked or total_power could be 0.
-   */
-  amount: OptionUint;
-  info: Address;
+    
+    */
+  amount: string;
+  /**
+    
+    */
+  asset: string;
 }
 
+/**
+    
+    */
+export interface AnnualizedRewardsResponse {
+  /**
+    
+    */
+  rewards: Array<AnnualizedReward>;
+}
+
+/**
+    
+    */
 export interface WithdrawableReward {
-  reward_address: Address;
+  /**
+    
+    */
+  reward_address: string;
+  /**
+    
+    */
   reward_amount: u128;
 }
 
+/**
+    
+    */
 export interface WithdrawableRewardsResponse {
   /**
-   * Amount of rewards assigned for withdrawal from the given address.
-   */
+    Amount of rewards assigned for withdrawal from the given address.
+    */
   rewards: Array<WithdrawableReward>;
 }
 
+/**
+    
+    */
 export interface Config {
-  lp_token: Address;
+  /**
+    
+    */
+  lp_token: string;
+  /**
+    
+    */
   max_distributions: u32;
+  /**
+    
+    */
   min_bond: i128;
+  /**
+    
+    */
   min_reward: i128;
 }
 
+/**
+    
+    */
 export interface Stake {
   /**
-   * The amount of staked tokens
-   */
+    The amount of staked tokens
+    */
   stake: i128;
   /**
-   * The timestamp when the stake was made
-   */
+    The timestamp when the stake was made
+    */
   stake_timestamp: u64;
 }
 
+/**
+    
+    */
 export interface BondingInfo {
   /**
-   * Last time when user has claimed rewards
-   */
+    Last time when user has claimed rewards
+    */
   last_reward_time: u64;
   /**
-   * The rewards debt is a mechanism to determine how much a user has already been credited in terms of staking rewards.
-   * Whenever a user deposits or withdraws staked tokens to the pool, the rewards for the user is updated based on the
-   * accumulated rewards per share, and the difference is stored as reward debt. When claiming rewards, this reward debt
-   * is used to determine how much rewards a user can actually claim.
-   */
+    The rewards debt is a mechanism to determine how much a user has already been credited in terms of staking rewards.
+    * Whenever a user deposits or withdraws staked tokens to the pool, the rewards for the user is updated based on the
+    * accumulated rewards per share, and the difference is stored as reward debt. When claiming rewards, this reward debt
+    * is used to determine how much rewards a user can actually claim.
+    */
   reward_debt: u128;
   /**
-   * Vec of stakes sorted by stake timestamp
-   */
+    Vec of stakes sorted by stake timestamp
+    */
   stakes: Array<Stake>;
   /**
-   * Total amount of staked tokens
-   */
+    Total amount of staked tokens
+    */
   total_stake: u128;
 }
 
+/**
+    
+    */
 export type OptionUint =
   | { tag: "Some"; values: readonly [u128] }
   | { tag: "None"; values: void };
 
 /**
- * Curve types
- */
+    Curve types
+    */
 export type Curve =
   | { tag: "Constant"; values: readonly [u128] }
   | { tag: "SaturatingLinear"; values: readonly [SaturatingLinear] }
   | { tag: "PiecewiseLinear"; values: readonly [PiecewiseLinear] };
 
 /**
- * Saturating Linear
- * $$f(x)=\begin{cases}
- * [min(y) * amount],  & \text{if x <= $x_1$ } \\\\
- * [y * amount],  & \text{if $x_1$ >= x <= $x_2$ } \\\\
- * [max(y) * amount],  & \text{if x >= $x_2$ }
- * \end{cases}$$
- *
- * min_y for all x <= min_x, max_y for all x >= max_x, linear in between
- */
+    Saturating Linear
+    * $$f(x)=\begin{cases}
+    * [min(y) * amount],  & \text{if x <= $x_1$ } \\\\
+    * [y * amount],  & \text{if $x_1$ >= x <= $x_2$ } \\\\
+    * [max(y) * amount],  & \text{if x >= $x_2$ }
+    * \end{cases}$$
+    * 
+    * min_y for all x <= min_x, max_y for all x >= max_x, linear in between
+    */
 export interface SaturatingLinear {
   /**
-   * time when curve has fully saturated
-   */
+    time when curve has fully saturated
+    */
   max_x: u64;
   /**
-   * max value at saturated time
-   */
+    max value at saturated time
+    */
   max_y: u128;
   /**
-   * time when curve start
-   */
+    time when curve start
+    */
   min_x: u64;
   /**
-   * min value at start time
-   */
+    min value at start time
+    */
   min_y: u128;
 }
 
 /**
- * This is a generalization of SaturatingLinear, steps must be arranged with increasing time [`u64`].
- * Any point before first step gets the first value, after last step the last value.
- * Otherwise, it is a linear interpolation between the two closest points.
- * Vec of length 1 -> [`Constant`](Curve::Constant) .
- * Vec of length 2 -> [`SaturatingLinear`] .
- */
+    This is a generalization of SaturatingLinear, steps must be arranged with increasing time [`u64`].
+    * Any point before first step gets the first value, after last step the last value.
+    * Otherwise, it is a linear interpolation between the two closest points.
+    * Vec of length 1 -> [`Constant`](Curve::Constant) .
+    * Vec of length 2 -> [`SaturatingLinear`] .
+    */
 export interface Step {
+  /**
+    
+    */
   time: u64;
+  /**
+    
+    */
   value: u128;
 }
 
+/**
+    
+    */
 export interface PiecewiseLinear {
   /**
-   * steps
-   */
+    steps
+    */
   steps: Array<Step>;
 }
 
+/**
+    
+    */
+export const Errors = {};
+
 export class Contract {
   spec: ContractSpec;
-  constructor(public readonly options: methodOptions.ClassOptions) {
+  constructor(public readonly options: ClassOptions) {
     this.spec = new ContractSpec([
-      "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAABQAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAhscF90b2tlbgAAABMAAAAAAAAACG1pbl9ib25kAAAACwAAAAAAAAARbWF4X2Rpc3RyaWJ1dGlvbnMAAAAAAAAEAAAAAAAAAAptaW5fcmV3YXJkAAAAAAALAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
-      "AAAAAAAAAAAAAAAEYm9uZAAAAAIAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAGdG9rZW5zAAAAAAALAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
-      "AAAAAAAAAAAAAAAGdW5ib25kAAAAAAADAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAADHN0YWtlX2Ftb3VudAAAAAsAAAAAAAAAD3N0YWtlX3RpbWVzdGFtcAAAAAAGAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
-      "AAAAAAAAAAAAAAAYY3JlYXRlX2Rpc3RyaWJ1dGlvbl9mbG93AAAAAwAAAAAAAAAGc2VuZGVyAAAAAAATAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
-      "AAAAAAAAAAAAAAASZGlzdHJpYnV0ZV9yZXdhcmRzAAAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
-      "AAAAAAAAAAAAAAAQd2l0aGRyYXdfcmV3YXJkcwAAAAEAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
-      "AAAAAAAAAAAAAAARZnVuZF9kaXN0cmlidXRpb24AAAAAAAAFAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAACnN0YXJ0X3RpbWUAAAAAAAYAAAAAAAAAFWRpc3RyaWJ1dGlvbl9kdXJhdGlvbgAAAAAAAAYAAAAAAAAADXRva2VuX2FkZHJlc3MAAAAAAAATAAAAAAAAAAx0b2tlbl9hbW91bnQAAAALAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
-      "AAAAAAAAAAAAAAAMcXVlcnlfY29uZmlnAAAAAAAAAAEAAAPpAAAH0AAAAA5Db25maWdSZXNwb25zZQAAAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
-      "AAAAAAAAAAAAAAALcXVlcnlfYWRtaW4AAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
-      "AAAAAAAAAAAAAAAMcXVlcnlfc3Rha2VkAAAAAQAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAQAAA+kAAAfQAAAADlN0YWtlZFJlc3BvbnNlAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
-      "AAAAAAAAAAAAAAAScXVlcnlfdG90YWxfc3Rha2VkAAAAAAAAAAAAAQAAA+kAAAALAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
-      "AAAAAAAAAAAAAAAYcXVlcnlfYW5udWFsaXplZF9yZXdhcmRzAAAAAAAAAAEAAAPpAAAH0AAAABlBbm51YWxpemVkUmV3YXJkc1Jlc3BvbnNlAAAAAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
-      "AAAAAAAAAAAAAAAacXVlcnlfd2l0aGRyYXdhYmxlX3Jld2FyZHMAAAAAAAEAAAAAAAAABHVzZXIAAAATAAAAAQAAA+kAAAfQAAAAG1dpdGhkcmF3YWJsZVJld2FyZHNSZXNwb25zZQAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
-      "AAAAAAAAAAAAAAAZcXVlcnlfZGlzdHJpYnV0ZWRfcmV3YXJkcwAAAAAAAAEAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAEAAAPpAAAACgAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
-      "AAAAAAAAAAAAAAAbcXVlcnlfdW5kaXN0cmlidXRlZF9yZXdhcmRzAAAAAAEAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAEAAAPpAAAACgAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
-      "AAAAAgAAAAAAAAAAAAAAE0Rpc3RyaWJ1dGlvbkRhdGFLZXkAAAAAAwAAAAEAAAAAAAAABUN1cnZlAAAAAAAAAQAAABMAAAABAAAAAAAAAAxEaXN0cmlidXRpb24AAAABAAAAEwAAAAEAAAAAAAAAEldpdGhkcmF3QWRqdXN0bWVudAAAAAAAAQAAABM=",
+      "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAABQAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAhscF90b2tlbgAAABMAAAAAAAAACG1pbl9ib25kAAAACwAAAAAAAAARbWF4X2Rpc3RyaWJ1dGlvbnMAAAAAAAAEAAAAAAAAAAptaW5fcmV3YXJkAAAAAAALAAAAAA==",
+      "AAAAAAAAAAAAAAAEYm9uZAAAAAIAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAGdG9rZW5zAAAAAAALAAAAAA==",
+      "AAAAAAAAAAAAAAAGdW5ib25kAAAAAAADAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAADHN0YWtlX2Ftb3VudAAAAAsAAAAAAAAAD3N0YWtlX3RpbWVzdGFtcAAAAAAGAAAAAA==",
+      "AAAAAAAAAAAAAAAYY3JlYXRlX2Rpc3RyaWJ1dGlvbl9mbG93AAAAAwAAAAAAAAAGc2VuZGVyAAAAAAATAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAA=",
+      "AAAAAAAAAAAAAAASZGlzdHJpYnV0ZV9yZXdhcmRzAAAAAAAAAAAAAA==",
+      "AAAAAAAAAAAAAAAQd2l0aGRyYXdfcmV3YXJkcwAAAAEAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAA=",
+      "AAAAAAAAAAAAAAARZnVuZF9kaXN0cmlidXRpb24AAAAAAAAFAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAACnN0YXJ0X3RpbWUAAAAAAAYAAAAAAAAAFWRpc3RyaWJ1dGlvbl9kdXJhdGlvbgAAAAAAAAYAAAAAAAAADXRva2VuX2FkZHJlc3MAAAAAAAATAAAAAAAAAAx0b2tlbl9hbW91bnQAAAALAAAAAA==",
+      "AAAAAAAAAAAAAAAMcXVlcnlfY29uZmlnAAAAAAAAAAEAAAfQAAAADkNvbmZpZ1Jlc3BvbnNlAAA=",
+      "AAAAAAAAAAAAAAALcXVlcnlfYWRtaW4AAAAAAAAAAAEAAAAT",
+      "AAAAAAAAAAAAAAAMcXVlcnlfc3Rha2VkAAAAAQAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAQAAB9AAAAAOU3Rha2VkUmVzcG9uc2UAAA==",
+      "AAAAAAAAAAAAAAAScXVlcnlfdG90YWxfc3Rha2VkAAAAAAAAAAAAAQAAAAs=",
+      "AAAAAAAAAAAAAAAYcXVlcnlfYW5udWFsaXplZF9yZXdhcmRzAAAAAAAAAAEAAAfQAAAAGUFubnVhbGl6ZWRSZXdhcmRzUmVzcG9uc2UAAAA=",
+      "AAAAAAAAAAAAAAAacXVlcnlfd2l0aGRyYXdhYmxlX3Jld2FyZHMAAAAAAAEAAAAAAAAABHVzZXIAAAATAAAAAQAAB9AAAAAbV2l0aGRyYXdhYmxlUmV3YXJkc1Jlc3BvbnNlAA==",
+      "AAAAAAAAAAAAAAAZcXVlcnlfZGlzdHJpYnV0ZWRfcmV3YXJkcwAAAAAAAAEAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAEAAAAK",
+      "AAAAAAAAAAAAAAAbcXVlcnlfdW5kaXN0cmlidXRlZF9yZXdhcmRzAAAAAAEAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAEAAAAK",
+      "AAAAAQAAAAAAAAAAAAAAFVdpdGhkcmF3QWRqdXN0bWVudEtleQAAAAAAAAIAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAEdXNlcgAAABM=",
+      "AAAAAgAAAAAAAAAAAAAAE0Rpc3RyaWJ1dGlvbkRhdGFLZXkAAAAAAwAAAAEAAAAAAAAABUN1cnZlAAAAAAAAAQAAABMAAAABAAAAAAAAAAxEaXN0cmlidXRpb24AAAABAAAAEwAAAAEAAAAAAAAAEldpdGhkcmF3QWRqdXN0bWVudAAAAAAAAQAAB9AAAAAVV2l0aGRyYXdBZGp1c3RtZW50S2V5AAAA",
       "AAAAAQAAAAAAAAAAAAAADERpc3RyaWJ1dGlvbgAAAAcAAAAVQm9udXMgcGVyIHN0YWtpbmcgZGF5AAAAAAAAEWJvbnVzX3Blcl9kYXlfYnBzAAAAAAAABgAAACtUb3RhbCByZXdhcmRzIGRpc3RyaWJ1dGVkIGJ5IHRoaXMgY29udHJhY3QuAAAAABFkaXN0cmlidXRlZF90b3RhbAAAAAAAAAoAAAAgVGhlIG1hbmFnZXIgb2YgdGhpcyBkaXN0cmlidXRpb24AAAAHbWFuYWdlcgAAAAATAAAAI01heCBib251cyBmb3Igc3Rha2luZyBhZnRlciA2MCBkYXlzAAAAAA1tYXhfYm9udXNfYnBzAAAAAAAABgAAAF5TaGFyZXMgd2hpY2ggd2VyZSBub3QgZnVsbHkgZGlzdHJpYnV0ZWQgb24gcHJldmlvdXMgZGlzdHJpYnV0aW9ucywgYW5kIHNob3VsZCBiZSByZWRpc3RyaWJ1dGVkAAAAAAAPc2hhcmVzX2xlZnRvdmVyAAAAAAYAAAAlSG93IG1hbnkgc2hhcmVzIGlzIHNpbmdsZSBwb2ludCB3b3J0aAAAAAAAABBzaGFyZXNfcGVyX3BvaW50AAAACgAAACBUb3RhbCByZXdhcmRzIG5vdCB5ZXQgd2l0aGRyYXduLgAAABJ3aXRoZHJhd2FibGVfdG90YWwAAAAAAAo=",
-      "AAAAAQAAAAAAAAAAAAAAEldpdGhkcmF3QWRqdXN0bWVudAAAAAAAAgAAAUVSZXByZXNlbnRzIGEgY29ycmVjdGlvbiB0byB0aGUgcmV3YXJkIHBvaW50cyBmb3IgdGhlIHVzZXIuIFRoaXMgY2FuIGJlIHBvc2l0aXZlIG9yIG5lZ2F0aXZlLgpBIHBvc2l0aXZlIHZhbHVlIGluZGljYXRlcyB0aGF0IHRoZSB1c2VyIHNob3VsZCByZWNlaXZlIGFkZGl0aW9uYWwgcG9pbnRzIChlLmcuLCBmcm9tIGEgYm9udXMgb3IgYW4gZXJyb3IgY29ycmVjdGlvbiksCndoaWxlIGEgbmVnYXRpdmUgdmFsdWUgc2lnbmlmaWVzIGEgcmVkdWN0aW9uIChlLmcuLCBkdWUgdG8gYSBwZW5hbHR5IG9yIGFuIGFkanVzdG1lbnQgZm9yIHBhc3Qgb3Zlci1hbGxvY2F0aW9ucykuAAAAAAAAEXNoYXJlZF9jb3JyZWN0aW9uAAAAAAAACwAAAOJSZXByZXNlbnRzIHRoZSB0b3RhbCBhbW91bnQgb2YgcmV3YXJkcyB0aGF0IHRoZSB1c2VyIGhhcyB3aXRoZHJhd24gc28gZmFyLgpUaGlzIHZhbHVlIGVuc3VyZXMgdGhhdCBhIHVzZXIgZG9lc24ndCB3aXRoZHJhdyBtb3JlIHRoYW4gdGhleSBhcmUgb3dlZCBhbmQgaXMgdXNlZCB0bwpjYWxjdWxhdGUgdGhlIG5ldCByZXdhcmRzIGEgdXNlciBjYW4gd2l0aGRyYXcgYXQgYW55IGdpdmVuIHRpbWUuAAAAAAARd2l0aGRyYXduX3Jld2FyZHMAAAAAAAAK",
-      "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAARAAAAFUluaXRpYWxpemF0aW9uIGVycm9ycwAAAAAAABlUb2tlblBlclBvd2VyQ2Fubm90QmVaZXJvAAAAAAAAAQAAAA1SZXdhcmQgZXJyb3JzAAAAAAAAEU1pblJld2FyZFRvb1NtYWxsAAAAAAAAAgAAAAAAAAATTWluUmV3YXJkTm90UmVhY2hlZAAAAAADAAAAAAAAABVOb1Jld2FyZHNGb3JUaGlzQXNzZXQAAAAAAAAEAAAAAAAAACFGdW5kRGlzdHJpYnV0aW9uU3RhcnRUaW1lVG9vRWFybHkAAAAAAAAMAAAAAAAAABdSZXdhcmRzVmFsaWRhdGlvbkZhaWxlZAAAAAANAAAAAAAAABhEaXN0cmlidXRpb25BbHJlYWR5QWRkZWQAAAAOAAAAAAAAABlXaXRoZHJhd0FkanVzdG1lbnRNaXNzaW5nAAAAAAAADwAAAAAAAAAURGlzdHJpYnV0aW9uTm90Rm91bmQAAAAQAAAAAAAAAC1SZXdhcmRzTm90RGlzdHJpYnV0ZWRPckRpc3RyaWJ1dGlvbk5vdENyZWF0ZWQAAAAAAAARAAAADFN0YWtlIGVycnJvcwAAABdNaW5TdGFrZUxlc3NPckVxdWFsWmVybwAAAAAFAAAAAAAAABRTdGFrZUxlc3NUaGVuTWluQm9uZAAAAAYAAAAAAAAADVN0YWtlTm90Rm91bmQAAAAAAAAHAAAAAAAAAB1Ub3RhbFN0YWtlZENhbm5vdEJlWmVyb09yTGVzcwAAAAAAAAgAAAAOU3RvcmFnZSBlcnJvcnMAAAAAAAxDb25maWdOb3RTZXQAAAAJAAAAAAAAAB9GYWlsZWRUb0dldEFkbWluQWRkckZyb21TdG9yYWdlAAAAAAoAAAAMT3RoZXIgZXJyb3JzAAAADFVuYXV0aG9yaXplZAAAAAs=",
+      "AAAAAQAAAAAAAAAAAAAAEldpdGhkcmF3QWRqdXN0bWVudAAAAAAAAgAAAUVSZXByZXNlbnRzIGEgY29ycmVjdGlvbiB0byB0aGUgcmV3YXJkIHBvaW50cyBmb3IgdGhlIHVzZXIuIFRoaXMgY2FuIGJlIHBvc2l0aXZlIG9yIG5lZ2F0aXZlLgpBIHBvc2l0aXZlIHZhbHVlIGluZGljYXRlcyB0aGF0IHRoZSB1c2VyIHNob3VsZCByZWNlaXZlIGFkZGl0aW9uYWwgcG9pbnRzIChlLmcuLCBmcm9tIGEgYm9udXMgb3IgYW4gZXJyb3IgY29ycmVjdGlvbiksCndoaWxlIGEgbmVnYXRpdmUgdmFsdWUgc2lnbmlmaWVzIGEgcmVkdWN0aW9uIChlLmcuLCBkdWUgdG8gYSBwZW5hbHR5IG9yIGFuIGFkanVzdG1lbnQgZm9yIHBhc3Qgb3Zlci1hbGxvY2F0aW9ucykuAAAAAAAAEXNoYXJlc19jb3JyZWN0aW9uAAAAAAAACwAAAOJSZXByZXNlbnRzIHRoZSB0b3RhbCBhbW91bnQgb2YgcmV3YXJkcyB0aGF0IHRoZSB1c2VyIGhhcyB3aXRoZHJhd24gc28gZmFyLgpUaGlzIHZhbHVlIGVuc3VyZXMgdGhhdCBhIHVzZXIgZG9lc24ndCB3aXRoZHJhdyBtb3JlIHRoYW4gdGhleSBhcmUgb3dlZCBhbmQgaXMgdXNlZCB0bwpjYWxjdWxhdGUgdGhlIG5ldCByZXdhcmRzIGEgdXNlciBjYW4gd2l0aGRyYXcgYXQgYW55IGdpdmVuIHRpbWUuAAAAAAARd2l0aGRyYXduX3Jld2FyZHMAAAAAAAAK",
       "AAAAAQAAAAAAAAAAAAAADkNvbmZpZ1Jlc3BvbnNlAAAAAAABAAAAAAAAAAZjb25maWcAAAAAB9AAAAAGQ29uZmlnAAA=",
       "AAAAAQAAAAAAAAAAAAAADlN0YWtlZFJlc3BvbnNlAAAAAAABAAAAAAAAAAZzdGFrZXMAAAAAA+oAAAfQAAAABVN0YWtlAAAA",
-      "AAAAAQAAAAAAAAAAAAAAGUFubnVhbGl6ZWRSZXdhcmRzUmVzcG9uc2UAAAAAAAACAAAAVU5vbmUgbWVhbnMgY29udHJhY3QgZG9lcyBub3Qga25vdyB0aGUgdmFsdWUgLSB0b3RhbF9zdGFrZWQgb3IgdG90YWxfcG93ZXIgY291bGQgYmUgMC4AAAAAAAAGYW1vdW50AAAAAAfQAAAACk9wdGlvblVpbnQAAAAAAAAAAAAEaW5mbwAAABM=",
+      "AAAAAQAAAAAAAAAAAAAAEEFubnVhbGl6ZWRSZXdhcmQAAAACAAAAAAAAAAZhbW91bnQAAAAAABAAAAAAAAAABWFzc2V0AAAAAAAAEw==",
+      "AAAAAQAAAAAAAAAAAAAAGUFubnVhbGl6ZWRSZXdhcmRzUmVzcG9uc2UAAAAAAAABAAAAAAAAAAdyZXdhcmRzAAAAA+oAAAfQAAAAEEFubnVhbGl6ZWRSZXdhcmQ=",
       "AAAAAQAAAAAAAAAAAAAAEldpdGhkcmF3YWJsZVJld2FyZAAAAAAAAgAAAAAAAAAOcmV3YXJkX2FkZHJlc3MAAAAAABMAAAAAAAAADXJld2FyZF9hbW91bnQAAAAAAAAK",
       "AAAAAQAAAAAAAAAAAAAAG1dpdGhkcmF3YWJsZVJld2FyZHNSZXNwb25zZQAAAAABAAAAQUFtb3VudCBvZiByZXdhcmRzIGFzc2lnbmVkIGZvciB3aXRoZHJhd2FsIGZyb20gdGhlIGdpdmVuIGFkZHJlc3MuAAAAAAAAB3Jld2FyZHMAAAAD6gAAB9AAAAASV2l0aGRyYXdhYmxlUmV3YXJkAAA=",
       "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAABAAAAAAAAAAIbHBfdG9rZW4AAAATAAAAAAAAABFtYXhfZGlzdHJpYnV0aW9ucwAAAAAAAAQAAAAAAAAACG1pbl9ib25kAAAACwAAAAAAAAAKbWluX3Jld2FyZAAAAAAACw==",
@@ -319,7 +351,95 @@ export class Contract {
       "AAAAAQAAAAAAAAAAAAAAD1BpZWNld2lzZUxpbmVhcgAAAAABAAAABXN0ZXBzAAAAAAAABXN0ZXBzAAAAAAAD6gAAB9AAAAAEU3RlcA==",
     ]);
   }
-  async initialize<R extends methodOptions.ResponseTypes = undefined>(
+
+  private readonly parsers = {
+    initialize: () => {},
+    bond: () => {},
+    unbond: () => {},
+    createDistributionFlow: () => {},
+    distributeRewards: () => {},
+    withdrawRewards: () => {},
+    fundDistribution: () => {},
+    queryConfig: (result: string | xdr.ScVal): ConfigResponse =>
+      this.spec.funcResToNative("query_config", result),
+    queryAdmin: (result: string | xdr.ScVal): string =>
+      this.spec.funcResToNative("query_admin", result),
+    queryStaked: (result: string | xdr.ScVal): StakedResponse =>
+      this.spec.funcResToNative("query_staked", result),
+    queryTotalStaked: (result: string | xdr.ScVal): i128 =>
+      this.spec.funcResToNative("query_total_staked", result),
+    queryAnnualizedRewards: (
+      result: string | xdr.ScVal
+    ): AnnualizedRewardsResponse =>
+      this.spec.funcResToNative("query_annualized_rewards", result),
+    queryWithdrawableRewards: (
+      result: string | xdr.ScVal
+    ): WithdrawableRewardsResponse =>
+      this.spec.funcResToNative("query_withdrawable_rewards", result),
+    queryDistributedRewards: (result: string | xdr.ScVal): u128 =>
+      this.spec.funcResToNative("query_distributed_rewards", result),
+    queryUndistributedRewards: (result: string | xdr.ScVal): u128 =>
+      this.spec.funcResToNative("query_undistributed_rewards", result),
+  };
+  private txFromJSON = <T>(json: string): AssembledTransaction<T> => {
+    const { method, ...tx } = JSON.parse(json);
+    return AssembledTransaction.fromJSON(
+      {
+        ...this.options,
+        method,
+        //@ts-ignore
+        parseResultXdr: this.parsers[method],
+      },
+      tx
+    );
+  };
+  public readonly fromJSON = {
+    initialize: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["initialize"]>
+    >,
+    bond: this.txFromJSON<ReturnType<(typeof this.parsers)["bond"]>>,
+    unbond: this.txFromJSON<ReturnType<(typeof this.parsers)["unbond"]>>,
+    createDistributionFlow: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["createDistributionFlow"]>
+    >,
+    distributeRewards: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["distributeRewards"]>
+    >,
+    withdrawRewards: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["withdrawRewards"]>
+    >,
+    fundDistribution: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["fundDistribution"]>
+    >,
+    queryConfig: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["queryConfig"]>
+    >,
+    queryAdmin: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["queryAdmin"]>
+    >,
+    queryStaked: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["queryStaked"]>
+    >,
+    queryTotalStaked: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["queryTotalStaked"]>
+    >,
+    queryAnnualizedRewards: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["queryAnnualizedRewards"]>
+    >,
+    queryWithdrawableRewards: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["queryWithdrawableRewards"]>
+    >,
+    queryDistributedRewards: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["queryDistributedRewards"]>
+    >,
+    queryUndistributedRewards: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["queryUndistributedRewards"]>
+    >,
+  };
+  /**
+   * Construct and simulate a initialize transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  initialize = async (
     {
       admin,
       lp_token,
@@ -327,8 +447,8 @@ export class Contract {
       max_distributions,
       min_reward,
     }: {
-      admin: Address;
-      lp_token: Address;
+      admin: string;
+      lp_token: string;
       min_bond: i128;
       max_distributions: u32;
       min_reward: i128;
@@ -338,265 +458,158 @@ export class Contract {
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "initialize",
-        args: this.spec.funcArgsToScVals("initialize", {
-          admin,
-          lp_token,
-          min_bond,
-          max_distributions,
-          min_reward,
-        }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("initialize", xdr));
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "initialize",
+      args: this.spec.funcArgsToScVals("initialize", {
+        admin: new Address(admin),
+        lp_token: new Address(lp_token),
+        min_bond,
+        max_distributions,
+        min_reward,
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["initialize"],
+    });
+  };
 
-  async bond<R extends methodOptions.ResponseTypes = undefined>(
-    { sender, tokens }: { sender: Address; tokens: i128 },
+  /**
+   * Construct and simulate a bond transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  bond = async (
+    { sender, tokens }: { sender: string; tokens: i128 },
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "bond",
-        args: this.spec.funcArgsToScVals("bond", { sender, tokens }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(void 0);
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "bond",
+      args: this.spec.funcArgsToScVals("bond", {
+        sender: new Address(sender),
+        tokens,
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["bond"],
+    });
+  };
 
-  async unbond<R extends methodOptions.ResponseTypes = undefined>(
+  /**
+   * Construct and simulate a unbond transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  unbond = async (
     {
       sender,
       stake_amount,
       stake_timestamp,
-    }: { sender: Address; stake_amount: i128; stake_timestamp: u64 },
+    }: { sender: string; stake_amount: i128; stake_timestamp: u64 },
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "unbond",
-        args: this.spec.funcArgsToScVals("unbond", {
-          sender,
-          stake_amount,
-          stake_timestamp,
-        }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(void 0);
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "unbond",
+      args: this.spec.funcArgsToScVals("unbond", {
+        sender: new Address(sender),
+        stake_amount,
+        stake_timestamp,
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["unbond"],
+    });
+  };
 
-  async createDistributionFlow<
-    R extends methodOptions.ResponseTypes = undefined
-  >(
+  /**
+   * Construct and simulate a create_distribution_flow transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  createDistributionFlow = async (
     {
       sender,
       manager,
       asset,
-    }: { sender: Address; manager: Address; asset: Address },
+    }: { sender: string; manager: string; asset: string },
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "create_distribution_flow",
-        args: this.spec.funcArgsToScVals("create_distribution_flow", {
-          sender,
-          manager,
-          asset,
-        }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(
-            this.spec.funcResToNative("create_distribution_flow", xdr)
-          );
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "create_distribution_flow",
+      args: this.spec.funcArgsToScVals("create_distribution_flow", {
+        sender: new Address(sender),
+        manager: new Address(manager),
+        asset: new Address(asset),
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["createDistributionFlow"],
+    });
+  };
 
-  async distributeRewards<R extends methodOptions.ResponseTypes = undefined>(
+  /**
+   * Construct and simulate a distribute_rewards transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  distributeRewards = async (
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "distribute_rewards",
-        args: this.spec.funcArgsToScVals("distribute_rewards", {}),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("distribute_rewards", xdr));
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "distribute_rewards",
+      args: this.spec.funcArgsToScVals("distribute_rewards", {}),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["distributeRewards"],
+    });
+  };
 
-  async withdrawRewards<R extends methodOptions.ResponseTypes = undefined>(
-    { sender }: { sender: Address },
+  /**
+   * Construct and simulate a withdraw_rewards transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  withdrawRewards = async (
+    { sender }: { sender: string },
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "withdraw_rewards",
-        args: this.spec.funcArgsToScVals("withdraw_rewards", { sender }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("withdraw_rewards", xdr));
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "withdraw_rewards",
+      args: this.spec.funcArgsToScVals("withdraw_rewards", {
+        sender: new Address(sender),
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["withdrawRewards"],
+    });
+  };
 
-  async fundDistribution<R extends methodOptions.ResponseTypes = undefined>(
+  /**
+   * Construct and simulate a fund_distribution transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  fundDistribution = async (
     {
       sender,
       start_time,
@@ -604,10 +617,10 @@ export class Contract {
       token_address,
       token_amount,
     }: {
-      sender: Address;
+      sender: string;
       start_time: u64;
       distribution_duration: u64;
-      token_address: Address;
+      token_address: string;
       token_amount: i128;
     },
     options: {
@@ -615,384 +628,201 @@ export class Contract {
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<void> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "fund_distribution",
-        args: this.spec.funcArgsToScVals("fund_distribution", {
-          sender,
-          start_time,
-          distribution_duration,
-          token_address,
-          token_amount,
-        }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<void> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("fund_distribution", xdr));
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "fund_distribution",
+      args: this.spec.funcArgsToScVals("fund_distribution", {
+        sender: new Address(sender),
+        start_time,
+        distribution_duration,
+        token_address: new Address(token_address),
+        token_amount,
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["fundDistribution"],
+    });
+  };
 
-  async queryConfig<R extends methodOptions.ResponseTypes = undefined>(
+  /**
+   * Construct and simulate a query_config transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  queryConfig = async (
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<ConfigResponse> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "query_config",
-        args: this.spec.funcArgsToScVals("query_config", {}),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<ConfigResponse> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("query_config", xdr));
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "query_config",
+      args: this.spec.funcArgsToScVals("query_config", {}),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["queryConfig"],
+    });
+  };
 
-  async queryAdmin<R extends methodOptions.ResponseTypes = undefined>(
+  /**
+   * Construct and simulate a query_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  queryAdmin = async (
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<Address> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "query_admin",
-        args: this.spec.funcArgsToScVals("query_admin", {}),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<Address> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("query_admin", xdr));
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "query_admin",
+      args: this.spec.funcArgsToScVals("query_admin", {}),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["queryAdmin"],
+    });
+  };
 
-  async queryStaked<R extends methodOptions.ResponseTypes = undefined>(
-    { address }: { address: Address },
+  /**
+   * Construct and simulate a query_staked transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  queryStaked = async (
+    { address }: { address: string },
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<StakedResponse> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "query_staked",
-        args: this.spec.funcArgsToScVals("query_staked", { address }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<StakedResponse> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("query_staked", xdr));
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "query_staked",
+      args: this.spec.funcArgsToScVals("query_staked", {
+        address: new Address(address),
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["queryStaked"],
+    });
+  };
 
-  async queryTotalStaked<R extends methodOptions.ResponseTypes = undefined>(
+  /**
+   * Construct and simulate a query_total_staked transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  queryTotalStaked = async (
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<i128> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "query_total_staked",
-        args: this.spec.funcArgsToScVals("query_total_staked", {}),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<i128> | Err<Error_> | undefined => {
-          return new Ok(this.spec.funcResToNative("query_total_staked", xdr));
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "query_total_staked",
+      args: this.spec.funcArgsToScVals("query_total_staked", {}),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["queryTotalStaked"],
+    });
+  };
 
-  async queryAnnualizedRewards<
-    R extends methodOptions.ResponseTypes = undefined
-  >(
+  /**
+   * Construct and simulate a query_annualized_rewards transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  queryAnnualizedRewards = async (
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<AnnualizedRewardsResponse> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "query_annualized_rewards",
-        args: this.spec.funcArgsToScVals("query_annualized_rewards", {}),
-        ...options,
-        ...this.options,
-        parseResultXdr: (
-          xdr
-        ): Ok<AnnualizedRewardsResponse> | Err<Error_> | undefined => {
-          return new Ok(
-            this.spec.funcResToNative("query_annualized_rewards", xdr)
-          );
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "query_annualized_rewards",
+      args: this.spec.funcArgsToScVals("query_annualized_rewards", {}),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["queryAnnualizedRewards"],
+    });
+  };
 
-  async queryWithdrawableRewards<
-    R extends methodOptions.ResponseTypes = undefined
-  >(
-    { user }: { user: Address },
+  /**
+   * Construct and simulate a query_withdrawable_rewards transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  queryWithdrawableRewards = async (
+    { user }: { user: string },
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<WithdrawableRewardsResponse> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "query_withdrawable_rewards",
-        args: this.spec.funcArgsToScVals("query_withdrawable_rewards", {
-          user,
-        }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (
-          xdr
-        ): Ok<WithdrawableRewardsResponse> | Err<Error_> | undefined => {
-          return new Ok(
-            this.spec.funcResToNative("query_withdrawable_rewards", xdr)
-          );
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "query_withdrawable_rewards",
+      args: this.spec.funcArgsToScVals("query_withdrawable_rewards", {
+        user: new Address(user),
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["queryWithdrawableRewards"],
+    });
+  };
 
-  async queryDistributedRewards<
-    R extends methodOptions.ResponseTypes = undefined
-  >(
-    { asset }: { asset: Address },
+  /**
+   * Construct and simulate a query_distributed_rewards transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  queryDistributedRewards = async (
+    { asset }: { asset: string },
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<u128> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "query_distributed_rewards",
-        args: this.spec.funcArgsToScVals("query_distributed_rewards", {
-          asset,
-        }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<u128> | Err<Error_> | undefined => {
-          return new Ok(
-            this.spec.funcResToNative("query_distributed_rewards", xdr)
-          );
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "query_distributed_rewards",
+      args: this.spec.funcArgsToScVals("query_distributed_rewards", {
+        asset: new Address(asset),
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["queryDistributedRewards"],
+    });
+  };
 
-  async queryUndistributedRewards<
-    R extends methodOptions.ResponseTypes = undefined
-  >(
-    { asset }: { asset: Address },
+  /**
+   * Construct and simulate a query_undistributed_rewards transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  queryUndistributedRewards = async (
+    { asset }: { asset: string },
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
        */
       fee?: number;
-      /**
-       * What type of response to return.
-       *
-       *   - `undefined`, the default, parses the returned XDR as `Ok<u128> | Err<Error_> | undefined`. Runs preflight, checks to see if auth/signing is required, and sends the transaction if so. If there's no error and `secondsToWait` is positive, awaits the finalized transaction.
-       *   - `'simulated'` will only simulate/preflight the transaction, even if it's a change/set method that requires auth/signing. Returns full preflight info.
-       *   - `'full'` return the full RPC response, meaning either 1. the preflight info, if it's a view/read method that doesn't require auth/signing, or 2. the `sendTransaction` response, if there's a problem with sending the transaction or if you set `secondsToWait` to 0, or 3. the `getTransaction` response, if it's a change method with no `sendTransaction` errors and a positive `secondsToWait`.
-       */
-      responseType?: R;
-      /**
-       * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
-       */
-      secondsToWait?: number;
     } = {}
-  ) {
-    try {
-      return await Invoke.invoke({
-        method: "query_undistributed_rewards",
-        args: this.spec.funcArgsToScVals("query_undistributed_rewards", {
-          asset,
-        }),
-        ...options,
-        ...this.options,
-        parseResultXdr: (xdr): Ok<u128> | Err<Error_> | undefined => {
-          return new Ok(
-            this.spec.funcResToNative("query_undistributed_rewards", xdr)
-          );
-        },
-      });
-    } catch (e) {
-      if (typeof e === "string") {
-        let err = parseError(e);
-        if (err) return err;
-      }
-      throw e;
-    }
-  }
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "query_undistributed_rewards",
+      args: this.spec.funcArgsToScVals("query_undistributed_rewards", {
+        asset: new Address(asset),
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["queryUndistributedRewards"],
+    });
+  };
 }

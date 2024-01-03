@@ -1,12 +1,17 @@
-import { WalletActions, Token } from "./types";
-import { AppStore, SetStateType, GetStateType } from "../types";
+import {
+  WalletActions,
+  StateToken as Token,
+  AppStore,
+  SetStateType,
+  GetStateType,
+} from "@phoenix-protocol/types";
 import {
   PhoenixFactoryContract,
   SorobanTokenContract,
 } from "@phoenix-protocol/contracts";
 import { usePersistStore } from "../store";
-import { Address } from "soroban-client";
 import { constants } from "@phoenix-protocol/utils";
+import { Address } from "stellar-sdk";
 
 export const createWalletActions = (
   setState: SetStateType,
@@ -25,11 +30,9 @@ export const createWalletActions = (
       });
 
       // Fetch all available tokens from chain
-
       const allPoolsDetails = await factoryContract.queryAllPoolsDetails();
       // Loop through all pools and get asset_a and asset_b addresses in an array
-      const _allAssets = allPoolsDetails
-        ?.unwrap()
+      const _allAssets = allPoolsDetails.result
         .map((pool) => [
           pool.pool_response.asset_a.address.toString(),
           pool.pool_response.asset_b.address.toString(),
@@ -48,8 +51,8 @@ export const createWalletActions = (
       await Promise.all(allAssets);
 
       const _tokens = getState()
-        .tokens.filter((token) => token?.symbol !== "POOL")
-        .map((token) => {
+        .tokens.filter((token: Token) => token?.symbol !== "POOL")
+        .map((token: Token) => {
           return {
             name: token?.symbol === "native" ? "XLM" : token?.symbol,
             icon: `/cryptoIcons/${
@@ -83,25 +86,31 @@ export const createWalletActions = (
       let balance: bigint;
       try {
         balance = BigInt(
-          await TokenContract.balance({
-            id: Address.fromString(usePersistStore.getState().wallet.address!),
-          })
+          (
+            await TokenContract.balance({
+              id: usePersistStore.getState().wallet.address!,
+            })
+          ).result
         );
       } catch (e) {
         balance = BigInt(0);
         console.log(e, "User has no balance");
       }
-
-      const _symbol: string =
-        getState().tokens.find(
-          (token: Token) => token.id === tokenAddress.toString()
-        )?.symbol || (await TokenContract.symbol());
-      const symbol: string = _symbol === "native" ? "XLM" : _symbol;
-
+      let symbol: string;
+      try {
+        const _symbol: string =
+          getState().tokens.find(
+            (token: Token) => token.id === tokenAddress.toString()
+          )?.symbol || (await TokenContract.symbol()).result;
+        symbol = _symbol === "native" ? "XLM" : _symbol;
+      } catch (e) {
+        console.log(e, "Token seems to be invalid");
+        return;
+      }
       const decimals =
         getState().tokens.find(
           (token: Token) => token.id === tokenAddress.toString()
-        )?.decimals || Number(await TokenContract.decimals());
+        )?.decimals || Number((await TokenContract.decimals()).result);
 
       // Update token balance
       setState((state: AppStore) => {

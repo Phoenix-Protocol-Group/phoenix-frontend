@@ -1,6 +1,6 @@
-import { Address, Server } from "soroban-client";
+import { Address, Horizon } from "stellar-sdk";
 
-export type Token = {
+export type StateToken = {
   id: string;
   balance: bigint;
   decimals: number;
@@ -10,13 +10,13 @@ export type Token = {
 export type Wallet = {
   address: string | undefined;
   activeChain: WalletChain | undefined;
-  server: Server | undefined;
+  server: Horizon.Server | undefined;
 };
 
 export interface WalletActions {
-  tokens: Token[];
+  tokens: StateToken[];
   allTokens: any;
-  fetchTokenInfo: (tokenAddress: Address) => Promise<Token | undefined>;
+  fetchTokenInfo: (tokenAddress: Address) => Promise<StateToken | undefined>;
   getAllTokens: () => Promise<any[]>;
 }
 

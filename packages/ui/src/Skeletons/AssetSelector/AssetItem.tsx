@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Button, Skeleton } from "@mui/material";
-import { Token } from "../../Modal/Modal";
+import { Token } from "@phoenix-protocol/types"
 
 const AssetItem = ({}: {}) => {
   return (

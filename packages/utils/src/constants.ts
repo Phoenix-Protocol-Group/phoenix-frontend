@@ -1,4 +1,4 @@
-import { Account } from "soroban-client";
+import { Account } from "stellar-sdk";
 
 export const TESTING_SOURCE: Account = new Account(
   "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
@@ -19,10 +19,10 @@ export const RPC_URL: string = "https://soroban-testnet.stellar.org:443";
  * Factory contract address
  */
 export const FACTORY_ADDRESS: string =
-  "CAO3QRJ36VDS5IIA3XFO6EQTWFRDDB6SUYYXCKMTVIQRS75NSVLRRRRQ";
+  "CC7M2QFZWG5OZ6DLEAOHN5OULALNOQMRWWRWSE5HJCZPI3W2L5DMJHLB";
 
 /**
  * Multihop contract address
  */
 export const MULTIHOP_ADDRESS: string =
-  "CC4W4EIZMCCUG2R5FHQGQDSBZY6S2V2CIIJQZ5XBXCKUVVSBR7HC6267";
+  "CCIEUAD63OGWJ3FKBI5SZG7HZ34PPYF4RCPWVB5SOP6G7FBBNAVPYHKW";

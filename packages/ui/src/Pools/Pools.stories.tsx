@@ -1,7 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Pools, Pool } from "./Pools";
-import { Token } from "../Modal/Modal";
+import { Pools } from "./Pools";
+import { Token, Pool } from "@phoenix-protocol/types";
 
 const testTokens: Token[] = [
   {
@@ -17,7 +17,7 @@ const testTokens: Token[] = [
     amount: 50,
     category: "Stable",
     usdValue: 1 * 50,
-  }
+  },
 ];
 
 const testPool: Pool = {
@@ -25,16 +25,29 @@ const testPool: Pool = {
   tvl: "$29,573.57",
   maxApr: "98.65%",
   userLiquidity: 30,
-  poolAddress: ""
-}
+  poolAddress: "",
+};
 
-const pools: Pool[] = [testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool, testPool];
-
+const pools: Pool[] = [
+  testPool,
+  testPool,
+  testPool,
+  testPool,
+  testPool,
+  testPool,
+  testPool,
+  testPool,
+  testPool,
+  testPool,
+  testPool,
+  testPool,
+  testPool,
+];
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof Pools> = {
   title: "Pools/Pools",
-  component: Pools
+  component: Pools,
 };
 
 export default meta;
@@ -45,13 +58,13 @@ type Story = StoryObj<typeof Pools>;
 export const Primary: Story = {
   args: {
     pools: pools,
-    filter: "ALL"
+    filter: "ALL",
   },
 };
 
 export const Secondary: Story = {
   args: {
     pools: pools,
-    filter: "MY"
+    filter: "MY",
   },
 };

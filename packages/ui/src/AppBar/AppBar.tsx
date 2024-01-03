@@ -17,6 +17,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import React from "react";
 import { Button } from "../Button/Button";
 import { MenuButton } from "./MenuButton";
+import { AppBarProps } from "@phoenix-protocol/types";
 
 const BalanceChip = ({ balance }: { balance: number }) => (
   <Chip
@@ -114,15 +115,6 @@ const OptionMenu = ({
     </Box>
   );
 };
-
-interface AppBarProps {
-  balance?: number | undefined;
-  walletAddress?: string | undefined;
-  mobileNavOpen: boolean;
-  connectWallet: () => void;
-  disconnectWallet: () => void;
-  toggleMobileNav: (open: boolean) => void;
-}
 
 const AppBar = ({
   balance,

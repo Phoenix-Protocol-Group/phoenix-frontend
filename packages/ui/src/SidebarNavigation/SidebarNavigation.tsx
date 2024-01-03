@@ -4,7 +4,6 @@ import { styled, Theme, CSSObject } from "@mui/material/styles";
 import {
   Box,
   Drawer as MuiDrawer,
-  DrawerProps as MuiDrawerProps,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -16,20 +15,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useEffect } from "react";
-
-interface Items {
-  label: string;
-  icon: any;
-  active: boolean;
-  href: string;
-}
-
-interface DrawerProps extends MuiDrawerProps {
-  items: Items[];
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  onNavClick: (href: string) => void;
-}
+import { DrawerProps } from "@phoenix-protocol/types";
 
 const drawerWidth = 240;
 

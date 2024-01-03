@@ -8,24 +8,7 @@ import {
   makeStyles,
 } from "@mui/material";
 import React from "react";
-
-interface Token {
-  name: string;
-  icon: string;
-  usdValue: number;
-  amount: number;
-  category: string;
-}
-
-interface TokenBoxProps {
-  token: Token;
-  onAssetClick?: () => void;
-  onChange: (value: string) => void;
-  hideDropdownButton?: boolean;
-  value: string | undefined;
-  disabled?: boolean;
-  loadingValues?: boolean;
-}
+import { Token, TokenBoxProps } from "@phoenix-protocol/types";
 
 const AssetButton = ({
   token,

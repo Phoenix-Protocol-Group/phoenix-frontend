@@ -1,10 +1,11 @@
 import { Server } from "soroban-client";
-import { WalletActions } from "./wallet/types";
-import { PersistWalletActions } from "./persist/types";
-import { LayoutActions } from "./layout/types";
+import { PersistWalletActions } from "./persist";
+import { LayoutActions } from "./layout";
+import { Horizon } from "stellar-sdk";
+import { WalletActions } from "./wallet";
 
 interface GeneralStore {
-  server: Server;
+  server: Horizon.Server;
   networkPassphrase: string;
 }
 

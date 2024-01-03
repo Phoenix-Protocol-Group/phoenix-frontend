@@ -11,12 +11,10 @@ import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
 import TabPanel from "@mui/lab/TabPanel";
 import TabContext from "@mui/lab/TabContext";
 import { TokenBox } from "../../Swap";
-import { Token } from "../../Modal/Modal";
 import { Button } from "../../Button/Button";
+import { PoolLiquidityProps, LabTabProps } from "@phoenix-protocol/types";
 
-type Data = number[];
-
-const GlowingChart = ({ data }: { data: Data[] }) => (
+const GlowingChart = ({ data }: { data: number[][] }) => (
   <ResponsiveContainer width="100%" height={200}>
     <AreaChart
       data={data}
@@ -46,16 +44,6 @@ const GlowingChart = ({ data }: { data: Data[] }) => (
   </ResponsiveContainer>
 );
 
-interface LabTabProps {
-  tokenA: Token;
-  tokenB: Token;
-  liquidityA: number;
-  liquidityB: number;
-  liquidityToken: Token;
-  onAddLiquidity: (tokenAAmount: number, tokenBAmount: number) => void;
-  onRemoveLiquidity: (liquidityTokenAmount: number) => void;
-}
-
 const LabTabs = ({
   tokenA,
   tokenB,
@@ -75,15 +63,15 @@ const LabTabs = ({
   const keepRatioA = (val: string) => {
     setTokenAValue(val);
 
-    const valB = (Number(val) / liquidityRatio);
-    setTokenBValue(valB.toFixed(4))
+    const valB = Number(val) / liquidityRatio;
+    setTokenBValue(valB.toFixed(4));
   };
 
   const keepRatioB = (val: string) => {
     setTokenBValue(val);
 
-    const valA = (Number(val) * liquidityRatio);
-    setTokenAValue(valA.toFixed(4))
+    const valA = Number(val) * liquidityRatio;
+    setTokenAValue(valA.toFixed(4));
   };
 
   const buttonStyles = {
@@ -177,17 +165,6 @@ const LabTabs = ({
     </Box>
   );
 };
-
-interface PoolLiquidityProps {
-  tokenA: Token;
-  tokenB: Token;
-  liquidityToken: Token;
-  poolHistory: Data[];
-  liquidityA: number;
-  liquidityB: number;
-  onAddLiquidity: (tokenAAmount: number, tokenBAmount: number) => void;
-  onRemoveLiquidity: (liquidityTokenAmount: number) => void;
-}
 
 const PoolLiquidity = ({
   tokenA,

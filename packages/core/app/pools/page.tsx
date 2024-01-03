@@ -5,11 +5,12 @@ import {
   PhoenixPairContract,
 } from "@phoenix-protocol/contracts";
 import { useAppStore } from "@phoenix-protocol/state";
-import { Pool, Pools, Skeleton } from "@phoenix-protocol/ui";
+import { Pools, Skeleton } from "@phoenix-protocol/ui";
 import { constants } from "@phoenix-protocol/utils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Address } from "soroban-client";
+import { Address } from "stellar-sdk";
+import { Pool } from "@phoenix-protocol/types";
 
 export default function Page() {
   const store = useAppStore(); // Global state management
@@ -31,10 +32,14 @@ export default function Page() {
         PairContract.queryPoolInfo(),
       ]);
 
-      if (pairConfig?.isOk() && pairInfo?.isOk()) {
+      if (pairConfig?.result && pairInfo?.result) {
         const [tokenA, tokenB] = await Promise.all([
-          store.fetchTokenInfo(pairConfig.unwrap().token_a),
-          store.fetchTokenInfo(pairConfig.unwrap().token_b),
+          store.fetchTokenInfo(
+            Address.fromString(pairConfig.result.unwrap().token_a)
+          ),
+          store.fetchTokenInfo(
+            Address.fromString(pairConfig.result.unwrap().token_b)
+          ),
         ]);
 
         // Construct and return pool object if all fetches are successful
@@ -44,7 +49,7 @@ export default function Page() {
               name: tokenA?.symbol || "",
               icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
               amount:
-                Number(pairInfo.unwrap().asset_a.amount) /
+                Number(pairInfo.result.unwrap().asset_a.amount) /
                 10 ** Number(tokenA?.decimals),
               category: "",
               usdValue: 0,
@@ -53,7 +58,7 @@ export default function Page() {
               name: tokenB?.symbol || "",
               icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
               amount:
-                Number(pairInfo.unwrap().asset_b.amount) /
+                Number(pairInfo.result.unwrap().asset_b.amount) /
                 10 ** Number(tokenB?.decimals),
               category: "",
               usdValue: 0,
@@ -68,15 +73,7 @@ export default function Page() {
     } catch (e) {
       console.log(e);
     }
-
-    // Fallback pool object for error or unsuccessful fetch
-    return {
-      tokens: [],
-      tvl: "0",
-      maxApr: "0",
-      userLiquidity: 0,
-      poolAddress: "",
-    };
+    return;
   };
 
   // Fetch all pools' data
@@ -91,13 +88,20 @@ export default function Page() {
 
     const poolWithData = pools
       ? await Promise.all(
-          pools.unwrap().map(async (pool: Address) => {
-            return await fetchPool(pool.toString());
+          pools.result.map(async (pool: string) => {
+            return await fetchPool(pool);
           })
         )
       : [];
 
-    setAllPools(poolWithData);
+    const poolsFiltered = poolWithData.filter(
+      (el: any) =>
+        el !== undefined ||
+        el?.tokens.length >= 2 ||
+        el.poolAddress !== "CBXBKAB6QIRUGTG77OQZHC46BIIPA5WDKIKZKPA2H7Q7CPKQ555W3EVB" // TODO TESTNET DEBUG
+    );
+    console.log(poolsFiltered);
+    setAllPools(poolsFiltered as Pool[]);
   };
 
   // On component mount, fetch pools and update loading state

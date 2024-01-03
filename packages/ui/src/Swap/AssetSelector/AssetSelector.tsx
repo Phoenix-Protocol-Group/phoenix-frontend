@@ -2,22 +2,7 @@ import React from "react";
 import { Box, Grid, IconButton, Input, Typography } from "@mui/material";
 import AssetItem from "./AssetItem";
 import { KeyboardArrowLeft } from "@mui/icons-material";
-
-interface Token {
-  name: string;
-  icon: string;
-  usdValue: number;
-  amount: number;
-  category: string;
-}
-
-interface AssetSelectorProps {
-  tokens: Token[];
-  tokensAll: Token[];
-
-  onClose: () => void;
-  onTokenClick: (token: Token) => void;
-}
+import { AssetSelectorProps } from "@phoenix-protocol/types";
 
 const containerStyle = {
   borderRadius: "16px",

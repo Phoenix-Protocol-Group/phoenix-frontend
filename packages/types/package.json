@@ -1,0 +1,20 @@
+{
+  "version": "0.0.1",
+  "name": "@phoenix-protocol/types",
+  "files": [
+    "build/**/*"
+  ],
+  "scripts": {
+    "test": "tsc && jest",
+    "build": "tsc"
+  },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "devDependencies": {
+    "typescript": "5.0.4"
+  },
+  "dependencies": {
+    "@mui/material": "^5.13.5",
+    "stellar-sdk": "^11.1.0"
+  }
+}

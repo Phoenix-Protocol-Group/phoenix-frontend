@@ -20,7 +20,7 @@
     "react-dom": "^18.2.0",
     "react-joyride": "^2.7.2",
     "react-usestateref": "^1.0.8",
-    "soroban-client": "1.0.0-beta.4",
+    "stellar-sdk": "^11.1.0",
     "typescript": "5.1.6",
     "use-debounce": "^10.0.0"
   },
