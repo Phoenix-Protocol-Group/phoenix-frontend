@@ -15,10 +15,9 @@ import {
   PoolLiquidity,
   PoolStats,
   StakingList,
-  Token,
   Skeleton as PhoenixSkeleton,
 } from "@phoenix-protocol/ui";
-
+import { Token } from "@phoenix-protocol/types";
 import {
   PoolSuccess,
   PoolError,

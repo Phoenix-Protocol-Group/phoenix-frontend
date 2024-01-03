@@ -1,12 +1,6 @@
 import { Box, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
-
-interface TileProps {
-  title: string;
-  value: string;
-  link: string;
-  isMobile?: boolean;
-}
+import { MainStatsProps, TileProps } from "@phoenix-protocol/types";
 
 const Tile = ({ title, value, link, isMobile }: TileProps) => {
   const openInNewTab = () => {
@@ -47,10 +41,6 @@ const Tile = ({ title, value, link, isMobile }: TileProps) => {
     </Box>
   );
 };
-
-interface MainStatsProps {
-  stats: TileProps[];
-}
 
 const MainStats = ({ stats }: MainStatsProps) => {
   const theme = useTheme();

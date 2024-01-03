@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "test": "yarn workspace @phoenix-protocol/utils run test --passWithNoTests",
-    "build": "yarn workspace @phoenix-protocol/utils run build && yarn workspace @phoenix-protocol/contracts run build && yarn workspace @phoenix-protocol/state run build && yarn workspace @phoenix-protocol/ui run build && yarn workspace @phoenix-protocol/core run build",
+    "build": "yarn workspace @phoenix-protocol/types run build && yarn workspace @phoenix-protocol/utils run build && yarn workspace @phoenix-protocol/contracts run build && yarn workspace @phoenix-protocol/state run build && yarn workspace @phoenix-protocol/ui run build && yarn workspace @phoenix-protocol/core run build",
     "storybook": "yarn workspace @phoenix-protocol/ui storybook"
   },
   "repository": {
@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Phoenix-Protocol-Group/phoenix-frontend",
   "workspaces": [
+    "packages/types",
     "packages/utils",
     "packages/contracts",
     "packages/state",

@@ -1,30 +1,14 @@
 import React from "react";
-import { Box, Typography, Modal as MuiModal, Grid, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Modal as MuiModal,
+  Grid,
+  CircularProgress,
+} from "@mui/material";
 import Colors from "../Theme/colors";
 import { Button } from "../Button/Button";
-
-export interface Token {
-  name: string;
-  icon: string;
-  usdValue: number;
-  amount: number;
-  category: string;
-}
-
-type Type = "SUCCESS" | "WARNING" | "ERROR" | "LOADING";
-
-interface ModalProps {
-  type: Type;
-  title: string;
-  description?: string;
-  tokens?: Token[];
-  tokenAmounts?: number[];
-  tokenTitles?: string[];
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  onButtonClick?: () => void;
-  error?: string;
-}
+import { ModalProps } from "@phoenix-protocol/types";
 
 const Modal = ({
   type,
@@ -122,7 +106,7 @@ const Modal = ({
             }}
           >
             {type == "LOADING" ? (
-               <Box
+              <Box
                 sx={{
                   h: "98px",
                   w: "98px",
@@ -130,10 +114,10 @@ const Modal = ({
                   marginBottom: "12px",
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
-              <CircularProgress />
+                <CircularProgress />
               </Box>
             ) : (
               <Box
@@ -145,7 +129,7 @@ const Modal = ({
                   marginBottom: "12px",
                 }}
                 src={getAsset()}
-            />
+              />
             )}
             <Typography
               sx={{
@@ -236,7 +220,7 @@ const Modal = ({
                 onClick={onButtonClick}
                 sx={{
                   width: "100%",
-                  display: type == "LOADING" ? "none" : "block"
+                  display: type == "LOADING" ? "none" : "block",
                 }}
                 label={
                   error ? "Copy error to clipboard" : "Transaction Details"

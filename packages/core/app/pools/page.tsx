@@ -5,11 +5,12 @@ import {
   PhoenixPairContract,
 } from "@phoenix-protocol/contracts";
 import { useAppStore } from "@phoenix-protocol/state";
-import { Pool, Pools, Skeleton } from "@phoenix-protocol/ui";
+import { Pools, Skeleton } from "@phoenix-protocol/ui";
 import { constants } from "@phoenix-protocol/utils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Address } from "stellar-sdk";
+import { Pool } from "@phoenix-protocol/types";
 
 export default function Page() {
   const store = useAppStore(); // Global state management

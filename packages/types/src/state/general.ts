@@ -1,6 +1,6 @@
 import { Horizon } from "stellar-sdk";
-import { WalletActions } from "./wallet/types";
-import { PersistWalletActions } from "./persist/types";
+import { WalletActions } from "./wallet";
+import { PersistWalletActions } from "./persist";
 
 interface GeneralStore {
   server: Horizon.Server;

@@ -1,5 +1,10 @@
-import { WalletActions, Token } from "./types";
-import { AppStore, SetStateType, GetStateType } from "../types";
+import {
+  WalletActions,
+  StateToken as Token,
+  AppStore,
+  SetStateType,
+  GetStateType,
+} from "@phoenix-protocol/types";
 import {
   PhoenixFactoryContract,
   SorobanTokenContract,
@@ -46,8 +51,8 @@ export const createWalletActions = (
       await Promise.all(allAssets);
 
       const _tokens = getState()
-        .tokens.filter((token) => token?.symbol !== "POOL")
-        .map((token) => {
+        .tokens.filter((token: Token) => token?.symbol !== "POOL")
+        .map((token: Token) => {
           return {
             name: token?.symbol === "native" ? "XLM" : token?.symbol,
             icon: `/cryptoIcons/${

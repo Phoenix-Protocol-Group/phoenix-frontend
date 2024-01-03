@@ -1,20 +1,7 @@
 import React from "react";
-import {
-  Button as MuiButton,
-  ButtonProps as MuiButtonProps,
-} from "@mui/material";
+import { Button as MuiButton } from "@mui/material";
 import Colors from "../Theme/colors";
-import { Modify } from "../helpers";
-
-interface ButtonProps
-  extends Modify<
-    MuiButtonProps,
-    {
-      type?: "primary" | "secondary";
-      size?: "medium" | "small";
-      label: string;
-    }
-  > {}
+import { ButtonProps } from "@phoenix-protocol/types";
 
 const Button = ({
   type = "primary",

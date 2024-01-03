@@ -4,7 +4,7 @@ import {
   SetStateType,
   GetStateType,
   AppStorePersist,
-} from "../types";
+} from "@phoenix-protocol/types";
 import { freighter } from "../wallet/freighter";
 import { allChains, networkToActiveChain } from "../wallet/chains";
 import { usePersistStore } from "../store";

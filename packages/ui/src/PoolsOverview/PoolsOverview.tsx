@@ -1,6 +1,6 @@
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import { Pool, Pools } from "../Pools/Pools";
-import { Token } from "../Modal/Modal";
+import { Pools } from "../Pools/Pools";
+import { Token, Pool } from "@phoenix-protocol/types";
 import MailIcon from "@mui/icons-material/Mail";
 import React from "react";
 import { SidebarNavigation } from "../SidebarNavigation/SidebarNavigation";

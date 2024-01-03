@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { createWalletActions } from "./wallet/actions";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { Horizon } from "stellar-sdk";
-import { AppStore, AppStorePersist } from "./types";
+import { AppStore, AppStorePersist } from "@phoenix-protocol/types";
 import { createConnectWalletActions } from "./persist/createConnectWalletActions";
 
 export const useAppStore = create<AppStore>()((set, get) => {

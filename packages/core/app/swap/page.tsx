@@ -10,14 +10,13 @@ import {
   Skeleton,
   SlippageSettings,
   SwapContainer,
-  Token,
 } from "@phoenix-protocol/ui";
+import { Token } from "@phoenix-protocol/types";
 import { PhoenixMultihopContract } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { constants, findBestPath } from "@phoenix-protocol/utils";
 import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Alert, Box } from "@mui/material";
-import { Address } from "stellar-sdk";
 
 export default function SwapPage() {
   // State variables declaration and initialization
