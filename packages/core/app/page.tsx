@@ -1,6 +1,7 @@
 "use client";
 import { Alert, Grid, useMediaQuery, useTheme } from "@mui/material";
 import { useAppStore } from "@phoenix-protocol/state";
+import { Helmet } from "react-helmet";
 import {
   CryptoCTA,
   DashboardPriceCharts,
@@ -96,6 +97,9 @@ export default function Page() {
 
   return (
     <>
+      <Helmet>
+        <title>Phoenix DeFi Hub - Dashboard</title>
+      </Helmet>
       <Grid
         sx={{
           transition: "all 0.2s ease-in-out",

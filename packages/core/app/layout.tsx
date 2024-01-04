@@ -144,8 +144,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     backgroundSize: "50% 100%",
   };
 
+  // Hacky way to avoid overflows
+  const css = `
+    body {
+      overflow-x: hidden!important;
+    }
+  `;
+
   return (
     <html lang="en">
+      <style>{css}</style>
       {/* Wrap components with Providers for context availability */}
       <Providers>
         <body>
