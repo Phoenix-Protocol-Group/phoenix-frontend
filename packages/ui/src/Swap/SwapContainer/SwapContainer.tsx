@@ -41,6 +41,7 @@ const SwapAssetsButton = ({ onClick }: { onClick: () => void }) => {
   return (
     <Button
       onClick={onClick}
+      className="swap-assets-button"
       sx={{
         padding: "4px",
         borderRadius: "8px",
@@ -104,6 +105,7 @@ const SwapContainer = ({
         <Box>
           <IconButton
             onClick={onOptionsClick}
+            className="slippage-button"
             sx={{
               borderRadius: "8px",
               background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
@@ -114,29 +116,32 @@ const SwapContainer = ({
           </IconButton>
         </Box>
       </Box>
-      <TokenBox
-        value={fromTokenValue}
-        token={fromToken}
-        onAssetClick={() => onTokenSelectorClick(true)}
-        onChange={(value) => onInputChange(true, value)}
-      />
-      <Box
-        sx={{
-          height: "8px",
-          width: "100%",
-          position: "relative",
-        }}
-      >
-        <SwapAssetsButton onClick={onSwapTokensClick} />
-      </Box>
-      <TokenBox
-        value={toTokenValue}
-        token={toToken}
-        onAssetClick={() => onTokenSelectorClick(false)}
-        onChange={(value) => onInputChange(false, value)}
-        disabled={true}
-        loadingValues={loadingSimulate}
-      />
+      <div className="token-box">
+        <TokenBox
+          value={fromTokenValue}
+          token={fromToken}
+          onAssetClick={() => onTokenSelectorClick(true)}
+          onChange={(value) => onInputChange(true, value)}
+        />
+        <Box
+          sx={{
+            height: "8px",
+            width: "100%",
+            position: "relative",
+          }}
+        >
+          <SwapAssetsButton onClick={onSwapTokensClick} />
+        </Box>
+
+        <TokenBox
+          value={toTokenValue}
+          token={toToken}
+          onAssetClick={() => onTokenSelectorClick(false)}
+          onChange={(value) => onInputChange(false, value)}
+          disabled={true}
+          loadingValues={loadingSimulate}
+        />
+      </div>
       <CustomButton
         onClick={onSwapButtonClick}
         disabled={swapButtonDisabled}

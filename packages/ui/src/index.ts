@@ -9,7 +9,7 @@ export * from "./Pools/Pools";
 export * from "./PoolSingle";
 export * from "./SidebarNavigation/SidebarNavigation";
 export * from "./Theme";
-
+export * from "./TourModal/TourModal";
 export * from "./Dashboard";
 export * from "./Swap";
 export * as Skeleton from "./Skeletons";

@@ -157,6 +157,7 @@ const SidebarNavigation = ({
           <ListItem
             key={item.label}
             disablePadding
+            className={item.label}
             sx={{
               margin: "0 16px",
               width: "unset",

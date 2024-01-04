@@ -1,13 +1,15 @@
+import { Server } from "soroban-client";
+import { PersistWalletActions } from "./persist";
+import { LayoutActions } from "./layout";
 import { Horizon } from "stellar-sdk";
 import { WalletActions } from "./wallet";
-import { PersistWalletActions } from "./persist";
 
 interface GeneralStore {
   server: Horizon.Server;
   networkPassphrase: string;
 }
 
-export type AppStore = WalletActions & GeneralStore;
+export type AppStore = WalletActions & LayoutActions & GeneralStore;
 
 export type AppStorePersist = PersistWalletActions;
 

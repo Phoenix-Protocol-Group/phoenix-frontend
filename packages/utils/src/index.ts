@@ -3,6 +3,8 @@ export * from "./assembled-tx";
 export * as server from "./server";
 export * as account from "./account";
 export * as time from "./time";
+export * as methodOptions from "./method-options";
+export * as joyride from "./joyride";
 export * from "./method-options";
 export { findBestPath } from "./demoFindPaths";
 export * from "./convert";

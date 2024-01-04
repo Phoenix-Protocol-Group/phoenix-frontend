@@ -17,6 +17,8 @@ import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { constants, findBestPath } from "@phoenix-protocol/utils";
 import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Alert, Box } from "@mui/material";
+import { init } from "next/dist/compiled/@vercel/og/satori";
+import { Helmet } from "react-helmet";
 
 export default function SwapPage() {
   // State variables declaration and initialization
@@ -153,6 +155,20 @@ export default function SwapPage() {
     setIsFrom(isFromToken);
   };
 
+  // Method for handling user tour events
+  const initUserTour = () => {
+    // Check if the user has already skipped the tour
+    if (storePersist.userTour.skipped && !storePersist.userTour.active) {
+      return;
+    }
+
+    // If the user has started the tour, we need to resume it from the last step
+    if (storePersist.userTour.active) {
+      appStore.setTourRunning(true);
+      appStore.setTourStep(3);
+    }
+  };
+
   // Effect hook to fetch all tokens once the component mounts
   useEffect(() => {
     const getAllTokens = async () => {
@@ -167,6 +183,17 @@ export default function SwapPage() {
     getAllTokens();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storePersist.wallet.address]);
+
+  // Effect hook to initialize the user tour delayed to avoid hydration issues
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        initUserTour();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading]);
 
   // Effect hook to simualte swaps on token change
   useEffect(() => {
@@ -216,6 +243,9 @@ export default function SwapPage() {
   ) : (
     // JSX for UI when data is loaded
     <Box sx={{ width: "100%", maxWidth: "600px" }}>
+      <Helmet>
+        <title>Phoenix DeFi Hub - Swap your tokens</title>
+      </Helmet>
       {/* Success Modal */}
       {fromToken && toToken && (
         <SwapSuccess

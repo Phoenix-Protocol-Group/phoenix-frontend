@@ -92,7 +92,10 @@ const LabTabs = ({
   };
 
   return (
-    <Box sx={{ width: "100%", typography: "body1", mt: 2, p: "1.4rem" }}>
+    <Box
+      className="liquidity"
+      sx={{ width: "100%", typography: "body1", mt: 2, p: "1.4rem" }}
+    >
       <TabContext value={value}>
         <Box sx={{ display: "flex" }}>
           <MuiButton

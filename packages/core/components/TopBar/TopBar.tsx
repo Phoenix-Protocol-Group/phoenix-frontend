@@ -18,7 +18,6 @@ const TopBar = ({
 }) => {
   const store = useAppStore();
   const storePersist = usePersistStore();
-  const [connectWalletOpen, setConnectWalletOpen] = useState(false);
 
   const connect = async (connector: any) => {
     await storePersist.connectWallet();
@@ -51,6 +50,16 @@ const TopBar = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storePersist.wallet.address]);
 
+  useEffect(() => {
+    if (!store.walletModalOpen) return;
+    // Delay the tour start to allow the modal to open
+    setTimeout(() => {
+      store.setTourStep(1);
+      store.setTourRunning(true);
+    }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.walletModalOpen]);
+
   return (
     <NoSsr>
       <AppBar
@@ -58,14 +67,14 @@ const TopBar = ({
         toggleMobileNav={(open) => setNavOpen(open)}
         balance={tokenBalance}
         walletAddress={storePersist.wallet.address}
-        connectWallet={() => setConnectWalletOpen(true)}
+        connectWallet={() => store.setWalletModalOpen(true)}
         disconnectWallet={disconnectWallet}
       />
       <ConnectWallet
-        open={connectWalletOpen}
+        open={store.walletModalOpen}
         // @ts-ignore
         connectors={[freighter()]}
-        setOpen={() => setConnectWalletOpen(!connectWalletOpen)}
+        setOpen={() => store.setWalletModalOpen(!store.walletModalOpen)}
         connect={connect}
       />
     </NoSsr>

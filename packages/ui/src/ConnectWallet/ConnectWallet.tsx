@@ -134,11 +134,16 @@ const ConnectWallet = ({
               Start by connecting with one of the wallets below.
             </Typography>
             {connectors.map((connector) => (
-              <OptionComponent
-                connector={connector}
-                selected={selected === connector}
-                onClick={() => setSelected(connector)}
-              />
+              <div
+                style={{ width: "100%" }}
+                className={connector.id + "-element"}
+              >
+                <OptionComponent
+                  connector={connector}
+                  selected={selected === connector}
+                  onClick={() => setSelected(connector)}
+                />
+              </div>
             ))}
             <PhoenixButton
               disabled={!selected}
