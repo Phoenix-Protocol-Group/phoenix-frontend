@@ -7,9 +7,10 @@ import TopBar from "@/components/TopBar/TopBar";
 import SideNav from "@/components/SideNav/SideNav";
 import { usePathname, useRouter } from "next/navigation";
 import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
-import { useAppStore } from "@phoenix-protocol/state";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import JoyRideTooltip from "@/components/JoyRideTooltip";
 import { joyride } from "@phoenix-protocol/utils";
+import { TourModal } from "@phoenix-protocol/ui";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   // Use theme for responsive design
@@ -22,8 +23,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   // Get AppStore
   const appStore = useAppStore();
+  // Get PersistStore
+  const persistStore = usePersistStore();
   // State to manage tour initialization
   const [initialized, setInitialized] = useState(false);
+  // State to handle tour modal open/close
+  const [tourModalOpen, setTourModalOpen] = useState(false);
   // Router
   const router = useRouter();
 
@@ -50,11 +55,34 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       router.push("/swap");
     }
 
+    // Navigate to pools page on eight step
+    if (action === ACTIONS.NEXT && index === 7) {
+      appStore.setTourStep(7);
+      // Navigate to pools page
+      router.push("/pools");
+    }
+
+    // Navigate to pool single page on ninth step
+    if (action === ACTIONS.NEXT && index === 8) {
+      appStore.setTourStep(8);
+      // Navigate to pool single page
+      router.push(
+        "/pools/CBT4WEAHQ72AYRD7WZFNYE6HGZEIX25754NG37LBLXTTRMWKQNKIUR6O"
+      );
+    }
+
+    // End the tour after the last step
+    if (action === ACTIONS.NEXT && index === 11) {
+      appStore.setTourStep(10);
+      appStore.setTourRunning(false);
+      persistStore.setUserTourActive(false);
+      persistStore.skipUserTour();
+    }
+
     if ([EVENTS.STEP_AFTER].includes(type)) {
       // Update state to advance the tour
       appStore.setTourStep(index + (action === ACTIONS.PREV ? -1 : 1));
     } else if (action === ACTIONS.NEXT && type === EVENTS.TARGET_NOT_FOUND) {
-      console.log(111);
       // If target not found, stop!
       appStore.setTourRunning(false);
     } else if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
@@ -69,12 +97,42 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   }, [largerThenMd]);
 
   // Use effect hook to delay the joyride until the page has loaded and avoid hydration issues
+  // Also we check the local storage to see if the user has already completed the tour
+  // Or if the user already skipped the tour
   useEffect(() => {
+    console.log(persistStore.userTour);
+    // If the user has already skipped the tour or completed it, we don't need to show it again
+    if (persistStore.userTour.skipped && !persistStore.userTour.active) {
+      setInitialized(true);
+      appStore.setTourRunning(false);
+      return;
+    }
+
+    // If the user has started the tour, we need to resume it from the last step
+    if (persistStore.userTour.active) {
+      console.log(2);
+      appStore.setTourRunning(true);
+      appStore.setTourStep(persistStore.userTour.step);
+    }
+
+    // If the user never started or skipped the tour, we need to start it from the beginning
+    // This means, from the modal, which then starts the tour
+    // Also we got to redirect the user to the home page
+    if (
+      !persistStore.userTour.active &&
+      !persistStore.userTour.skipped &&
+      persistStore.userTour.step === 0
+    ) {
+      setTourModalOpen(true);
+      router.push("/");
+    }
+
+    // Delay the tour to avoid hydration issues
     const timer = setTimeout(() => {
       setInitialized(true);
-      appStore.setTourRunning(true);
     }, 1000);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Style object for swap page background image
@@ -98,23 +156,40 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
           {/* Joyride Tour */}
           {initialized && (
-            <Joyride
-              // @ts-ignore
-              steps={joyride.steps}
-              continuous={true}
-              tooltipComponent={JoyRideTooltip}
-              spotlightClicks={true}
-              run={appStore.tourRunning}
-              stepIndex={appStore.tourStep}
-              callback={handleJoyrideCallback}
-              disableScrolling={true}
-              styles={{
-                options: {
-                  arrowColor: "#1F2123",
-                  zIndex: 1400,
-                },
-              }}
-            />
+            <>
+              <TourModal
+                open={tourModalOpen}
+                setOpen={(state) => {
+                  setTourModalOpen(state);
+                  appStore.setTourRunning(false);
+                  persistStore.skipUserTour();
+                }}
+                onClick={() => {
+                  setTourModalOpen(false);
+                  appStore.setTourRunning(true);
+                  persistStore.setUserTourActive(true);
+                  persistStore.setUserTourStep(0);
+                }}
+              />
+              <Joyride
+                // @ts-ignore
+                steps={joyride.steps}
+                continuous={true}
+                tooltipComponent={JoyRideTooltip}
+                run={appStore.tourRunning}
+                stepIndex={appStore.tourStep}
+                callback={handleJoyrideCallback}
+                disableScrolling={true}
+                disableOverlayClose={true}
+                keyboardNavigation={false}
+                styles={{
+                  options: {
+                    arrowColor: "#1F2123",
+                    zIndex: 1400,
+                  },
+                }}
+              />
+            </>
           )}
 
           {/* Main Content Area */}

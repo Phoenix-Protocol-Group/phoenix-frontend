@@ -1,5 +1,6 @@
 "use client";
 import { Box, Typography } from "@mui/material";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Button } from "@phoenix-protocol/ui";
 import React, { useEffect, useState } from "react";
 import { TooltipRenderProps } from "react-joyride";
@@ -39,6 +40,15 @@ const JoyRideTooltip = ({
     lineHeight: "1.5rem",
   };
 
+  const appStorePersist = usePersistStore();
+  const appStore = useAppStore();
+
+  const onSkipTour = () => {
+    appStorePersist.skipUserTour();
+    appStorePersist.setUserTourActive(false);
+    appStore.setTourRunning(false);
+  };
+
   return (
     <Box {...tooltipProps} sx={containerStyle}>
       <Box
@@ -56,6 +66,7 @@ const JoyRideTooltip = ({
           STEP {index + 1} OF 10
         </Typography>
         <Typography
+          onClick={onSkipTour}
           sx={{
             color: "white",
             fontFamily: "Ubuntu",
@@ -75,9 +86,12 @@ const JoyRideTooltip = ({
       <Box
         sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}
       >
-        {index > 0 && <Button type="secondary" {...backProps} label={"Back"} />}
-        {continuous && <Button {...primaryProps} label={"Next"} />}
-        {!continuous && <Button {...closeProps} label={"Close"} />}
+        {continuous && (
+          <Button
+            {...primaryProps}
+            label={index == 9 ? "Finish Tour" : "Next"}
+          />
+        )}
       </Box>
     </Box>
   );

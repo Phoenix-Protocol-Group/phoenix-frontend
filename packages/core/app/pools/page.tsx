@@ -4,7 +4,7 @@ import {
   PhoenixFactoryContract,
   PhoenixPairContract,
 } from "@phoenix-protocol/contracts";
-import { useAppStore } from "@phoenix-protocol/state";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Pools, Skeleton } from "@phoenix-protocol/ui";
 import { constants } from "@phoenix-protocol/utils";
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ export default function Page() {
   const router = useRouter(); // Next.js router
   const [loading, setLoading] = useState(true); // Loading state for async operations
   const [allPools, setAllPools] = useState<Pool[]>([]); // State to hold pool data
+  const storePersist = usePersistStore(); // Persisted state
 
   // Fetch pool information by its address
   const fetchPool = async (poolAddress: string) => {
@@ -98,10 +99,25 @@ export default function Page() {
       (el: any) =>
         el !== undefined ||
         el?.tokens.length >= 2 ||
-        el.poolAddress !== "CBXBKAB6QIRUGTG77OQZHC46BIIPA5WDKIKZKPA2H7Q7CPKQ555W3EVB" // TODO TESTNET DEBUG
+        el.poolAddress !==
+          "CBXBKAB6QIRUGTG77OQZHC46BIIPA5WDKIKZKPA2H7Q7CPKQ555W3EVB" // TODO TESTNET DEBUG
     );
     console.log(poolsFiltered);
     setAllPools(poolsFiltered as Pool[]);
+  };
+
+  // Method for handling user tour events
+  const initUserTour = () => {
+    // Check if the user has already skipped the tour
+    if (storePersist.userTour.skipped && !storePersist.userTour.active) {
+      return;
+    }
+
+    // If the user has started the tour, we need to resume it from the last step
+    if (storePersist.userTour.active) {
+      store.setTourRunning(true);
+      store.setTourStep(7);
+    }
   };
 
   // On component mount, fetch pools and update loading state
@@ -110,6 +126,16 @@ export default function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Effect hook to initialize the user tour delayed to avoid hydration issues
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        initUserTour();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
   // Render: conditionally display skeleton loader or pool data
   return loading ? (
     <Skeleton.Pools />

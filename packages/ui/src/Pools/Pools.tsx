@@ -85,7 +85,7 @@ const PoolItem = ({
   onShowDetailsClick: (pool: Pool) => void;
 }) => {
   return (
-    <Grid item xs={6} md={3}>
+    <Grid item xs={6} md={3} className="pool-card">
       <Box
         sx={{
           padding: "16px",
@@ -317,8 +317,9 @@ const Pools = ({
         </Grid>
       </Grid>
       <Grid container spacing={2}>
-        {pools.map((pool) => (
+        {pools.map((pool, index) => (
           <PoolItem
+            key={index}
             filter={filter}
             onAddLiquidityClick={() => onAddLiquidityClick(pool)}
             onShowDetailsClick={onShowDetailsClick}
