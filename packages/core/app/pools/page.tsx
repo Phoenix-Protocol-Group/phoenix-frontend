@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Address } from "stellar-sdk";
 import { Pool } from "@phoenix-protocol/types";
+import { Helmet } from "react-helmet";
 
 export default function Page() {
   const store = useAppStore(); // Global state management
@@ -138,18 +139,28 @@ export default function Page() {
   }, [loading]);
   // Render: conditionally display skeleton loader or pool data
   return loading ? (
-    <Skeleton.Pools />
+    <>
+      <Helmet>
+        <title>Phoenix DeFi Hub - Pools Overview</title>
+      </Helmet>
+      <Skeleton.Pools />
+    </>
   ) : (
-    <Pools
-      pools={allPools}
-      filter="ALL"
-      sort="HighAPR"
-      onAddLiquidityClick={() => {}}
-      onShowDetailsClick={(pool) => {
-        router.push(`/pools/${pool.poolAddress}`);
-      }}
-      onFilterClick={() => {}}
-      onSortSelect={() => {}}
-    />
+    <>
+      <Helmet>
+        <title>Phoenix DeFi Hub - Pools Overview</title>
+      </Helmet>
+      <Pools
+        pools={allPools}
+        filter="ALL"
+        sort="HighAPR"
+        onAddLiquidityClick={() => {}}
+        onShowDetailsClick={(pool) => {
+          router.push(`/pools/${pool.poolAddress}`);
+        }}
+        onFilterClick={() => {}}
+        onSortSelect={() => {}}
+      />
+    </>
   );
 }

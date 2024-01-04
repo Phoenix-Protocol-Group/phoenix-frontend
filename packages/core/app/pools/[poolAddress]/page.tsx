@@ -37,6 +37,7 @@ import {
 import { useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import Link from "next/link";
+import { Helmet } from "react-helmet";
 
 interface Entry {
   icon: string;
@@ -380,6 +381,11 @@ export default function Page({ params }: PoolPageProps) {
   }
   return (
     <Box>
+      <Helmet>
+        <title>
+          Phoenix DeFi Hub - {tokenA?.name} / {tokenB?.name}
+        </title>
+      </Helmet>
       {overviewStyles}
       {loading && <Loading open={loading} setOpen={setLoading} />}
       {sucessModalOpen && (

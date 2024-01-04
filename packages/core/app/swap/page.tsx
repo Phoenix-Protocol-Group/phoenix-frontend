@@ -18,6 +18,7 @@ import { constants, findBestPath } from "@phoenix-protocol/utils";
 import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Alert, Box } from "@mui/material";
 import { init } from "next/dist/compiled/@vercel/og/satori";
+import { Helmet } from "react-helmet";
 
 export default function SwapPage() {
   // State variables declaration and initialization
@@ -242,6 +243,9 @@ export default function SwapPage() {
   ) : (
     // JSX for UI when data is loaded
     <Box sx={{ width: "100%", maxWidth: "600px" }}>
+      <Helmet>
+        <title>Phoenix DeFi Hub - Swap your tokens</title>
+      </Helmet>
       {/* Success Modal */}
       {fromToken && toToken && (
         <SwapSuccess
