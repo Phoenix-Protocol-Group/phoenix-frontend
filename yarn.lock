@@ -3546,6 +3546,7 @@ __metadata:
     react-joyride: ^2.7.2
     soroban-client: ^1.0.0
     stellar-sdk: ^11.1.0
+    toml: ^3.0.0
     ts-jest: ^29.1.0
     typescript: ^5.1.3
   languageName: unknown

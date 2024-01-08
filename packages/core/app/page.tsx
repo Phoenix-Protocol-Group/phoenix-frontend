@@ -10,6 +10,7 @@ import {
   WalletBalanceTable,
 } from "@phoenix-protocol/ui";
 import Link from "next/link";
+import Sep24Test from "@/components/Sep24Test";
 const stellarGainerAsset = {
   name: "Stellar",
   symbol: "XLM",
@@ -100,6 +101,7 @@ export default function Page() {
       <Helmet>
         <title>Phoenix DeFi Hub - Dashboard</title>
       </Helmet>
+      <Sep24Test />
       <Grid
         sx={{
           transition: "all 0.2s ease-in-out",
