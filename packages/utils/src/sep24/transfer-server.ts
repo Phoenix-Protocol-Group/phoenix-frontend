@@ -118,8 +118,6 @@ export function resolveAssets(
     throw Error(`No CURRENCIES found in stellar.toml of domain ${domain}.`);
   }
 
-  console.log(stellarTomlData.CURRENCIES);
-
   return stellarTomlData.CURRENCIES.filter((currency) => currency.code).map(
     (currency) =>
       new Asset(

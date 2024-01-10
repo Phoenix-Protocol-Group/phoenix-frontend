@@ -248,8 +248,6 @@ const ListItem = ({
 
   useEffect(() => {
     localStorage.setItem("items", JSON.stringify(favorites));
-    console.log(localStorage.getItem("items"));
-    console.log(favorites);
   }, [favorites]);
 
   useEffect(() => {

@@ -127,9 +127,7 @@ export interface TransferServerInfo {
 export async function fetchTransferInfos(
   transferServer: TransferServer
 ): Promise<TransferServerInfo> {
-  console.log("Hallo!");
   const response = await transferServer.get<TransferInfoResponse>("/info");
-  console.log(1);
   const assetCodes = dedupe([
     ...Object.keys(response.data.deposit),
     ...Object.keys(response.data.withdraw),
@@ -137,7 +135,6 @@ export async function fetchTransferInfos(
     // TEMPO work-around…
     (assetCode) => assetCode !== "transactions"
   );
-  console.log(2);
   const assetInfos = assetCodes
     // Filter out assets that the transfer server lists, but are not in
     // the stellar.toml. Prevent crashes on partially inconsistent data.
@@ -153,7 +150,6 @@ export async function fetchTransferInfos(
       transferServer,
       withdraw: response.data.withdraw[assetCode],
     }));
-  console.log(3);
   return {
     assets: assetInfos,
     depositableAssets: assetInfos

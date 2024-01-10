@@ -9,4 +9,4 @@ export * from "./method-options";
 export { findBestPath } from "./demoFindPaths";
 export * from "./convert";
 export * as Sep24 from "./sep24";
-export * as Sep10 from "./sep10";
+export * from "./sep10";

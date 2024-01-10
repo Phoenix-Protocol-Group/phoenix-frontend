@@ -122,7 +122,6 @@ export default function SwapPage() {
         ]);
       }
 
-      console.log(tx);
     } catch (e) {
       console.log(e);
     }

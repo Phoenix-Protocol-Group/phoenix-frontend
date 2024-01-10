@@ -1,8 +1,13 @@
 import { usePersistStore } from "@phoenix-protocol/state";
-import { Sep24, Sep10 } from "@phoenix-protocol/utils";
+import {
+  Sep24,
+  sep10AuthStart,
+  sep10AuthSign,
+  sep10AuthSend,
+} from "@phoenix-protocol/utils";
+import { NETWORK_PASSPHRASE } from "@phoenix-protocol/utils/build/constants";
 
 const { openTransferServer, fetchTransferInfos, Deposit } = Sep24;
-const { authenticate } = Sep10;
 
 import { useEffect } from "react";
 import { Networks } from "stellar-sdk";
@@ -23,25 +28,27 @@ const Sep24Test = () => {
 
     console.log("Test:", depositableAssets, withdrawableAssets);
 
-    const deposit = Deposit(
-      transferServer,
-      depositableAssets[1],
-      "GAFNG7UOA2FDD745PVHFYHSZEIMJ6NYY2BY7ONJ74MRZGHSU2NEHBZ74"
-    );
-
-    console.log("After deposit");
-    const wallet = (await import("@stellar/freighter-api")).default;
     // Get sep10
-    const jwt = await authenticate(
-      transferServer.auth,
-      transferServer.signingKey,
-      storePersist.wallet.address!,
-      Networks.TESTNET,
-      wallet
-    );
+    // SEP-10 start
+    const challengeTransaction = await sep10AuthStart({
+      authEndpoint: transferServer.auth,
+      serverSigningKey: transferServer.signingKey,
+      publicKey: storePersist.wallet.address!,
+      homeDomain: transferServer.domain,
+      clientDomain: "https://app.phoenix-hub.io",
+      memoId: undefined,
+    });
 
-    const instructions = await deposit.interactive(jwt);
-    console.log(instructions);
+    const signedChallengeTransaction = await sep10AuthSign({
+      networkPassphrase: NETWORK_PASSPHRASE,
+      challengeTransaction,
+      wallet: (await import("@stellar/freighter-api")).default,
+    });
+
+    const token = await sep10AuthSend({
+      authEndpoint: transferServer.auth,
+      signedChallengeTransaction,
+    });
   };
 
   useEffect(() => {

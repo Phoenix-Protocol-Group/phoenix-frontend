@@ -100,7 +100,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   // Also we check the local storage to see if the user has already completed the tour
   // Or if the user already skipped the tour
   useEffect(() => {
-    console.log(persistStore.userTour);
+
     // If the user has already skipped the tour or completed it, we don't need to show it again
     if (persistStore.userTour.skipped && !persistStore.userTour.active) {
       setInitialized(true);
@@ -110,7 +110,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
     // If the user has started the tour, we need to resume it from the last step
     if (persistStore.userTour.active) {
-      console.log(2);
       appStore.setTourRunning(true);
       appStore.setTourStep(persistStore.userTour.step);
     }

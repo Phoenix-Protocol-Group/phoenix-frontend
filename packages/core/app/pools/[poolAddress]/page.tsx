@@ -156,7 +156,6 @@ export default function Page({ params }: PoolPageProps) {
         custom_slippage_bps: BigInt(1),
       });
       await tx.signAndSend();
-      console.log(tx);
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([tokenAAmount, tokenBAmount]);
