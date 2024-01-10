@@ -13,8 +13,7 @@ export const NETWORK_PASSPHRASE: string = "Test SDF Network ; September 2015";
 /**
  * The Soroban RPC endpoint used to initialize this library.
  */
-export const RPC_URL: string =
-  "https://clean-spring-log.stellar-testnet.quiknode.pro/6989aedb39f9eb5f05808feb99d9eecb6c26c8ce/";
+export const RPC_URL: string = "https://soroban-testnet.stellar.org";
 
 /**
  * Factory contract address
