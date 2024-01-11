@@ -52,6 +52,8 @@ const TopBar = ({
 
   useEffect(() => {
     if (!store.walletModalOpen) return;
+    if (!storePersist.userTour.active) return;
+    if (storePersist.userTour.skipped) return;
     // Delay the tour start to allow the modal to open
     setTimeout(() => {
       store.setTourStep(1);

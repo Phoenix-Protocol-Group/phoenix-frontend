@@ -28,6 +28,7 @@
     "bignumber.js": "^9.1.1",
     "react-joyride": "^2.7.2",
     "soroban-client": "^1.0.0",
-    "stellar-sdk": "^11.1.0"
+    "stellar-sdk": "^11.1.0",
+    "toml": "^3.0.0"
   }
 }

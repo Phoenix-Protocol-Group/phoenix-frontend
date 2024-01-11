@@ -81,6 +81,7 @@ const SlippageSettings = ({
           <RadioGroup defaultValue={selectedOption} onChange={onChange}>
             {options.map((option, index) => (
               <FormControlLabel
+                key={index}
                 value={index}
                 control={
                   <Radio

@@ -62,8 +62,8 @@ const MainStats = ({ stats }: MainStatsProps) => {
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <HelloMsg />
         <Box sx={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-          {stats.map((stat) => (
-            <Tile {...stat} />
+          {stats.map((stat, key) => (
+            <Tile key={key} {...stat} />
           ))}
         </Box>
       </Box>
@@ -74,8 +74,8 @@ const MainStats = ({ stats }: MainStatsProps) => {
         <Grid item xs={12}>
           <HelloMsg />
         </Grid>
-        {stats.map((stat) => (
-          <Grid item xs={6}>
+        {stats.map((stat, key) => (
+          <Grid key={key} item xs={6}>
             <Tile {...stat} isMobile={true} />
           </Grid>
         ))}

@@ -1,6 +1,6 @@
 "use client";
 import { Alert, Grid, useMediaQuery, useTheme } from "@mui/material";
-import { useAppStore } from "@phoenix-protocol/state";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Helmet } from "react-helmet";
 import {
   CryptoCTA,
@@ -8,8 +8,17 @@ import {
   DashboardStats,
   MainStats,
   WalletBalanceTable,
+  AnchorServices,
 } from "@phoenix-protocol/ui";
 import Link from "next/link";
+
+import { useEffect, useState } from "react";
+import {
+  DepositManager,
+  getAllAnchors,
+} from "@phoenix-protocol/utils/build/sep24";
+import { Anchor } from "@phoenix-protocol/types";
+
 const stellarGainerAsset = {
   name: "Stellar",
   symbol: "XLM",
@@ -93,13 +102,52 @@ const args = {
 export default function Page() {
   const theme = useTheme();
   const appStore = useAppStore();
+  const persistStore = usePersistStore();
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
+  const [anchorOpen, setAnchorOpen] = useState(false);
+  const [anchors, setAnchors] = useState<Anchor[]>([]);
+
+  const authenticate = async (anchor: Anchor) => {
+    const manager = new DepositManager(anchor, persistStore.wallet.address!);
+    const transferServer = await manager.openTransferServer();
+    return true;
+  };
+
+  const sign = async (anchor: Anchor) => {
+    const manager = new DepositManager(anchor, persistStore.wallet.address!);
+    const transferServer = await manager.openTransferServer();
+    const { depositableAssets: supportedAssets } =
+      await manager.fetchTransferInfos(transferServer);
+    const token = await manager.startSep10Auth(transferServer);
+    await manager.handleDeposit(transferServer, supportedAssets, token);
+    return true;
+  };
+
+  const initAnchor = async () => {
+    const allAnchors = await getAllAnchors();
+    setAnchors(allAnchors);
+  };
+
+  useEffect(() => {
+    initAnchor();
+  }, []);
 
   return (
     <>
       <Helmet>
         <title>Phoenix DeFi Hub - Dashboard</title>
       </Helmet>
+      {anchors.length > 0 && (
+        <AnchorServices
+          anchors={anchors}
+          open={anchorOpen}
+          authenticate={(anchor) => authenticate(anchor)}
+          // Wait 2 seconds
+          sign={() => new Promise((resolve) => setTimeout(resolve, 2000))}
+          send={(anchor) => sign(anchor)}
+          setOpen={(open) => setAnchorOpen(open)}
+        />
+      )}
       <Grid
         sx={{
           transition: "all 0.2s ease-in-out",
@@ -134,7 +182,7 @@ export default function Page() {
           <DashboardPriceCharts {...args.dashboardArgs} />
         </Grid>
         <Grid item xs={12} md={4} mt={!largerThenMd ? 2 : undefined}>
-          <CryptoCTA onClick={() => {}} />
+          <CryptoCTA onClick={() => setAnchorOpen(true)} />
         </Grid>
         <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
           <WalletBalanceTable {...args.walletBalanceArgs} />

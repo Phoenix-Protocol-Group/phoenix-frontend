@@ -44,6 +44,7 @@ const AssetSelector = ({
   tokensAll,
   onClose,
   onTokenClick,
+  hideQuickSelect,
 }: AssetSelectorProps) => {
   const [searchValue, setSearchValue] = React.useState("");
 
@@ -112,16 +113,18 @@ const AssetSelector = ({
           <img style={{ marginRight: "8px" }} src="/MagnifyingGlass.svg" />
         }
       />
-      <Box sx={containerStyle}>
-        <Typography sx={headerStyle}>Quick select</Typography>
-        <Grid container spacing={1}>
-          {tokens.map((token, index) => (
-            <Grid item xs={4} md={2}>
-              <AssetItem token={token} onClick={onTokenClick} />
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
+      {!hideQuickSelect && (
+        <Box sx={containerStyle}>
+          <Typography sx={headerStyle}>Quick select</Typography>
+          <Grid container spacing={1}>
+            {tokens.map((token, index) => (
+              <Grid key={index} item xs={4} md={2}>
+                <AssetItem token={token} onClick={onTokenClick} />
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      )}
       <Box sx={containerStyle}>
         <Typography sx={headerStyle}>All tokens</Typography>
         <Box

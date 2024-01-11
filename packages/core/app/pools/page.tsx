@@ -103,7 +103,6 @@ export default function Page() {
         el.poolAddress !==
           "CBXBKAB6QIRUGTG77OQZHC46BIIPA5WDKIKZKPA2H7Q7CPKQ555W3EVB" // TODO TESTNET DEBUG
     );
-    console.log(poolsFiltered);
     setAllPools(poolsFiltered as Pool[]);
   };
 

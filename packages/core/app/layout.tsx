@@ -100,7 +100,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   // Also we check the local storage to see if the user has already completed the tour
   // Or if the user already skipped the tour
   useEffect(() => {
-    console.log(persistStore.userTour);
     // If the user has already skipped the tour or completed it, we don't need to show it again
     if (persistStore.userTour.skipped && !persistStore.userTour.active) {
       setInitialized(true);
@@ -110,7 +109,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
     // If the user has started the tour, we need to resume it from the last step
     if (persistStore.userTour.active) {
-      console.log(2);
       appStore.setTourRunning(true);
       appStore.setTourStep(persistStore.userTour.step);
     }
@@ -153,7 +151,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
   return (
     <html lang="en">
-      <style>{css}</style>
       <head>
         <meta
           name="description"
@@ -188,11 +185,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
         {/* Additional tags for responsiveness and browser compatibility */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
       </head>
       {/* Wrap components with Providers for context availability */}
       <Providers>
-        <body>
+        <body suppressHydrationWarning={true}>
+          <style>{css}</style>
           {/* Side Navigation Component */}
           <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
 

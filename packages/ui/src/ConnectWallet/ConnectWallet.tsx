@@ -137,6 +137,7 @@ const ConnectWallet = ({
               <div
                 style={{ width: "100%" }}
                 className={connector.id + "-element"}
+                key={connector.id}
               >
                 <OptionComponent
                   connector={connector}

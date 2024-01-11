@@ -13,3 +13,4 @@ export * from "./TourModal/TourModal";
 export * from "./Dashboard";
 export * from "./Swap";
 export * as Skeleton from "./Skeletons";
+export * from "./AnchorServices/AnchorServices";
