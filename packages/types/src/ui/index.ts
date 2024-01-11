@@ -16,3 +16,4 @@ export * from "./StakingList";
 export * from "./SwapContainer";
 export * from "./TokenBox";
 export * from "./WalletBalanceTable";
+export * from "./AnchorServices";

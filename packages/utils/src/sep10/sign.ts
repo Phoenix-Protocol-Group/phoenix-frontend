@@ -1,4 +1,4 @@
-import { Keypair, Transaction } from "stellar-sdk";
+import { Transaction } from "stellar-sdk";
 import { Wallet } from "../method-options";
 
 export const sign = async ({
@@ -9,24 +9,34 @@ export const sign = async ({
   challengeTransaction: Transaction;
   networkPassphrase: string;
   wallet: Wallet;
-}) => {
-  for (const op of challengeTransaction.operations) {
-    if (op.type === "manageData" && op.name === "client_domain") {
-      // The anchor server supports client attribution, get a signature from the demo wallet backend server
+}): Promise<string> => {
+  // Serialize the transaction to a string
+  const transactionXDR = challengeTransaction.toXDR();
 
-      const signedTx = await wallet.signTransaction(
-        challengeTransaction.toEnvelope().toXDR("base64")
-      );
+  // Define the API endpoint URL
+  const apiURL = "/api/transaction";
 
-      challengeTransaction = new Transaction(signedTx, networkPassphrase);
+  // Create the request body
+  const body = JSON.stringify({
+    transaction: transactionXDR,
+  });
 
-      break;
-    }
+  // Make the POST request to the API
+  const response = await fetch(apiURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body,
+  });
+
+  // Handle the response
+  if (!response.ok) {
+    throw new Error(
+      `API call failed: ${response.status} ${response.statusText}`
+    );
   }
 
-  const envelope = challengeTransaction.toEnvelope().toXDR("base64");
-  const _transaction = new Transaction(envelope, networkPassphrase);
-  const transaction = wallet.signTransaction(_transaction.toXDR());
-
-  return transaction;
+  const responseData = await response.json();
+  return responseData.signedTransaction;
 };

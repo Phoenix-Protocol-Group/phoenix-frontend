@@ -45,8 +45,8 @@ const PoolStatsBox = ({ title, value }: PoolStatsBoxProps) => {
 const PoolStats = ({ stats }: PoolStatsProps) => {
   return (
     <Grid container spacing={2}>
-      {stats.map((stat) => (
-        <PoolStatsBox title={stat.title} value={stat.value} />
+      {stats.map((stat, key) => (
+        <PoolStatsBox key={key} title={stat.title} value={stat.value} />
       ))}
     </Grid>
   );

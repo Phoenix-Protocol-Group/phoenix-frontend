@@ -197,8 +197,11 @@ const ClaimRewards = ({
         </Typography>
 
         {rewards.length > 0 ? (
-          rewards.map((reward) => (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
+          rewards.map((reward, index) => (
+            <Box
+              key={index}
+              sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}
+            >
               <Box
                 component="img"
                 src={reward.icon}
