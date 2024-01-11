@@ -58,8 +58,7 @@ export class DepositManager {
         serverSigningKey: transferServer.signingKey,
         publicKey: this.walletAddress,
         homeDomain: transferServer.domain,
-        clientDomain:
-          "phoenix-frontend-core-9pwvyuc1w-phoenix-protocol.vercel.app",
+        clientDomain: "app.phoenix-hub.io",
       });
 
       const signedChallengeTransaction = await sep10AuthSign({
