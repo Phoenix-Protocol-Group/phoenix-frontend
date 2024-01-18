@@ -382,7 +382,7 @@ export default function Page({ params }: PoolPageProps) {
     <Box>
       <Helmet>
         <title>
-          Phoenix DeFi Hub - {tokenA?.name} / {tokenB?.name}
+         {`Phoenix DeFi Hub - ${tokenA?.name} / ${tokenB?.name}`}
         </title>
       </Helmet>
       {overviewStyles}
