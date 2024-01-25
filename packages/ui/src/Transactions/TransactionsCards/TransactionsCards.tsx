@@ -1,13 +1,6 @@
 import { Box, Grid, Typography } from "@mui/material";
-import { Token } from "@phoenix-protocol/types";
 import React from "react";
-import Palette from "../../Theme/palette";
-
-export interface TransactionsCardsProps {
-  activeTraders: string;
-  totalTraders: string;
-  mostTradedAsset: Token;
-}
+import { TransactionsCardsProps } from "@phoenix-protocol/types";
 
 const TransactionCard = ({
   title,

@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { TransactionsCards } from "./TransactionsCards";
-import { Grid } from "@mui/material";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof TransactionsCards> = {
