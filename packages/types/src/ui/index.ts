@@ -17,3 +17,5 @@ export * from "./SwapContainer";
 export * from "./TokenBox";
 export * from "./WalletBalanceTable";
 export * from "./AnchorServices";
+export * from "./TransactionsCards";
+export * from "./TransactionsTable";
