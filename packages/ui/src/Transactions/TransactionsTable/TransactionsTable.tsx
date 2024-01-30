@@ -1,4 +1,11 @@
-import { ArrowDownward, ArrowRightAlt, ExpandMore, ManageSearch, SwapVert, Tune } from "@mui/icons-material";
+import {
+  ArrowDownward,
+  ArrowRightAlt,
+  ExpandMore,
+  ManageSearch,
+  SwapVert,
+  Tune,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -59,10 +66,13 @@ const TransactionsEntry = (props: TransactionTableEntryProps) => {
                   color: "#FFF",
                   fontSize: "14px",
                   display: "flex",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
-                {asset.name} {index !== props.assets.length - 1 && <ArrowRightAlt sx={{fontSize: "24px"}} />}
+                {asset.name}{" "}
+                {index !== props.assets.length - 1 && (
+                  <ArrowRightAlt sx={{ fontSize: "24px" }} />
+                )}
               </Typography>
             ))}
           </Box>
@@ -101,7 +111,7 @@ const TransactionsEntry = (props: TransactionTableEntryProps) => {
         </Grid>
         <Grid item xs={1}>
           <IconButton>
-            <ManageSearch sx={{fontSize: "20px"}}/>
+            <ManageSearch sx={{ fontSize: "20px" }} />
           </IconButton>
         </Grid>
       </Grid>
@@ -142,6 +152,7 @@ const TransactionsTable = (props: TransactionsTableProps) => {
   return (
     <Box
       sx={{
+        mt: 2,
         p: 3,
         borderRadius: 3,
         background:
@@ -183,9 +194,9 @@ const TransactionsTable = (props: TransactionsTableProps) => {
             height: "38px",
           }}
         >
-          <Tune sx={{fontSize: "15px", mr: 0.5}} />
+          <Tune sx={{ fontSize: "15px", mr: 0.5 }} />
           Filter
-          <ExpandMore sx={{fontSize: "14px", ml: 0.5}} />
+          <ExpandMore sx={{ fontSize: "14px", ml: 0.5 }} />
         </Button>
       </Box>
       <Box sx={{ ...BoxStyle, mb: 2 }}>

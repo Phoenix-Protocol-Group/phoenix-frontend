@@ -63,7 +63,6 @@ export default function SwapPage() {
         recipient: storePersist.wallet.address!,
         operations: operations,
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
-        referral: undefined,
         max_spread_bps: BigInt((maxSpread + 1) * 100),
         max_belief_price: undefined,
       });
@@ -121,7 +120,6 @@ export default function SwapPage() {
           Number(tx.result.ask_amount) / 10 ** 7,
         ]);
       }
-
     } catch (e) {
       console.log(e);
     }
