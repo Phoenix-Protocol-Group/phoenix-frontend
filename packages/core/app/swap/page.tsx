@@ -12,7 +12,10 @@ import {
   SwapContainer,
 } from "@phoenix-protocol/ui";
 import { Token } from "@phoenix-protocol/types";
-import { PhoenixMultihopContract } from "@phoenix-protocol/contracts";
+import {
+  PhoenixFactoryContract,
+  PhoenixMultihopContract,
+} from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { constants, findBestPath } from "@phoenix-protocol/utils";
 import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
@@ -41,6 +44,9 @@ export default function SwapPage() {
   const [loadingSimulate, setLoadingSimulate] = useState<boolean>(false);
   const [exchangeRate, setExchangeRate] = useState<string>("");
   const [networkFee, setNetworkFee] = useState<string>("");
+
+  // All Pools
+  const [allPools, setAllPools] = useState<any[]>([]);
 
   // Using the store
   const storePersist = usePersistStore();
@@ -175,6 +181,24 @@ export default function SwapPage() {
       setFromToken(allTokens[0]);
       setToToken(allTokens[1]);
       setIsLoading(false);
+
+      // Get all pools
+      const factoryContract = new PhoenixFactoryContract.Contract({
+        contractId: constants.FACTORY_ADDRESS,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+
+      // Fetch all available tokens from chain
+      const { result } = await factoryContract.queryAllPoolsDetails();
+
+      const allPairs = result.map((pool: any) => {
+        return {
+          asset_a: pool.pool_response.asset_a.address,
+          asset_b: pool.pool_response.asset_b.address,
+        };
+      });
+      setAllPools(allPairs);
     };
 
     getAllTokens();
@@ -213,10 +237,11 @@ export default function SwapPage() {
       if (!fromTokenContractID || !toTokenContractID) {
         return;
       }
-
+      
       const { operations: ops } = findBestPath(
         toTokenContractID,
-        fromTokenContractID
+        fromTokenContractID,
+        allPools
       );
 
       const _operations = ops.reverse();
