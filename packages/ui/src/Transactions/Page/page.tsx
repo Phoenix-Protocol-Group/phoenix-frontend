@@ -53,23 +53,66 @@ const cardArgs = {
 const tableArgs = {
   entries: [
     {
-      type: "Sent",
+      type: "Success",
       assets: [asset, asset],
       tradeSize: "1000",
       tradeValue: "2000",
       date: "1.1.2024",
+      txHash: "0x1234567890",
     },
     {
-      type: "Received",
+      type: "Failed",
       assets: [asset, asset],
       tradeSize: "1000",
       tradeValue: "2000",
       date: "1.1.2024",
+      txHash: "0x1234567890",
     },
   ],
 };
 
+const mockActiveFilters = {
+  dateRange: {
+    from: null,
+    to: null,
+  },
+  tradeSize: {
+    from: 100,
+    to: 1000,
+  },
+  tradeValue: {
+    from: 5000,
+    to: 10000,
+  },
+};
+
+const mockApplyFilters: (newFilters) => void = (newFilters) => {
+  console.log("Applying filters with new values:", newFilters);
+};
+
+const mockProps = {
+  activeFilters: mockActiveFilters,
+  applyFilters: mockApplyFilters,
+};
+
 const HistoryPage = () => {
+  const [activeSort, setActiveSort] = React.useState<{
+    column:
+      | "date"
+      | "tradeSize"
+      | "tradeValue"
+      | "asset"
+      | "tradeType"
+      | "txHash"
+      | "actions";
+    direction: "asc" | "desc" | false;
+  }>({
+    column: "date",
+    direction: "asc",
+  });
+
+  const [selectedTab, setSelectedTab] = React.useState<"A" | "M" | "D">("A");
+
   return (
     <Box>
       <Typography
@@ -84,10 +127,29 @@ const HistoryPage = () => {
       >
         Transaction History
       </Typography>
-      <VolumeChart data={data} />
+      <VolumeChart data={data} selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
       <TransactionsCards {...cardArgs} />
       {/* @ts-ignore */}
-      <TransactionsTable {...tableArgs} />
+      <TransactionsTable
+        {...tableArgs}
+        {...mockProps}
+        // @ts-ignore
+        activeSort={activeSort}
+        activeView="personal"
+        setActiveView={() => {}}
+        handleSort={(column) =>
+          setActiveSort({
+            // @ts-ignore
+            column,
+            direction:
+              column === activeSort.column
+                ? activeSort.direction === "asc"
+                  ? "desc"
+                  : "asc"
+                : "asc",
+          })
+        }
+      />
     </Box>
   );
 };

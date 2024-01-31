@@ -12,10 +12,84 @@ import { Tune, ExpandMore, ManageSearch } from "@mui/icons-material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import dayjs from "dayjs";
+import { FilterMenuProps } from "@phoenix-protocol/types";
 
-const FilterMenu = () => {
+const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
+  // Set State for filters
+  const [dateRange, setDateRange] = React.useState<{
+    from: Date | null;
+    to: Date | null;
+  }>({
+    from: activeFilters.dateRange.from,
+    to: activeFilters.dateRange.to,
+  });
+  const [tradeSize, setTradeSize] = React.useState({
+    from: activeFilters.tradeSize.from,
+    to: activeFilters.tradeSize.to,
+  });
+  const [tradeValue, setTradeValue] = React.useState({
+    from: activeFilters.tradeValue.from,
+    to: activeFilters.tradeValue.to,
+  });
+
+  // React useEffect to update filters
+  React.useEffect(() => {
+    setDateRange({
+      from: activeFilters.dateRange.from,
+      to: activeFilters.dateRange.to,
+    });
+    setTradeSize({
+      from: activeFilters.tradeSize.from,
+      to: activeFilters.tradeSize.to,
+    });
+    setTradeValue({
+      from: activeFilters.tradeValue.from,
+      to: activeFilters.tradeValue.to,
+    });
+  }, [activeFilters]);
+
+  // Function to update new filters
+  const updateFilters = () => {
+    applyFilters({
+      dateRange,
+      tradeSize,
+      tradeValue,
+    });
+  };
+
+  // Function to reset filters
+  const resetFilters = () => {
+    setDateRange({
+      from: new Date(),
+      to: new Date(),
+    });
+    setTradeSize({
+      from: 0,
+      to: 0,
+    });
+    setTradeValue({
+      from: 0,
+      to: 0,
+    });
+    applyFilters({
+      dateRange: {
+        from: new Date(),
+        to: new Date(),
+      },
+      tradeSize: {
+        from: 0,
+        to: 0,
+      },
+      tradeValue: {
+        from: 0,
+        to: 0,
+      },
+    });
+  };
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -97,55 +171,6 @@ const FilterMenu = () => {
           >
             DATE RANGE
           </Typography>
-          <Button
-            sx={{
-              display: "flex",
-              padding: "0rem 0.5rem",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "0.25rem",
-              borderRadius: "0.5rem",
-              border: "1px solid #292B2C",
-              background: "#1F2123",
-            }}
-          >
-            <svg
-              width="11"
-              height="10"
-              viewBox="0 0 11 10"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g opacity="0.6">
-                <path
-                  d="M2.20376 3.08911C2.66696 2.28969 3.4049 1.68584 4.28018 1.39001C5.15546 1.09418 6.10843 1.12653 6.96163 1.48103C7.81484 1.83553 8.51014 2.48802 8.91806 3.31701C9.32599 4.146 9.41874 5.09499 9.17905 5.98728C8.93935 6.87957 8.38355 7.65434 7.61513 8.16733C6.84671 8.68033 5.91805 8.89658 5.00205 8.77582C4.08606 8.65507 3.24516 8.20554 2.63594 7.51093C2.02672 6.81632 1.69069 5.92398 1.69043 5.00006"
-                  stroke="white"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M4.07127 3.09519H2.1665V1.19043"
-                  stroke="white"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </g>
-            </svg>
-            <Typography
-              sx={{
-                color: "var(--Secondary-S2, #FFF)",
-                fontFeatureSettings: "'clig' off, 'liga' off",
-                fontFamily: "Ubuntu",
-                fontSize: "0.625rem",
-                fontStyle: "normal",
-                fontWeight: 700,
-                lineHeight: "1.25rem", // 200%
-                opacity: 0.6,
-              }}
-            >
-              Reset
-            </Typography>
-          </Button>
         </Box>
         <Box
           sx={{
@@ -173,6 +198,13 @@ const FilterMenu = () => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={["DatePicker"]}>
                 <DatePicker
+                  value={dayjs(dateRange.from)}
+                  onChange={(newValue) =>
+                    setDateRange({ ...dateRange, from: newValue.toDate() })
+                  }
+                  slotProps={{
+                    field: { clearable: true },
+                  }}
                   sx={{
                     "& .MuiInputBase-root": {
                       alignItems: "center",
@@ -186,6 +218,9 @@ const FilterMenu = () => {
                     },
                     "& legend": {
                       display: "none",
+                    },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      border: "1px solid #2D303A",
                     },
                   }}
                 />
@@ -209,6 +244,18 @@ const FilterMenu = () => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={["DatePicker"]}>
                 <DatePicker
+                  value={dayjs(dateRange.to)}
+                  onChange={(newValue: dayjs.Dayjs | null) =>
+                    setDateRange({
+                      ...dateRange,
+                      // @ts-ignore
+                      to: newValue === null ? newValue : newValue.toDate(),
+                    })
+                  }
+                  disableFuture
+                  slotProps={{
+                    field: { clearable: true },
+                  }}
                   sx={{
                     "& .MuiInputBase-root": {
                       alignItems: "center",
@@ -222,6 +269,9 @@ const FilterMenu = () => {
                     },
                     "& legend": {
                       display: "none",
+                    },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      border: "1px solid #2D303A",
                     },
                   }}
                 />
@@ -261,6 +311,12 @@ const FilterMenu = () => {
               border: "1px solid #292B2C",
               background: "#1F2123",
             }}
+            onClick={() => {
+              setTradeSize({
+                from: undefined,
+                to: undefined,
+              });
+            }}
           >
             <svg
               width="11"
@@ -295,6 +351,12 @@ const FilterMenu = () => {
                 lineHeight: "1.25rem", // 200%
                 opacity: 0.6,
               }}
+              onClick={() => {
+                setTradeSize({
+                  from: undefined,
+                  to: undefined,
+                });
+              }}
             >
               Reset
             </Typography>
@@ -325,6 +387,13 @@ const FilterMenu = () => {
             </Typography>
 
             <TextField
+              value={tradeSize.from || ""}
+              onChange={(e) =>
+                setTradeSize({
+                  ...tradeSize,
+                  from: parseInt(e.target.value),
+                })
+              }
               sx={{
                 marginTop: "0.5rem",
                 width: "100%",
@@ -346,6 +415,9 @@ const FilterMenu = () => {
                 "& legend": {
                   display: "none",
                 },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "1px solid #2D303A",
+                },
               }}
             />
           </Box>
@@ -364,6 +436,13 @@ const FilterMenu = () => {
               To
             </Typography>
             <TextField
+              value={tradeSize.to || ""}
+              onChange={(e) =>
+                setTradeSize({
+                  ...tradeSize,
+                  to: parseInt(e.target.value),
+                })
+              }
               fullWidth
               sx={{
                 marginTop: "0.5rem",
@@ -385,6 +464,9 @@ const FilterMenu = () => {
                 },
                 "& legend": {
                   display: "none",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "1px solid #2D303A",
                 },
               }}
             />
@@ -422,6 +504,12 @@ const FilterMenu = () => {
               border: "1px solid #292B2C",
               background: "#1F2123",
             }}
+            onClick={() => {
+              setTradeValue({
+                from: undefined,
+                to: undefined,
+              });
+            }}
           >
             <svg
               width="11"
@@ -486,6 +574,13 @@ const FilterMenu = () => {
             </Typography>
 
             <TextField
+              value={tradeValue.from || ""}
+              onChange={(e) =>
+                setTradeValue({
+                  ...tradeValue,
+                  from: parseInt(e.target.value),
+                })
+              }
               sx={{
                 marginTop: "0.5rem",
                 width: "100%",
@@ -507,6 +602,9 @@ const FilterMenu = () => {
                 "& legend": {
                   display: "none",
                 },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "1px solid #2D303A",
+                },
               }}
             />
           </Box>
@@ -525,6 +623,13 @@ const FilterMenu = () => {
               To
             </Typography>
             <TextField
+              value={tradeValue.to || ""}
+              onChange={(e) =>
+                setTradeValue({
+                  ...tradeValue,
+                  to: parseInt(e.target.value),
+                })
+              }
               fullWidth
               sx={{
                 marginTop: "0.5rem",
@@ -547,18 +652,22 @@ const FilterMenu = () => {
                 "& legend": {
                   display: "none",
                 },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "1px solid #2D303A",
+                },
               }}
             />
           </Box>
         </Box>
         <Divider sx={{ my: "0.75rem" }} />
-        <PhoButton label={"Apply"} />
+        <PhoButton label={"Apply"} onClick={() => updateFilters()} />
         <Box sx={{ width: "100%", mt: "0.5rem" }}>
           <PhoButton
             sx={{ width: "100%" }}
             type="secondary"
             fullWidth
             label={"Reset"}
+            onClick={() => resetFilters()}
           />
         </Box>
       </Menu>

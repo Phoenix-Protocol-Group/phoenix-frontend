@@ -35,12 +35,8 @@ const BoxStyle = {
     "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
 };
 
-const TransactionsTable = (props: TransactionsTableProps) => {
-  // Set State for search
-  const [searchValue, setSearchValue] = React.useState("");
-  // Set state for tabs
-  const [selectedTab, setSelectedTab] = React.useState("all");
 
+const TransactionsTable = (props: TransactionsTableProps) => {
   const tabUnselectedStyles = {
     display: "flex",
     width: "2.75rem",
@@ -99,28 +95,28 @@ const TransactionsTable = (props: TransactionsTableProps) => {
         <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
           <Box
             sx={
-              selectedTab === "all"
+              props.activeView === "all"
                 ? { ...tabUnselectedStyles, ...tabSelectedStyles }
                 : tabUnselectedStyles
             }
-            onClick={() => setSelectedTab("all")}
+            onClick={() => props.setActiveView("all")}
           >
             All
           </Box>
           <Box
             sx={
-              selectedTab === "personal"
+              props.activeView === "personal"
                 ? { ...tabUnselectedStyles, ...tabSelectedStyles }
                 : tabUnselectedStyles
             }
-            onClick={() => setSelectedTab("personal")}
+            onClick={() => props.setActiveView("personal")}
           >
             Personal
           </Box>
         </Box>
         <Input
           placeholder="Search"
-          onChange={(e: any) => setSearchValue(e.target.value)}
+          onChange={(e: any) => props.setSearchTerm(e.target.value)}
           sx={{
             flex: 1,
             borderRadius: "8px",
@@ -141,27 +137,78 @@ const TransactionsTable = (props: TransactionsTableProps) => {
             <img style={{ marginRight: "8px" }} src="/MagnifyingGlass.svg" />
           }
         />
-        <FilterMenu />
+        <FilterMenu
+          activeFilters={props.activeFilters}
+          applyFilters={props.applyFilters}
+        />
       </Box>
       <Box sx={{ ...BoxStyle, mb: 2 }}>
         <Grid container>
           <Grid item xs={2}>
-            <TransactionHeader label="Trade type" active={false} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Trade type"
+              active={
+                props.activeSort.column === "tradeType"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
           <Grid item xs={3}>
-            <TransactionHeader label="Asset" active={false} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Asset"
+              active={
+                props.activeSort.column === "asset"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
           <Grid item xs={2}>
-            <TransactionHeader label="Trade Size" active={true} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Trade Size"
+              active={
+                props.activeSort.column === "tradeSize"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
           <Grid item xs={2}>
-            <TransactionHeader label="Trade Value" active={false} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Trade Value"
+              active={
+                props.activeSort.column === "tradeValue"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
           <Grid item xs={2}>
-            <TransactionHeader label="Date" active={false} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Date"
+              active={
+                props.activeSort.column === "date"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
           <Grid item xs={1}>
-            <TransactionHeader label="Actions" active={false} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Actions"
+              active={
+                props.activeSort.column === "actions"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
         </Grid>
       </Box>
@@ -173,6 +220,7 @@ const TransactionsTable = (props: TransactionsTableProps) => {
             tradeSize={entry.tradeSize}
             tradeValue={entry.tradeValue}
             date={entry.date}
+            txHash={entry.txHash}
           />
         ))}
       </Box>

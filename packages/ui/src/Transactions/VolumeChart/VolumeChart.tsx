@@ -13,6 +13,8 @@ import {
 
 interface VolumeChartProps {
   data: { name: string; value: number }[];
+  selectedTab: "D" | "M" | "A";
+  setSelectedTab: (tab: "D" | "M" | "A") => void;
 }
 
 const getBarBackground = (value: number, max: number) => {
@@ -78,12 +80,13 @@ const tabSelectedStyles = {
   background: "rgba(226, 73, 26, 0.10)",
 };
 
-const VolumeChart: React.FC<VolumeChartProps> = ({ data }) => {
+const VolumeChart: React.FC<VolumeChartProps> = ({
+  data,
+  selectedTab,
+  setSelectedTab,
+}) => {
   // Find the maximum value in the data array
   const maxValue = Math.max(...data.map((item) => item.value));
-
-  // Set state for tabs
-  const [selectedTab, setSelectedTab] = React.useState("D");
 
   return (
     <Box
