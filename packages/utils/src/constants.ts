@@ -26,3 +26,8 @@ export const FACTORY_ADDRESS: string =
  */
 export const MULTIHOP_ADDRESS: string =
   "CCIHTQHVCIDNNH5FL7NEUTWIU2JEITTBW2AM5UXMPS5SCUPM25SV5ODG";
+
+/**
+ * Phoenix History Indexer
+ */
+export const PHOENIX_HISTORY_INDEXER: string = "http://localhost:4000";

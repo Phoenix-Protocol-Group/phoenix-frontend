@@ -5,34 +5,37 @@ import {
   TransactionsTable,
   VolumeChart,
 } from "@phoenix-protocol/ui";
+import {
+  fetchDataByTimeEpoch,
+  fetchHistoryMetaData,
+} from "@phoenix-protocol/utils";
+import { useEffect, useState } from "react";
 
 export default function Page() {
-  const data = [
-    { name: "12 AM", value: 1200000 },
-    { name: "1 AM", value: 800000 },
-    { name: "2 AM", value: 500000 },
-    { name: "3 AM", value: 300000 },
-    { name: "4 AM", value: 200000 },
-    { name: "5 AM", value: 250000 },
-    { name: "6 AM", value: 600000 },
-    { name: "7 AM", value: 960000 },
-    { name: "8 AM", value: 1280000 },
-    { name: "9 AM", value: 1600000 },
-    { name: "10 AM", value: 1880000 },
-    { name: "11 AM", value: 2200000 },
-    { name: "12 PM", value: 2100000 },
-    { name: "1 PM", value: 2000000 },
-    { name: "2 PM", value: 1800000 },
-    { name: "3 PM", value: 1700000 },
-    { name: "4 PM", value: 1500000 },
-    { name: "5 PM", value: 1400000 },
-    { name: "6 PM", value: 1300000 },
-    { name: "7 PM", value: 1250000 },
-    { name: "8 PM", value: 1300000 },
-    { name: "9 PM", value: 1350000 },
-    { name: "10 PM", value: 1400000 },
-    { name: "11 PM", value: 1450000 },
-  ];
+  // Set Account Meta
+  const [meta, setMeta] = useState({
+    activeAccountsLast24h: 0,
+    totalAccounts: 0,
+  });
+
+  // Set Volume Chart Data
+  const [data, setData] = useState([]);
+
+  const loadMetaData = async () => {
+    const { activeAccountsLast24h, totalAccounts } =
+      await fetchHistoryMetaData();
+    setMeta({ activeAccountsLast24h, totalAccounts });
+  };
+
+  const loadVolumeData = async (epoch: "monthly" | "yearly" | "daily") => {
+    const result = await fetchDataByTimeEpoch(epoch);
+    setData(result[Object.keys(result)[0]].intervals);
+  };
+
+  useEffect(() => {
+    loadMetaData();
+    loadVolumeData("daily");
+  }, []);
 
   const asset = {
     name: "USDT",
@@ -43,8 +46,6 @@ export default function Page() {
   };
 
   const cardArgs = {
-    activeTraders: "12 370",
-    totalTraders: "420 690",
     mostTradedAsset: {
       name: "USDT",
       icon: "cryptoIcons/usdt.svg",
@@ -88,10 +89,17 @@ export default function Page() {
       >
         Transaction History
       </Typography>
-      <VolumeChart data={data} />
-      <TransactionsCards {...cardArgs} />
-      {/* @ts-ignore */}
-      <TransactionsTable {...tableArgs} />
+      <VolumeChart
+        data={data}
+        setSelectedTab={(e) => console.log}
+        selectedTab="D"
+      />
+      <TransactionsCards
+        activeTraders={meta.activeAccountsLast24h.toString()}
+        totalTraders={meta.totalAccounts.toString()}
+        {...cardArgs}
+      />
+      {/* <TransactionsTable {...tableArgs} /> */}
     </Box>
   );
 }
