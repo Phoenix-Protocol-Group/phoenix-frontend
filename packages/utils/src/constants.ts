@@ -30,4 +30,4 @@ export const MULTIHOP_ADDRESS: string =
 /**
  * Phoenix History Indexer
  */
-export const PHOENIX_HISTORY_INDEXER: string = "http://localhost:4000";
+export const PHOENIX_HISTORY_INDEXER: string = "https://history.phoenix-hub.io";

@@ -15,6 +15,7 @@ interface VolumeChartProps {
   data: { name: string; value: number }[];
   selectedTab: "D" | "M" | "A";
   setSelectedTab: (tab: "D" | "M" | "A") => void;
+  totalVolume: number;
 }
 
 const getBarBackground = (value: number, max: number) => {
@@ -82,6 +83,7 @@ const tabSelectedStyles = {
 
 const VolumeChart: React.FC<VolumeChartProps> = ({
   data,
+  totalVolume,
   selectedTab,
   setSelectedTab,
 }) => {
@@ -131,7 +133,7 @@ const VolumeChart: React.FC<VolumeChartProps> = ({
               fontWeight: 700,
             }}
           >
-            $21 370.00
+            ${totalVolume}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
@@ -194,9 +196,9 @@ const VolumeChart: React.FC<VolumeChartProps> = ({
             strokeWidth={1}
             vertical={false}
           />
-          <XAxis dataKey="name" />
+          <XAxis dataKey="timestamp" />
           <YAxis tickFormatter={renderCustomAxisTick} />
-          <Bar dataKey="value" barSize={12} radius={[2, 2, 0, 0]}>
+          <Bar dataKey="volume" barSize={12} radius={[2, 2, 0, 0]}>
             {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
