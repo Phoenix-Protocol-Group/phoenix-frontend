@@ -19,10 +19,13 @@ import {
 } from "@phoenix-protocol/utils/build/sep24";
 import { Anchor } from "@phoenix-protocol/types";
 import {
+  constants,
   fetchBiggestWinnerAndLoser,
   fetchTokenPrices,
   formatCurrency,
+  scValToJs,
 } from "@phoenix-protocol/utils";
+import { PhoenixFactoryContract } from "@phoenix-protocol/contracts";
 
 export default function Page() {
   const theme = useTheme();
@@ -55,6 +58,22 @@ export default function Page() {
     const allAnchors = await getAllAnchors();
     setAnchors(allAnchors);
   };
+
+  const getMultihopAdress = async () => {
+    // Get all pools
+    const factoryContract = new PhoenixFactoryContract.Contract({
+      contractId: constants.FACTORY_ADDRESS,
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
+      rpcUrl: constants.RPC_URL,
+    });
+
+    const config = await factoryContract.getConfig();
+    console.log(scValToJs(config.simulation.result.retval));
+  };
+
+  useEffect(() => {
+    getMultihopAdress();
+  }, []);
 
   const getBiggestGainerAndLoser = async () => {
     const { winner, loser } = await fetchBiggestWinnerAndLoser();

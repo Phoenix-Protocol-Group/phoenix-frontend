@@ -105,6 +105,7 @@ export default function Page({ params }: PoolPageProps) {
   const [poolLiquidityTokenA, setPoolLiquidityTokenA] = useState<number>(0);
   const [poolLiquidityTokenB, setPoolLiquidityTokenB] = useState<number>(0);
   const [assetLpShare, setAssetLpShare] = useState<number>(0);
+  const [userShare, setUserShare] = useState<number>(0);
 
   // Stakes
   const [userStakes, setUserStakes] = useState<Entry[] | undefined>(undefined);
@@ -164,6 +165,8 @@ export default function Page({ params }: PoolPageProps) {
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([tokenAAmount, tokenBAmount]);
+      // Refresh pool data
+      await getPool();
       setSuccessModalOpen(true);
     } catch (error: any) {
       //!todo view transaction id in blockexplorer
@@ -283,9 +286,9 @@ export default function Page({ params }: PoolPageProps) {
 
         const tvl =
           (priceA * Number(pairInfo.result.unwrap().asset_a.amount)) /
-            10 ** Number(tokenA?.decimals) +
+            10 ** Number(_tokenA?.decimals) +
           (priceB * Number(pairInfo.result.unwrap().asset_b.amount)) /
-            10 ** Number(tokenB?.decimals);
+            10 ** Number(_tokenB?.decimals);
 
         setPoolLiquidity(tvl);
         setStakeContract(stakeContractAddress);
@@ -334,7 +337,40 @@ export default function Page({ params }: PoolPageProps) {
             ).toFixed(2)
           )
         );
-        fetchStakes(_lpToken?.symbol, stakeContractAddress);
+        const stakes = await fetchStakes(
+          _lpToken?.symbol,
+          stakeContractAddress
+        );
+
+        // Get user share
+        if (storePersist.wallet.address) {
+          if (pairInfo.result.isOk()) {
+            // Get the total amount of LP tokens in the pool
+            const info = pairInfo.result.unwrap();
+            const lpShareAmount = info.asset_lp_share.amount;
+            const lpShareAmountDec =
+              Number(lpShareAmount) / 10 ** (_lpToken?.decimals || 7);
+
+            // Get the amount of LP tokens the user has as balance or staked
+            const userLpTokenAmount =
+              Number(_lpToken!.balance || 0) / 10 ** (_lpToken?.decimals || 7);
+
+            const summedStakes =
+              stakes?.reduce(
+                (acc, stake) => acc + Number(stake.amount.tokenAmount),
+                0
+              ) || 0;
+
+            // Total LP tokens of the user
+            const totalUserLPTokens = userLpTokenAmount + summedStakes;
+
+            // Price per Unit
+            const pricePerUnit = tvl / lpShareAmountDec;
+
+            // User share
+            setUserShare(totalUserLPTokens * pricePerUnit);
+          }
+        }
       }
     } catch (e) {
       // If pool not found, set poolNotFound to true
@@ -376,6 +412,7 @@ export default function Page({ params }: PoolPageProps) {
             };
           });
           setUserStakes(_stakes);
+          return _stakes;
         }
       }
     }
@@ -481,7 +518,13 @@ export default function Page({ params }: PoolPageProps) {
                 },
                 {
                   title: "My Share",
-                  value: "-",
+                  value: storePersist.wallet.address
+                    ? formatCurrency(
+                        "USD",
+                        userShare.toString(),
+                        navigator.language
+                      )
+                    : "-",
                 },
                 {
                   title: "LP tokens",
