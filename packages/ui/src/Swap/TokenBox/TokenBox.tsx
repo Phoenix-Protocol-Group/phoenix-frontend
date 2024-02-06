@@ -101,6 +101,7 @@ const TokenBox = ({
                 fontSize: "24px",
                 fontWeight: 700,
                 lineHeight: "140%",
+                width: "100%",
                 "&:before": {
                   content: "none",
                 },

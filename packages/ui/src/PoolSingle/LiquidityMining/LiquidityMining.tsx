@@ -82,7 +82,7 @@ const StakeInput = ({
       <TextField
         id="input"
         type="number"
-        value={amount}
+        value={amount === 0 ? "" : amount}
         placeholder="0.00"
         fullWidth
         sx={{
@@ -102,6 +102,10 @@ const StakeInput = ({
             opacity: 0.6,
             textAlign: "center",
           },
+        }}
+        inputProps={{
+          min: 0,
+          max: balance
         }}
         InputProps={{
           endAdornment: (
