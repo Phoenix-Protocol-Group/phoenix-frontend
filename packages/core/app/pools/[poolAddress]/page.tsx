@@ -26,7 +26,12 @@ import {
   UnstakeSuccess,
 } from "../../../components/Modal/Modal";
 
-import { constants, time } from "@phoenix-protocol/utils";
+import {
+  constants,
+  fetchTokenPrices,
+  formatCurrency,
+  time,
+} from "@phoenix-protocol/utils";
 
 import { Address } from "stellar-sdk";
 
@@ -270,6 +275,19 @@ export default function Page({ params }: PoolPageProps) {
             }),
           ]);
 
+        // Fetch prices and calculate TVL
+        const [priceA, priceB] = await Promise.all([
+          await fetchTokenPrices(_tokenA?.symbol || ""),
+          await fetchTokenPrices(_tokenB?.symbol || ""),
+        ]);
+
+        const tvl =
+          (priceA * Number(pairInfo.result.unwrap().asset_a.amount)) /
+            10 ** Number(tokenA?.decimals) +
+          (priceB * Number(pairInfo.result.unwrap().asset_b.amount)) /
+            10 ** Number(tokenB?.decimals);
+
+        setPoolLiquidity(tvl);
         setStakeContract(stakeContractAddress);
         // Set token states
         setTokenA({
@@ -455,7 +473,11 @@ export default function Page({ params }: PoolPageProps) {
               stats={[
                 {
                   title: "TVL",
-                  value: "-",
+                  value: formatCurrency(
+                    "USD",
+                    poolLiquidity.toString(),
+                    navigator.language
+                  ),
                 },
                 {
                   title: "My Share",
