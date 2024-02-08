@@ -90,6 +90,10 @@ export default function Page() {
           ...item,
           // @ts-ignore
           tradeSize: Number(item.tradeSize) / 10 ** assets.flat()[0].decimals,
+          tradeValue:
+            (Number(item.tradeValue) * Number(item.tradeSize)) /
+            // @ts-ignore
+            10 ** assets.flat()[0].decimals,
           assets: assets.flat().map((asset) => {
             return {
               name: asset?.symbol,
@@ -114,6 +118,7 @@ export default function Page() {
     setSortBy(newSortBy);
     setSortOrder(newSortOrder);
     setPage(0); // Reset page to the first page
+    setHistory([]); // Reset history to clear previous entries
   };
 
   const mapToSwapField = (column: string) => {

@@ -59,22 +59,6 @@ export default function Page() {
     setAnchors(allAnchors);
   };
 
-  const getMultihopAdress = async () => {
-    // Get all pools
-    const factoryContract = new PhoenixFactoryContract.Contract({
-      contractId: constants.FACTORY_ADDRESS,
-      networkPassphrase: constants.NETWORK_PASSPHRASE,
-      rpcUrl: constants.RPC_URL,
-    });
-
-    const config = await factoryContract.getConfig();
-    console.log(scValToJs(config.simulation.result.retval));
-  };
-
-  useEffect(() => {
-    getMultihopAdress();
-  }, []);
-
   const getBiggestGainerAndLoser = async () => {
     const { winner, loser } = await fetchBiggestWinnerAndLoser();
 
