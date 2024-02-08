@@ -181,7 +181,6 @@ export default function SwapPage() {
       setFromToken(allTokens[0]);
       setToToken(allTokens[1]);
       setIsLoading(false);
-
       // Get all pools
       const factoryContract = new PhoenixFactoryContract.Contract({
         contractId: constants.FACTORY_ADDRESS,
@@ -199,6 +198,26 @@ export default function SwapPage() {
         };
       });
       setAllPools(allPairs);
+      const fromTokenContractID = allTokens[0].contractId;
+      const toTokenContractID = allTokens[1].contractId;
+      if (!fromTokenContractID || !toTokenContractID) {
+        return;
+      }
+      const { operations: ops } = findBestPath(
+        toTokenContractID,
+        fromTokenContractID,
+        allPairs
+      );
+      const _operations = ops.reverse();
+      const _swapRoute: string[] = _operations.map((op, index) => {
+        const toAssetName = appStore.allTokens.find(
+          (token: any) => token.contractId === op.ask_asset
+        )?.name;
+        return toAssetName;
+      });
+      setOperations(_operations);
+      const swapRoute_ = allTokens[0].name + " -> " + _swapRoute.join(" -> ");
+      setSwapRoute(swapRoute_);
     };
 
     getAllTokens();
@@ -237,7 +256,7 @@ export default function SwapPage() {
       if (!fromTokenContractID || !toTokenContractID) {
         return;
       }
-      
+
       const { operations: ops } = findBestPath(
         toTokenContractID,
         fromTokenContractID,
@@ -257,6 +276,7 @@ export default function SwapPage() {
       const swapRoute_ = fromToken.name + " -> " + _swapRoute.join(" -> ");
       setSwapRoute(swapRoute_);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromToken, toToken, appStore.allTokens]);
 
   // Return statement for rendering components conditionally based on state
