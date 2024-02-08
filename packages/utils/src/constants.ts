@@ -30,4 +30,4 @@ export const MULTIHOP_ADDRESS: string =
 /**
  * Phoenix History Indexer
  */
-export const PHOENIX_HISTORY_INDEXER: string = "https://graph.phoenix-hub.io";
+export const PHOENIX_HISTORY_INDEXER: string = "https://graphql.phoenix-hub.io";
