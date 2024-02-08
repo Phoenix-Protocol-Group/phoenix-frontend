@@ -9,7 +9,7 @@
     "@stellar/freighter-api": "1.7.1",
     "bigint-conversion": "2.4.1",
     "buffer": "6.0.3",
-    "stellar-sdk": "^11.1.0"
+    "stellar-sdk": "^11.2.1"
   },
   "scripts": {
     "test": "tsc && jest",

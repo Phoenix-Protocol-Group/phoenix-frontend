@@ -9,19 +9,9 @@ type Pool = {
 };
 export function findBestPath(
   fromAsset: string,
-  toAsset: string
+  toAsset: string,
+  pools: Pool[]
 ): { operations: Operation[] } {
-  const pools: Pool[] = [
-    {
-      asset_a: "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-      asset_b: "CDUJS5DK4EAV7EALH3KPPPAJGVNB5UAWF5FRGHUTSGT4VIAANDDHOCEC",
-    },
-    {
-      asset_a: "CA2E4NMXKS7YQQ4UVYRBCZQ3ZBETUZ4PVYTUB6AXXTXYQRTRIBKN2XNO",
-      asset_b: "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-    },
-  ];
-
   const operations: Operation[] = [];
   // Helper function to avoid duplicate operations
   const addOperation = (ask: string, offer: string) => {

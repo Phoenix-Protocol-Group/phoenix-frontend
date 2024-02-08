@@ -1,17 +1,31 @@
-import { ArrowDownward, ArrowRightAlt, ExpandMore, ManageSearch, SwapVert, Tune } from "@mui/icons-material";
+import {
+  ArrowDownward,
+  ArrowRightAlt,
+  ExpandMore,
+  ManageSearch,
+  SwapVert,
+  Tune,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
+  Divider,
   Grid,
   IconButton,
   Input,
+  Menu,
+  MenuItem,
+  TextField,
   Typography,
 } from "@mui/material";
+import FilterMenu from "./FilterMenu";
 import {
   TransactionsTableProps,
   TransactionTableEntryProps,
 } from "@phoenix-protocol/types";
 import React from "react";
+import TransactionEntry from "./TransactionEntry";
+import TransactionHeader from "./TransactionsHeader";
 
 const BoxStyle = {
   p: 2,
@@ -21,127 +35,56 @@ const BoxStyle = {
     "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
 };
 
-const TransactionsEntry = (props: TransactionTableEntryProps) => {
-  return (
-    <Box sx={{ ...BoxStyle, mb: 2 }}>
-      <Grid container alignItems="center">
-        <Grid item xs={2}>
-          <Box
-            sx={{
-              borderRadius: "16px",
-              border:
-                props.type === "Sent" ? "1px solid #F22" : "1px solid #5BFF22",
-              background:
-                props.type === "Sent"
-                  ? "rgba(255, 34, 34, 0.20)"
-                  : "rgba(91, 255, 34, 0.20)",
-              color: props.type === "Sent" ? "#F22" : "#5BFF22",
-              fontSize: "12px",
-              py: 0.5,
-              display: "inline-flex",
-              width: "88px",
-              justifyContent: "center",
-            }}
-          >
-            {props.type}
-          </Box>
-        </Grid>
-        <Grid item xs={3}>
-          <Box
-            sx={{
-              display: "flex",
-              width: "100%",
-            }}
-          >
-            {props.assets.map((asset, index) => (
-              <Typography
-                sx={{
-                  color: "#FFF",
-                  fontSize: "14px",
-                  display: "flex",
-                  alignItems: "center"
-                }}
-              >
-                {asset.name} {index !== props.assets.length - 1 && <ArrowRightAlt sx={{fontSize: "24px"}} />}
-              </Typography>
-            ))}
-          </Box>
-        </Grid>
-        <Grid item xs={2}>
-          <Typography
-            sx={{
-              color: "#FFF",
-              fontSize: "14px",
-            }}
-          >
-            {props.tradeSize}
-          </Typography>
-        </Grid>
-        <Grid item xs={2}>
-          <Typography
-            sx={{
-              color: "#FFF",
-              fontSize: "14px",
-              opacity: "0.6",
-            }}
-          >
-            ${props.tradeValue}
-          </Typography>
-        </Grid>
-        <Grid item xs={2}>
-          <Typography
-            sx={{
-              color: "#FFF",
-              fontSize: "14px",
-              opacity: "0.6",
-            }}
-          >
-            {props.date}
-          </Typography>
-        </Grid>
-        <Grid item xs={1}>
-          <IconButton>
-            <ManageSearch sx={{fontSize: "20px"}}/>
-          </IconButton>
-        </Grid>
-      </Grid>
-    </Box>
-  );
-};
-
-const TableHeader = ({ label, active }: { label: string; active: boolean }) => (
-  <Box
-    sx={{
-      display: "flex",
-      alignItems: "center",
-    }}
-  >
-    <Typography
-      sx={{
-        fontSize: "10px",
-        lineHeight: "200%",
-        fontWeight: "700",
-        textTransform: "uppercase",
-        opacity: active ? "1" : "0.6",
-        mr: 0.5,
-      }}
-    >
-      {label}
-    </Typography>
-    {active ? (
-      <ArrowDownward sx={{ fontSize: "14px" }} />
-    ) : (
-      <SwapVert sx={{ fontSize: "14px", opacity: "0.6" }} />
-    )}
-  </Box>
-);
 
 const TransactionsTable = (props: TransactionsTableProps) => {
-  const [searchValue, setSearchValue] = React.useState("");
+  const tabUnselectedStyles = {
+    display: "flex",
+    width: "2.75rem",
+    height: "2.3125rem",
+    padding: "1.125rem 1.5rem",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "0.625rem",
+    borderRadius: "1rem",
+    cursor: "pointer",
+    background:
+      "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+    color: "#FFF",
+    opacity: 0.6,
+    textAlign: "center",
+    fontFeatureSettings: "'clig' off, 'liga' off",
+    fontFamily: "Ubuntu",
+    fontSize: "0.625rem",
+    fontStyle: "normal",
+    fontWeight: 700,
+    lineHeight: "1.25rem", // 200%
+  };
+
+  const tabSelectedStyles = {
+    display: "flex",
+    height: "2.25rem",
+    padding: "1.125rem 1.5rem",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "0.625rem",
+    flex: "1 0 0",
+    borderRadius: "1rem",
+    border: "1px solid var(--Primary-P3, #E2571C)",
+    background: "rgba(226, 73, 26, 0.10)",
+    color: "#FFF",
+    textAlign: "center",
+    fontFeatureSettings: "'clig' off, 'liga' off",
+    fontFamily: "Ubuntu",
+    fontSize: "0.625rem",
+    fontStyle: "normal",
+    fontWeight: 700,
+    lineHeight: "1.25rem", // 200%
+  };
 
   return (
     <Box
       sx={{
+        mt: 2,
         p: 3,
         borderRadius: 3,
         background:
@@ -149,9 +92,31 @@ const TransactionsTable = (props: TransactionsTableProps) => {
       }}
     >
       <Box sx={{ display: "flex", mb: 2 }}>
+        <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
+          <Box
+            sx={
+              props.activeView === "all"
+                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                : tabUnselectedStyles
+            }
+            onClick={() => props.setActiveView("all")}
+          >
+            All
+          </Box>
+          <Box
+            sx={
+              props.activeView === "personal"
+                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                : tabUnselectedStyles
+            }
+            onClick={() => props.setActiveView("personal")}
+          >
+            Personal
+          </Box>
+        </Box>
         <Input
           placeholder="Search"
-          onChange={(e: any) => setSearchValue(e.target.value)}
+          onChange={(e: any) => props.setSearchTerm(e.target.value)}
           sx={{
             flex: 1,
             borderRadius: "8px",
@@ -160,6 +125,7 @@ const TransactionsTable = (props: TransactionsTableProps) => {
             padding: "4px 16px",
             lineHeight: "18px",
             fontSize: "13px",
+            ml: "0.75rem",
             "&:before": {
               content: "none",
             },
@@ -171,53 +137,90 @@ const TransactionsTable = (props: TransactionsTableProps) => {
             <img style={{ marginRight: "8px" }} src="/MagnifyingGlass.svg" />
           }
         />
-        <Button
-          sx={{
-            ...BoxStyle,
-            textTransform: "none",
-            fontSize: "13px",
-            color: "rgba(255, 255, 255, 0.6)",
-            borderRadius: "8px",
-            lineHeight: "20px",
-            ml: 3,
-            height: "38px",
-          }}
-        >
-          <Tune sx={{fontSize: "15px", mr: 0.5}} />
-          Filter
-          <ExpandMore sx={{fontSize: "14px", ml: 0.5}} />
-        </Button>
+        <FilterMenu
+          activeFilters={props.activeFilters}
+          applyFilters={props.applyFilters}
+        />
       </Box>
       <Box sx={{ ...BoxStyle, mb: 2 }}>
         <Grid container>
           <Grid item xs={2}>
-            <TableHeader label="Trade type" active={false} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Trade type"
+              active={
+                props.activeSort.column === "tradeType"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
           <Grid item xs={3}>
-            <TableHeader label="Asset" active={false} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Asset"
+              active={
+                props.activeSort.column === "asset"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
           <Grid item xs={2}>
-            <TableHeader label="Trade Size" active={true} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Trade Size"
+              active={
+                props.activeSort.column === "tradeSize"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
           <Grid item xs={2}>
-            <TableHeader label="Trade Value" active={false} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Trade Value"
+              active={
+                props.activeSort.column === "tradeValue"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
           <Grid item xs={2}>
-            <TableHeader label="Date" active={false} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Date"
+              active={
+                props.activeSort.column === "date"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
           <Grid item xs={1}>
-            <TableHeader label="Actions" active={false} />
+            <TransactionHeader
+              handleSort={props.handleSort}
+              label="Actions"
+              active={
+                props.activeSort.column === "actions"
+                  ? props.activeSort.direction
+                  : false
+              }
+            />
           </Grid>
         </Grid>
       </Box>
       <Box>
         {props.entries.map((entry, index) => (
-          <TransactionsEntry
+          <TransactionEntry
             type={entry.type}
             assets={entry.assets}
             tradeSize={entry.tradeSize}
             tradeValue={entry.tradeValue}
             date={entry.date}
+            txHash={entry.txHash}
           />
         ))}
       </Box>

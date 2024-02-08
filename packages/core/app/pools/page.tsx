@@ -6,7 +6,11 @@ import {
 } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Pools, Skeleton } from "@phoenix-protocol/ui";
-import { constants } from "@phoenix-protocol/utils";
+import {
+  constants,
+  fetchTokenPrices,
+  formatCurrency,
+} from "@phoenix-protocol/utils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Address } from "stellar-sdk";
@@ -44,6 +48,18 @@ export default function Page() {
           ),
         ]);
 
+        // Fetch prices and calculate TVL
+        const [priceA, priceB] = await Promise.all([
+          await fetchTokenPrices(tokenA?.symbol || ""),
+          await fetchTokenPrices(tokenB?.symbol || ""),
+        ]);
+
+        const tvl =
+          (priceA * Number(pairInfo.result.unwrap().asset_a.amount)) /
+            10 ** Number(tokenA?.decimals) +
+          (priceB * Number(pairInfo.result.unwrap().asset_b.amount)) /
+            10 ** Number(tokenB?.decimals);
+
         // Construct and return pool object if all fetches are successful
         return {
           tokens: [
@@ -66,7 +82,7 @@ export default function Page() {
               usdValue: 0,
             },
           ],
-          tvl: "0",
+          tvl: formatCurrency("USD", tvl.toString(), navigator.language),
           maxApr: "0",
           userLiquidity: 0,
           poolAddress: poolAddress,

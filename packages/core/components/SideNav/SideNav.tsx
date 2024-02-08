@@ -10,27 +10,55 @@ const SideNav = ({
   navOpen: boolean;
   setNavOpen: (open: boolean) => void;
 }) => {
-  const router = useRouter()
+  const router = useRouter();
   const pathname = usePathname();
 
   const navItems = [
     {
       label: "Dashboard",
-      icon: <img src={pathname == "/" ? "/dashboardIconActive.svg" : "/dashboardIcon.svg"} />,
+      icon: (
+        <img
+          src={
+            pathname == "/" ? "/dashboardIconActive.svg" : "/dashboardIcon.svg"
+          }
+        />
+      ),
       active: pathname == "/",
       href: "/",
     },
     {
       label: "Swap",
-      icon: <img src={pathname == "/swap" ? "/swapIconActive.svg" : "/swapIcon.svg"} />,
+      icon: (
+        <img
+          src={pathname == "/swap" ? "/swapIconActive.svg" : "/swapIcon.svg"}
+        />
+      ),
       active: pathname == "/swap",
       href: "/swap",
     },
     {
       label: "Pools",
-      icon: <img src={pathname == "/pools" ? "/poolsIconActive.svg" : "/poolsIcon.svg"} />,
+      icon: (
+        <img
+          src={pathname == "/pools" ? "/poolsIconActive.svg" : "/poolsIcon.svg"}
+        />
+      ),
       active: pathname == "/pools",
       href: "/pools",
+    },
+    {
+      label: "Trade History",
+      icon: (
+        <img
+          src={
+            pathname == "/history"
+              ? "/tradeHistoryIconActive.svg"
+              : "/tradeHistoryIcon.svg"
+          }
+        />
+      ),
+      active: pathname == "/history",
+      href: "/history",
     },
   ];
 
@@ -40,10 +68,10 @@ const SideNav = ({
 
   return (
     <SidebarNavigation
-        onNavClick={onNavClick}
-        items={navItems}
-        open={navOpen}
-        setOpen={setNavOpen}
+      onNavClick={onNavClick}
+      items={navItems}
+      open={navOpen}
+      setOpen={setNavOpen}
     />
   );
 };
