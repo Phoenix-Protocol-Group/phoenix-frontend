@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
         // Include other headers as required by the target API
       },
       // If POST method, send body as JSON
-      // body: JSON.stringify(req.body),
+      // body: JSON.stringify(req.body),}
+      next: { revalidate: 3600 },
     });
 
     // Extract the JSON data
