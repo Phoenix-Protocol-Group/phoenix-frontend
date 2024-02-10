@@ -10,7 +10,7 @@ import {
   SorobanTokenContract,
 } from "@phoenix-protocol/contracts";
 import { usePersistStore } from "../store";
-import { constants } from "@phoenix-protocol/utils";
+import { constants, fetchTokenPrices } from "@phoenix-protocol/utils";
 import { Address } from "stellar-sdk";
 
 export const createWalletActions = (
@@ -52,7 +52,7 @@ export const createWalletActions = (
 
       const _tokens = getState()
         .tokens.filter((token: Token) => token?.symbol !== "POOL")
-        .map((token: Token) => {
+        .map(async (token: Token) => {
           return {
             name: token?.symbol === "native" ? "XLM" : token?.symbol,
             icon: `/cryptoIcons/${
@@ -60,14 +60,19 @@ export const createWalletActions = (
             }.svg`,
             amount: Number(token?.balance) / 10 ** token?.decimals,
             category: "Non-Stable", // todo: add category
-            usdValue: 0, // todo: add usdValue
+            usdValue: (
+              (Number(token?.balance) / 10 ** token?.decimals) *
+              (await fetchTokenPrices(token?.symbol))
+            ).toFixed(2), // todo: add usdValue
             contractId: token?.id,
           };
         });
+      // Wait promise
+      const _allTokens = await Promise.all(_tokens);
       setState((state: AppStore) => {
-        return { allTokens: _tokens };
+        return { allTokens: _allTokens };
       });
-      return _tokens;
+      return _allTokens;
     },
 
     fetchTokenInfo: async (tokenAddress: Address) => {

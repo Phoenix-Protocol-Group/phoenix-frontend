@@ -1,7 +1,8 @@
 "use client";
 import { Box, Typography } from "@mui/material";
-import { useAppStore } from "@phoenix-protocol/state";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
+  Button,
   TransactionsCards,
   TransactionsTable,
   VolumeChart,
@@ -16,6 +17,7 @@ import { useEffect, useState } from "react";
 export default function Page() {
   // Init AppStore
   const appStore = useAppStore();
+  const appStorePersist = usePersistStore();
 
   // Set Account Meta
   const [meta, setMeta] = useState({
@@ -50,6 +52,9 @@ export default function Page() {
     "D"
   );
 
+  // Personal or all
+  const [activeView, setActiveView] = useState<"personal" | "all">("all");
+
   // Load Meta Data
   const loadMetaData = async () => {
     const { activeAccountsLast24h, totalAccounts } =
@@ -64,14 +69,30 @@ export default function Page() {
     setTotalVolume(result[Object.keys(result)[0]].totalVolume);
   };
 
+  // Load more / pagination
+  const loadMore = () => {
+    setPage(page + 1);
+  };
+
   // Load History
   const loadHistory = async () => {
-    const result = await fetchSwapHistory(
-      page,
-      pageSize,
-      sortBy,
-      sortOrder.toUpperCase()
-    );
+    let result = [];
+    if (activeView === "personal" && appStorePersist.wallet.address) {
+      result = await fetchSwapHistory(
+        page,
+        pageSize,
+        sortBy,
+        sortOrder.toUpperCase(),
+        appStorePersist.wallet.address
+      );
+    } else {
+      result = await fetchSwapHistory(
+        page,
+        pageSize,
+        sortBy,
+        sortOrder.toUpperCase()
+      );
+    }
 
     // Map Token Names
     const _result = await Promise.all(
@@ -198,7 +219,7 @@ export default function Page() {
   useEffect(() => {
     loadHistory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, sortBy, sortOrder]);
+  }, [page, pageSize, sortBy, sortOrder, activeView]);
 
   // Use Effect to Init Data
   useEffect(() => {
@@ -259,12 +280,19 @@ export default function Page() {
           column: mapFromSwapField(sortBy),
           direction: sortOrder,
         }}
-        activeView="all"
-        setActiveView={() => {}}
+        activeView={activeView}
+        setActiveView={(a) => {
+          setHistory([]);
+          setActiveView(a);
+        }}
         loadingResults={false}
+        loggedIn={appStorePersist.wallet.address ? true : false}
         {...mockProps}
         handleSort={(column) => handleSortChange(mapToSwapField(column), "asc")}
       />
+      <Box sx={{ display: "flex", justifyContent: "end", mt: 3 }}>
+        <Button type="secondary" label="Load more" onClick={() => loadMore()} />
+      </Box>
     </Box>
   );
 }

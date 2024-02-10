@@ -1,5 +1,11 @@
 "use client";
-import { Alert, Grid, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Alert,
+  Grid,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Helmet } from "react-helmet";
 import {
@@ -158,6 +164,7 @@ export default function Page() {
       <Helmet>
         <title>Phoenix DeFi Hub - Dashboard</title>
       </Helmet>
+
       {anchors.length > 0 && (
         <AnchorServices
           anchors={anchors}
@@ -173,12 +180,15 @@ export default function Page() {
         sx={{
           transition: "all 0.2s ease-in-out",
           mt: 6,
+          height: "100%",
         }}
         container
         spacing={largerThenMd ? 3 : 1}
       >
         <Grid item xs={12}>
-          <MainStats {...args.mainstatsArgs} />
+          <Typography sx={{ fontSize: "2rem", fontWeight: "700" }}>
+            Hello 👋
+          </Typography>
         </Grid>
         <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
           <DashboardStats {...args.dashboardStatsArgs} />
@@ -189,10 +199,10 @@ export default function Page() {
         <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
           <DashboardPriceCharts {...args.dashboardArgs} />
         </Grid>
-        <Grid item xs={12} md={4} mt={!largerThenMd ? 2 : undefined}>
+        <Grid item xs={12} md={4} sx={{ mt: 2 }}>
           <CryptoCTA onClick={() => setAnchorOpen(true)} />
         </Grid>
-        <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
+        <Grid item xs={12} md={8} sx={{ mt: 2 }}>
           <WalletBalanceTable {...args.walletBalanceArgs} />
         </Grid>
       </Grid>

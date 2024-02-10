@@ -15,27 +15,36 @@ const tokensAvailableAndPaired: TokenPairs = {
 export async function fetchTokenPrices(tokenSymbol: string): Promise<number> {
   const tokenPair = tokensAvailableAndPaired[tokenSymbol.toUpperCase()];
   if (!tokenPair) {
-    throw new Error(`Token ${tokenSymbol} not supported`);
+    throw new Error(`Token ${tokenSymbol} not supported`);
   }
-  const response = await fetch(
-    `https://www.bitstamp.net/api/v2/ticker/${tokenPair}/`
-  );
+  const targetUrl = `https://www.bitstamp.net/api/v2/ticker/${tokenPair}/`;
+  const response = await fetch("/api/proxy", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ targetUrl }),
+  });
   const data = await response.json();
-  return data.last;
+  return data.data.last;
 }
 
 export async function fetchTokenPrices2(tokenSymbol: string): Promise<number> {
   const tokenPair = tokensAvailableAndPaired[tokenSymbol.toUpperCase()];
   if (!tokenPair) {
-    throw new Error(`Token ${tokenSymbol} not supported`);
+    throw new Error(`Token ${tokenSymbol} not supported`);
   }
-  const response = await fetch(
-    `https://www.bitstamp.net/api/v2/ticker/${tokenPair}/`
-  );
+  const targetUrl = `https://www.bitstamp.net/api/v2/ticker/${tokenPair}/`;
+  const response = await fetch("/api/proxy", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ targetUrl }),
+  });
   const data = await response.json();
-  return data.percent_change_24;
+  return data.data.percent_change_24;
 }
-
 // Function to check biggest winner and loser in the last 24 hours
 // Fetch all prices and return biggest loser and winner symbol by percent_change_24
 export async function fetchBiggestWinnerAndLoser(): Promise<{
