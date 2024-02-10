@@ -2,6 +2,7 @@
 import { Box, Typography } from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
+  Button,
   TransactionsCards,
   TransactionsTable,
   VolumeChart,
@@ -66,6 +67,11 @@ export default function Page() {
     const result = await fetchDataByTimeEpoch(epoch);
     setData(result[Object.keys(result)[0]].intervals);
     setTotalVolume(result[Object.keys(result)[0]].totalVolume);
+  };
+
+  // Load more / pagination
+  const loadMore = () => {
+    setPage(page + 1);
   };
 
   // Load History
@@ -284,6 +290,9 @@ export default function Page() {
         {...mockProps}
         handleSort={(column) => handleSortChange(mapToSwapField(column), "asc")}
       />
+      <Box sx={{ display: "flex", justifyContent: "end", mt: 3 }}>
+        <Button type="secondary" label="Load more" onClick={() => loadMore()} />
+      </Box>
     </Box>
   );
 }

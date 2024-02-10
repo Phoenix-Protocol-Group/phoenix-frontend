@@ -113,7 +113,14 @@ const TransactionsTable = (props: TransactionsTableProps) => {
         ...scrollbarStyles,
       }}
     >
-      <Box sx={{ display: "flex", mb: 2, minWidth: "700px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          mb: 2,
+          minWidth: "700px",
+          justifyContent: "space-between",
+        }}
+      >
         <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
           <Box
             sx={
@@ -138,29 +145,6 @@ const TransactionsTable = (props: TransactionsTableProps) => {
             Personal
           </Box>
         </Box>
-        <Input
-          placeholder="Search"
-          onChange={(e: any) => props.setSearchTerm(e.target.value)}
-          sx={{
-            flex: 1,
-            borderRadius: "8px",
-            border: "1px solid #2C2C31",
-            background: "#2C2C31",
-            padding: "4px 16px",
-            lineHeight: "18px",
-            fontSize: "13px",
-            ml: "0.75rem",
-            "&:before": {
-              content: "none",
-            },
-            "&:after": {
-              content: "none",
-            },
-          }}
-          startAdornment={
-            <img style={{ marginRight: "8px" }} src="/MagnifyingGlass.svg" />
-          }
-        />
         <FilterMenu
           activeFilters={props.activeFilters}
           applyFilters={props.applyFilters}

@@ -85,6 +85,7 @@ export async function fetchSwapHistory(
           sortBy,
           sortOrder,
           accountId,
+          offset,
         },
       });
 
@@ -114,6 +115,7 @@ export async function fetchSwapHistory(
         pageSize,
         sortBy,
         sortOrder,
+        offset,
       },
     });
 
