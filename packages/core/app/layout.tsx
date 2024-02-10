@@ -11,6 +11,7 @@ import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import JoyRideTooltip from "@/components/JoyRideTooltip";
 import { joyride } from "@phoenix-protocol/utils";
 import { TourModal } from "@phoenix-protocol/ui";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   // Use theme for responsive design
@@ -267,6 +268,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </Box>
         </body>
       </Providers>
+      <Analytics />
     </html>
   );
 }
