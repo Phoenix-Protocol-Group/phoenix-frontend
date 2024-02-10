@@ -35,7 +35,6 @@ const BoxStyle = {
     "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
 };
 
-
 const TransactionsTable = (props: TransactionsTableProps) => {
   const tabUnselectedStyles = {
     display: "flex",
@@ -81,6 +80,27 @@ const TransactionsTable = (props: TransactionsTableProps) => {
     lineHeight: "1.25rem", // 200%
   };
 
+  const scrollbarStyles = {
+    /* Firefox */
+    scrollbarWidth: "thin",
+    scrollbarColor: "#E2491A #1B1B1B",
+
+    /* Chrome, Edge, and Safari */
+    "&::-webkit-scrollbar": {
+      width: "4px",
+    },
+
+    "&::-webkit-scrollbar-track": {
+      background:
+        "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);",
+    },
+
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: "#E2491A",
+      borderRadius: "8px",
+    },
+  };
+
   return (
     <Box
       sx={{
@@ -89,9 +109,11 @@ const TransactionsTable = (props: TransactionsTableProps) => {
         borderRadius: 3,
         background:
           "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+        overflowX: "auto",
+        ...scrollbarStyles,
       }}
     >
-      <Box sx={{ display: "flex", mb: 2 }}>
+      <Box sx={{ display: "flex", mb: 2, minWidth: "700px" }}>
         <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
           <Box
             sx={
@@ -109,7 +131,9 @@ const TransactionsTable = (props: TransactionsTableProps) => {
                 ? { ...tabUnselectedStyles, ...tabSelectedStyles }
                 : tabUnselectedStyles
             }
-            onClick={() => props.setActiveView("personal")}
+            onClick={() =>
+              props.loggedIn ? props.setActiveView("personal") : null
+            }
           >
             Personal
           </Box>
@@ -142,7 +166,7 @@ const TransactionsTable = (props: TransactionsTableProps) => {
           applyFilters={props.applyFilters}
         />
       </Box>
-      <Box sx={{ ...BoxStyle, mb: 2 }}>
+      <Box sx={{ ...BoxStyle, mb: 2, minWidth: "700px" }}>
         <Grid container>
           <Grid item xs={2}>
             <TransactionHeader
@@ -212,7 +236,7 @@ const TransactionsTable = (props: TransactionsTableProps) => {
           </Grid>
         </Grid>
       </Box>
-      <Box>
+      <Box sx={{ minWidth: "700px" }}>
         {props.entries.map((entry, index) => (
           <TransactionEntry
             type={entry.type}

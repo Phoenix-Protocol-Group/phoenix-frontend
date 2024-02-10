@@ -51,11 +51,15 @@ const TransactionsCards = (props: TransactionsCardsProps) => {
       sx={{
         display: "flex",
         justifyContent: "space-evenly",
-        gap: "1.5rem",
+        gap: { lg: "1.5rem", xs: "1rem" },
         mt: "1.5rem",
+        flexDirection: { lg: "row", xs: "column" },
       }}
     >
-      <TransactionCard title="Active Traders (24h)" content={props.activeTraders} />
+      <TransactionCard
+        title="Active Traders (24h)"
+        content={props.activeTraders}
+      />
       <TransactionCard title="Total Traders" content={props.totalTraders} />
       <TransactionCard
         title="Most Traded Asset"

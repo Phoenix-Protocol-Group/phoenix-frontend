@@ -30,6 +30,7 @@ export interface TransactionsTableProps {
   loadingResults: boolean;
   activeFilters: ActiveFilters;
   applyFilters: (newFilters: ActiveFilters) => void;
+  loggedIn?: boolean;
 }
 
 export interface ActiveFilters {

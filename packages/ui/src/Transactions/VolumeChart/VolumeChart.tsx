@@ -12,7 +12,7 @@ import {
 } from "recharts";
 
 interface VolumeChartProps {
-  data: { name: string; value: number }[];
+  data: { timestamp: string; volume: number }[];
   selectedTab: "D" | "M" | "A";
   setSelectedTab: (tab: "D" | "M" | "A") => void;
   totalVolume: number;
@@ -88,7 +88,7 @@ const VolumeChart: React.FC<VolumeChartProps> = ({
   setSelectedTab,
 }) => {
   // Find the maximum value in the data array
-  const maxValue = Math.max(...data.map((item) => item.value));
+  const maxValue = Math.max(...data.map((item) => item.volume));
 
   return (
     <Box
@@ -202,7 +202,7 @@ const VolumeChart: React.FC<VolumeChartProps> = ({
             {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={getBarBackground(entry.value, maxValue)}
+                fill={getBarBackground(entry.volume, maxValue)}
               />
             ))}
           </Bar>
