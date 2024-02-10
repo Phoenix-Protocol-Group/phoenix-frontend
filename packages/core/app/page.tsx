@@ -15,6 +15,7 @@ import {
   MainStats,
   WalletBalanceTable,
   AnchorServices,
+  Skeleton,
 } from "@phoenix-protocol/ui";
 import Link from "next/link";
 
@@ -44,6 +45,10 @@ export default function Page() {
   const [loserAsset, setLoserAsset] = useState<any>({});
   const [allTokens, setAllTokens] = useState<any[]>([]);
 
+  // Loading states
+  const [loadingBalances, setLoadingBalances] = useState(true);
+  const [loadingDashboard, setLoadingDashboard] = useState(true);
+
   const authenticate = async (anchor: Anchor) => {
     const manager = new DepositManager(anchor, persistStore.wallet.address!);
     const transferServer = await manager.openTransferServer();
@@ -66,6 +71,7 @@ export default function Page() {
   };
 
   const getBiggestGainerAndLoser = async () => {
+    setLoadingDashboard(true);
     const { winner, loser } = await fetchBiggestWinnerAndLoser();
 
     // Resolve names by fetching all assets
@@ -94,11 +100,14 @@ export default function Page() {
 
     setGainerAsset(_gainerAsset);
     setLoserAsset(_loserAsset);
+    setLoadingDashboard(false);
   };
 
   const loadAllBalances = async () => {
+    setLoadingBalances(true);
     const _allTokens = await appStore.getAllTokens();
     setAllTokens(_allTokens);
+    setLoadingBalances(false);
   };
 
   useEffect(() => {
@@ -191,7 +200,11 @@ export default function Page() {
           </Typography>
         </Grid>
         <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
-          <DashboardStats {...args.dashboardStatsArgs} />
+          {loadingDashboard ? (
+            <Skeleton.DashboardStats />
+          ) : (
+            <DashboardStats {...args.dashboardStatsArgs} />
+          )}
         </Grid>
         <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
           <DashboardPriceCharts {...args.dashboardArgs} />
@@ -203,7 +216,11 @@ export default function Page() {
           <CryptoCTA onClick={() => setAnchorOpen(true)} />
         </Grid>
         <Grid item xs={12} md={8} sx={{ mt: 2 }}>
-          <WalletBalanceTable {...args.walletBalanceArgs} />
+          {loadingBalances ? (
+            <Skeleton.WalletBalanceTable />
+          ) : (
+            <WalletBalanceTable {...args.walletBalanceArgs} />
+          )}
         </Grid>
       </Grid>
     </>

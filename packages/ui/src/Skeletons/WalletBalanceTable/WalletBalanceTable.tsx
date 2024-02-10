@@ -1,20 +1,5 @@
-import {
-  Box,
-  FormControl,
-  Grid,
-  IconButton,
-  InputAdornment,
-  MenuItem,
-  Select,
-  Skeleton,
-  Tab,
-  Tabs,
-  TextField,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material";
+import React from "react";
 
 function a11yProps(index: number) {
   return {
@@ -23,20 +8,21 @@ function a11yProps(index: number) {
   };
 }
 
-const FilterAndTabPanel = ({
-  isMobile,
-}: {
-  isMobile: boolean;
-}) => {
-
+const FilterAndTabPanel = ({ isMobile }: { isMobile: boolean }) => {
   if (!isMobile) {
     return (
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Skeleton variant="text" sx={{ fontSize: '1rem', minWidth: "120px" }} />
-        <Skeleton variant="text" sx={{ fontSize: '1rem', minWidth: "120px" }} />
+        <Skeleton variant="text" sx={{ fontSize: "1rem", minWidth: "120px" }} />
+        <Skeleton variant="text" sx={{ fontSize: "1rem", minWidth: "120px" }} />
         <Box>
-          <Skeleton variant="text" sx={{ fontSize: '1rem', minWidth: "120px" }} />
-          <Skeleton variant="text" sx={{ fontSize: '1rem', minWidth: "120px" }} />
+          <Skeleton
+            variant="text"
+            sx={{ fontSize: "1rem", minWidth: "120px" }}
+          />
+          <Skeleton
+            variant="text"
+            sx={{ fontSize: "1rem", minWidth: "120px" }}
+          />
         </Box>
       </Box>
     );
@@ -44,10 +30,16 @@ const FilterAndTabPanel = ({
     return (
       <Grid container p={0} spacing={1}>
         <Grid item xs={12}>
-          <Skeleton variant="text" sx={{ fontSize: '1rem', minWidth: "120px" }} />
+          <Skeleton
+            variant="text"
+            sx={{ fontSize: "1rem", minWidth: "120px" }}
+          />
         </Grid>
         <Grid item xs={6}>
-          <Skeleton variant="text" sx={{ fontSize: '1rem', minWidth: "120px" }} />
+          <Skeleton
+            variant="text"
+            sx={{ fontSize: "1rem", minWidth: "120px" }}
+          />
         </Grid>
       </Grid>
     );
@@ -67,10 +59,16 @@ const ListItem = () => {
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
         <Skeleton variant="circular" width={32} height={32} />
-        <Skeleton variant="text" sx={{ fontSize: '1.2rem', minWidth: "160px"}} />
+        <Skeleton
+          variant="text"
+          sx={{ fontSize: "1.2rem", minWidth: "160px" }}
+        />
       </Box>
       <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Skeleton variant="text" sx={{ fontSize: '1.2rem', marginRight: "16px", minWidth: "70px" }} />
+        <Skeleton
+          variant="text"
+          sx={{ fontSize: "1.2rem", marginRight: "16px", minWidth: "70px" }}
+        />
         <Skeleton variant="rounded" width={24} height={24} />
       </Box>
     </Box>
@@ -91,9 +89,7 @@ const WalletBalanceTable = () => {
         height: largerThenMd ? "26rem" : "auto",
       }}
     >
-      <FilterAndTabPanel
-        isMobile={!largerThenMd}
-      />
+      <FilterAndTabPanel isMobile={!largerThenMd} />
       <Box sx={{ overflow: "auto", maxHeight: "19rem" }}>
         <ListItem />
         <ListItem />

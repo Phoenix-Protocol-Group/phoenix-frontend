@@ -1,15 +1,5 @@
-import {
-  Box,
-  Chip,
-  Grid,
-  Skeleton,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, Skeleton, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
-import { AreaChart, Area, YAxis, ResponsiveContainer } from "recharts";
-
 
 const GlowingChart = () => (
   <Skeleton variant="rectangular" width="100%" height={250} />
@@ -51,7 +41,10 @@ const DashboardPriceCharts = () => {
             <Skeleton variant="circular" width="1.25rem" height="1.25rem" />
           </Box>
         </Box>
-        <Skeleton variant="text" sx={{ fontSize: '1.5rem', maxWidth: "80px" }} />
+        <Skeleton
+          variant="text"
+          sx={{ fontSize: "1.5rem", maxWidth: "80px" }}
+        />
         <Box
           sx={{
             display: "flex",
@@ -59,7 +52,10 @@ const DashboardPriceCharts = () => {
             alignItems: "center",
           }}
         >
-          <Skeleton variant="text" sx={{ fontSize: '2rem', minWidth: "120px" }} />
+          <Skeleton
+            variant="text"
+            sx={{ fontSize: "2rem", minWidth: "120px" }}
+          />
         </Box>
       </Box>
       <Box
@@ -68,8 +64,7 @@ const DashboardPriceCharts = () => {
           top: 0,
           right: 0,
         }}
-      >
-      </Box>
+      ></Box>
       <Box sx={{ position: "absolute", bottom: 0, width: "100%" }}>
         <GlowingChart />
       </Box>
