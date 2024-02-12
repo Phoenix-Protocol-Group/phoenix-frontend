@@ -18,7 +18,7 @@ import {
 } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { constants, findBestPath } from "@phoenix-protocol/utils";
-import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
+import { SwapError, SwapSuccess, Loading } from "@/components/Modal/Modal";
 import { Alert, Box } from "@mui/material";
 import { init } from "next/dist/compiled/@vercel/og/satori";
 import { Helmet } from "react-helmet";
@@ -39,6 +39,7 @@ export default function SwapPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [swapRoute, setSwapRoute] = useState<string>("");
   const [operations, setOperations] = useState<any[]>([]);
+  const [txBroadcasting, setTxBroadcasting] = useState<boolean>(false);
 
   // Simulate swap states
   const [loadingSimulate, setLoadingSimulate] = useState<boolean>(false);
@@ -56,6 +57,7 @@ export default function SwapPage() {
 
   // Function for handling token swapping logic
   const doSwap = async () => {
+    setTxBroadcasting(true);
     try {
       // Create contract instance
       const contract = new PhoenixMultihopContract.Contract({
@@ -87,6 +89,7 @@ export default function SwapPage() {
     } catch (e) {
       console.error(e);
     }
+    setTxBroadcasting(false);
   };
 
   // Function for simulating swap
@@ -306,6 +309,7 @@ export default function SwapPage() {
           error={errorDescription}
         />
       )}
+      <Loading open={txBroadcasting} setOpen={setTxBroadcasting} />
       <Box>
         {/* Main Swap Container */}
         {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (
