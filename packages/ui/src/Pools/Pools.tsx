@@ -169,18 +169,6 @@ const PoolItem = ({
         </Grid>
 
         <Grid container spacing={1}>
-          <Grid item xs={12} md={7}>
-            <CustomButton
-              onClick={() => onAddLiquidityClick(pool)}
-              sx={{
-                padding: "12px 16px",
-                width: "100%",
-              }}
-              label="Add liquidity"
-              type="primary"
-              size="small"
-            />
-          </Grid>
           <Grid item xs={12} md={5}>
             <CustomButton
               onClick={() => onShowDetailsClick(pool)}
