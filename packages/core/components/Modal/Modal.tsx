@@ -93,7 +93,7 @@ export const UnstakeSuccess = ({
   <ModalUI
     type="SUCCESS"
     open={open}
-    title="Successfulyl Unstaked"
+    title="Successfully Unstaked"
     tokenTitles={["Amount:"]}
     tokens={[token]}
     tokenAmounts={tokenAmounts}
