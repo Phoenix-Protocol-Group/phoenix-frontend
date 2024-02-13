@@ -240,7 +240,7 @@ export default function SwapPage() {
 
   // Effect hook to simualte swaps on token change
   useEffect(() => {
-    if (fromToken && toToken) {
+    if (fromToken && toToken && operations.length) {
       doSimulateSwap();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
