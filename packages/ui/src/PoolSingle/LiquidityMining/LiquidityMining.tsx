@@ -54,8 +54,8 @@ const StakeInput = ({
 }: {
   onStake: () => void;
   balance: number;
-  amount: number;
-  setAmount: (amount: number) => void;
+  amount: string;
+  setAmount: (amount: string) => void;
   tokenName: string;
 }) => {
   const options = [
@@ -94,7 +94,7 @@ const StakeInput = ({
             fontSize: "0.8125rem!important",
           },
         }}
-        onChange={(e) => setAmount(Number(e.target.value))}
+        onChange={(e) => setAmount(e.target.value)}
         InputLabelProps={{
           sx: {
             color: "white!important",
@@ -102,6 +102,10 @@ const StakeInput = ({
             opacity: 0.6,
             textAlign: "center",
           },
+        }}
+        inputProps={{
+          min: 0,
+          max: balance
         }}
         InputProps={{
           endAdornment: (
@@ -146,14 +150,14 @@ const StakeInput = ({
         {options.map((value, index) => (
           <Grid item key={index} xs={3}>
             <OptionButton
-              onClick={(number) => setAmount(balance * number)}
+              onClick={(number) => setAmount((balance * number).toString())}
               {...value}
             />
           </Grid>
         ))}
         <Grid item xs={12}>
           <Button
-            disabled={amount > balance || amount <= 0}
+            disabled={Number(amount) > balance || Number(amount) <= 0}
             fullWidth
             //@ts-ignore
             variant="primary"
@@ -245,7 +249,7 @@ const LiquidityMining = ({
   tokenName,
   onStake,
 }: LiquidityMiningProps) => {
-  const [amount, setAmount] = useState<number>(0);
+  const [amount, setAmount] = useState<string>("");
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
@@ -267,7 +271,7 @@ const LiquidityMining = ({
           balance={balance}
           setAmount={setAmount}
           amount={amount}
-          onStake={() => onStake(amount)}
+          onStake={() => onStake(Number(amount))}
           tokenName={tokenName}
         />
       </Grid>
