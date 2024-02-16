@@ -161,3 +161,24 @@ export const Loading = ({
     setOpen={setOpen}
   />
 );
+
+export const LoadingSwap = ({
+  setOpen,
+  open,
+  fromToken,
+  toToken,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  fromToken: Token;
+  toToken: Token;
+}) => (
+  <ModalUI
+    title=""
+    type="LOADING_SWAP"
+    open={open}
+    description="Transaction broadcasting..."
+    setOpen={setOpen}
+    tokens={[fromToken, toToken]}
+  />
+);

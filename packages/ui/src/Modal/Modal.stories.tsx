@@ -45,6 +45,7 @@ export const SwapSuccess: Story = {
     open: true,
     type: "SUCCESS",
     setOpen: () => {},
+    tokenAmounts: [100, 50],
     tokenTitles: ["From:", "To:"],
     tokens: [
       {
@@ -114,6 +115,31 @@ export const Loading: Story = {
   args: {
     open: true,
     type: "LOADING",
+    setOpen: () => {},
+    description: "Transaction broadcasting...",
+  },
+};
+
+export const LoadingSwap: Story = {
+  args: {
+    open: true,
+    type: "LOADING_SWAP",
+    tokens: [
+      {
+        name: "USDT",
+        icon: "cryptoIcons/usdt.svg",
+        amount: 100,
+        category: "Stable",
+        usdValue: 1 * 100,
+      },
+      {
+        name: "USDC",
+        icon: "cryptoIcons/usdc.svg",
+        amount: 50,
+        category: "Stable",
+        usdValue: 1 * 50,
+      },
+    ],
     setOpen: () => {},
     description: "Transaction broadcasting...",
   },

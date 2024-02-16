@@ -22,7 +22,12 @@ import {
   findBestPath,
   resolveContractError,
 } from "@phoenix-protocol/utils";
-import { SwapError, SwapSuccess, Loading } from "@/components/Modal/Modal";
+import {
+  SwapError,
+  SwapSuccess,
+  Loading,
+  LoadingSwap,
+} from "@/components/Modal/Modal";
 import { Alert, Box } from "@mui/material";
 import { init } from "next/dist/compiled/@vercel/og/satori";
 import { Helmet } from "react-helmet";
@@ -320,7 +325,12 @@ export default function SwapPage() {
           error={errorDescription}
         />
       )}
-      <Loading open={txBroadcasting} setOpen={setTxBroadcasting} />
+      <LoadingSwap
+        open={txBroadcasting}
+        setOpen={setTxBroadcasting}
+        toToken={toToken!}
+        fromToken={fromToken!}
+      />
       <Box>
         {/* Main Swap Container */}
         {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (

@@ -13,4 +13,9 @@ export interface ModalProps {
   error?: string;
 }
 
-export type ModalType = "SUCCESS" | "WARNING" | "ERROR" | "LOADING";
+export type ModalType =
+  | "SUCCESS"
+  | "WARNING"
+  | "ERROR"
+  | "LOADING"
+  | "LOADING_SWAP";

@@ -9,6 +9,7 @@ import {
 import Colors from "../Theme/colors";
 import { Button } from "../Button/Button";
 import { ModalProps } from "@phoenix-protocol/types";
+import SwapAnimation from "./SwapAnimation";
 
 const Modal = ({
   type,
@@ -105,19 +106,23 @@ const Modal = ({
               alignItems: "center",
             }}
           >
-            {type == "LOADING" ? (
+            {type == "LOADING" || type == "LOADING_SWAP" ? (
               <Box
                 sx={{
                   h: "98px",
-                  w: "98px",
-                  margin: "0 auto",
+                  width: type == "LOADING_SWAP" ? "60%" : "98px",
                   marginBottom: "12px",
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
               >
-                <CircularProgress />
+                {type == "LOADING_SWAP" ? (
+                  // @ts-ignore
+                  <SwapAnimation fromToken={tokens[0]} toToken={tokens[1]} />
+                ) : (
+                  <CircularProgress />
+                )}
               </Box>
             ) : (
               <Box
@@ -142,7 +147,7 @@ const Modal = ({
               {title}
             </Typography>
 
-            {!!tokens && (
+            {!!tokens && type !== "LOADING_SWAP" && (
               <Box
                 sx={{
                   width: "100%",
@@ -233,7 +238,7 @@ const Modal = ({
                 </Typography>
               </Box>
             )}
-            {onButtonClick && (
+            {onButtonClick && type !== "LOADING_SWAP" && (
               <Button
                 onClick={onButtonClick}
                 sx={{
