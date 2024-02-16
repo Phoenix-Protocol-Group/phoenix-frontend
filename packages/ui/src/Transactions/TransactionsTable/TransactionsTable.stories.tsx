@@ -23,17 +23,19 @@ const asset = {
 export const Primary: Story = {
   args: {
     entries: [{
-      type: "Sent",
+      type: "Success",
       assets: [asset, asset],
       tradeSize: "1000",
       tradeValue: "2000",
       date: "1.1.2024",
+      txHash: "0x1234567890",
     }, {
-      type: "Received",
+      type: "Failed",
       assets: [asset, asset],
       tradeSize: "1000",
       tradeValue: "2000",
       date: "1.1.2024",
+      txHash: "0x1234567890",
     }]
   },
 };

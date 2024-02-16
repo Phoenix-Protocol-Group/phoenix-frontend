@@ -19,10 +19,15 @@ export const RPC_URL: string = "https://soroban-testnet.stellar.org";
  * Factory contract address
  */
 export const FACTORY_ADDRESS: string =
-  "CCWKMFZ356WOTIELP6TKR2Y3LERRA6VURXB7ZY44BFO45HNZRQWGO4YF";
+  "CDM4B5WKRBXZUWUAGSXR5NPMPOVUGG53WVRGRAOSSNSOPAYO4AQEYIIB";
 
 /**
  * Multihop contract address
  */
 export const MULTIHOP_ADDRESS: string =
-  "CD6WK4FXZSVES5NTITEOZUPVZ6AJGVFFUACEJO63JX35ODDFKTJ6ZIUI";
+  "CCTZUXAKGKD7T6FVDEGEKQHDSLQIXMMNPLH7P6OI5GD5B32LHVKUQQ7F";
+
+/**
+ * Phoenix History Indexer
+ */
+export const PHOENIX_HISTORY_INDEXER: string = "https://graphql.phoenix-hub.io";

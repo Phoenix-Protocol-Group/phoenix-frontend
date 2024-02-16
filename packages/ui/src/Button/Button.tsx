@@ -15,6 +15,7 @@ const Button = ({
       background: "linear-gradient(180deg, #E2391B 0%, #E29E1B 100%)",
       padding: "1px", // This is the border witdh
       borderRadius: "16px",
+      width: props.fullWidth ? "100%" : "auto",
     },
     button: {
       background: type === "primary" ? Colors.primary : Colors.background,
@@ -41,7 +42,7 @@ const Button = ({
         //  @ts-ignore
         sx={{
           ...styles.button,
-          ...props.sx,
+          ...(sx || {}), // Merge with existing sx prop or an empty object
         }}
         {...otherProps}
       >

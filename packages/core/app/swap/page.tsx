@@ -12,10 +12,13 @@ import {
   SwapContainer,
 } from "@phoenix-protocol/ui";
 import { Token } from "@phoenix-protocol/types";
-import { PhoenixMultihopContract } from "@phoenix-protocol/contracts";
+import {
+  PhoenixFactoryContract,
+  PhoenixMultihopContract,
+} from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { constants, findBestPath } from "@phoenix-protocol/utils";
-import { SwapError, SwapSuccess } from "@/components/Modal/Modal";
+import { SwapError, SwapSuccess, Loading } from "@/components/Modal/Modal";
 import { Alert, Box } from "@mui/material";
 import { init } from "next/dist/compiled/@vercel/og/satori";
 import { Helmet } from "react-helmet";
@@ -36,11 +39,15 @@ export default function SwapPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [swapRoute, setSwapRoute] = useState<string>("");
   const [operations, setOperations] = useState<any[]>([]);
+  const [txBroadcasting, setTxBroadcasting] = useState<boolean>(false);
 
   // Simulate swap states
   const [loadingSimulate, setLoadingSimulate] = useState<boolean>(false);
   const [exchangeRate, setExchangeRate] = useState<string>("");
   const [networkFee, setNetworkFee] = useState<string>("");
+
+  // All Pools
+  const [allPools, setAllPools] = useState<any[]>([]);
 
   // Using the store
   const storePersist = usePersistStore();
@@ -50,6 +57,7 @@ export default function SwapPage() {
 
   // Function for handling token swapping logic
   const doSwap = async () => {
+    setTxBroadcasting(true);
     try {
       // Create contract instance
       const contract = new PhoenixMultihopContract.Contract({
@@ -63,7 +71,6 @@ export default function SwapPage() {
         recipient: storePersist.wallet.address!,
         operations: operations,
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
-        referral: undefined,
         max_spread_bps: BigInt((maxSpread + 1) * 100),
         max_belief_price: undefined,
       });
@@ -82,6 +89,7 @@ export default function SwapPage() {
     } catch (e) {
       console.error(e);
     }
+    setTxBroadcasting(false);
   };
 
   // Function for simulating swap
@@ -121,7 +129,6 @@ export default function SwapPage() {
           Number(tx.result.ask_amount) / 10 ** 7,
         ]);
       }
-
     } catch (e) {
       console.log(e);
     }
@@ -177,6 +184,43 @@ export default function SwapPage() {
       setFromToken(allTokens[0]);
       setToToken(allTokens[1]);
       setIsLoading(false);
+      // Get all pools
+      const factoryContract = new PhoenixFactoryContract.Contract({
+        contractId: constants.FACTORY_ADDRESS,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+
+      // Fetch all available tokens from chain
+      const { result } = await factoryContract.queryAllPoolsDetails();
+
+      const allPairs = result.map((pool: any) => {
+        return {
+          asset_a: pool.pool_response.asset_a.address,
+          asset_b: pool.pool_response.asset_b.address,
+        };
+      });
+      setAllPools(allPairs);
+      const fromTokenContractID = allTokens[0].contractId;
+      const toTokenContractID = allTokens[1].contractId;
+      if (!fromTokenContractID || !toTokenContractID) {
+        return;
+      }
+      const { operations: ops } = findBestPath(
+        toTokenContractID,
+        fromTokenContractID,
+        allPairs
+      );
+      const _operations = ops.reverse();
+      const _swapRoute: string[] = _operations.map((op, index) => {
+        const toAssetName = appStore.allTokens.find(
+          (token: any) => token.contractId === op.ask_asset
+        )?.name;
+        return toAssetName;
+      });
+      setOperations(_operations);
+      const swapRoute_ = allTokens[0].name + " -> " + _swapRoute.join(" -> ");
+      setSwapRoute(swapRoute_);
     };
 
     getAllTokens();
@@ -218,7 +262,8 @@ export default function SwapPage() {
 
       const { operations: ops } = findBestPath(
         toTokenContractID,
-        fromTokenContractID
+        fromTokenContractID,
+        allPools
       );
 
       const _operations = ops.reverse();
@@ -234,6 +279,7 @@ export default function SwapPage() {
       const swapRoute_ = fromToken.name + " -> " + _swapRoute.join(" -> ");
       setSwapRoute(swapRoute_);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromToken, toToken, appStore.allTokens]);
 
   // Return statement for rendering components conditionally based on state
@@ -263,6 +309,7 @@ export default function SwapPage() {
           error={errorDescription}
         />
       )}
+      <Loading open={txBroadcasting} setOpen={setTxBroadcasting} />
       <Box>
         {/* Main Swap Container */}
         {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (

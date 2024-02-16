@@ -18,6 +18,7 @@ const TransactionCard = ({
       px: 3,
       py: 4,
       borderRadius: "12px",
+      flex: 1,
       border: "1px solid #2C2C31",
       background:
         "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
@@ -46,16 +47,25 @@ const TransactionCard = ({
 
 const TransactionsCards = (props: TransactionsCardsProps) => {
   return (
-    <Box>
-      <Grid container spacing={3}>
-        <TransactionCard title="Active Traders" content={props.activeTraders} />
-        <TransactionCard title="Total Traders" content={props.totalTraders} />
-        <TransactionCard
-          title="Most Traded Asset"
-          content={props.mostTradedAsset.name}
-          icon={props.mostTradedAsset.icon}
-        />
-      </Grid>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-evenly",
+        gap: { lg: "1.5rem", xs: "1rem" },
+        mt: "1.5rem",
+        flexDirection: { lg: "row", xs: "column" },
+      }}
+    >
+      <TransactionCard
+        title="Active Traders (24h)"
+        content={props.activeTraders}
+      />
+      <TransactionCard title="Total Traders" content={props.totalTraders} />
+      <TransactionCard
+        title="Most Traded Asset"
+        content={props.mostTradedAsset.name}
+        icon={props.mostTradedAsset.icon}
+      />
     </Box>
   );
 };
