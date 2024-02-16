@@ -215,6 +215,24 @@ const Modal = ({
                 </Typography>
               </Box>
             )}
+            {error && (
+              <Box>
+                <Typography
+                  sx={{
+                    color:
+                      "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
+                    textAlign: "center",
+                    fontSize: "12px",
+                    fontWeight: 400,
+                    lineHeight: "140%",
+                    marginBottom: "22px",
+                    marginTop: "4px",
+                  }}
+                >
+                  {error}
+                </Typography>
+              </Box>
+            )}
             {onButtonClick && (
               <Button
                 onClick={onButtonClick}
