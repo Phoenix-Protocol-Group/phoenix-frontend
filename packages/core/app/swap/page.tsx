@@ -17,7 +17,11 @@ import {
   PhoenixMultihopContract,
 } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import { constants, findBestPath, resolveContractError } from "@phoenix-protocol/utils";
+import {
+  constants,
+  findBestPath,
+  resolveContractError,
+} from "@phoenix-protocol/utils";
 import { SwapError, SwapSuccess, Loading } from "@/components/Modal/Modal";
 import { Alert, Box } from "@mui/material";
 import { init } from "next/dist/compiled/@vercel/og/satori";
@@ -210,6 +214,7 @@ export default function SwapPage() {
       const fromTokenContractID = allTokens[0].contractId;
       const toTokenContractID = allTokens[1].contractId;
       if (!fromTokenContractID || !toTokenContractID) {
+        console.log("no from or to token");
         return;
       }
       const { operations: ops } = findBestPath(
@@ -246,7 +251,7 @@ export default function SwapPage() {
 
   // Effect hook to simualte swaps on token change
   useEffect(() => {
-    if (fromToken && toToken) {
+    if (fromToken && toToken && operations.length > 0) {
       doSimulateSwap();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -286,7 +291,7 @@ export default function SwapPage() {
       setSwapRoute(swapRoute_);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromToken, toToken, appStore.allTokens]);
+  }, [fromToken, toToken, allPools]);
 
   // Return statement for rendering components conditionally based on state
   return isLoading ? (
