@@ -246,7 +246,13 @@ export default function Page() {
   };
 
   return (
-    <Box sx={{ width: "100%", padding: "2.5rem" }}>
+    <Box
+      sx={{
+        width: "100%",
+        padding: { xs: 0, md: "2.5rem" },
+        mt: { xs: "4.5rem", md: 0 },
+      }}
+    >
       <Typography
         sx={{
           color: "#FFF",
