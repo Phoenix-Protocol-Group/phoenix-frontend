@@ -12,3 +12,4 @@ export * as Sep24 from "./sep24";
 export * from "./sep10";
 export * from "./graphql";
 export * from "./prices";
+export * from "./errorResolver";

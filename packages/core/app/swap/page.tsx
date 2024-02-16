@@ -17,7 +17,7 @@ import {
   PhoenixMultihopContract,
 } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import { constants, findBestPath } from "@phoenix-protocol/utils";
+import { constants, findBestPath, resolveContractError } from "@phoenix-protocol/utils";
 import { SwapError, SwapSuccess, Loading } from "@/components/Modal/Modal";
 import { Alert, Box } from "@mui/material";
 import { init } from "next/dist/compiled/@vercel/og/satori";
@@ -83,14 +83,16 @@ export default function SwapPage() {
         // @ts-ignore
         setErrorDescription(tx?.resultXdr);
 
-        // @ts-ignore
-        console.log(result);
-
         setTxBroadcasting(false);
         return;
       }
       setSuccessModalOpen(true);
     } catch (e) {
+      setErrorModalOpen(true);
+
+      // @ts-ignore
+      setErrorDescription(resolveContractError(e.message));
+      setTxBroadcasting(false);
       console.error(e);
     }
     setTxBroadcasting(false);
