@@ -44,6 +44,7 @@ export default function Page() {
   const [gainerAsset, setGainerAsset] = useState<any>({});
   const [loserAsset, setLoserAsset] = useState<any>({});
   const [allTokens, setAllTokens] = useState<any[]>([]);
+  const [xlmPrice, setXlmPrice] = useState(0);
 
   // Loading states
   const [loadingBalances, setLoadingBalances] = useState(true);
@@ -118,8 +119,14 @@ export default function Page() {
   useEffect(() => {
     initAnchor();
     getBiggestGainerAndLoser();
+    getXlmPrice();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const getXlmPrice = async () => {
+    const price = await fetchTokenPrices("XLM");
+    setXlmPrice(price);
+  };
 
   const args = {
     mainstatsArgs: {
@@ -149,7 +156,7 @@ export default function Page() {
         [1687651200000, 0.09057594512560627],
         [1687737600000, 0.09168837759904613],
         [1687824000000, 0.09213058385843788],
-        [1687859473000, 0.09397611798887386],
+        [1687859473000, xlmPrice],
       ],
       icon: {
         small: "image-103.png",

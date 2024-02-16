@@ -257,10 +257,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               display: "flex",
               justifyContent: "center",
               padding: "16px",
-              // Conditionally apply styles for swap page
-              ...(pathname === "/swap" || pathname === "/"
-                ? swapPageStyle
-                : {}),
+              ...swapPageStyle,
             }}
           >
             {/* Child Components */}

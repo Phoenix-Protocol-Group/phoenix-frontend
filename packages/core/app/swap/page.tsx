@@ -83,6 +83,10 @@ export default function SwapPage() {
         // @ts-ignore
         setErrorDescription(tx?.resultXdr);
 
+        // @ts-ignore
+        console.log(result);
+
+        setTxBroadcasting(false);
         return;
       }
       setSuccessModalOpen(true);
