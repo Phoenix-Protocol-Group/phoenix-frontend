@@ -9,6 +9,7 @@ import {
   Input,
   Radio,
   RadioGroup,
+  TextField,
   Typography,
 } from "@mui/material";
 import { KeyboardArrowLeft } from "@mui/icons-material";
@@ -21,6 +22,19 @@ const SlippageSettings = ({
   onClose,
   onChange,
 }: SlippageOptionsProps) => {
+  const [customInputValue, setCustomInputValue] = React.useState("");
+
+  const handleChange = (optionValue: string) => {
+    onChange(optionValue !== "custom" ? optionValue : customInputValue);
+  };
+
+  const handleCustomInputChange = (event) => {
+    const value = (Number(event.target.value) > 30) ? "30" : event.target.value; 
+
+    setCustomInputValue(value);
+    handleChange(value);
+  };
+
   return (
     <Box
       sx={{
@@ -76,13 +90,16 @@ const SlippageSettings = ({
                 "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
             }}
           >
-            Select slippage tolerance
+            Select Spread tolerance
           </Typography>
-          <RadioGroup defaultValue={selectedOption} onChange={onChange}>
+          <RadioGroup
+            defaultValue={selectedOption}
+            onChange={(e: any) => handleChange(e.target.value)}
+          >
             {options.map((option, index) => (
               <FormControlLabel
                 key={index}
-                value={index}
+                value={option.charAt(0)}
                 control={
                   <Radio
                     color="primary"
@@ -106,6 +123,52 @@ const SlippageSettings = ({
                 }
               />
             ))}
+            <FormControlLabel
+              value="custom"
+              control={
+                <Radio
+                  color="primary"
+                  sx={{
+                    "& .MuiSvgIcon-root": {
+                      fontSize: 20,
+                    },
+                  }}
+                />
+              }
+              label={
+                <TextField
+                  value={customInputValue}
+                  onChange={handleCustomInputChange}
+                  placeholder="Custom option"
+                  type="number"
+                  inputProps={{ min: 0, max: 30 }}
+                  InputLabelProps={{
+                    sx: {
+                      color: "white!important",
+                      fontSize: "14px",
+                      opacity: 0.6,
+                      textAlign: "center",
+                    },
+                  }}
+                  InputProps={{
+                    sx: {
+                      minWidth: "140px",
+                      color: "white",
+                      fontSize: "14px",
+                      lineHeight: "16px",
+                      borderRadius: "16px",
+                      "&:hover fieldset": {
+                        border: "1px solid #E2621B!important",
+                      },
+                      "&:focus-within fieldset, &:focus-visible fieldset": {
+                        border: "2px solid #E2621B!important",
+                        color: "white!important",
+                      },
+                    },
+                  }}
+                />
+              }
+            />
           </RadioGroup>
         </FormControl>
       </Box>

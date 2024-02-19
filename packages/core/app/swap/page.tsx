@@ -43,7 +43,7 @@ export default function SwapPage() {
   const [tokenAmounts, setTokenAmounts] = useState<number[]>([0, 0]);
   const [tokens, setTokens] = useState<Token[]>([]);
   const [fromToken, setFromToken] = useState<Token>();
-  const [maxSpread, setMaxSpread] = useState<number>(0);
+  const [maxSpread, setMaxSpread] = useState<number>(1);
   const [toToken, setToToken] = useState<Token>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [swapRoute, setSwapRoute] = useState<string>("");
@@ -371,11 +371,11 @@ export default function SwapPage() {
         {/* Options Modal for Setting Slippage Tolerance */}
         {optionsOpen && (
           <SlippageSettings
-            options={["1%", "2%", "3%"]}
+            options={["1%", "3%", "5%"]}
             selectedOption={maxSpread}
             onClose={() => setOptionsOpen(false)}
-            onChange={(e) => {
-              setMaxSpread(Number(e.target.value));
+            onChange={(option: string) => {
+              setMaxSpread(Number(option));
             }}
           />
         )}
