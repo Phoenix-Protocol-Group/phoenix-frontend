@@ -425,7 +425,7 @@ export default function Page({ params }: PoolPageProps) {
 
   if (!params.poolAddress || poolNotFound) {
     return (
-      <Box>
+      <Box sx={{ mt: { xs: 12, md: 0 } }}>
         <Typography>{"The pool you're looking for doesn't exist."}</Typography>
         <Typography>
           Return <Link href="/">Home</Link>
@@ -434,7 +434,7 @@ export default function Page({ params }: PoolPageProps) {
     );
   }
   return (
-    <Box>
+    <Box sx={{ mt: { xs: 12, md: 0 } }}>
       <Helmet>
         <title>{`Phoenix DeFi Hub - ${tokenA?.name} / ${tokenB?.name}`}</title>
       </Helmet>
