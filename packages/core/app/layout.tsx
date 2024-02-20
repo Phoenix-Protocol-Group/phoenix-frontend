@@ -140,7 +140,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     backgroundRepeat: "no-repeat",
     backgroundAttachment: "fixed",
     backgroundPosition: "center",
-    backgroundSize: "50% 100%",
+    backgroundSize: { xs: "cover", md: "50% 100%" },
+    width: {
+      xs: "100vw",
+      md: largerThenMd
+        ? navOpen
+          ? "calc(100% - 240px)"
+          : "calc(100% - 60px)"
+        : navOpen
+        ? "0"
+        : "100%",
+    },
+    height: { xs: "100vh", md: "auto" },
+    overflowX: { xs: "hidden", md: "auto" },
   };
 
   // Hacky way to avoid overflows
@@ -245,13 +257,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 : navOpen
                 ? "240px"
                 : "0",
-              width: largerThenMd
-                ? navOpen
-                  ? "calc(100% - 240px)"
-                  : "calc(100% - 60px)"
-                : navOpen
-                ? "0"
-                : "100%",
               minHeight: "100vh",
               transition: "all 0.2s ease-in-out",
               display: "flex",
