@@ -21,7 +21,7 @@ export const SwapSuccess = ({
   <ModalUI
     type="SUCCESS"
     open={open}
-    title="Successul Swap"
+    title="Successful Swap"
     tokenTitles={["From:", "To:"]}
     tokens={tokens}
     tokenAmounts={tokenAmounts}
