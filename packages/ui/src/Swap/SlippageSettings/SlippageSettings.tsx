@@ -7,6 +7,7 @@ import {
   Grid,
   IconButton,
   Input,
+  InputAdornment,
   Radio,
   RadioGroup,
   TextField,
@@ -29,7 +30,7 @@ const SlippageSettings = ({
   };
 
   const handleCustomInputChange = (event) => {
-    const value = (Number(event.target.value) > 30) ? "30" : event.target.value; 
+    const value = Number(event.target.value) > 30 ? "30" : event.target.value;
 
     setCustomInputValue(value);
     handleChange(value);
@@ -151,6 +152,9 @@ const SlippageSettings = ({
                     },
                   }}
                   InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
                     sx: {
                       minWidth: "140px",
                       color: "white",

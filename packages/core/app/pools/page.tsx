@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { Address } from "stellar-sdk";
 import { Pool } from "@phoenix-protocol/types";
 import { Helmet } from "react-helmet";
+import { Box } from "@mui/material";
 
 export default function Page() {
   const store = useAppStore(); // Global state management
@@ -154,14 +155,14 @@ export default function Page() {
   }, [loading]);
   // Render: conditionally display skeleton loader or pool data
   return loading ? (
-    <>
+    <Box sx={{ mt: { xs: 12, md: 0 } }}>
       <Helmet>
         <title>Phoenix DeFi Hub - Pools Overview</title>
       </Helmet>
       <Skeleton.Pools />
-    </>
+    </Box>
   ) : (
-    <>
+    <Box sx={{ mt: { xs: 12, md: 0 } }}>
       <Helmet>
         <title>Phoenix DeFi Hub - Pools Overview</title>
       </Helmet>
@@ -176,6 +177,6 @@ export default function Page() {
         onFilterClick={() => {}}
         onSortSelect={() => {}}
       />
-    </>
+    </Box>
   );
 }

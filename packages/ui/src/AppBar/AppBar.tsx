@@ -168,7 +168,7 @@ const AppBar = ({
               <Button
                 className={"connect-wallet"}
                 size="small"
-                sx={{ marginRight: 1 }}
+                sx={{ mr: { sx: 3, md: 1 }, padding: { sx: 2, md: 2 } }}
                 // @ts-ignore
                 variant="primary"
                 onClick={connectWallet}
@@ -178,7 +178,7 @@ const AppBar = ({
             )}
           </Box>
           {!largerThenMd && (
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: "flex", alignItems: "center", ml: 2 }}>
               <MenuButton
                 isOpen={mobileNavOpen}
                 onClick={() => toggleMobileNav(!mobileNavOpen)}

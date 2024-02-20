@@ -16,7 +16,7 @@ const TourModal = ({
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "30rem",
+    width: { md: "30rem", xs: "100vw" },
     background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
     borderRadius: "16px",
     display: "flex",
