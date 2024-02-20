@@ -1,6 +1,7 @@
 "use client";
 import {
   Alert,
+  Box,
   Grid,
   Typography,
   useMediaQuery,
@@ -176,7 +177,7 @@ export default function Page() {
   };
 
   return (
-    <>
+    <Box sx={{ marginTop: { md: 0, xs: 12 } }}>
       <Helmet>
         <title>Phoenix DeFi Hub - Dashboard</title>
       </Helmet>
@@ -230,6 +231,6 @@ export default function Page() {
           )}
         </Grid>
       </Grid>
-    </>
+    </Box>
   );
 }
