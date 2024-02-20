@@ -80,7 +80,7 @@ export default function SwapPage() {
         recipient: storePersist.wallet.address!,
         operations: operations,
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
-        max_spread_bps: BigInt((maxSpread + 1) * 100),
+        max_spread_bps: BigInt(maxSpread * 100),
         max_belief_price: undefined,
       });
 
@@ -362,7 +362,7 @@ export default function SwapPage() {
             loadingSimulate={loadingSimulate}
             estSellPrice={"TODO"}
             minSellPrice={"TODO"}
-            slippageTolerance={`${maxSpread + 1}%`}
+            slippageTolerance={`${maxSpread}%`}
             swapButtonDisabled={
               tokenAmounts[0] <= 0 || storePersist.wallet.address === undefined
             }
