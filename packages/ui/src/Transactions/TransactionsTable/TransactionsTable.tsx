@@ -116,7 +116,7 @@ const TransactionsTable = (props: TransactionsTableProps) => {
         sx={{
           display: "flex",
           mb: 2,
-          minWidth: "700px",
+          minWidth: {xs: "80vw", md: "700px"},
           justifyContent: "space-between",
         }}
       >
