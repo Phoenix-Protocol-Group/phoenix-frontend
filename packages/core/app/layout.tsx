@@ -254,8 +254,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 ? navOpen
                   ? "240px"
                   : "60px"
-                : navOpen
-                ? "240px"
                 : "0",
               minHeight: "100vh",
               transition: "all 0.2s ease-in-out",
