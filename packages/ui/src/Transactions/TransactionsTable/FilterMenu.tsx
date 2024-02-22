@@ -214,6 +214,10 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                       fontWeight: 400,
                       borderRadius: "1rem",
                       border: "1px solid #2D303A",
+                      minWidth: {
+                        xs: "unset",
+                        md: "200px"
+                      }
                     },
                     "& legend": {
                       display: "none",
