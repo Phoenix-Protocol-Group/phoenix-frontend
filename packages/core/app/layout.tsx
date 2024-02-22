@@ -141,6 +141,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     backgroundAttachment: "fixed",
     backgroundPosition: "center",
     backgroundSize: { xs: "cover", md: "50% 100%" },
+    paddingBottom: "50px",
     width: {
       xs: "100vw",
       md: largerThenMd
