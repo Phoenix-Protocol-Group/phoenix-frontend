@@ -150,7 +150,7 @@ export default function Overview() {
         <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
           <DashboardPriceCharts {...args.dashboardArgs} />
         </Grid>
-        <Grid item xs={12} md={4} mt={!largerThenMd ? 2 : undefined}>
+        <Grid item xs={12} md={4} mt={!largerThenMd ? 4 : undefined}>
           <CryptoCTA onClick={() => {}} />
         </Grid>
         <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>

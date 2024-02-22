@@ -72,7 +72,7 @@ const ConnectWallet = ({
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: { md: 512, xs: "100vw" },
+    width: { md: 512, xs: "96vw" },
     background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
     borderRadius: "16px",
     display: "flex",
