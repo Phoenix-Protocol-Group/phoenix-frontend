@@ -137,7 +137,7 @@ const AppBar = ({
           background: largerThenMd
             ? "transparent"
             : "linear-gradient(180deg, #1A1C20 0%, #0E1011 100%)",
-          position: "absolute",
+          position: {xs: "fixed", md: "absolute"},
           top: 0,
           left: 0,
           width: "100%",

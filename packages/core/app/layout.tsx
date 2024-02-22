@@ -151,8 +151,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         ? "0"
         : "100%",
     },
-    height: { xs: "100vh", md: "auto" },
-    overflowX: { xs: "hidden", md: "auto" },
   };
 
   // Hacky way to avoid overflows
