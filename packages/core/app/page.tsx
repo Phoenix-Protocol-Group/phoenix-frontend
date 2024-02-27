@@ -207,23 +207,35 @@ export default function Page() {
             Hello 👋
           </Typography>
         </Grid>
-        <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
+        <Grid item xs={12} md={12} lg={8} mt={!largerThenMd ? 2 : undefined}>
           {loadingDashboard ? (
             <Skeleton.DashboardStats />
           ) : (
             <DashboardStats {...args.dashboardStatsArgs} />
           )}
         </Grid>
-        <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
+        <Grid item xs={6} md={6} lg={2} mt={!largerThenMd ? 2 : undefined} sx={{
+          pr: {
+            xs: 0,
+            md: 0.5,
+            lg: 0
+          }
+        }}>
           <DashboardPriceCharts {...args.dashboardArgs} />
         </Grid>
-        <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
+        <Grid item xs={6} md={6} lg={2} mt={!largerThenMd ? 2 : undefined} sx={{
+          pl: {
+            xs: 0,
+            md: 0.5,
+            lg: 0
+          }
+        }}>
           <DashboardPriceCharts {...args.dashboardArgs} />
         </Grid>
-        <Grid item xs={12} md={4} sx={{ mt: 2 }}>
+        <Grid item xs={12} md={5} lg={4} sx={{ mt: 2 }}>
           <CryptoCTA onClick={() => setAnchorOpen(true)} />
         </Grid>
-        <Grid item xs={12} md={8} sx={{ mt: 2 }}>
+        <Grid item xs={12} md={7} lg={8} sx={{ mt: 2 }}>
           {loadingBalances ? (
             <Skeleton.WalletBalanceTable />
           ) : (
