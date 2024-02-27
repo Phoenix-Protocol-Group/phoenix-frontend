@@ -85,7 +85,7 @@ const PoolItem = ({
   onShowDetailsClick: (pool: Pool) => void;
 }) => {
   return (
-    <Grid item xs={6} md={3} className="pool-card">
+    <Grid item xs={6} md={4} lg={3} className="pool-card">
       <Box
         sx={{
           padding: "16px",
@@ -232,13 +232,15 @@ const Pools = ({
           />
         </Grid>
       </Grid>
-      <Grid container spacing={1}>
-        <Grid item xs={7} md={10}>
+      <Box sx={{
+        display: "flex"
+      }}>
           <Input
             placeholder="Search"
             onChange={(e: any) => setSearchValue(e.target.value)}
             sx={{
               width: "100%",
+              mr: 2,
               borderRadius: "16px",
               border: "1px solid #2D303A",
               background: "#1D1F21",
@@ -257,9 +259,9 @@ const Pools = ({
               <img style={{ marginRight: "8px" }} src="/MagnifyingGlass.svg" />
             }
           />
-        </Grid>
-        <Grid item xs={5} md={2}>
-          <FormControl fullWidth>
+          <FormControl sx={{
+            minWidth: "180px"
+          }}>
             <InputLabel
               sx={{
                 fontSize: "13px !important",
@@ -269,7 +271,7 @@ const Pools = ({
                 borderColor: "transparent",
                 "&:hover": {
                   borderColor: "transparent",
-                },
+                }
               }}
             >
               Sort by
@@ -302,8 +304,7 @@ const Pools = ({
               </MenuItem>
             </Select>
           </FormControl>
-        </Grid>
-      </Grid>
+      </Box>
       <Grid container spacing={2}>
         {pools.map((pool, index) => (
           <PoolItem
