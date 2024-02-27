@@ -162,7 +162,7 @@ export default function Page() {
       <Skeleton.Pools />
     </Box>
   ) : (
-    <Box sx={{ mt: { xs: 12, md: 0 } }}>
+    <Box sx={{ mt: { xs: 12, md: 0 }, width: "100%" }}>
       <Helmet>
         <title>Phoenix DeFi Hub - Pools Overview</title>
       </Helmet>
