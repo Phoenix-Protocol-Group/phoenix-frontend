@@ -141,6 +141,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     backgroundAttachment: "fixed",
     backgroundPosition: "center",
     backgroundSize: { xs: "cover", md: "50% 100%" },
+    paddingBottom: "50px",
     width: {
       xs: "100vw",
       md: largerThenMd
@@ -151,8 +152,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         ? "0"
         : "100%",
     },
-    height: { xs: "100vh", md: "auto" },
-    overflowX: { xs: "hidden", md: "auto" },
   };
 
   // Hacky way to avoid overflows
@@ -254,8 +253,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 ? navOpen
                   ? "240px"
                   : "60px"
-                : navOpen
-                ? "240px"
                 : "0",
               minHeight: "100vh",
               transition: "all 0.2s ease-in-out",

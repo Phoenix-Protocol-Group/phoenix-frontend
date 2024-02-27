@@ -360,6 +360,10 @@ const WalletBalanceTable = ({ tokens }: WalletBalanceTableProps) => {
         background:
           "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
         height: largerThenMd ? "26rem" : "auto",
+        mb: {
+          xs: 2,
+          md: 0
+        }
       }}
     >
       <FilterAndTabPanel
@@ -372,7 +376,7 @@ const WalletBalanceTable = ({ tokens }: WalletBalanceTableProps) => {
         sort={sort}
         isMobile={!largerThenMd}
       />
-      <Box sx={{ overflow: "auto", maxHeight: "19rem", ...scrollbarStyles }}>
+      <Box sx={{ overflow: "auto", maxHeight: "19rem", mt: {xs: 2, md: 0}, ...scrollbarStyles }}>
         {[...tokens]
           .filter((token) => token.category === category || category === "All")
           .filter((token) =>

@@ -137,11 +137,12 @@ const AppBar = ({
           background: largerThenMd
             ? "transparent"
             : "linear-gradient(180deg, #1A1C20 0%, #0E1011 100%)",
-          position: "absolute",
+          position: {xs: "fixed", md: "absolute"},
           top: 0,
           left: 0,
           width: "100%",
           p: "0.8rem 0.3rem",
+          zIndex: 1
         }}
       >
         <Box
@@ -154,7 +155,7 @@ const AppBar = ({
         >
           <Box component="img" src="/logo_icon.svg" />
         </Box>
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: "flex", mr: {xs: 2, md: 0} }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             {walletAddress && balance >= 0 ? (
               <>

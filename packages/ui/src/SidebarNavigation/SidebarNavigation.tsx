@@ -102,6 +102,7 @@ const SidebarNavigation = ({
         sx: {
           background: Colors.backgroundSidenav,
           boxShadow: "-1px 0px 0px 0px rgba(228, 228, 228, 0.10) inset",
+          maxWidth: "100vw",
         },
       }}
       variant="permanent"

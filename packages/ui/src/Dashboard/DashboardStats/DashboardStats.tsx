@@ -182,6 +182,10 @@ const DashboardStats = ({
           sx={{
             padding: "1.2rem 2.8rem",
             borderLeft: "1px solid rgba(255, 255, 255, 0.10)",
+            paddingRight: {
+              xs: "0",
+              md: "2.8rem"
+            }
           }}
         >
           <GainerAndLooser title="Top Loser" asset={loser} />
