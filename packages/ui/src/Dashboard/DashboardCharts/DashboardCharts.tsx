@@ -55,7 +55,7 @@ const DashboardPriceCharts = ({
   return (
     <Box
       sx={{
-        height: "26rem",
+        height: "26.875rem",
         borderRadius: "24px",
         position: "relative",
         background:
