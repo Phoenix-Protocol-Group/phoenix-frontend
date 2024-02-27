@@ -155,7 +155,7 @@ const AppBar = ({
         >
           <Box component="img" src="/logo_icon.svg" />
         </Box>
-        <Box sx={{ display: "flex", mr: {xs: 2, md: 1} }}>
+        <Box sx={{ display: "flex", mr: {xs: 2, md: 1.3} }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             {walletAddress && balance >= 0 ? (
               <>
