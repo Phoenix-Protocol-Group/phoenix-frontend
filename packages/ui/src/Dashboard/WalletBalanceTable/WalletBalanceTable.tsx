@@ -169,7 +169,9 @@ const FilterAndTabPanel = ({
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} mb={2} sx={{
+          display: "flex"
+        }}>
           <TextField
             id="search"
             type="search"
@@ -177,6 +179,7 @@ const FilterAndTabPanel = ({
             placeholder="Search"
             sx={{
               color: "white",
+              width: "100%",
               "&::placeholder": {
                 color: "white",
                 opacity: 0.6,
@@ -202,6 +205,7 @@ const FilterAndTabPanel = ({
               sx: {
                 color: "white",
                 opacity: 0.6,
+                width: "100%",
                 fontSize: "0.8125rem",
                 lineHeight: "1.125rem",
                 borderRadius: "16px",
@@ -215,9 +219,7 @@ const FilterAndTabPanel = ({
               },
             }}
           />
-        </Grid>
-        <Grid item xs={6}>
-          <FormControl sx={{ ml: 1, minWidth: 120 }}>
+          <FormControl sx={{ ml: 1, minWidth: 150 }}>
             <Select
               value={sort}
               onChange={(e) => setSort(e.target.value as "highest" | "lowest")}
@@ -235,7 +237,7 @@ const FilterAndTabPanel = ({
               <MenuItem value={"lowest"}>Lowest Balance</MenuItem>
             </Select>
           </FormControl>
-        </Grid>
+      </Grid>
       </Grid>
     );
   }

@@ -11,7 +11,7 @@ const AssetStat = () => (
     <Box
       sx={{
         display: "flex",
-        padding: "1.5rem 2rem",
+        padding: "1.4rem 2rem",
         alignItems: "center",
       }}
     >
@@ -43,7 +43,7 @@ const GainerAndLooser = () => (
       sx={{
         display: "flex",
         alignItems: "center",
-        marginTop: "1rem",
+        marginTop: "0.6rem",
         gap: 1,
       }}
     >
@@ -52,7 +52,7 @@ const GainerAndLooser = () => (
       <Skeleton variant="text" sx={{ fontSize: '1rem', minWidth: "40px" }} />
     </Box>
     <Skeleton variant="text" sx={{ fontSize: '2rem', maxWidth:"120px" }} />
-    <Box sx={{ display: "flex", gap: 4, marginTop: "1.5rem" }}>
+    <Box sx={{ display: "flex", gap: 4, marginTop: "1.4rem" }}>
       <Box>
       <Skeleton variant="text" sx={{ fontSize: '1rem', minWidth: "60px" }} />
         <Box sx={{ display: "flex", gap: 1, marginTop: "0.5rem" }}>
@@ -77,7 +77,7 @@ const DashboardStats = () => {
         background:
           "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
         borderRadius: "1rem",
-        padding: "2rem",
+        padding: "2rem 2rem 0.813rem 2rem",
         height: "100%",
       }}
     >

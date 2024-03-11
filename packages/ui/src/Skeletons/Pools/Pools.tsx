@@ -24,7 +24,7 @@ const descriptionContent = {
 
 const PoolItem = () => {
   return (
-    <Grid item xs={6} md={3}>
+    <Grid item xs={6} md={4} lg={3}>
       <Box
         sx={{
           padding: "16px",
@@ -41,7 +41,9 @@ const PoolItem = () => {
             marginLeft: "5px",
           }}
         >
-          <Skeleton variant="circular" sx={{
+          <Skeleton
+            variant="circular"
+            sx={{
               width: {
                 xs: "48px",
                 md: "64px",
@@ -50,8 +52,11 @@ const PoolItem = () => {
                 xs: "48px",
                 md: "64px",
               },
-            }}/>
-          <Skeleton variant="circular" sx={{
+            }}
+          />
+          <Skeleton
+            variant="circular"
+            sx={{
               width: {
                 xs: "48px",
                 md: "64px",
@@ -60,9 +65,10 @@ const PoolItem = () => {
                 xs: "48px",
                 md: "64px",
               },
-            }}/>
+            }}
+          />
         </Box>
-        <Skeleton variant="text" sx={{ fontSize: '18px', minWidth: "120px" }} />
+        <Skeleton variant="text" sx={{ fontSize: "18px", minWidth: "120px" }} />
 
         <Grid
           container
@@ -73,16 +79,28 @@ const PoolItem = () => {
           }}
         >
           <Grid item xs={6}>
-            <Skeleton variant="text" sx={{ fontSize: '16px', minWidth: "60px" }} />
+            <Skeleton
+              variant="text"
+              sx={{ fontSize: "16px", minWidth: "60px" }}
+            />
           </Grid>
           <Grid item xs={6}>
-          <Skeleton variant="text" sx={{ fontSize: '16px', minWidth: "80px" }} />
+            <Skeleton
+              variant="text"
+              sx={{ fontSize: "16px", minWidth: "80px" }}
+            />
           </Grid>
           <Grid item xs={6}>
-          <Skeleton variant="text" sx={{ fontSize: '16px', minWidth: "60px" }} />
+            <Skeleton
+              variant="text"
+              sx={{ fontSize: "16px", minWidth: "60px" }}
+            />
           </Grid>
           <Grid item xs={6}>
-          <Skeleton variant="text" sx={{ fontSize: '16px', minWidth: "80px" }} />
+            <Skeleton
+              variant="text"
+              sx={{ fontSize: "16px", minWidth: "80px" }}
+            />
           </Grid>
         </Grid>
 
@@ -102,34 +120,39 @@ const PoolItem = () => {
 const Pools = () => {
   return (
     <Box>
-      <Skeleton variant="text" sx={{ fontSize: '36px', maxWidth: "160px" }} />
-      <Skeleton variant="text" sx={{ fontSize: '1rem', width: "100px", marginBottom: "16px" }} />
+      <Skeleton variant="text" sx={{ fontSize: "36px", maxWidth: "160px" }} />
+      <Skeleton
+        variant="text"
+        sx={{ fontSize: "1rem", width: "100px", marginBottom: "16px" }}
+      />
       <Grid container spacing={1}>
-        <Grid item xs={7} md={10}>
-        <Skeleton variant="rounded" width="100%" height={30} sx={{
-          marginBottom: "16px"
-        }} />
+        <Grid item xs={9} md={10}>
+          <Skeleton
+            variant="rounded"
+            width="100%"
+            height={30}
+            sx={{
+              marginBottom: "16px",
+            }}
+          />
         </Grid>
         <Grid item xs={5} md={2}>
-          <Skeleton variant="rounded" sx={{ height: '30px', width: "100%" }} />
+          <Skeleton variant="rounded" sx={{ height: "30px", width: "100%" }} />
         </Grid>
       </Grid>
-      <Grid
-        container
-        spacing={2}
-      >
-        <PoolItem/>
-        <PoolItem/>
-        <PoolItem/>
-        <PoolItem/>
-        <PoolItem/>
-        <PoolItem/>
-        <PoolItem/>
-        <PoolItem/>
-        <PoolItem/>
-        <PoolItem/>
-        <PoolItem/>
-        <PoolItem/>
+      <Grid container spacing={2}>
+        <PoolItem />
+        <PoolItem />
+        <PoolItem />
+        <PoolItem />
+        <PoolItem />
+        <PoolItem />
+        <PoolItem />
+        <PoolItem />
+        <PoolItem />
+        <PoolItem />
+        <PoolItem />
+        <PoolItem />
       </Grid>
     </Box>
   );

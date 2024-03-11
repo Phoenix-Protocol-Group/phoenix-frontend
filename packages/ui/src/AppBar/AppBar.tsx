@@ -155,7 +155,7 @@ const AppBar = ({
         >
           <Box component="img" src="/logo_icon.svg" />
         </Box>
-        <Box sx={{ display: "flex", mr: {xs: 2, md: 0} }}>
+        <Box sx={{ display: "flex", mr: {xs: 2, md: 1.3} }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             {walletAddress && balance >= 0 ? (
               <>
@@ -169,7 +169,7 @@ const AppBar = ({
               <Button
                 className={"connect-wallet"}
                 size="small"
-                sx={{ mr: { sx: 3, md: 1 }, padding: { sx: 2, md: 2 } }}
+                sx={{ mr: { xs: 3, md: 1 }, padding: { sx: 2, md: 2 } }}
                 // @ts-ignore
                 variant="primary"
                 onClick={connectWallet}
