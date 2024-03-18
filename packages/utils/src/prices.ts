@@ -1,3 +1,6 @@
+import { ReflectorContract } from "@phoenix-protocol/contracts";
+import { constants } from ".";
+
 interface TokenPairs {
   [key: string]: string;
 }
@@ -27,6 +30,20 @@ export async function fetchTokenPrices(tokenSymbol: string): Promise<number> {
   });
   const data = await response.json();
   return data.data.last;
+}
+
+export async function fetchReflectorTokenPrices() {
+  const Reflector = new ReflectorContract.Contract({
+    contractId: constants.REFLECTOR_ADDRESS,
+    networkPassphrase: constants.NETWORK_PASSPHRASE,
+    rpcUrl: constants.RPC_URL,
+  });
+
+  const asset: ReflectorContract.Asset = {tag: "Stellar", values: ["XLM"]}
+
+  const lastTimestamp = await Reflector.lastTimestamp();
+
+  console.log(lastTimestamp)
 }
 
 export async function fetchTokenPrices2(tokenSymbol: string): Promise<number> {

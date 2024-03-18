@@ -31,3 +31,9 @@ export const MULTIHOP_ADDRESS: string =
  * Phoenix History Indexer
  */
 export const PHOENIX_HISTORY_INDEXER: string = "https://graphql.phoenix-hub.io";
+
+/**
+ * Reflector contract address
+ */
+export const REFLECTOR_ADDRESS: string = 
+  "CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN";

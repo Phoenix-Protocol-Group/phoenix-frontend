@@ -33,7 +33,7 @@ import {
   formatCurrency,
   scValToJs,
 } from "@phoenix-protocol/utils";
-import { PhoenixFactoryContract } from "@phoenix-protocol/contracts";
+import { ReflectorContract } from "@phoenix-protocol/contracts";
 
 export default function Page() {
   const theme = useTheme();
@@ -126,6 +126,23 @@ export default function Page() {
 
   const getXlmPrice = async () => {
     const price = await fetchTokenPrices("XLM");
+
+    console.log(constants.REFLECTOR_ADDRESS)
+
+    const Reflector = new ReflectorContract.Contract({
+      contractId: constants.REFLECTOR_ADDRESS,
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
+      rpcUrl: constants.RPC_URL,
+    });
+  
+    const asset: ReflectorContract.Asset = {tag: "Stellar", values: ["XLM"]}
+  
+    const lastTimestamp = await Reflector.lastTimestamp();
+
+    console.log(lastTimestamp.result)
+
+
+
     setXlmPrice(price);
   };
 
