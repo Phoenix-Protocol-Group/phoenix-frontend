@@ -15,12 +15,9 @@ import {
 } from "stellar-sdk";
 import type { Memo, MemoType, Transaction } from "stellar-sdk";
 import { Buffer } from "buffer";
-import type {
-  ClassOptions,
-  MethodOptions,
-  Wallet,
-  XDR_BASE64,
-} from "./method-options";
+import type { ClassOptions, MethodOptions, XDR_BASE64 } from "./method-options";
+
+import { Wallet } from "./wallets/types";
 
 export type Tx = Transaction<Memo<MemoType>, Operation[]>;
 
@@ -262,6 +259,7 @@ export class AssembledTransaction<T> {
   }
 
   getWallet = async (): Promise<Wallet> => {
+    // @ts-ignore
     return (
       this.options.wallet ?? (await import("@stellar/freighter-api")).default
     );

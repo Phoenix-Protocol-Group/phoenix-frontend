@@ -21,6 +21,8 @@
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-joyride": "^2.7.2",
+    "react-pageflip": "^2.0.3",
+    "react-pdf": "^7.7.1",
     "react-usestateref": "^1.0.8",
     "stellar-sdk": "^11.2.1",
     "typescript": "5.1.6",
