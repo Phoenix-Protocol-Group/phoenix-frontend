@@ -310,49 +310,31 @@ export class Contract {
   }
   private readonly parsers = {
     initialize: () => {},
-    createLiquidityPool: (
-      result: string | xdr.ScVal | Err<Error_>
-    ): string | Err<Error_> => {
-      if (result instanceof Err) return result;
+    createLiquidityPool: (result: string | xdr.ScVal): string => {
       return this.spec.funcResToNative("create_liquidity_pool", result);
     },
     updateWhitelistedAccounts: () => {},
-    queryPools: (
-      result: string | xdr.ScVal | Err
-    ): Array<string> | Err<Error_> => {
-      if (result instanceof Err) return result;
+    queryPools: (result: string | xdr.ScVal): Array<string> => {
       return this.spec.funcResToNative("query_pools", result);
     },
-    queryPoolDetails: (
-      result: string | xdr.ScVal | Err
-    ): LiquidityPoolInfo | Err<Error_> => {
-      if (result instanceof Err) return result;
+    queryPoolDetails: (result: string | xdr.ScVal): LiquidityPoolInfo => {
       return this.spec.funcResToNative("query_pool_details", result);
     },
     queryAllPoolsDetails: (
-      result: string | xdr.ScVal | Err
-    ): Array<LiquidityPoolInfo> | Err<Error_> => {
-      if (result instanceof Err) return result;
+      result: string | xdr.ScVal
+    ): Array<LiquidityPoolInfo> => {
       return this.spec.funcResToNative("query_all_pools_details", result);
     },
-    queryForPoolByTokenPair: (
-      result: string | xdr.ScVal | Err
-    ): string | Err<Error_> => {
-      if (result instanceof Err) return result;
+    queryForPoolByTokenPair: (result: string | xdr.ScVal): string => {
       return this.spec.funcResToNative("query_for_pool_by_token_pair", result);
     },
-    getAdmin: (result: string | xdr.ScVal | Err): string | Err<Error_> => {
-      if (result instanceof Err) return result;
+    getAdmin: (result: string | xdr.ScVal): string => {
       return this.spec.funcResToNative("get_admin", result);
     },
-    getConfig: (result: string | xdr.ScVal | Err): Config | Err<Error_> => {
-      if (result instanceof Err) return result;
+    getConfig: (result: string | xdr.ScVal): Config => {
       return this.spec.funcResToNative("get_config", result);
     },
-    queryUserPortfolio: (
-      result: string | xdr.ScVal | Err
-    ): UserPortfolio | Err<Error_> => {
-      if (result instanceof Err) return result;
+    queryUserPortfolio: (result: string | xdr.ScVal): UserPortfolio => {
       return this.spec.funcResToNative("query_user_portfolio", result);
     },
   };

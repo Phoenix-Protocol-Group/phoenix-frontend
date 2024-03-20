@@ -41,12 +41,8 @@ export default function Page() {
 
       if (pairConfig?.result && pairInfo?.result) {
         const [tokenA, tokenB] = await Promise.all([
-          store.fetchTokenInfo(
-            Address.fromString(pairConfig.result.unwrap().token_a)
-          ),
-          store.fetchTokenInfo(
-            Address.fromString(pairConfig.result.unwrap().token_b)
-          ),
+          store.fetchTokenInfo(Address.fromString(pairConfig.result.token_a)),
+          store.fetchTokenInfo(Address.fromString(pairConfig.result.token_b)),
         ]);
 
         // Fetch prices and calculate TVL
@@ -56,9 +52,9 @@ export default function Page() {
         ]);
 
         const tvl =
-          (priceA * Number(pairInfo.result.unwrap().asset_a.amount)) /
+          (priceA * Number(pairInfo.result.asset_a.amount)) /
             10 ** Number(tokenA?.decimals) +
-          (priceB * Number(pairInfo.result.unwrap().asset_b.amount)) /
+          (priceB * Number(pairInfo.result.asset_b.amount)) /
             10 ** Number(tokenB?.decimals);
 
         // Construct and return pool object if all fetches are successful
@@ -68,7 +64,7 @@ export default function Page() {
               name: tokenA?.symbol || "",
               icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
               amount:
-                Number(pairInfo.result.unwrap().asset_a.amount) /
+                Number(pairInfo.result.asset_a.amount) /
                 10 ** Number(tokenA?.decimals),
               category: "",
               usdValue: 0,
@@ -77,7 +73,7 @@ export default function Page() {
               name: tokenB?.symbol || "",
               icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
               amount:
-                Number(pairInfo.result.unwrap().asset_b.amount) /
+                Number(pairInfo.result.asset_b.amount) /
                 10 ** Number(tokenB?.decimals),
               category: "",
               usdValue: 0,

@@ -18,6 +18,7 @@ import { Buffer } from "buffer";
 import type { ClassOptions, MethodOptions, XDR_BASE64 } from "./method-options";
 
 import { Wallet } from "./wallets/types";
+import { xBull } from "./wallets/xbull";
 
 export type Tx = Transaction<Memo<MemoType>, Operation[]>;
 
@@ -161,10 +162,44 @@ export class AssembledTransaction<T> {
     });
   }
 
+  getWalletType(): string {
+    const appStorageValue = localStorage.getItem("app-storage");
+    if (appStorageValue !== null) {
+      try {
+        const parsedValue = JSON.parse(appStorageValue);
+        const walletType = parsedValue?.state?.wallet?.walletType;
+        return walletType;
+      } catch (error) {
+        console.error("Error parsing app-storage value:", error);
+      }
+    } else {
+      console.error("app-storage key not found in localStorage.");
+    }
+    return "";
+  }
+
   static async fromSimulation<T>(
     options: AssembledTransactionOptions<T>
   ): Promise<AssembledTransaction<T>> {
-    const tx = new AssembledTransaction(options);
+    // Can't import state here, so we need to extract the wallet type from the local storage
+    let walletType = "";
+    const appStorageValue = localStorage.getItem("app-storage");
+    if (appStorageValue !== null) {
+      try {
+        const parsedValue = JSON.parse(appStorageValue);
+        const walletType_ = parsedValue?.state?.wallet?.walletType;
+        walletType = walletType_;
+      } catch (error) {
+        console.error("Error parsing app-storage value:", error);
+      }
+    } else {
+      console.error("app-storage key not found in localStorage.");
+    }
+
+    const tx = new AssembledTransaction({
+      ...options,
+      wallet: walletType === "xbull" ? new xBull() : undefined,
+    });
     const contract = new Contract(options.contractId);
 
     tx.raw = new TransactionBuilder(await tx.getAccount(), {
@@ -559,7 +594,6 @@ class SentTransaction<T> {
 
   private send = async (secondsToWait: number = 10): Promise<this> => {
     const wallet = await this.assembled.getWallet();
-
     this.sendTransactionResponseAll = await withExponentialBackoff(
       async (previousFailure) => {
         if (previousFailure) {
@@ -588,7 +622,11 @@ class SentTransaction<T> {
         const signature = await wallet.signTransaction(
           this.assembled.raw.toXDR(),
           {
+            accountToSign: (
+              await this.options.wallet?.getUserInfo()
+            )?.publicKey,
             networkPassphrase: this.options.networkPassphrase,
+            network: this.options.networkPassphrase,
           }
         );
 

@@ -258,21 +258,17 @@ export default function Page({ params }: PoolPageProps) {
       ]);
 
       // When results ok...
-      if (pairConfig?.result.isOk() && pairInfo?.result.isOk()) {
+      if (pairConfig?.result && pairInfo?.result) {
         // Fetch token infos from chain and save in global appstore
         const [_tokenA, _tokenB, _lpToken, stakeContractAddress] =
           await Promise.all([
+            store.fetchTokenInfo(Address.fromString(pairConfig.result.token_a)),
+            store.fetchTokenInfo(Address.fromString(pairConfig.result.token_b)),
             store.fetchTokenInfo(
-              Address.fromString(pairConfig.result.unwrap().token_a)
-            ),
-            store.fetchTokenInfo(
-              Address.fromString(pairConfig.result.unwrap().token_b)
-            ),
-            store.fetchTokenInfo(
-              Address.fromString(pairConfig.result.unwrap().share_token)
+              Address.fromString(pairConfig.result.share_token)
             ),
             new PhoenixStakeContract.Contract({
-              contractId: pairConfig.result.unwrap().stake_contract.toString(),
+              contractId: pairConfig.result.stake_contract.toString(),
               networkPassphrase: constants.NETWORK_PASSPHRASE,
               rpcUrl: constants.RPC_URL,
             }),
@@ -285,9 +281,9 @@ export default function Page({ params }: PoolPageProps) {
         ]);
 
         const tvl =
-          (priceA * Number(pairInfo.result.unwrap().asset_a.amount)) /
+          (priceA * Number(pairInfo.result.asset_a.amount)) /
             10 ** Number(_tokenA?.decimals) +
-          (priceB * Number(pairInfo.result.unwrap().asset_b.amount)) /
+          (priceB * Number(pairInfo.result.asset_b.amount)) /
             10 ** Number(_tokenB?.decimals);
 
         setPoolLiquidity(tvl);
@@ -318,13 +314,13 @@ export default function Page({ params }: PoolPageProps) {
           decimals: Number(_lpToken?.decimals),
         });
         setAssetLpShare(
-          Number(pairInfo.result.unwrap().asset_lp_share.amount) /
+          Number(pairInfo.result.asset_lp_share.amount) /
             10 ** Number(_lpToken?.decimals)
         );
         setPoolLiquidityTokenA(
           Number(
             (
-              Number(pairInfo.result.unwrap().asset_a.amount) /
+              Number(pairInfo.result.asset_a.amount) /
               10 ** Number(_tokenA?.decimals)
             ).toFixed(2)
           )
@@ -332,7 +328,7 @@ export default function Page({ params }: PoolPageProps) {
         setPoolLiquidityTokenB(
           Number(
             (
-              Number(pairInfo.result.unwrap().asset_b.amount) /
+              Number(pairInfo.result.asset_b.amount) /
               10 ** Number(_tokenB?.decimals)
             ).toFixed(2)
           )
@@ -344,9 +340,9 @@ export default function Page({ params }: PoolPageProps) {
 
         // Get user share
         if (storePersist.wallet.address) {
-          if (pairInfo.result.isOk()) {
+          if (pairInfo.result) {
             // Get the total amount of LP tokens in the pool
-            const info = pairInfo.result.unwrap();
+            const info = pairInfo.result;
             const lpShareAmount = info.asset_lp_share.amount;
             const lpShareAmountDec =
               Number(lpShareAmount) / 10 ** (_lpToken?.decimals || 7);

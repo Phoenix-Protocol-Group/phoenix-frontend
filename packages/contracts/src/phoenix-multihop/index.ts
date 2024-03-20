@@ -19,19 +19,26 @@ import type {
 import type { ClassOptions, XDR_BASE64 } from "@phoenix-protocol/utils";
 
 export * from "@phoenix-protocol/utils";
-
 if (typeof window !== "undefined") {
   //@ts-ignore Buffer exists
   window.Buffer = window.Buffer || Buffer;
 }
 
 export const networks = {
-  futurenet: {
-    networkPassphrase: "Test SDF Future Network ; October 2022",
+  testnet: {
+    networkPassphrase: "Test SDF Network ; September 2015",
     contractId: "0",
   },
 } as const;
 
+/**
+    
+    */
+export const Errors = {
+  1: { message: "" },
+  2: { message: "" },
+  3: { message: "" },
+};
 /**
     
     */
@@ -40,6 +47,10 @@ export interface Swap {
     
     */
   ask_asset: string;
+  /**
+    
+    */
+  max_belief_price: Option<i64>;
   /**
     
     */
@@ -110,19 +121,23 @@ export interface SimulateSwapResponse {
     */
   ask_amount: i128;
   /**
-    
+    tuple of ask_asset denom and commission amount for the swap
     */
-  spread_amount: Array<i128>;
+  commission_amounts: Array<readonly [string, i128]>;
   /**
     
     */
-  total_commission_amount: i128;
+  spread_amount: Array<i128>;
 }
 
 /**
     
     */
 export interface SimulateReverseSwapResponse {
+  /**
+    tuple of offer_asset denom and commission amount for the swap
+    */
+  commission_amounts: Array<readonly [string, i128]>;
   /**
     
     */
@@ -131,46 +146,37 @@ export interface SimulateReverseSwapResponse {
     
     */
   spread_amount: Array<i128>;
-  /**
-    
-    */
-  total_commission_amount: i128;
 }
-
-/**
-    
-    */
-export const Errors = {};
 
 export class Contract {
   spec: ContractSpec;
   constructor(public readonly options: ClassOptions) {
     this.spec = new ContractSpec([
       "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAdmYWN0b3J5AAAAABMAAAAA",
-      "AAAAAAAAAAAAAAAEc3dhcAAAAAUAAAAAAAAACXJlY2lwaWVudAAAAAAAABMAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAAEG1heF9iZWxpZWZfcHJpY2UAAAPoAAAABwAAAAAAAAAObWF4X3NwcmVhZF9icHMAAAAAA+gAAAAHAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAA",
+      "AAAAAAAAAAAAAAAEc3dhcAAAAAQAAAAAAAAACXJlY2lwaWVudAAAAAAAABMAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAADm1heF9zcHJlYWRfYnBzAAAAAAPoAAAABwAAAAAAAAAGYW1vdW50AAAAAAALAAAAAA==",
       "AAAAAAAAAAAAAAANc2ltdWxhdGVfc3dhcAAAAAAAAAIAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAABmFtb3VudAAAAAAACwAAAAEAAAfQAAAAFFNpbXVsYXRlU3dhcFJlc3BvbnNl",
       "AAAAAAAAAAAAAAAVc2ltdWxhdGVfcmV2ZXJzZV9zd2FwAAAAAAAAAgAAAAAAAAAKb3BlcmF0aW9ucwAAAAAD6gAAB9AAAAAEU3dhcAAAAAAAAAAGYW1vdW50AAAAAAALAAAAAQAAB9AAAAAbU2ltdWxhdGVSZXZlcnNlU3dhcFJlc3BvbnNlAA==",
-      "AAAAAAAAAAAAAAAJZ2V0X2FkbWluAAAAAAAAAAAAAAEAAAAT",
-      "AAAAAQAAAAAAAAAAAAAABFN3YXAAAAACAAAAAAAAAAlhc2tfYXNzZXQAAAAAAAATAAAAAAAAAAtvZmZlcl9hc3NldAAAAAAT",
+      "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAADAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAEAAAAAAAAAD09wZXJhdGlvbnNFbXB0eQAAAAACAAAAAAAAABJJbmNvcnJlY3RBc3NldFN3YXAAAAAAAAM=",
+      "AAAAAQAAAAAAAAAAAAAABFN3YXAAAAADAAAAAAAAAAlhc2tfYXNzZXQAAAAAAAATAAAAAAAAABBtYXhfYmVsaWVmX3ByaWNlAAAD6AAAAAcAAAAAAAAAC29mZmVyX2Fzc2V0AAAAABM=",
       "AAAAAQAAAAAAAAAAAAAABFBhaXIAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
       "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAABAAAAAEAAAAAAAAAB1BhaXJLZXkAAAAAAQAAB9AAAAAEUGFpcgAAAAAAAAAAAAAACkZhY3RvcnlLZXkAAAAAAAAAAAAAAAAABUFkbWluAAAAAAAAAAAAAAAAAAALSW5pdGlhbGl6ZWQA",
       "AAAAAQAAAAAAAAAAAAAABUFzc2V0AAAAAAAAAgAAABRBZGRyZXNzIG9mIHRoZSBhc3NldAAAAAdhZGRyZXNzAAAAABMAAAAsVGhlIHRvdGFsIGFtb3VudCBvZiB0aG9zZSB0b2tlbnMgaW4gdGhlIHBvb2wAAAAGYW1vdW50AAAAAAAL",
       "AAAAAQAAAG5UaGlzIHN0cnVjdCBpcyB1c2VkIHRvIHJldHVybiBhIHF1ZXJ5IHJlc3VsdCB3aXRoIHRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGFuZCBhc3NldHMgaW4gYSBzcGVjaWZpYyBwb29sLgAAAAAAAAAAAAxQb29sUmVzcG9uc2UAAAADAAAAM1RoZSBhc3NldCBBIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYQAAAAfQAAAABUFzc2V0AAAAAAAAM1RoZSBhc3NldCBCIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYgAAAAfQAAAABUFzc2V0AAAAAAAALlRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGN1cnJlbnRseSBpc3N1ZWQAAAAAAA5hc3NldF9scF9zaGFyZQAAAAAH0AAAAAVBc3NldAAAAA==",
-      "AAAAAQAAAAAAAAAAAAAAFFNpbXVsYXRlU3dhcFJlc3BvbnNlAAAAAwAAAAAAAAAKYXNrX2Ftb3VudAAAAAAACwAAAAAAAAANc3ByZWFkX2Ftb3VudAAAAAAAA+oAAAALAAAAAAAAABd0b3RhbF9jb21taXNzaW9uX2Ftb3VudAAAAAAL",
-      "AAAAAQAAAAAAAAAAAAAAG1NpbXVsYXRlUmV2ZXJzZVN3YXBSZXNwb25zZQAAAAADAAAAAAAAAAxvZmZlcl9hbW91bnQAAAALAAAAAAAAAA1zcHJlYWRfYW1vdW50AAAAAAAD6gAAAAsAAAAAAAAAF3RvdGFsX2NvbW1pc3Npb25fYW1vdW50AAAAAAs=",
+      "AAAAAQAAAAAAAAAAAAAAFFNpbXVsYXRlU3dhcFJlc3BvbnNlAAAAAwAAAAAAAAAKYXNrX2Ftb3VudAAAAAAACwAAADt0dXBsZSBvZiBhc2tfYXNzZXQgZGVub20gYW5kIGNvbW1pc3Npb24gYW1vdW50IGZvciB0aGUgc3dhcAAAAAASY29tbWlzc2lvbl9hbW91bnRzAAAAAAPqAAAD7QAAAAIAAAAQAAAACwAAAAAAAAANc3ByZWFkX2Ftb3VudAAAAAAAA+oAAAAL",
+      "AAAAAQAAAAAAAAAAAAAAG1NpbXVsYXRlUmV2ZXJzZVN3YXBSZXNwb25zZQAAAAADAAAAPXR1cGxlIG9mIG9mZmVyX2Fzc2V0IGRlbm9tIGFuZCBjb21taXNzaW9uIGFtb3VudCBmb3IgdGhlIHN3YXAAAAAAAAASY29tbWlzc2lvbl9hbW91bnRzAAAAAAPqAAAD7QAAAAIAAAAQAAAACwAAAAAAAAAMb2ZmZXJfYW1vdW50AAAACwAAAAAAAAANc3ByZWFkX2Ftb3VudAAAAAAAA+oAAAAL",
     ]);
   }
   private readonly parsers = {
     initialize: () => {},
     swap: () => {},
-    simulateSwap: (result: string | xdr.ScVal): SimulateSwapResponse =>
-      this.spec.funcResToNative("simulate_swap", result),
+    simulateSwap: (result: string | xdr.ScVal): SimulateSwapResponse => {
+      return this.spec.funcResToNative("simulate_swap", result);
+    },
     simulateReverseSwap: (
       result: string | xdr.ScVal
-    ): SimulateReverseSwapResponse =>
-      this.spec.funcResToNative("simulate_reverse_swap", result),
-    getAdmin: (result: string | xdr.ScVal): string =>
-      this.spec.funcResToNative("get_admin", result),
+    ): SimulateReverseSwapResponse => {
+      return this.spec.funcResToNative("simulate_reverse_swap", result);
+    },
   };
   private txFromJSON = <T>(json: string): AssembledTransaction<T> => {
     const { method, ...tx } = JSON.parse(json);
@@ -178,7 +184,7 @@ export class Contract {
       {
         ...this.options,
         method,
-        //@ts-ignore
+        // @ts-ignore
         parseResultXdr: this.parsers[method],
       },
       tx
@@ -195,7 +201,6 @@ export class Contract {
     simulateReverseSwap: this.txFromJSON<
       ReturnType<(typeof this.parsers)["simulateReverseSwap"]>
     >,
-    getAdmin: this.txFromJSON<ReturnType<(typeof this.parsers)["getAdmin"]>>,
   };
   /**
    * Construct and simulate a initialize transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
@@ -229,13 +234,11 @@ export class Contract {
     {
       recipient,
       operations,
-      max_belief_price,
       max_spread_bps,
       amount,
     }: {
       recipient: string;
       operations: Array<Swap>;
-      max_belief_price: Option<i64>;
       max_spread_bps: Option<i64>;
       amount: i128;
     },
@@ -251,7 +254,6 @@ export class Contract {
       args: this.spec.funcArgsToScVals("swap", {
         recipient: new Address(recipient),
         operations,
-        max_belief_price,
         max_spread_bps,
         amount,
       }),
@@ -306,27 +308,6 @@ export class Contract {
       ...this.options,
       errorTypes: Errors,
       parseResultXdr: this.parsers["simulateReverseSwap"],
-    });
-  };
-
-  /**
-   * Construct and simulate a get_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
-   */
-  getAdmin = async (
-    options: {
-      /**
-       * The fee to pay for the transaction. Default: 100.
-       */
-      fee?: number;
-    } = {}
-  ) => {
-    return await AssembledTransaction.fromSimulation({
-      method: "get_admin",
-      args: this.spec.funcArgsToScVals("get_admin", {}),
-      ...options,
-      ...this.options,
-      errorTypes: Errors,
-      parseResultXdr: this.parsers["getAdmin"],
     });
   };
 }

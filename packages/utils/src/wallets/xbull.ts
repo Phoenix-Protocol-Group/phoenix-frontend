@@ -24,17 +24,18 @@ export class xBull implements Wallet {
       accountToSign?: string;
     }
   ): Promise<string> {
-    // Get Bridge
     const bridge: xBullWalletConnect = new xBullWalletConnect();
 
-    const signature = await bridge.sign({
-      xdr: tx,
-      network: opts?.networkPassphrase,
+    let updatedXdr: string = tx;
+
+    updatedXdr = await bridge.sign({
+      xdr: updatedXdr,
       publicKey: opts?.accountToSign,
+      network: opts?.networkPassphrase,
     });
 
     bridge.closeConnections();
-    return signature;
+    return updatedXdr;
   }
   async signAuthEntry(
     entryXdr: string,
