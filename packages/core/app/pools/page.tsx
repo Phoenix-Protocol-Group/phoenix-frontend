@@ -105,13 +105,14 @@ export default function Page() {
 
     const pools = await FactoryContract.queryPools({});
 
-    const poolWithData = pools
-      ? await Promise.all(
-          pools.result.map(async (pool: string) => {
-            return await fetchPool(pool);
-          })
-        )
-      : [];
+    const poolWithData =
+      pools && Array.isArray(pools.result)
+        ? await Promise.all(
+            pools.result.map(async (pool: string) => {
+              return await fetchPool(pool);
+            })
+          )
+        : [];
 
     const poolsFiltered = poolWithData.filter(
       (el: any) =>

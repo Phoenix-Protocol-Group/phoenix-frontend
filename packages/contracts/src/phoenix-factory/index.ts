@@ -19,18 +19,31 @@ import type {
 import type { ClassOptions, XDR_BASE64 } from "@phoenix-protocol/utils";
 
 export * from "@phoenix-protocol/utils";
+
 if (typeof window !== "undefined") {
   //@ts-ignore Buffer exists
   window.Buffer = window.Buffer || Buffer;
 }
 
 export const networks = {
-  futurenet: {
-    networkPassphrase: "Test SDF Future Network ; October 2022",
+  testnet: {
+    networkPassphrase: "Test SDF Network ; September 2015",
     contractId: "0",
   },
 } as const;
 
+/**
+    
+    */
+export const Errors = {
+  1: { message: "" },
+  2: { message: "" },
+  3: { message: "" },
+  4: { message: "" },
+  5: { message: "" },
+  6: { message: "" },
+  7: { message: "" },
+};
 /**
     
     */
@@ -56,7 +69,65 @@ export interface Config {
   /**
     
     */
+  lp_token_decimals: u32;
+  /**
+    
+    */
+  lp_wasm_hash: Buffer;
+  /**
+    
+    */
   multihop_address: string;
+  /**
+    
+    */
+  stake_wasm_hash: Buffer;
+  /**
+    
+    */
+  token_wasm_hash: Buffer;
+  /**
+    
+    */
+  whitelisted_accounts: Array<string>;
+}
+
+/**
+    
+    */
+export interface UserPortfolio {
+  /**
+    
+    */
+  lp_portfolio: Array<LpPortfolio>;
+  /**
+    
+    */
+  stake_portfolio: Array<StakePortfolio>;
+}
+
+/**
+    
+    */
+export interface LpPortfolio {
+  /**
+    
+    */
+  assets: readonly [Asset, Asset];
+}
+
+/**
+    
+    */
+export interface StakePortfolio {
+  /**
+    
+    */
+  stakes: Array<Stake>;
+  /**
+    
+    */
+  staking_contract: string;
 }
 
 /**
@@ -89,6 +160,10 @@ export interface PoolResponse {
     The total amount of LP tokens currently issued
     */
   asset_lp_share: Asset;
+  /**
+    The address of the Stake contract for the liquidity pool
+    */
+  stake_address: string;
 }
 
 /**
@@ -112,6 +187,30 @@ export interface LiquidityPoolInfo {
 /**
     
     */
+export interface StakedResponse {
+  /**
+    
+    */
+  stakes: Array<Stake>;
+}
+
+/**
+    
+    */
+export interface Stake {
+  /**
+    The amount of staked tokens
+    */
+  stake: i128;
+  /**
+    The timestamp when the stake was made
+    */
+  stake_timestamp: u64;
+}
+
+/**
+    
+    */
 export interface TokenInitInfo {
   /**
     
@@ -121,10 +220,6 @@ export interface TokenInitInfo {
     
     */
   token_b: string;
-  /**
-    
-    */
-  token_wasm_hash: Buffer;
 }
 
 /**
@@ -134,7 +229,7 @@ export interface StakeInitInfo {
   /**
     
     */
-  max_distributions: u32;
+  manager: string;
   /**
     
     */
@@ -143,10 +238,6 @@ export interface StakeInitInfo {
     
     */
   min_reward: i128;
-  /**
-    
-    */
-  stake_wasm_hash: Buffer;
 }
 
 /**
@@ -164,10 +255,6 @@ export interface LiquidityPoolInitInfo {
   /**
     
     */
-  lp_wasm_hash: Buffer;
-  /**
-    
-    */
   max_allowed_slippage_bps: i64;
   /**
     
@@ -177,10 +264,6 @@ export interface LiquidityPoolInitInfo {
     
     */
   max_referral_bps: i64;
-  /**
-    
-    */
-  share_token_decimals: u32;
   /**
     
     */
@@ -195,51 +278,83 @@ export interface LiquidityPoolInitInfo {
   token_init_info: TokenInitInfo;
 }
 
-/**
-    
-    */
-export const Errors = {};
-
 export class Contract {
   spec: ContractSpec;
   constructor(public readonly options: ClassOptions) {
     this.spec = new ContractSpec([
-      "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAABJtdWx0aWhvcF93YXNtX2hhc2gAAAAAA+4AAAAgAAAAAA==",
-      "AAAAAAAAAAAAAAAVY3JlYXRlX2xpcXVpZGl0eV9wb29sAAAAAAAAAQAAAAAAAAAMbHBfaW5pdF9pbmZvAAAH0AAAABVMaXF1aWRpdHlQb29sSW5pdEluZm8AAAAAAAABAAAAEw==",
+      "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAABwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAABJtdWx0aWhvcF93YXNtX2hhc2gAAAAAA+4AAAAgAAAAAAAAAAxscF93YXNtX2hhc2gAAAPuAAAAIAAAAAAAAAAPc3Rha2Vfd2FzbV9oYXNoAAAAA+4AAAAgAAAAAAAAAA90b2tlbl93YXNtX2hhc2gAAAAD7gAAACAAAAAAAAAAFHdoaXRlbGlzdGVkX2FjY291bnRzAAAD6gAAABMAAAAAAAAAEWxwX3Rva2VuX2RlY2ltYWxzAAAAAAAABAAAAAA=",
+      "AAAAAAAAAAAAAAAVY3JlYXRlX2xpcXVpZGl0eV9wb29sAAAAAAAABAAAAAAAAAAGc2VuZGVyAAAAAAATAAAAAAAAAAxscF9pbml0X2luZm8AAAfQAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAAAAAAQc2hhcmVfdG9rZW5fbmFtZQAAABAAAAAAAAAAEnNoYXJlX3Rva2VuX3N5bWJvbAAAAAAAEAAAAAEAAAAT",
+      "AAAAAAAAAAAAAAAbdXBkYXRlX3doaXRlbGlzdGVkX2FjY291bnRzAAAAAAMAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAGdG9fYWRkAAAAAAPqAAAAEwAAAAAAAAAJdG9fcmVtb3ZlAAAAAAAD6gAAABMAAAAA",
       "AAAAAAAAAAAAAAALcXVlcnlfcG9vbHMAAAAAAAAAAAEAAAPqAAAAEw==",
       "AAAAAAAAAAAAAAAScXVlcnlfcG9vbF9kZXRhaWxzAAAAAAABAAAAAAAAAAxwb29sX2FkZHJlc3MAAAATAAAAAQAAB9AAAAARTGlxdWlkaXR5UG9vbEluZm8AAAA=",
       "AAAAAAAAAAAAAAAXcXVlcnlfYWxsX3Bvb2xzX2RldGFpbHMAAAAAAAAAAAEAAAPqAAAH0AAAABFMaXF1aWRpdHlQb29sSW5mbwAAAA==",
       "AAAAAAAAAAAAAAAccXVlcnlfZm9yX3Bvb2xfYnlfdG9rZW5fcGFpcgAAAAIAAAAAAAAAB3Rva2VuX2EAAAAAEwAAAAAAAAAHdG9rZW5fYgAAAAATAAAAAQAAABM=",
       "AAAAAAAAAAAAAAAJZ2V0X2FkbWluAAAAAAAAAAAAAAEAAAAT",
       "AAAAAAAAAAAAAAAKZ2V0X2NvbmZpZwAAAAAAAAAAAAEAAAfQAAAABkNvbmZpZwAA",
+      "AAAAAAAAAAAAAAAUcXVlcnlfdXNlcl9wb3J0Zm9saW8AAAACAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAAB3N0YWtpbmcAAAAAAQAAAAEAAAfQAAAADVVzZXJQb3J0Zm9saW8AAAA=",
+      "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAHAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAEAAAAAAAAAD1doaXRlTGlzdGVFbXB0eQAAAAACAAAAAAAAAA1Ob3RBdXRob3JpemVkAAAAAAAAAwAAAAAAAAAVTGlxdWlkaXR5UG9vbE5vdEZvdW5kAAAAAAAABAAAAAAAAAAWVG9rZW5BQmlnZ2VyVGhhblRva2VuQgAAAAAABQAAAAAAAAAPTWluU3Rha2VJbnZhbGlkAAAAAAYAAAAAAAAAEE1pblJld2FyZEludmFsaWQAAAAH",
       "AAAAAQAAAAAAAAAAAAAADFBhaXJUdXBsZUtleQAAAAIAAAAAAAAAB3Rva2VuX2EAAAAAEwAAAAAAAAAHdG9rZW5fYgAAAAAT",
-      "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAABBtdWx0aWhvcF9hZGRyZXNzAAAAEw==",
+      "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAABwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAABFscF90b2tlbl9kZWNpbWFscwAAAAAAAAQAAAAAAAAADGxwX3dhc21faGFzaAAAA+4AAAAgAAAAAAAAABBtdWx0aWhvcF9hZGRyZXNzAAAAEwAAAAAAAAAPc3Rha2Vfd2FzbV9oYXNoAAAAA+4AAAAgAAAAAAAAAA90b2tlbl93YXNtX2hhc2gAAAAD7gAAACAAAAAAAAAAFHdoaXRlbGlzdGVkX2FjY291bnRzAAAD6gAAABM=",
+      "AAAAAQAAAAAAAAAAAAAADVVzZXJQb3J0Zm9saW8AAAAAAAACAAAAAAAAAAxscF9wb3J0Zm9saW8AAAPqAAAH0AAAAAtMcFBvcnRmb2xpbwAAAAAAAAAAD3N0YWtlX3BvcnRmb2xpbwAAAAPqAAAH0AAAAA5TdGFrZVBvcnRmb2xpbwAA",
+      "AAAAAQAAAAAAAAAAAAAAC0xwUG9ydGZvbGlvAAAAAAEAAAAAAAAABmFzc2V0cwAAAAAD7QAAAAIAAAfQAAAABUFzc2V0AAAAAAAH0AAAAAVBc3NldAAAAA==",
+      "AAAAAQAAAAAAAAAAAAAADlN0YWtlUG9ydGZvbGlvAAAAAAACAAAAAAAAAAZzdGFrZXMAAAAAA+oAAAfQAAAABVN0YWtlAAAAAAAAAAAAABBzdGFraW5nX2NvbnRyYWN0AAAAEw==",
       "AAAAAQAAAAAAAAAAAAAABUFzc2V0AAAAAAAAAgAAABRBZGRyZXNzIG9mIHRoZSBhc3NldAAAAAdhZGRyZXNzAAAAABMAAAAsVGhlIHRvdGFsIGFtb3VudCBvZiB0aG9zZSB0b2tlbnMgaW4gdGhlIHBvb2wAAAAGYW1vdW50AAAAAAAL",
-      "AAAAAQAAAG5UaGlzIHN0cnVjdCBpcyB1c2VkIHRvIHJldHVybiBhIHF1ZXJ5IHJlc3VsdCB3aXRoIHRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGFuZCBhc3NldHMgaW4gYSBzcGVjaWZpYyBwb29sLgAAAAAAAAAAAAxQb29sUmVzcG9uc2UAAAADAAAAM1RoZSBhc3NldCBBIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYQAAAAfQAAAABUFzc2V0AAAAAAAAM1RoZSBhc3NldCBCIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYgAAAAfQAAAABUFzc2V0AAAAAAAALlRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGN1cnJlbnRseSBpc3N1ZWQAAAAAAA5hc3NldF9scF9zaGFyZQAAAAAH0AAAAAVBc3NldAAAAA==",
+      "AAAAAQAAAG5UaGlzIHN0cnVjdCBpcyB1c2VkIHRvIHJldHVybiBhIHF1ZXJ5IHJlc3VsdCB3aXRoIHRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGFuZCBhc3NldHMgaW4gYSBzcGVjaWZpYyBwb29sLgAAAAAAAAAAAAxQb29sUmVzcG9uc2UAAAAEAAAAM1RoZSBhc3NldCBBIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYQAAAAfQAAAABUFzc2V0AAAAAAAAM1RoZSBhc3NldCBCIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYgAAAAfQAAAABUFzc2V0AAAAAAAALlRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGN1cnJlbnRseSBpc3N1ZWQAAAAAAA5hc3NldF9scF9zaGFyZQAAAAAH0AAAAAVBc3NldAAAAAAAADhUaGUgYWRkcmVzcyBvZiB0aGUgU3Rha2UgY29udHJhY3QgZm9yIHRoZSBsaXF1aWRpdHkgcG9vbAAAAA1zdGFrZV9hZGRyZXNzAAAAAAAAEw==",
       "AAAAAQAAAAAAAAAAAAAAEUxpcXVpZGl0eVBvb2xJbmZvAAAAAAAAAwAAAAAAAAAMcG9vbF9hZGRyZXNzAAAAEwAAAAAAAAANcG9vbF9yZXNwb25zZQAAAAAAB9AAAAAMUG9vbFJlc3BvbnNlAAAAAAAAAA10b3RhbF9mZWVfYnBzAAAAAAAABw==",
-      "AAAAAQAAAAAAAAAAAAAADVRva2VuSW5pdEluZm8AAAAAAAADAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEwAAAAAAAAAPdG9rZW5fd2FzbV9oYXNoAAAAA+4AAAAg",
-      "AAAAAQAAAAAAAAAAAAAADVN0YWtlSW5pdEluZm8AAAAAAAAEAAAAAAAAABFtYXhfZGlzdHJpYnV0aW9ucwAAAAAAAAQAAAAAAAAACG1pbl9ib25kAAAACwAAAAAAAAAKbWluX3Jld2FyZAAAAAAACwAAAAAAAAAPc3Rha2Vfd2FzbV9oYXNoAAAAA+4AAAAg",
-      "AAAAAQAAAAAAAAAAAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAoAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAANZmVlX3JlY2lwaWVudAAAAAAAABMAAAAAAAAADGxwX3dhc21faGFzaAAAA+4AAAAgAAAAAAAAABhtYXhfYWxsb3dlZF9zbGlwcGFnZV9icHMAAAAHAAAAAAAAABZtYXhfYWxsb3dlZF9zcHJlYWRfYnBzAAAAAAAHAAAAAAAAABBtYXhfcmVmZXJyYWxfYnBzAAAABwAAAAAAAAAUc2hhcmVfdG9rZW5fZGVjaW1hbHMAAAAEAAAAAAAAAA9zdGFrZV9pbml0X2luZm8AAAAH0AAAAA1TdGFrZUluaXRJbmZvAAAAAAAAAAAAAAxzd2FwX2ZlZV9icHMAAAAHAAAAAAAAAA90b2tlbl9pbml0X2luZm8AAAAH0AAAAA1Ub2tlbkluaXRJbmZvAAAA",
+      "AAAAAQAAAAAAAAAAAAAADlN0YWtlZFJlc3BvbnNlAAAAAAABAAAAAAAAAAZzdGFrZXMAAAAAA+oAAAfQAAAABVN0YWtlAAAA",
+      "AAAAAQAAAAAAAAAAAAAABVN0YWtlAAAAAAAAAgAAABtUaGUgYW1vdW50IG9mIHN0YWtlZCB0b2tlbnMAAAAABXN0YWtlAAAAAAAACwAAACVUaGUgdGltZXN0YW1wIHdoZW4gdGhlIHN0YWtlIHdhcyBtYWRlAAAAAAAAD3N0YWtlX3RpbWVzdGFtcAAAAAAG",
+      "AAAAAQAAAAAAAAAAAAAADVRva2VuSW5pdEluZm8AAAAAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
+      "AAAAAQAAAAAAAAAAAAAADVN0YWtlSW5pdEluZm8AAAAAAAADAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAACG1pbl9ib25kAAAACwAAAAAAAAAKbWluX3Jld2FyZAAAAAAACw==",
+      "AAAAAQAAAAAAAAAAAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAgAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAANZmVlX3JlY2lwaWVudAAAAAAAABMAAAAAAAAAGG1heF9hbGxvd2VkX3NsaXBwYWdlX2JwcwAAAAcAAAAAAAAAFm1heF9hbGxvd2VkX3NwcmVhZF9icHMAAAAAAAcAAAAAAAAAEG1heF9yZWZlcnJhbF9icHMAAAAHAAAAAAAAAA9zdGFrZV9pbml0X2luZm8AAAAH0AAAAA1TdGFrZUluaXRJbmZvAAAAAAAAAAAAAAxzd2FwX2ZlZV9icHMAAAAHAAAAAAAAAA90b2tlbl9pbml0X2luZm8AAAAH0AAAAA1Ub2tlbkluaXRJbmZvAAAA",
     ]);
   }
   private readonly parsers = {
     initialize: () => {},
-    createLiquidityPool: (result: string | xdr.ScVal): string =>
-      this.spec.funcResToNative("create_liquidity_pool", result),
-    queryPools: (result: string | xdr.ScVal): Array<string> =>
-      this.spec.funcResToNative("query_pools", result),
-    queryPoolDetails: (result: string | xdr.ScVal): LiquidityPoolInfo =>
-      this.spec.funcResToNative("query_pool_details", result),
+    createLiquidityPool: (
+      result: string | xdr.ScVal | Err<Error_>
+    ): string | Err<Error_> => {
+      if (result instanceof Err) return result;
+      return this.spec.funcResToNative("create_liquidity_pool", result);
+    },
+    updateWhitelistedAccounts: () => {},
+    queryPools: (
+      result: string | xdr.ScVal | Err
+    ): Array<string> | Err<Error_> => {
+      if (result instanceof Err) return result;
+      return this.spec.funcResToNative("query_pools", result);
+    },
+    queryPoolDetails: (
+      result: string | xdr.ScVal | Err
+    ): LiquidityPoolInfo | Err<Error_> => {
+      if (result instanceof Err) return result;
+      return this.spec.funcResToNative("query_pool_details", result);
+    },
     queryAllPoolsDetails: (
-      result: string | xdr.ScVal
-    ): Array<LiquidityPoolInfo> =>
-      this.spec.funcResToNative("query_all_pools_details", result),
-    queryForPoolByTokenPair: (result: string | xdr.ScVal): string =>
-      this.spec.funcResToNative("query_for_pool_by_token_pair", result),
-    getAdmin: (result: string | xdr.ScVal): string =>
-      this.spec.funcResToNative("get_admin", result),
-    getConfig: (result: string | xdr.ScVal): Config =>
-      this.spec.funcResToNative("get_config", result),
+      result: string | xdr.ScVal | Err
+    ): Array<LiquidityPoolInfo> | Err<Error_> => {
+      if (result instanceof Err) return result;
+      return this.spec.funcResToNative("query_all_pools_details", result);
+    },
+    queryForPoolByTokenPair: (
+      result: string | xdr.ScVal | Err
+    ): string | Err<Error_> => {
+      if (result instanceof Err) return result;
+      return this.spec.funcResToNative("query_for_pool_by_token_pair", result);
+    },
+    getAdmin: (result: string | xdr.ScVal | Err): string | Err<Error_> => {
+      if (result instanceof Err) return result;
+      return this.spec.funcResToNative("get_admin", result);
+    },
+    getConfig: (result: string | xdr.ScVal | Err): Config | Err<Error_> => {
+      if (result instanceof Err) return result;
+      return this.spec.funcResToNative("get_config", result);
+    },
+    queryUserPortfolio: (
+      result: string | xdr.ScVal | Err
+    ): UserPortfolio | Err<Error_> => {
+      if (result instanceof Err) return result;
+      return this.spec.funcResToNative("query_user_portfolio", result);
+    },
   };
   private txFromJSON = <T>(json: string): AssembledTransaction<T> => {
     const { method, ...tx } = JSON.parse(json);
@@ -247,7 +362,7 @@ export class Contract {
       {
         ...this.options,
         method,
-        //@ts-ignore
+        // @ts-ignore
         parseResultXdr: this.parsers[method],
       },
       tx
@@ -259,6 +374,9 @@ export class Contract {
     >,
     createLiquidityPool: this.txFromJSON<
       ReturnType<(typeof this.parsers)["createLiquidityPool"]>
+    >,
+    updateWhitelistedAccounts: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["updateWhitelistedAccounts"]>
     >,
     queryPools: this.txFromJSON<
       ReturnType<(typeof this.parsers)["queryPools"]>
@@ -274,6 +392,9 @@ export class Contract {
     >,
     getAdmin: this.txFromJSON<ReturnType<(typeof this.parsers)["getAdmin"]>>,
     getConfig: this.txFromJSON<ReturnType<(typeof this.parsers)["getConfig"]>>,
+    queryUserPortfolio: this.txFromJSON<
+      ReturnType<(typeof this.parsers)["queryUserPortfolio"]>
+    >,
   };
   /**
    * Construct and simulate a initialize transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
@@ -282,7 +403,20 @@ export class Contract {
     {
       admin,
       multihop_wasm_hash,
-    }: { admin: string; multihop_wasm_hash: Buffer },
+      lp_wasm_hash,
+      stake_wasm_hash,
+      token_wasm_hash,
+      whitelisted_accounts,
+      lp_token_decimals,
+    }: {
+      admin: string;
+      multihop_wasm_hash: Buffer;
+      lp_wasm_hash: Buffer;
+      stake_wasm_hash: Buffer;
+      token_wasm_hash: Buffer;
+      whitelisted_accounts: Array<string>;
+      lp_token_decimals: u32;
+    },
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
@@ -295,6 +429,11 @@ export class Contract {
       args: this.spec.funcArgsToScVals("initialize", {
         admin: new Address(admin),
         multihop_wasm_hash,
+        lp_wasm_hash,
+        stake_wasm_hash,
+        token_wasm_hash,
+        whitelisted_accounts,
+        lp_token_decimals,
       }),
       ...options,
       ...this.options,
@@ -307,7 +446,17 @@ export class Contract {
    * Construct and simulate a create_liquidity_pool transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
   createLiquidityPool = async (
-    { lp_init_info }: { lp_init_info: LiquidityPoolInitInfo },
+    {
+      sender,
+      lp_init_info,
+      share_token_name,
+      share_token_symbol,
+    }: {
+      sender: string;
+      lp_init_info: LiquidityPoolInitInfo;
+      share_token_name: string;
+      share_token_symbol: string;
+    },
     options: {
       /**
        * The fee to pay for the transaction. Default: 100.
@@ -318,12 +467,45 @@ export class Contract {
     return await AssembledTransaction.fromSimulation({
       method: "create_liquidity_pool",
       args: this.spec.funcArgsToScVals("create_liquidity_pool", {
+        sender: new Address(sender),
         lp_init_info,
+        share_token_name,
+        share_token_symbol,
       }),
       ...options,
       ...this.options,
       errorTypes: Errors,
       parseResultXdr: this.parsers["createLiquidityPool"],
+    });
+  };
+
+  /**
+   * Construct and simulate a update_whitelisted_accounts transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  updateWhitelistedAccounts = async (
+    {
+      sender,
+      to_add,
+      to_remove,
+    }: { sender: string; to_add: Array<string>; to_remove: Array<string> },
+    options: {
+      /**
+       * The fee to pay for the transaction. Default: 100.
+       */
+      fee?: number;
+    } = {}
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "update_whitelisted_accounts",
+      args: this.spec.funcArgsToScVals("update_whitelisted_accounts", {
+        sender: new Address(sender),
+        to_add,
+        to_remove,
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["updateWhitelistedAccounts"],
     });
   };
 
@@ -457,6 +639,31 @@ export class Contract {
       ...this.options,
       errorTypes: Errors,
       parseResultXdr: this.parsers["getConfig"],
+    });
+  };
+
+  /**
+   * Construct and simulate a query_user_portfolio transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  queryUserPortfolio = async (
+    { sender, staking }: { sender: string; staking: boolean },
+    options: {
+      /**
+       * The fee to pay for the transaction. Default: 100.
+       */
+      fee?: number;
+    } = {}
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "query_user_portfolio",
+      args: this.spec.funcArgsToScVals("query_user_portfolio", {
+        sender: new Address(sender),
+        staking,
+      }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["queryUserPortfolio"],
     });
   };
 }
