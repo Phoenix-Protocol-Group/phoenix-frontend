@@ -185,7 +185,7 @@ const ConnectWallet = ({
               style={{ width: "100%" }}
             />
             <Typography sx={{ fontSize: "1.5rem", fontWeight: 700 }}>
-              Opening Freighter
+              Opening {selected.name}
             </Typography>
             <Typography
               sx={{ fontSize: "0.875rem", opacity: 0.4, mt: "-0.47rem" }}
