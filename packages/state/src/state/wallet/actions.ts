@@ -31,6 +31,7 @@ export const createWalletActions = (
 
       // Fetch all available tokens from chain
       const allPoolsDetails = await factoryContract.queryAllPoolsDetails();
+
       // Loop through all pools and get asset_a and asset_b addresses in an array
       const _allAssets = allPoolsDetails.result
         .map((pool) => [

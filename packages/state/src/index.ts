@@ -1,5 +1,6 @@
 // Export freighter
 export { freighter } from "./state/wallet/freighter";
+export { xbull } from "./state/wallet/xbull";
 
 // Export chains
 export {

@@ -11,6 +11,7 @@ export type Wallet = {
   address: string | undefined;
   activeChain: WalletChain | undefined;
   server: Horizon.Server | undefined;
+  walletType: "freighter" | "xbull" | undefined;
 };
 
 export interface WalletActions {

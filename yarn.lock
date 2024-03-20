@@ -3748,6 +3748,7 @@ __metadata:
     toml: ^3.0.0
     ts-jest: ^29.1.0
     typescript: ^5.1.3
+    xBull-Wallet-Connect: "https://github.com/Creit-Tech/xBull-Wallet-Connect.git"
   languageName: unknown
   linkType: soft
 
@@ -15262,6 +15263,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rxjs@npm:^7.5.5":
+  version: 7.8.1
+  resolution: "rxjs@npm:7.8.1"
+  dependencies:
+    tslib: ^2.1.0
+  checksum: de4b53db1063e618ec2eca0f7965d9137cabe98cf6be9272efe6c86b47c17b987383df8574861bcced18ebd590764125a901d5506082be84a8b8e364bf05f119
+  languageName: node
+  linkType: hard
+
 "safe-array-concat@npm:^1.0.0":
   version: 1.0.0
   resolution: "safe-array-concat@npm:1.0.0"
@@ -16530,6 +16540,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tweetnacl-util@npm:^0.15.1":
+  version: 0.15.1
+  resolution: "tweetnacl-util@npm:0.15.1"
+  checksum: ae6aa8a52cdd21a95103a4cc10657d6a2040b36c7a6da7b9d3ab811c6750a2d5db77e8c36969e75fdee11f511aa2b91c552496c6e8e989b6e490e54aca2864fc
+  languageName: node
+  linkType: hard
+
 "tweetnacl@npm:^1.0.3":
   version: 1.0.3
   resolution: "tweetnacl@npm:1.0.3"
@@ -17316,6 +17333,17 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 53e991bbf928faf5dc6efac9b8eb9ab6497c69feeb94f963d648b7a3530a720b19ec2e0ec037344257e05a4f35bd9ad04d9de6f289615ffb133282031b18c61c
+  languageName: node
+  linkType: hard
+
+"xBull-Wallet-Connect@https://github.com/Creit-Tech/xBull-Wallet-Connect.git":
+  version: 0.2.0
+  resolution: "xBull-Wallet-Connect@https://github.com/Creit-Tech/xBull-Wallet-Connect.git#commit=a93e2e0d97c61bbd83fedcca0c71feef9f28b2d3"
+  dependencies:
+    rxjs: ^7.5.5
+    tweetnacl: ^1.0.3
+    tweetnacl-util: ^0.15.1
+  checksum: 54b626e5ae34062b06de7629de37b6e48eb863cb062bfcc55ddfb76fec877cdef29d4f91305b7f62d1c1154339ddbc6b49a24604ef45f289fbb9036588650fbc
   languageName: node
   linkType: hard
 

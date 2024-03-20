@@ -8,6 +8,7 @@ import {
 import { freighter } from "../wallet/freighter";
 import { allChains, networkToActiveChain } from "../wallet/chains";
 import { usePersistStore } from "../store";
+import { xbull } from "../wallet/xbull";
 
 export const createConnectWalletActions = () => {
   return {
@@ -15,12 +16,13 @@ export const createConnectWalletActions = () => {
       address: undefined,
       activeChain: undefined,
       server: undefined,
+      walletType: undefined,
     },
 
     // This function is called when the user clicks the "Connect" button
     // in the wallet modal. It uses the Freighters SDK to get the user's
     // address and network details, and then stores them in the app state.
-    connectWallet: async () => {
+    connectWallet: async (wallet: string) => {
       // Get the network details from the user's wallet.
       const networkDetails = await freighter().getNetworkDetails();
 
@@ -40,7 +42,18 @@ export const createConnectWalletActions = () => {
       const activeChain = networkToActiveChain(networkDetails, allChains);
 
       // Get the user's address from the wallet.
-      const address = await freighter().getPublicKey();
+      let address = "";
+      console.log(wallet);
+      switch (wallet) {
+        case "freighter":
+          address = await freighter().getPublicKey();
+          break;
+        case "xbull":
+          address = await xbull().getPublicKey();
+          break;
+        default:
+          throw new Error("Wallet not supported");
+      }
 
       // Create a server object to connect to the blockchain.
       let server =
@@ -52,7 +65,7 @@ export const createConnectWalletActions = () => {
       // Update the state to store the wallet address and server.
       usePersistStore.setState((state: AppStorePersist) => ({
         ...state,
-        wallet: { address, activeChain, server },
+        wallet: { address, activeChain, server, walletType: wallet },
       }));
 
       return;
@@ -67,6 +80,7 @@ export const createConnectWalletActions = () => {
           address: undefined,
           activeChain: undefined,
           server: undefined,
+          walletType: undefined,
         },
       }));
     },

@@ -32,6 +32,7 @@
     "react-joyride": "^2.7.2",
     "soroban-client": "^1.0.0",
     "stellar-sdk": "^11.2.1",
-    "toml": "^3.0.0"
+    "toml": "^3.0.0",
+    "xBull-Wallet-Connect": "https://github.com/Creit-Tech/xBull-Wallet-Connect.git"
   }
 }
