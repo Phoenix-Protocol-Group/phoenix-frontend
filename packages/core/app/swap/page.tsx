@@ -81,7 +81,6 @@ export default function SwapPage() {
         operations: operations,
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
         max_spread_bps: BigInt(maxSpread * 100),
-        max_belief_price: undefined,
       });
 
       const result = await tx.signAndSend();
@@ -122,10 +121,11 @@ export default function SwapPage() {
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
       });
 
-      if (tx.result.ask_amount && tx.result.total_commission_amount) {
+      console.log(tx.result.commission_amounts);
+      if (tx.result.ask_amount && tx.result.commission_amounts) {
         const _exchangeRate =
           (Number(tx.result.ask_amount) -
-            Number(tx.result.total_commission_amount)) /
+            Number(tx.result.commission_amounts[0][1])) /
           Number(tokenAmounts[0]);
 
         setExchangeRate(
@@ -133,8 +133,10 @@ export default function SwapPage() {
             fromToken?.name
           }`
         );
+
+        // TODO: Adjust network fee and iterate through amounts
         setNetworkFee(
-          `${Number(tx.result.total_commission_amount) / 10 ** 7} ${
+          `${Number(tx.result.commission_amounts[0][1]) / 10 ** 7} ${
             fromToken?.name
           }`
         );

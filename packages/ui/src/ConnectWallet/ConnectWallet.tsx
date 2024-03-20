@@ -43,7 +43,12 @@ const OptionComponent = ({
       onClick={onClick}
       sx={selected ? { ...style, ...styleHovered } : style}
     >
-      <img src={connector.iconUrl} alt={connector.name} />
+      <img
+        src={connector.iconUrl}
+        width="37"
+        height="37"
+        alt={connector.name}
+      />
       <Typography>{connector.name}</Typography>
     </Box>
   );
@@ -79,7 +84,6 @@ const ConnectWallet = ({
     flexDirection: "column" as "column",
     padding: "1.5rem",
   };
-
 
   return (
     <Modal
@@ -172,14 +176,21 @@ const ConnectWallet = ({
               mt: "1.5rem",
             }}
           >
-            <img src="/image-105.png" />
+            <img
+              src={
+                selected.id === "freighter"
+                  ? "/image-105.png"
+                  : selected.iconUrl
+              }
+              style={{ width: "100%" }}
+            />
             <Typography sx={{ fontSize: "1.5rem", fontWeight: 700 }}>
-              Opening Freighter
+              Opening {selected.name}
             </Typography>
             <Typography
               sx={{ fontSize: "0.875rem", opacity: 0.4, mt: "-0.47rem" }}
             >
-              Please confirm in the Freighter app
+              Please confirm in the {selected.name} app
             </Typography>
           </Box>
         )}

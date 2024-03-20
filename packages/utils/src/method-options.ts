@@ -1,28 +1,10 @@
+import { Wallet } from "./wallets/types";
+
 // defined this way so typeahead shows full union, not named alias
 let responseTypes: "simulated" | "full" | undefined;
 export type ResponseTypes = typeof responseTypes;
 
 export type XDR_BASE64 = string;
-
-export interface Wallet {
-  isConnected: () => Promise<boolean>;
-  isAllowed: () => Promise<boolean>;
-  getUserInfo: () => Promise<{ publicKey?: string }>;
-  signTransaction: (
-    tx: XDR_BASE64,
-    opts?: {
-      network?: string;
-      networkPassphrase?: string;
-      accountToSign?: string;
-    }
-  ) => Promise<XDR_BASE64>;
-  signAuthEntry: (
-    entryXdr: XDR_BASE64,
-    opts?: {
-      accountToSign?: string;
-    }
-  ) => Promise<XDR_BASE64>;
-}
 
 export type ClassOptions = {
   contractId: string;
@@ -51,3 +33,5 @@ export type MethodOptions = {
    */
   fee?: number;
 };
+
+export { Wallet };
