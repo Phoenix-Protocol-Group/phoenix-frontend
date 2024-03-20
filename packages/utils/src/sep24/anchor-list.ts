@@ -8,7 +8,7 @@ export const anchorStatics = [
     name: "kado",
     logo: "anchors/kado.svg",
     sep: ["sep24"],
-    url: "test-kado-anchor-sep.kado.money/sep24",
+    url: "test-kado-anchor-sep.kado.money",
   },
 ];
 

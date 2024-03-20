@@ -4,6 +4,7 @@ import {
   freighter,
   useAppStore,
   usePersistStore,
+  xbull,
 } from "@phoenix-protocol/state";
 import { AppBar, ConnectWallet } from "@phoenix-protocol/ui";
 import React, { useEffect, useState } from "react";
@@ -20,7 +21,7 @@ const TopBar = ({
   const storePersist = usePersistStore();
 
   const connect = async (connector: any) => {
-    await storePersist.connectWallet();
+    await storePersist.connectWallet(connector.id);
 
     return;
   };
@@ -75,7 +76,7 @@ const TopBar = ({
       <ConnectWallet
         open={store.walletModalOpen}
         // @ts-ignore
-        connectors={[freighter()]}
+        connectors={[freighter(), xbull()]}
         setOpen={() => store.setWalletModalOpen(!store.walletModalOpen)}
         connect={connect}
       />

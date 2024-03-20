@@ -1,3 +1,4 @@
+type XDR_BASE64 = string;
 export interface Wallet {
   isConnected: () => Promise<boolean>;
   isAllowed: () => Promise<boolean>;

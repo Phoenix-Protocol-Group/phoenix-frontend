@@ -1,4 +1,4 @@
-import { Wallet } from "@phoenix-protocol/types";
+import { Wallet } from "./wallets/types";
 
 // defined this way so typeahead shows full union, not named alias
 let responseTypes: "simulated" | "full" | undefined;
@@ -33,3 +33,5 @@ export type MethodOptions = {
    */
   fee?: number;
 };
+
+export { Wallet };

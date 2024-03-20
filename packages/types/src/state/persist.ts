@@ -2,7 +2,7 @@ import { UserTour } from "./userTour";
 import { Wallet } from "./wallet";
 
 export interface PersistWalletActions {
-  connectWallet: () => Promise<void>;
+  connectWallet: (wallet: string) => Promise<void>;
   disconnectWallet: () => void;
   wallet: Wallet;
   userTour: UserTour;
