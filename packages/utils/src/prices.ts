@@ -7,12 +7,14 @@ interface TokenPairs {
 // Check https://www.bitstamp.net/api/v2/currencies/ and https://www.bitstamp.net/api/v2/ticker/{market_symbol}/
 const tokensAvailableAndPaired: TokenPairs = {
   XLM: "xlmusd",
-  EURC: "eurocusdc",
-  PHO: "xlmusd", // TODO, for testing
+  USDC: "usdcusd", // TODO, for testing
 };
 
 // Function to fetch prices for a given token
 export async function fetchTokenPrices(tokenSymbol: string): Promise<number> {
+  if (tokenSymbol === "USDC") {
+    return 1;
+  }
   const tokenPair = tokensAvailableAndPaired[tokenSymbol.toUpperCase()];
   if (!tokenPair) {
     throw new Error(`Token ${tokenSymbol} not supported`);

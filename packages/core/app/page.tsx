@@ -46,6 +46,7 @@ export default function Page() {
   const [loserAsset, setLoserAsset] = useState<any>({});
   const [allTokens, setAllTokens] = useState<any[]>([]);
   const [xlmPrice, setXlmPrice] = useState(0);
+  const [usdcPrice, setUsdcPrice] = useState(0);
 
   // Loading states
   const [loadingBalances, setLoadingBalances] = useState(true);
@@ -78,6 +79,8 @@ export default function Page() {
 
     // Resolve names by fetching all assets
     const _allTokens = await appStore.getAllTokens();
+
+    console.log(winner, loser);
 
     const _winner = _allTokens.find((token) => token.name === winner.symbol);
     const _loser = _allTokens.find((token) => token.name === loser.symbol);
@@ -126,7 +129,9 @@ export default function Page() {
 
   const getXlmPrice = async () => {
     const price = await fetchTokenPrices("XLM");
+    const price2 = await fetchTokenPrices("USDC");
     setXlmPrice(price);
+    setUsdcPrice(price2);
   };
 
   const args = {
@@ -149,14 +154,14 @@ export default function Page() {
         },
       ],
     },
-    dashboardArgs: {
+    dashboardArgs1: {
       data: [
-        [1687392000000, 0.08683713332799949],
-        [1687478400000, 0.08669248419239592],
-        [1687564800000, 0.0893807322702632],
-        [1687651200000, 0.09057594512560627],
-        [1687737600000, 0.09168837759904613],
-        [1687824000000, 0.09213058385843788],
+        [1687392000000, 0.130],
+        [1687478400000, 0.131],
+        [1687564800000, 0.130],
+        [1687651200000, 0.132],
+        [1687737600000, 0.1301],
+        [1687824000000, 0.130],
         [1687859473000, xlmPrice],
       ],
       icon: {
@@ -164,6 +169,22 @@ export default function Page() {
         large: "image-stellar.png",
       },
       assetName: "XLM",
+    },
+    dashboardArgs2: {
+      data: [
+        [1687392000000, 0.99983713332799949],
+        [1687478400000, 0.99669248419239592],
+        [1687564800000, 0.99893807322702632],
+        [1687651200000, 1],
+        [1687737600000, 1.01],
+        [1687824000000, 1],
+        [1687859473000, usdcPrice],
+      ],
+      icon: {
+        small: "image-105.png",
+        large: "image-stellar.png",
+      },
+      assetName: "USDC",
     },
     walletBalanceArgs: {
       tokens: allTokens,
@@ -214,23 +235,37 @@ export default function Page() {
             <DashboardStats {...args.dashboardStatsArgs} />
           )}
         </Grid>
-        <Grid item xs={6} md={6} lg={2} mt={!largerThenMd ? 2 : undefined} sx={{
-          pr: {
-            xs: 0,
-            md: 0.5,
-            lg: 0
-          }
-        }}>
-          <DashboardPriceCharts {...args.dashboardArgs} />
+        <Grid
+          item
+          xs={6}
+          md={6}
+          lg={2}
+          mt={!largerThenMd ? 2 : undefined}
+          sx={{
+            pr: {
+              xs: 0,
+              md: 0.5,
+              lg: 0,
+            },
+          }}
+        >
+          <DashboardPriceCharts {...args.dashboardArgs1} />
         </Grid>
-        <Grid item xs={6} md={6} lg={2} mt={!largerThenMd ? 2 : undefined} sx={{
-          pl: {
-            xs: 0,
-            md: 0.5,
-            lg: 0
-          }
-        }}>
-          <DashboardPriceCharts {...args.dashboardArgs} />
+        <Grid
+          item
+          xs={6}
+          md={6}
+          lg={2}
+          mt={!largerThenMd ? 2 : undefined}
+          sx={{
+            pl: {
+              xs: 0,
+              md: 0.5,
+              lg: 0,
+            },
+          }}
+        >
+          <DashboardPriceCharts {...args.dashboardArgs2} />
         </Grid>
         <Grid item xs={12} md={5} lg={4} sx={{ mt: 2 }}>
           <CryptoCTA onClick={() => setAnchorOpen(true)} />

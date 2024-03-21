@@ -155,7 +155,7 @@ const DashboardStats = ({
         padding: "2rem",
       }}
     >
-      <Grid container spacing={2}>
+      {/*  <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <AssetStat
             title="Available assets"
@@ -171,6 +171,7 @@ const DashboardStats = ({
           />
         </Grid>
       </Grid>
+    */}
       <Grid container sx={{ px: "1.6rem", mt: 3 }}>
         <Grid item xs={12} md={6} sx={{ padding: "1.2rem" }}>
           <GainerAndLooser title="Top Gainer" asset={gainer} />
@@ -184,8 +185,8 @@ const DashboardStats = ({
             borderLeft: "1px solid rgba(255, 255, 255, 0.10)",
             paddingRight: {
               xs: "0",
-              md: "2.8rem"
-            }
+              md: "2.8rem",
+            },
           }}
         >
           <GainerAndLooser title="Top Loser" asset={loser} />

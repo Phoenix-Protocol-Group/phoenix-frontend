@@ -21,7 +21,7 @@ export function xbull(): Connector {
       // !TODO - find a better solution here
       return {
         ...(await freighterApi.getNetworkDetails()),
-        networkUrl: "https://soroban-testnet.stellar.org/",
+        networkUrl: "https://bitter-alpha-layer.stellar-mainnet.quiknode.pro/54b50c548864e1470fd52dbd629b647d556b983e",
       };
     },
     async getPublicKey(): Promise<string> {

@@ -200,8 +200,8 @@ export class AssembledTransaction<T> {
       ...options,
       wallet: walletType === "xbull" ? new xBull() : undefined,
     });
-    const contract = new Contract(options.contractId);
 
+    const contract = new Contract(options.contractId);
     tx.raw = new TransactionBuilder(await tx.getAccount(), {
       fee: options.fee?.toString(10) ?? BASE_FEE,
       networkPassphrase: options.networkPassphrase,
@@ -209,7 +209,6 @@ export class AssembledTransaction<T> {
       .addOperation(contract.call(options.method, ...(options.args ?? [])))
       .setTimeout(TimeoutInfinite)
       .build();
-
     return await tx.simulate();
   }
 
@@ -314,9 +313,16 @@ export class AssembledTransaction<T> {
    */
   getAccount = async (): Promise<Account> => {
     const publicKey = await this.getPublicKey();
-    return publicKey
-      ? await this.server.getAccount(publicKey)
-      : new Account(NULL_ACCOUNT, "0");
+
+    // Need to see if that account even exists on chain
+    if (publicKey) {
+      try {
+        return await this.server.getAccount(publicKey);
+      } catch (e) {
+        return new Account(NULL_ACCOUNT, "0");
+      }
+    }
+    return new Account(NULL_ACCOUNT, "0");
   };
 
   /**
@@ -728,7 +734,7 @@ class SentTransaction<T> {
  * Keep calling a `fn` for `secondsToWait` seconds, if `keepWaitingIf` is true.
  * Returns an array of all attempts to call the function.
  */
-async function withExponentialBackoff<T>(
+export async function withExponentialBackoff<T>(
   fn: (previousFailure?: T) => Promise<T>,
   keepWaitingIf: (result: T) => boolean,
   secondsToWait: number,

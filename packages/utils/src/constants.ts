@@ -8,7 +8,8 @@ export const TESTING_SOURCE: Account = new Account(
 /**
  * The Soroban network passphrase used to initialize this library.
  */
-export const NETWORK_PASSPHRASE: string = "Public Global Stellar Network ; September 2015";
+export const NETWORK_PASSPHRASE: string =
+  "Public Global Stellar Network ; September 2015";
 
 /**
  * The Soroban RPC endpoint used to initialize this library.
@@ -20,13 +21,13 @@ export const RPC_URL: string =
  * Factory contract address
  */
 export const FACTORY_ADDRESS: string =
-  "CARVO4GFHVVHSNJQUJGWINRNTL3Z6LRR3YIL54LGQSDWO4LHXCY5IMCZ";
+  "CC3AWJG5I7P5VMTBCPYCAGCQOSKDBQK6NWS4G4KQ3FWXJZT6FTCSLRYY";
 
 /**
  * Multihop contract address
  */
 export const MULTIHOP_ADDRESS: string =
-  "CAWSSOOXES5AGPV3Y35A65CJNWNPGUO4OUFGGSEFCUWL4LDHC3EPSJAA";
+  "CBLGRAHJ4OJ2TOQYQ4W2HCHXMQCEIUTP6DWKTH2OHS7FKKF3TZGYC7FW";
 
 /**
  * Phoenix History Indexer

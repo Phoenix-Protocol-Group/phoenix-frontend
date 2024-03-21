@@ -6,7 +6,7 @@ import MailIcon from "@mui/icons-material/Mail";
 import { SwapContainer } from "../SwapContainer/SwapContainer";
 import { SlippageSettings } from "../SlippageSettings/SlippageSettings";
 import { AssetSelector } from "../AssetSelector/AssetSelector";
-import { Token } from "@phoenix-protocol/types"
+import { Token } from "@phoenix-protocol/types";
 
 const args = {
   navItems: [
@@ -166,6 +166,8 @@ const SwapPage = () => {
           <SwapContainer
             {...args.SwapContainerArgs}
             onOptionsClick={() => setOptionsOpen(true)}
+            onTrustlineButtonClick={() => {}}
+            trustlineAssetName="USDT"
             onSwapTokensClick={() => {}}
             onTokenSelectorClick={(isFromToken) =>
               handleSelectorOpen(isFromToken)

@@ -100,7 +100,6 @@ export const createWalletActions = (
         );
       } catch (e) {
         balance = BigInt(0);
-        console.log(e, "User has no balance");
       }
       let symbol: string;
       try {
@@ -110,7 +109,6 @@ export const createWalletActions = (
           )?.symbol || (await TokenContract.symbol()).result;
         symbol = _symbol === "native" ? "XLM" : _symbol;
       } catch (e) {
-        console.log(e, "Token seems to be invalid");
         return;
       }
       const decimals =
