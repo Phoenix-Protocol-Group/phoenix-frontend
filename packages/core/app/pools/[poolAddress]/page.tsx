@@ -265,7 +265,8 @@ export default function Page({ params }: PoolPageProps) {
             store.fetchTokenInfo(Address.fromString(pairConfig.result.token_a)),
             store.fetchTokenInfo(Address.fromString(pairConfig.result.token_b)),
             store.fetchTokenInfo(
-              Address.fromString(pairConfig.result.share_token)
+              Address.fromString(pairConfig.result.share_token),
+              true
             ),
             new PhoenixStakeContract.Contract({
               contractId: pairConfig.result.stake_contract.toString(),

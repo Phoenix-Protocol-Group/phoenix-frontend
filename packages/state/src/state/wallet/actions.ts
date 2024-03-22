@@ -52,7 +52,10 @@ export const createWalletActions = (
       await Promise.all(allAssets);
 
       const _tokens = getState()
-        .tokens.filter((token: Token) => token?.symbol !== "POOL")
+        .tokens.filter(
+          (token: Token) =>
+            token?.symbol !== "POOL" && token.isStakingToken !== true
+        )
         .map(async (token: Token) => {
           return {
             name: token?.symbol === "native" ? "XLM" : token?.symbol,
@@ -76,7 +79,10 @@ export const createWalletActions = (
       return _allTokens;
     },
 
-    fetchTokenInfo: async (tokenAddress: Address) => {
+    fetchTokenInfo: async (
+      tokenAddress: Address,
+      isStakingToken: boolean = false
+    ) => {
       let updatedTokenInfo: Token | undefined;
       // Check if account, server, and network passphrase are set
       if (!getState().server || !getState().networkPassphrase) {
@@ -120,7 +126,7 @@ export const createWalletActions = (
       setState((state: AppStore) => {
         const updatedTokens = state.tokens.map((token: Token) =>
           token.id === tokenAddress.toString()
-            ? { ...token, balance, decimals, symbol }
+            ? { ...token, balance, decimals, symbol, isStakingToken }
             : token
         );
         // If token couldnt be found, add it
@@ -134,6 +140,7 @@ export const createWalletActions = (
             balance,
             decimals: decimals,
             symbol: symbol === "native" ? "XLM" : symbol,
+            isStakingToken,
           });
         }
         updatedTokenInfo = updatedTokens.find(
