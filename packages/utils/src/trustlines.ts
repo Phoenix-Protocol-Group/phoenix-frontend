@@ -12,7 +12,7 @@ import { AssembledTransaction, constants, withExponentialBackoff } from ".";
 import { assetList } from "./assets/assetList";
 import { xBull } from "./wallets/xbull";
 
-const horizonUrl = constants.RPC_URL;
+const horizonUrl = "https://horizon.stellar.org";
 const server = new Horizon.Server(horizonUrl);
 
 /**
@@ -62,6 +62,7 @@ export async function checkTrustline(
   // Fetch Account
   const account = await fetchAccount(publicKey);
 
+  console.log(account);
   if (!account) {
     return {
       exists: false,
