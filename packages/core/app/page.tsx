@@ -167,8 +167,8 @@ export default function Page() {
         [1687859473000, xlmPrice],
       ],
       icon: {
-        small: "image-103.png",
-        large: "image-stellar.png",
+        small: "/image-103.png",
+        large: "/image-stellar.png",
       },
       assetName: "XLM",
     },
@@ -183,8 +183,8 @@ export default function Page() {
         [1687859473000, usdcPrice],
       ],
       icon: {
-        small: "cryptoIcons/usdc.svg",
-        large: "pho-bg.png",
+        small: "/cryptoIcons/usdc.svg",
+        large: "/pho-bg.png",
       },
       assetName: "USDC",
     },
