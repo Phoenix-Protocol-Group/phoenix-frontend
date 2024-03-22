@@ -34,6 +34,7 @@ import {
   scValToJs,
 } from "@phoenix-protocol/utils";
 import { PhoenixFactoryContract } from "@phoenix-protocol/contracts";
+import DisclaimerModal from "@/components/Disclaimer";
 
 export default function Page() {
   const theme = useTheme();
@@ -47,6 +48,7 @@ export default function Page() {
   const [allTokens, setAllTokens] = useState<any[]>([]);
   const [xlmPrice, setXlmPrice] = useState(0);
   const [usdcPrice, setUsdcPrice] = useState(0);
+  const [disclaimer, setDisclaimer] = useState(true);
 
   // Loading states
   const [loadingBalances, setLoadingBalances] = useState(true);
@@ -156,12 +158,12 @@ export default function Page() {
     },
     dashboardArgs1: {
       data: [
-        [1687392000000, 0.130],
+        [1687392000000, 0.13],
         [1687478400000, 0.131],
-        [1687564800000, 0.130],
+        [1687564800000, 0.13],
         [1687651200000, 0.132],
         [1687737600000, 0.1301],
-        [1687824000000, 0.130],
+        [1687824000000, 0.13],
         [1687859473000, xlmPrice],
       ],
       icon: {
@@ -202,6 +204,10 @@ export default function Page() {
       <Helmet>
         <title>Phoenix DeFi Hub - Dashboard</title>
       </Helmet>
+      <DisclaimerModal
+        open={disclaimer}
+        handleClose={() => setDisclaimer(false)}
+      />
 
       {anchors.length > 0 && (
         <AnchorServices
