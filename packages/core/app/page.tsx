@@ -274,7 +274,24 @@ export default function Page() {
           <DashboardPriceCharts {...args.dashboardArgs2} />
         </Grid>
         <Grid item xs={12} md={5} lg={4} sx={{ mt: 2 }}>
-          <CryptoCTA onClick={() => setAnchorOpen(true)} />
+          <CryptoCTA
+            onClick={() =>
+              window.open(
+                `https://app.kado.money/
+?onPayAmount=250
+&onPayCurrency=USD
+&onRevCurrency=USDC
+&cryptoList=XLM,USDC
+&network=STELLAR
+&networkList=STELLAR
+&product=BUY
+&productList=BUY
+&mode=minimal`,
+                "_blank",
+                "toolbar=yes,scrollbars=yes,resizable=yes,top=0,left=0,width=480,height=620"
+              )
+            }
+          />
         </Grid>
         <Grid item xs={12} md={7} lg={8} sx={{ mt: 2 }}>
           {loadingBalances ? (
