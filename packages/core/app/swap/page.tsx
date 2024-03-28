@@ -339,12 +339,12 @@ export default function SwapPage() {
 
   // Return statement for rendering components conditionally based on state
   return isLoading ? (
-    <Box sx={{ width: "100%", maxWidth: "600px", mt: { xs: 12, md: 0 } }}>
+    <Box sx={{ width: "100%", maxWidth: "600px", mt: 12}}>
       <Skeleton.Swap />
     </Box>
   ) : (
     // JSX for UI when data is loaded
-    <Box sx={{ width: "100%", maxWidth: "600px", mt: { xs: 12, md: 0 } }}>
+    <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
       <Helmet>
         <title>Phoenix DeFi Hub - Swap your tokens</title>
       </Helmet>
