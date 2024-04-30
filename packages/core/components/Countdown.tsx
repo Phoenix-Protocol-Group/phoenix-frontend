@@ -299,7 +299,7 @@ const Countdown: React.FC = () => {
                     target="_blank"
                     sx={socialIconStyle}
                   >
-                    <Box component="img" src="/X.svg" />
+                    <Box component="img" src="/x.svg" />
                   </Link>
                   <Link
                     href="https://discord.gg/yWqJwJ4yza"
