@@ -16,7 +16,7 @@ export const getAllAnchors = async (): Promise<any> => {
   const all = anchorStatics.map(async (anchor) => {
     const transferServer = await openTransferServer(
       anchor.url,
-      Networks.TESTNET,
+      Networks.PUBLIC,
       {
         // Optional
         lang: "en",

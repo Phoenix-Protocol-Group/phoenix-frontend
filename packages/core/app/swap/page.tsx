@@ -18,7 +18,9 @@ import {
 } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
+  checkTrustline,
   constants,
+  fetchAndIssueTrustline,
   findBestPath,
   resolveContractError,
 } from "@phoenix-protocol/utils";
@@ -54,6 +56,13 @@ export default function SwapPage() {
   const [loadingSimulate, setLoadingSimulate] = useState<boolean>(false);
   const [exchangeRate, setExchangeRate] = useState<string>("");
   const [networkFee, setNetworkFee] = useState<string>("");
+
+  // Trustline
+  const [trustlineButtonActive, setTrustlineButtonActive] =
+    useState<boolean>(false);
+  const [trustlineTokenName, setTrustlineTokenName] = useState<string>("");
+  const [trustlineTokenContract, setTrustlineTokenContract] =
+    useState<string>("");
 
   // All Pools
   const [allPools, setAllPools] = useState<any[]>([]);
@@ -121,7 +130,6 @@ export default function SwapPage() {
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
       });
 
-      console.log(tx.result.commission_amounts);
       if (tx.result.ask_amount && tx.result.commission_amounts) {
         const _exchangeRate =
           (Number(tx.result.ask_amount) -
@@ -296,18 +304,47 @@ export default function SwapPage() {
       setOperations(_operations);
       const swapRoute_ = fromToken.name + " -> " + _swapRoute.join(" -> ");
       setSwapRoute(swapRoute_);
+      if (storePersist.wallet.address) {
+        handleTrustLine(toTokenContractID);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromToken, toToken, allPools]);
 
+  const handleTrustLine = async (tokenAddress: string) => {
+    // Check if trustline exists
+    const trust = await checkTrustline(
+      storePersist.wallet.address!,
+      tokenAddress
+    );
+
+    setTrustlineButtonActive(!trust.exists);
+    setTrustlineTokenName(trust.asset?.code || "");
+    setTrustlineTokenContract(trust.asset?.contract || "");
+  };
+
+  const addTrustLine = async () => {
+    try {
+      setTxBroadcasting(true);
+      await fetchAndIssueTrustline(
+        storePersist.wallet.address!,
+        trustlineTokenContract
+      );
+      setTrustlineButtonActive(false);
+    } catch (e) {
+      console.error(e);
+    }
+    setTxBroadcasting(false);
+  };
+
   // Return statement for rendering components conditionally based on state
   return isLoading ? (
-    <Box sx={{ width: "100%", maxWidth: "600px", mt: { xs: 12, md: 0 } }}>
+    <Box sx={{ width: "100%", maxWidth: "600px", mt: 12}}>
       <Skeleton.Swap />
     </Box>
   ) : (
     // JSX for UI when data is loaded
-    <Box sx={{ width: "100%", maxWidth: "600px", mt: { xs: 12, md: 0 } }}>
+    <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
       <Helmet>
         <title>Phoenix DeFi Hub - Swap your tokens</title>
       </Helmet>
@@ -370,6 +407,9 @@ export default function SwapPage() {
             swapButtonDisabled={
               tokenAmounts[0] <= 0 || storePersist.wallet.address === undefined
             }
+            trustlineButtonActive={trustlineButtonActive}
+            trustlineAssetName={trustlineTokenName}
+            onTrustlineButtonClick={() => addTrustLine()}
           />
         )}
         {/* Options Modal for Setting Slippage Tolerance */}

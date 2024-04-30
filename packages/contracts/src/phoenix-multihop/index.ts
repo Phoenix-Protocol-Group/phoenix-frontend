@@ -26,7 +26,7 @@ if (typeof window !== "undefined") {
 
 export const networks = {
   testnet: {
-    networkPassphrase: "Test SDF Network ; September 2015",
+    networkPassphrase: "Public Global Stellar Network ; September 2015",
     contractId: "0",
   },
 } as const;

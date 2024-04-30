@@ -12,7 +12,7 @@ export const useAppStore = create<AppStore>()((set, get) => {
   const server = new Horizon.Server("https://soroban-rpc.stellar.org");
 
   // The network passphrase for the test network.
-  const networkPassphrase = "Test SDF Network ; September 2015";
+  const networkPassphrase = "Public Global Stellar Network ; September 2015";
 
   // Create some states for the app and layouting
   const layout = createLayoutActions(set, get);
@@ -35,7 +35,8 @@ export const usePersistStore = create<AppStorePersist>()(
       const server = new Horizon.Server("https://soroban-rpc.stellar.org");
 
       // The network passphrase for the test network.
-      const networkPassphrase = "Test SDF Network ; September 2015";
+      const networkPassphrase =
+        "Public Global Stellar Network ; September 2015";
 
       // Create a wallet with the given server and network passphrase.
       const walletPersist = createConnectWalletActions();

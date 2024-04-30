@@ -238,7 +238,7 @@ const Modal = ({
                 </Typography>
               </Box>
             )}
-            {onButtonClick && type !== "LOADING_SWAP" && (
+            {onButtonClick && type !== "LOADING_SWAP" && error && (
               <Button
                 onClick={onButtonClick}
                 sx={{

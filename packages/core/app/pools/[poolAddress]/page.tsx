@@ -30,6 +30,7 @@ import {
   constants,
   fetchTokenPrices,
   formatCurrency,
+  resolveContractError,
   time,
 } from "@phoenix-protocol/utils";
 
@@ -157,11 +158,12 @@ export default function Page({ params }: PoolPageProps) {
         desired_b: BigInt(
           (tokenBAmount * 10 ** (tokenB?.decimals || 7)).toFixed(0)
         ),
-        min_a: BigInt(1),
-        min_b: BigInt(1),
-        custom_slippage_bps: BigInt(1),
+        min_a: undefined,
+        min_b: undefined,
+        custom_slippage_bps: undefined,
       });
       await tx.signAndSend();
+
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([tokenAAmount, tokenBAmount]);
@@ -169,10 +171,11 @@ export default function Page({ params }: PoolPageProps) {
       await getPool();
       setSuccessModalOpen(true);
     } catch (error: any) {
-      //!todo view transaction id in blockexplorer
-      setLoading(false);
-      setErrorDescripption(error);
       setErrorModalOpen(true);
+
+      setErrorDescripption(resolveContractError(error.message));
+      setLoading(false);
+      console.error(error);
     }
   };
 
@@ -265,7 +268,8 @@ export default function Page({ params }: PoolPageProps) {
             store.fetchTokenInfo(Address.fromString(pairConfig.result.token_a)),
             store.fetchTokenInfo(Address.fromString(pairConfig.result.token_b)),
             store.fetchTokenInfo(
-              Address.fromString(pairConfig.result.share_token)
+              Address.fromString(pairConfig.result.share_token),
+              true
             ),
             new PhoenixStakeContract.Contract({
               contractId: pairConfig.result.stake_contract.toString(),

@@ -102,7 +102,7 @@ const TransactionEntry = (props: TransactionTableEntryProps) => {
         </Grid>
         <Grid item xs={1}>
           <Link
-            href={`https://testnet.steexp.com/tx/${props.txHash}`}
+            href={`https://steexp.com/tx/${props.txHash}`}
             target="_blank"
           >
             <IconButton>

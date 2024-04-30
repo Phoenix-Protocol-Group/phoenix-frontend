@@ -18,4 +18,7 @@ export interface SwapContainerProps {
   onSwapButtonClick: () => void;
   onTokenSelectorClick: (isFromToken: boolean) => void;
   onInputChange: (isFromToken: boolean, value: string) => void;
+  trustlineButtonActive?: boolean;
+  trustlineAssetName: string;
+  onTrustlineButtonClick: () => void;
 }

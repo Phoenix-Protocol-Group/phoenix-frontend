@@ -73,10 +73,13 @@ const SwapContainer = ({
   onOptionsClick,
   onSwapTokensClick,
   onSwapButtonClick,
+  onTrustlineButtonClick,
   onInputChange,
   swapButtonDisabled,
   onTokenSelectorClick,
   loadingSimulate = false,
+  trustlineButtonActive = false,
+  trustlineAssetName,
 }: SwapContainerProps) => {
   const [expanded, setExpanded] = React.useState(true);
 
@@ -142,16 +145,36 @@ const SwapContainer = ({
           loadingValues={loadingSimulate}
         />
       </div>
-      <CustomButton
-        onClick={onSwapButtonClick}
-        disabled={swapButtonDisabled}
-        type="primary"
-        label="Swap"
-        sx={{
-          marginTop: "16px",
-          width: "100%",
-        }}
-      />
+      {trustlineButtonActive ? (
+        <>
+          <CustomButton
+            onClick={onTrustlineButtonClick}
+            disabled={false}
+            type="primary"
+            label={`Add ${trustlineAssetName} trustline`}
+            sx={{
+              marginTop: "16px",
+              width: "100%",
+            }}
+          />
+          <Typography
+            sx={{ fontSize: "0.875rem", color: "#FFF", textAlign: "right" }}
+          >
+            Setting the trustline requires some XLM on your wallet!
+          </Typography>
+        </>
+      ) : (
+        <CustomButton
+          onClick={onSwapButtonClick}
+          disabled={swapButtonDisabled}
+          type="primary"
+          label="Swap"
+          sx={{
+            marginTop: "16px",
+            width: "100%",
+          }}
+        />
+      )}
       <Box
         sx={{
           marginTop: "24px",

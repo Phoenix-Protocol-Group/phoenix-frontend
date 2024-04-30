@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
         }
       );
     }
-    const networkPassphrase: string = "Test SDF Network ; September 2015";
+    const networkPassphrase: string = "Public Global Stellar Network ; September 2015";
     const tx = new Transaction(transaction, networkPassphrase);
     for (const op of tx.operations as Operation[]) {
       if (op.type === "manageData" && op.name === "client_domain") {

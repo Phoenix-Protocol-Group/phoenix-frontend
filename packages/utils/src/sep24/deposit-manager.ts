@@ -28,7 +28,7 @@ export class DepositManager {
   async openTransferServer(): Promise<TransferServer> {
     console.log("Opening transfer server", this.anchor);
     try {
-      return await openTransferServer(this.anchor.domain, Networks.TESTNET, {
+      return await openTransferServer(this.anchor.domain, Networks.PUBLIC, {
         lang: "en",
         walletName: "Demo wallet",
       });

@@ -13,3 +13,4 @@ export * from "./sep10";
 export * from "./graphql";
 export * from "./prices";
 export * from "./errorResolver";
+export * from "./trustlines";
