@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Helmet } from "react-helmet";
+import "./style.css";
 import {
   CryptoCTA,
   DashboardPriceCharts,

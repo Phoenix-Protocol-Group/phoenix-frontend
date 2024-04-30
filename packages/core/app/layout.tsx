@@ -12,6 +12,7 @@ import JoyRideTooltip from "@/components/JoyRideTooltip";
 import { joyride } from "@phoenix-protocol/utils";
 import { TourModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
+import Countdown from "@/components/Countdown";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   // Use theme for responsive design
@@ -203,68 +204,70 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <Providers>
         <body suppressHydrationWarning={true}>
           <style>{css}</style>
-          {/* Side Navigation Component */}
-          <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
 
-          {/* Top Navigation Bar */}
-          <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
-          {/* Joyride Tour */}
-          {initialized && (
+          {/* Pre-Launch */}
+          {true ? (
+            <Countdown />
+          ) : (
             <>
-              <TourModal
-                open={tourModalOpen}
-                setOpen={(state) => {
-                  setTourModalOpen(state);
-                  appStore.setTourRunning(false);
-                  persistStore.skipUserTour();
+              {/* Side Navigation Component */}
+              <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
+              {/* Top Navigation Bar */}
+              <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
+              {/* Joyride Tour */}
+              {initialized && (
+                <>
+                  <TourModal
+                    open={tourModalOpen}
+                    setOpen={(state) => {
+                      setTourModalOpen(state);
+                      appStore.setTourRunning(false);
+                      persistStore.skipUserTour();
+                    }}
+                    onClick={() => {
+                      setTourModalOpen(false);
+                      appStore.setTourRunning(true);
+                      persistStore.setUserTourActive(true);
+                      persistStore.setUserTourStep(0);
+                    }}
+                  />
+                  <Joyride
+                    // @ts-ignore
+                    steps={joyride.steps}
+                    continuous={true}
+                    tooltipComponent={JoyRideTooltip}
+                    run={appStore.tourRunning}
+                    stepIndex={appStore.tourStep}
+                    callback={handleJoyrideCallback}
+                    disableScrolling={true}
+                    disableOverlayClose={true}
+                    keyboardNavigation={false}
+                    styles={{
+                      options: {
+                        arrowColor: "#1F2123",
+                        zIndex: 1400,
+                      },
+                    }}
+                  />
+                </>
+              )}
+              {/* Main Content Area */}
+              <Box
+                sx={{
+                  marginLeft: largerThenMd ? (navOpen ? "240px" : "60px") : "0",
+                  minHeight: "100vh",
+                  transition: "all 0.2s ease-in-out",
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "16px",
+                  ...swapPageStyle,
                 }}
-                onClick={() => {
-                  setTourModalOpen(false);
-                  appStore.setTourRunning(true);
-                  persistStore.setUserTourActive(true);
-                  persistStore.setUserTourStep(0);
-                }}
-              />
-              <Joyride
-                // @ts-ignore
-                steps={joyride.steps}
-                continuous={true}
-                tooltipComponent={JoyRideTooltip}
-                run={appStore.tourRunning}
-                stepIndex={appStore.tourStep}
-                callback={handleJoyrideCallback}
-                disableScrolling={true}
-                disableOverlayClose={true}
-                keyboardNavigation={false}
-                styles={{
-                  options: {
-                    arrowColor: "#1F2123",
-                    zIndex: 1400,
-                  },
-                }}
-              />
+              >
+                {/* Child Components */}
+                {children}
+              </Box>
             </>
           )}
-
-          {/* Main Content Area */}
-          <Box
-            sx={{
-              marginLeft: largerThenMd
-                ? navOpen
-                  ? "240px"
-                  : "60px"
-                : "0",
-              minHeight: "100vh",
-              transition: "all 0.2s ease-in-out",
-              display: "flex",
-              justifyContent: "center",
-              padding: "16px",
-              ...swapPageStyle,
-            }}
-          >
-            {/* Child Components */}
-            {children}
-          </Box>
         </body>
       </Providers>
       <Analytics />
