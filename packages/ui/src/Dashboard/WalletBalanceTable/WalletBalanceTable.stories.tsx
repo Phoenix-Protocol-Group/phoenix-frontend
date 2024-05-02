@@ -37,6 +37,8 @@ export const testTokens = [
     amount: 0.5,
     category: "Non-Stable",
     usdValue: 30000 * 0.5,
+    amountVested: 1,
+    usdValueVested: 50000
   },
 ];
 

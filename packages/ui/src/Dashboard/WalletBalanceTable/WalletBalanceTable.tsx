@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   FormControl,
   Grid,
   IconButton,
@@ -21,6 +22,8 @@ import StarIcon from "@mui/icons-material/Star";
 import {
   FilterAndTabPanelProps,
   ListItemProps,
+  Token,
+  TokenWithVestedAmount,
   WalletBalanceTableProps,
 } from "@phoenix-protocol/types";
 
@@ -169,9 +172,14 @@ const FilterAndTabPanel = ({
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} mb={2} sx={{
-          display: "flex"
-        }}>
+        <Grid
+          item
+          xs={12}
+          mb={2}
+          sx={{
+            display: "flex",
+          }}
+        >
           <TextField
             id="search"
             type="search"
@@ -237,15 +245,16 @@ const FilterAndTabPanel = ({
               <MenuItem value={"lowest"}>Lowest Balance</MenuItem>
             </Select>
           </FormControl>
-      </Grid>
+        </Grid>
       </Grid>
     );
   }
 };
 
-const ListItem = ({
-  token: { name, icon, usdValue, amount },
-}: ListItemProps) => {
+const ListItem = ({ token }: ListItemProps) => {
+  const { name, icon, usdValue, amount } = token as Token;
+  const { amountVested, usdValueVested } = token as TokenWithVestedAmount;
+
   const [favorites, setFavorites] = useState<string[]>([]);
 
   useEffect(() => {
@@ -282,6 +291,20 @@ const ListItem = ({
         </Typography>
       </Box>
       <Box sx={{ display: "flex", alignItems: "center" }}>
+        {amountVested && usdValueVested && (
+          <Tooltip title={`Amount: ${amountVested} ($${usdValueVested.toFixed(2)})`} placement="top">
+            <Button
+              size="small"
+              sx={{
+                mr: 2,
+                fontWeight: 500,
+                fontSize: "0.75rem",
+              }}
+            >
+              Show Vested
+            </Button>
+          </Tooltip>
+        )}
         <Typography
           sx={{
             fontWeight: 700,
@@ -364,8 +387,8 @@ const WalletBalanceTable = ({ tokens }: WalletBalanceTableProps) => {
         height: largerThenMd ? "26rem" : "auto",
         mb: {
           xs: 2,
-          md: 0
-        }
+          md: 0,
+        },
       }}
     >
       <FilterAndTabPanel
@@ -378,7 +401,14 @@ const WalletBalanceTable = ({ tokens }: WalletBalanceTableProps) => {
         sort={sort}
         isMobile={!largerThenMd}
       />
-      <Box sx={{ overflow: "auto", maxHeight: "19rem", mt: {xs: 2, md: 0}, ...scrollbarStyles }}>
+      <Box
+        sx={{
+          overflow: "auto",
+          maxHeight: "19rem",
+          mt: { xs: 2, md: 0 },
+          ...scrollbarStyles,
+        }}
+      >
         {[...tokens]
           .filter((token) => token.category === category || category === "All")
           .filter((token) =>
