@@ -1,4 +1,4 @@
-import { Token } from "../general";
+import { Token, TokenWithVestedAmount } from "../general";
 
 export interface FilterAndTabPanelProps {
   categories: string[];
@@ -11,8 +11,8 @@ export interface FilterAndTabPanelProps {
   isMobile: boolean;
 }
 export interface ListItemProps {
-  token: Token;
+  token: Token | TokenWithVestedAmount;
 }
 export interface WalletBalanceTableProps {
-  tokens: Token[];
+  tokens: Token[] | TokenWithVestedAmount[];
 }
