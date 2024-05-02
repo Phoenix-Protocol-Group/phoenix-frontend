@@ -5,3 +5,8 @@ export interface Token {
   amount: number;
   category: string;
 }
+
+export interface TokenWithVestedAmount extends Token {
+  amountVested: number;
+  usdValueVested: number;
+}
