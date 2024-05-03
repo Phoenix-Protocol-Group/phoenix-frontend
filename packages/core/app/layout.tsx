@@ -206,7 +206,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <style>{css}</style>
 
           {/* Pre-Launch */}
-          {true ? (
+          {false ? (
             <Countdown />
           ) : (
             <>

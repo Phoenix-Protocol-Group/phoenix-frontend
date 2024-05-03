@@ -19,6 +19,7 @@ import type { ClassOptions, MethodOptions, XDR_BASE64 } from "./method-options";
 
 import { Wallet } from "./wallets/types";
 import { xBull } from "./wallets/xbull";
+import { lobstr } from "./wallets/lobstr";
 
 export type Tx = Transaction<Memo<MemoType>, Operation[]>;
 
@@ -198,7 +199,12 @@ export class AssembledTransaction<T> {
 
     const tx = new AssembledTransaction({
       ...options,
-      wallet: walletType === "xbull" ? new xBull() : undefined,
+      wallet:
+        walletType === "xbull"
+          ? new xBull()
+          : walletType === "lobstr"
+          ? new lobstr()
+          : undefined,
     });
 
     const contract = new Contract(options.contractId);
