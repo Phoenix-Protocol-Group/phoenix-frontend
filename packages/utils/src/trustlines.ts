@@ -11,6 +11,7 @@ import {
 import { AssembledTransaction, constants, withExponentialBackoff } from ".";
 import { assetList } from "./assets/assetList";
 import { xBull } from "./wallets/xbull";
+import { lobstr } from "./wallets/lobstr";
 
 const horizonUrl = "https://horizon.stellar.org";
 const server = new Horizon.Server(horizonUrl);
@@ -162,6 +163,8 @@ export async function fetchAndIssueTrustline(
     const wallet =
       walletType === "xbull"
         ? new xBull()
+        : walletType === "lobstr"
+        ? new lobstr()
         : (await import("@stellar/freighter-api")).default;
 
     const signature = await wallet.signTransaction(transaction.toXDR());
