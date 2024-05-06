@@ -205,10 +205,6 @@ export default function Page() {
       <Helmet>
         <title>Phoenix DeFi Hub - Dashboard</title>
       </Helmet>
-      <DisclaimerModal
-        open={disclaimer}
-        handleClose={() => setDisclaimer(false)}
-      />
 
       {anchors.length > 0 && (
         <AnchorServices
