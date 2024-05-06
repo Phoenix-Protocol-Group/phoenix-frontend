@@ -12,7 +12,7 @@ export type Wallet = {
   address: string | undefined;
   activeChain: WalletChain | undefined;
   server: Horizon.Server | undefined;
-  walletType: "freighter" | "xbull" | undefined;
+  walletType: "freighter" | "xbull" | "lobstr" | undefined;
 };
 
 export interface WalletActions {
@@ -48,7 +48,7 @@ export type Connector = {
     browserExtension?: string;
     qrCode?: string;
   };
-  isConnected: () => boolean;
+  isConnected: () => boolean | Promise<boolean>;
   getNetworkDetails: () => Promise<NetworkDetails>;
   getPublicKey: () => Promise<string>;
   signTransaction: (

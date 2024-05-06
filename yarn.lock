@@ -3120,6 +3120,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lobstrco/signer-extension-api@npm:^1.0.0-beta.0":
+  version: 1.0.0-beta.0
+  resolution: "@lobstrco/signer-extension-api@npm:1.0.0-beta.0"
+  checksum: 07fabb0721f4cc0963b5298e4a214e46d437e2f5cf106412ea2ed4b32a033711e43fca5e25609c49dff8fe662350d3d1ef55a8b439fa8e62f62bb93e5bead03f
+  languageName: node
+  linkType: hard
+
 "@mdx-js/react@npm:^2.1.5":
   version: 2.3.0
   resolution: "@mdx-js/react@npm:2.3.0"
@@ -3642,6 +3649,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/state@workspace:packages/state"
   dependencies:
+    "@lobstrco/signer-extension-api": ^1.0.0-beta.0
     "@phoenix-protocol/contracts": "workspace:^"
     "@phoenix-protocol/types": "workspace:^"
     "@stellar/freighter-api": 1.7.1
