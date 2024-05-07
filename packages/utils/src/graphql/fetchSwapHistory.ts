@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { createApolloClient } from "./apolloClient";
+import { ActiveFilters } from "@phoenix-protocol/types";
 
 interface SwapResult {
   type: "Success" | "Failed";
@@ -15,7 +16,8 @@ export async function fetchSwapHistory(
   pageSize: number,
   sortBy: string,
   sortOrder: string,
-  accountId?: string
+  filters: ActiveFilters,
+  accountId?: string,
 ): Promise<SwapResult[]> {
   const client = createApolloClient();
 
@@ -27,12 +29,14 @@ export async function fetchSwapHistory(
       $sortBy: String
       $sortOrder: String
       $offset: Int
+      $filters: ActiveFiltersInput
     ) {
       swaps(
         sortBy: $sortBy
         sortOrder: $sortOrder
         limit: $pageSize
         offset: $offset
+        filters: $filters
       ) {
         id
         accountId
@@ -54,6 +58,7 @@ export async function fetchSwapHistory(
       $sortOrder: String
       $offset: Int
       $accountId: String
+      $filters: ActiveFiltersInput
     ) {
       swapByAccountId(
         sortBy: $sortBy
@@ -61,6 +66,7 @@ export async function fetchSwapHistory(
         sortOrder: $sortOrder
         limit: $pageSize
         offset: $offset
+        filters: $filters
       ) {
         id
         accountId
@@ -86,6 +92,7 @@ export async function fetchSwapHistory(
           sortOrder,
           accountId,
           offset,
+          filters
         },
       });
 
@@ -116,6 +123,7 @@ export async function fetchSwapHistory(
         sortBy,
         sortOrder,
         offset,
+        filters
       },
     });
 

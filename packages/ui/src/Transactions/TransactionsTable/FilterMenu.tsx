@@ -21,17 +21,23 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
 
   // Set State for filters
   const [dateRange, setDateRange] = React.useState<{
-    from: Date | null;
-    to: Date | null;
+    from: Date | undefined;
+    to: Date | undefined;
   }>({
     from: activeFilters.dateRange.from,
     to: activeFilters.dateRange.to,
   });
-  const [tradeSize, setTradeSize] = React.useState({
+  const [tradeSize, setTradeSize] = React.useState<{
+    from: number | undefined;
+    to: number | undefined;
+  }>({
     from: activeFilters.tradeSize.from,
     to: activeFilters.tradeSize.to,
   });
-  const [tradeValue, setTradeValue] = React.useState({
+  const [tradeValue, setTradeValue] = React.useState<{
+    from: number | undefined;
+    to: number | undefined;
+  }>({
     from: activeFilters.tradeValue.from,
     to: activeFilters.tradeValue.to,
   });
@@ -64,29 +70,29 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
   // Function to reset filters
   const resetFilters = () => {
     setDateRange({
-      from: new Date(),
-      to: new Date(),
+      from: undefined,
+      to: undefined,
     });
     setTradeSize({
-      from: 0,
-      to: 0,
+      from: undefined,
+      to: undefined,
     });
     setTradeValue({
-      from: 0,
-      to: 0,
+      from: undefined,
+      to: undefined,
     });
     applyFilters({
       dateRange: {
-        from: new Date(),
-        to: new Date(),
+        from: undefined,
+        to: undefined,
       },
       tradeSize: {
-        from: 0,
-        to: 0,
+        from: undefined,
+        to: undefined,
       },
       tradeValue: {
-        from: 0,
-        to: 0,
+        from: undefined,
+        to: undefined,
       },
     });
   };
@@ -197,9 +203,13 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={["DatePicker"]}>
                 <DatePicker
-                  value={dayjs(dateRange.from)}
-                  onChange={(newValue) =>
-                    setDateRange({ ...dateRange, from: newValue.toDate() })
+                  value={dateRange.from ? dayjs(dateRange.from) : undefined}
+                  onChange={(newValue: dayjs.Dayjs | null) =>
+                    setDateRange({
+                      ...dateRange,
+                      // @ts-ignore
+                      from: newValue === null ? undefined : newValue.toDate(),
+                    })
                   }
                   slotProps={{
                     field: { clearable: true },
@@ -247,12 +257,12 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={["DatePicker"]}>
                 <DatePicker
-                  value={dayjs(dateRange.to)}
+                  value={dateRange.to ? dayjs(dateRange.to) : undefined}
                   onChange={(newValue: dayjs.Dayjs | null) =>
                     setDateRange({
                       ...dateRange,
                       // @ts-ignore
-                      to: newValue === null ? newValue : newValue.toDate(),
+                      to: newValue === null ? undefined : newValue.toDate(),
                     })
                   }
                   disableFuture

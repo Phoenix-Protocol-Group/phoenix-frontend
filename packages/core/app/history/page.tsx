@@ -1,6 +1,7 @@
 "use client";
 import { Box, Typography } from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
+import { ActiveFilters } from "@phoenix-protocol/types";
 import {
   Button,
   TransactionsCards,
@@ -55,6 +56,21 @@ export default function Page() {
   // Personal or all
   const [activeView, setActiveView] = useState<"personal" | "all">("all");
 
+  const [activeFilters, setActiveFilters] = useState<ActiveFilters>({
+    dateRange: {
+      from: undefined,
+      to: undefined
+    },
+    tradeSize: {
+      from: undefined,
+      to: undefined,
+    },
+    tradeValue: {
+      from: undefined,
+      to: undefined
+    }
+  });
+
   // Load Meta Data
   const loadMetaData = async () => {
     const { activeAccountsLast24h, totalAccounts } =
@@ -83,6 +99,7 @@ export default function Page() {
         pageSize,
         sortBy,
         sortOrder.toUpperCase(),
+        activeFilters,
         appStorePersist.wallet.address
       );
     } else {
@@ -90,7 +107,8 @@ export default function Page() {
         page,
         pageSize,
         sortBy,
-        sortOrder.toUpperCase()
+        sortOrder.toUpperCase(),
+        activeFilters
       );
     }
 
@@ -176,30 +194,6 @@ export default function Page() {
     }
   };
 
-  const mockActiveFilters = {
-    dateRange: {
-      from: null,
-      to: null,
-    },
-    tradeSize: {
-      from: 100,
-      to: 1000,
-    },
-    tradeValue: {
-      from: 5000,
-      to: 10000,
-    },
-  };
-
-  const mockApplyFilters: (newFilters: any) => void = (newFilters) => {
-    console.log("Applying filters with new values:", newFilters);
-  };
-
-  const mockProps = {
-    activeFilters: mockActiveFilters,
-    applyFilters: mockApplyFilters,
-  };
-
   // Use Effect to load volume on selected time epoch
   useEffect(() => {
     const _selected = () => {
@@ -219,7 +213,7 @@ export default function Page() {
   useEffect(() => {
     loadHistory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, sortBy, sortOrder, activeView]);
+  }, [page, pageSize, sortBy, sortOrder, activeView, activeFilters]);
 
   // Use Effect to Init Data
   useEffect(() => {
@@ -293,7 +287,10 @@ export default function Page() {
         }}
         loadingResults={false}
         loggedIn={appStorePersist.wallet.address ? true : false}
-        {...mockProps}
+        activeFilters={activeFilters}
+        applyFilters={(newFilters: ActiveFilters) => {
+          setActiveFilters(newFilters);
+        }}
         handleSort={(column) => handleSortChange(mapToSwapField(column), "asc")}
       />
       <Box sx={{ display: "flex", justifyContent: "end", mt: 3 }}>
