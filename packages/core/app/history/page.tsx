@@ -33,7 +33,10 @@ export default function Page() {
   // Set Total Volume
   const [totalVolume, setTotalVolume] = useState(0);
 
-  const [mostTradedAsset, setMostTradedAsset] = useState<any>(undefined);
+  const [mostTradedAsset, setMostTradedAsset] = useState<any>({
+    name: "XLM",
+    icon: `cryptoIcons/xlm.svg`,
+  });
 
   // Set History
   const [history, setHistory] = useState<any>([]);
