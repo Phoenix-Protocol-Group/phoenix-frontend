@@ -55,7 +55,7 @@ const StepTextStyle = {
 
 const Countdown: React.FC = () => {
   const targetDate = moment
-    .tz("2024-05-07 20:00:00", "Europe/Berlin")
+    .tz("2024-05-07 23:59:00", "Europe/Berlin")
     .valueOf();
 
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
