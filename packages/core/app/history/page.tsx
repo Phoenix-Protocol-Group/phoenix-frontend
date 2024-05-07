@@ -112,6 +112,10 @@ export default function Page() {
       );
     }
 
+    if(!result.length) {
+      return setHistory([]);
+    }
+
     // Map Token Names
     const _result = await Promise.all(
       result.map(async (item) => {
@@ -145,8 +149,7 @@ export default function Page() {
         };
       })
     );
-    const updatedHistory = [...history, ..._result];
-    setHistory(updatedHistory);
+    setHistory(_result);
   };
 
   // Handle Sort Change

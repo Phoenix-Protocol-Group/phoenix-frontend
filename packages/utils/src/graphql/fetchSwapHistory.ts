@@ -21,6 +21,8 @@ export async function fetchSwapHistory(
 ): Promise<SwapResult[]> {
   const client = createApolloClient();
 
+  console.log(filters);
+
   const offset = page * pageSize;
 
   const GET_SWAPS = gql`

@@ -204,12 +204,8 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
               <DemoContainer components={["DatePicker"]}>
                 <DatePicker
                   value={dateRange.from ? dayjs(dateRange.from) : undefined}
-                  onChange={(newValue: dayjs.Dayjs | null) =>
-                    setDateRange({
-                      ...dateRange,
-                      // @ts-ignore
-                      from: newValue === null ? undefined : newValue.toDate(),
-                    })
+                  onChange={(newValue) =>
+                    setDateRange({ ...dateRange, from: newValue.toDate() })
                   }
                   slotProps={{
                     field: { clearable: true },
@@ -223,17 +219,18 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                       fontStyle: "normal",
                       fontWeight: 400,
                       borderRadius: "1rem",
-                      border: "1px solid #2D303A",
                       minWidth: {
                         xs: "unset",
                         md: "200px"
-                      }
+                      },
+                      maxWidth: "217px"
                     },
                     "& legend": {
                       display: "none",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "1px solid #2D303A",
+                      top: "-2px"
                     },
                   }}
                 />
@@ -278,13 +275,13 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                       fontStyle: "normal",
                       fontWeight: 400,
                       borderRadius: "1rem",
-                      border: "1px solid #2D303A",
                     },
                     "& legend": {
                       display: "none",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "1px solid #2D303A",
+                      top: "-2px"
                     },
                   }}
                 />
@@ -419,9 +416,8 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
-                  border: "1px solid #2D303A",
                   "& .MuiOutlinedInput-input": {
-                    padding: "0.75rem",
+                    padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
                   },
                 },
@@ -469,9 +465,8 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
-                  border: "1px solid #2D303A",
                   "& .MuiOutlinedInput-input": {
-                    padding: "0.75rem",
+                    padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
                   },
                 },
@@ -606,9 +601,8 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
-                  border: "1px solid #2D303A",
                   "& .MuiOutlinedInput-input": {
-                    padding: "0.75rem",
+                    padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
                   },
                 },
@@ -656,9 +650,8 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
-                  border: "1px solid #2D303A",
                   "& .MuiOutlinedInput-input": {
-                    padding: "0.75rem",
+                    padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
                   },
                 },
