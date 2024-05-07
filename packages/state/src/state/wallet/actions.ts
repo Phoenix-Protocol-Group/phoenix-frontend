@@ -8,6 +8,7 @@ import {
 import {
   PhoenixFactoryContract,
   SorobanTokenContract,
+  fetchPho,
 } from "@phoenix-protocol/contracts";
 import { usePersistStore } from "../store";
 import { constants, fetchTokenPrices } from "@phoenix-protocol/utils";
@@ -64,10 +65,10 @@ export const createWalletActions = (
             }.svg`,
             amount: Number(token?.balance) / 10 ** token?.decimals,
             category: "Non-Stable", // todo: add category
-            usdValue: (
-              (Number(token?.balance) / 10 ** token?.decimals) *
-              (await fetchTokenPrices(token?.symbol))
-            ).toFixed(2), // todo: add usdValue
+            usdValue: 
+              Number((token?.symbol === "PHO" ? await fetchPho() :
+              await fetchTokenPrices(token?.symbol)))
+            .toFixed(2),
             contractId: token?.id,
           };
         });

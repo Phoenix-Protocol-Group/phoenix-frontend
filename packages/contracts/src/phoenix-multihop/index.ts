@@ -18,16 +18,15 @@ import type {
 } from "@phoenix-protocol/utils";
 import type { ClassOptions, XDR_BASE64 } from "@phoenix-protocol/utils";
 
-export * from "@phoenix-protocol/utils";
 if (typeof window !== "undefined") {
   //@ts-ignore Buffer exists
   window.Buffer = window.Buffer || Buffer;
 }
 
 export const networks = {
-  testnet: {
+  unknown: {
     networkPassphrase: "Public Global Stellar Network ; September 2015",
-    contractId: "0",
+    contractId: "CCLZRD4E72T7JCZCN3P7KNPYNXFYKQCL64ECLX7WP5GNVYPYJGU2IO2G",
   },
 } as const;
 
@@ -38,6 +37,7 @@ export const Errors = {
   1: { message: "" },
   2: { message: "" },
   3: { message: "" },
+  4: { message: "" },
 };
 /**
     
@@ -50,7 +50,7 @@ export interface Swap {
   /**
     
     */
-  max_belief_price: Option<i64>;
+  ask_asset_min_amount: Option<i128>;
   /**
     
     */
@@ -156,8 +156,9 @@ export class Contract {
       "AAAAAAAAAAAAAAAEc3dhcAAAAAQAAAAAAAAACXJlY2lwaWVudAAAAAAAABMAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAADm1heF9zcHJlYWRfYnBzAAAAAAPoAAAABwAAAAAAAAAGYW1vdW50AAAAAAALAAAAAA==",
       "AAAAAAAAAAAAAAANc2ltdWxhdGVfc3dhcAAAAAAAAAIAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAABmFtb3VudAAAAAAACwAAAAEAAAfQAAAAFFNpbXVsYXRlU3dhcFJlc3BvbnNl",
       "AAAAAAAAAAAAAAAVc2ltdWxhdGVfcmV2ZXJzZV9zd2FwAAAAAAAAAgAAAAAAAAAKb3BlcmF0aW9ucwAAAAAD6gAAB9AAAAAEU3dhcAAAAAAAAAAGYW1vdW50AAAAAAALAAAAAQAAB9AAAAAbU2ltdWxhdGVSZXZlcnNlU3dhcFJlc3BvbnNlAA==",
-      "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAADAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAEAAAAAAAAAD09wZXJhdGlvbnNFbXB0eQAAAAACAAAAAAAAABJJbmNvcnJlY3RBc3NldFN3YXAAAAAAAAM=",
-      "AAAAAQAAAAAAAAAAAAAABFN3YXAAAAADAAAAAAAAAAlhc2tfYXNzZXQAAAAAAAATAAAAAAAAABBtYXhfYmVsaWVmX3ByaWNlAAAD6AAAAAcAAAAAAAAAC29mZmVyX2Fzc2V0AAAAABM=",
+      "AAAAAAAAAAAAAAAGdXBkYXRlAAAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
+      "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAEAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAEAAAAAAAAAD09wZXJhdGlvbnNFbXB0eQAAAAACAAAAAAAAABJJbmNvcnJlY3RBc3NldFN3YXAAAAAAAAMAAAAAAAAAC0FkbWluTm90U2V0AAAAAAQ=",
+      "AAAAAQAAAAAAAAAAAAAABFN3YXAAAAADAAAAAAAAAAlhc2tfYXNzZXQAAAAAAAATAAAAAAAAABRhc2tfYXNzZXRfbWluX2Ftb3VudAAAA+gAAAALAAAAAAAAAAtvZmZlcl9hc3NldAAAAAAT",
       "AAAAAQAAAAAAAAAAAAAABFBhaXIAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
       "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAABAAAAAEAAAAAAAAAB1BhaXJLZXkAAAAAAQAAB9AAAAAEUGFpcgAAAAAAAAAAAAAACkZhY3RvcnlLZXkAAAAAAAAAAAAAAAAABUFkbWluAAAAAAAAAAAAAAAAAAALSW5pdGlhbGl6ZWQA",
       "AAAAAQAAAAAAAAAAAAAABUFzc2V0AAAAAAAAAgAAABRBZGRyZXNzIG9mIHRoZSBhc3NldAAAAAdhZGRyZXNzAAAAABMAAAAsVGhlIHRvdGFsIGFtb3VudCBvZiB0aG9zZSB0b2tlbnMgaW4gdGhlIHBvb2wAAAAGYW1vdW50AAAAAAAL",
@@ -169,14 +170,11 @@ export class Contract {
   private readonly parsers = {
     initialize: () => {},
     swap: () => {},
-    simulateSwap: (result: string | xdr.ScVal): SimulateSwapResponse => {
-      return this.spec.funcResToNative("simulate_swap", result);
-    },
-    simulateReverseSwap: (
-      result: string | xdr.ScVal
-    ): SimulateReverseSwapResponse => {
-      return this.spec.funcResToNative("simulate_reverse_swap", result);
-    },
+    simulateSwap: (result: XDR_BASE64): SimulateSwapResponse =>
+      this.spec.funcResToNative("simulate_swap", result),
+    simulateReverseSwap: (result: XDR_BASE64): SimulateReverseSwapResponse =>
+      this.spec.funcResToNative("simulate_reverse_swap", result),
+    update: () => {},
   };
   private txFromJSON = <T>(json: string): AssembledTransaction<T> => {
     const { method, ...tx } = JSON.parse(json);
@@ -201,6 +199,7 @@ export class Contract {
     simulateReverseSwap: this.txFromJSON<
       ReturnType<(typeof this.parsers)["simulateReverseSwap"]>
     >,
+    update: this.txFromJSON<ReturnType<(typeof this.parsers)["update"]>>,
   };
   /**
    * Construct and simulate a initialize transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
@@ -282,6 +281,7 @@ export class Contract {
       ...options,
       ...this.options,
       errorTypes: Errors,
+      // @ts-ignore
       parseResultXdr: this.parsers["simulateSwap"],
     });
   };
@@ -307,7 +307,30 @@ export class Contract {
       ...options,
       ...this.options,
       errorTypes: Errors,
+      // @ts-ignore
       parseResultXdr: this.parsers["simulateReverseSwap"],
+    });
+  };
+
+  /**
+   * Construct and simulate a update transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  update = async (
+    { new_wasm_hash }: { new_wasm_hash: Buffer },
+    options: {
+      /**
+       * The fee to pay for the transaction. Default: 100.
+       */
+      fee?: number;
+    } = {}
+  ) => {
+    return await AssembledTransaction.fromSimulation({
+      method: "update",
+      args: this.spec.funcArgsToScVals("update", { new_wasm_hash }),
+      ...options,
+      ...this.options,
+      errorTypes: Errors,
+      parseResultXdr: this.parsers["update"],
     });
   };
 }

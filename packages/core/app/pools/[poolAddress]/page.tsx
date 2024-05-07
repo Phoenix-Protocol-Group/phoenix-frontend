@@ -216,7 +216,7 @@ export default function Page({ params }: PoolPageProps) {
       });
 
       await tx?.signAndSend();
-      console.log(tx?.signAndSend())
+      console.log(tx?.signAndSend());
       await fetchStakes();
       setLoading(false);
       //!todo view transaction id in blockexplorer
@@ -298,7 +298,7 @@ export default function Page({ params }: PoolPageProps) {
         setTokenA({
           name: _tokenA?.symbol as string,
           icon: `/cryptoIcons/${_tokenA?.symbol.toLowerCase()}.svg`,
-          usdValue: 0,
+          usdValue: Number(priceA),
           amount: Number(_tokenA?.balance) / 10 ** Number(_tokenA?.decimals),
           category: "none",
           decimals: Number(_tokenA?.decimals),
@@ -306,7 +306,7 @@ export default function Page({ params }: PoolPageProps) {
         setTokenB({
           name: _tokenB?.symbol as string,
           icon: `/cryptoIcons/${_tokenB?.symbol.toLowerCase()}.svg`,
-          usdValue: 0,
+          usdValue: Number(priceB),
           amount: Number(_tokenB?.balance) / 10 ** Number(_tokenB?.decimals),
           category: "none",
           decimals: Number(_tokenB?.decimals),
@@ -534,7 +534,7 @@ export default function Page({ params }: PoolPageProps) {
                 },
                 {
                   title: "Swap fee",
-                  value: "0.3%",
+                  value: "1%",
                 },
               ]}
             />

@@ -65,7 +65,7 @@ export default function Page() {
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>({
     dateRange: {
       from: undefined,
-      to: undefined
+      to: undefined,
     },
     tradeSize: {
       from: undefined,
@@ -73,8 +73,8 @@ export default function Page() {
     },
     tradeValue: {
       from: undefined,
-      to: undefined
-    }
+      to: undefined,
+    },
   });
 
   // Load Meta Data
@@ -87,11 +87,14 @@ export default function Page() {
   // Load Volume Data
   const loadVolumeData = async (epoch: "monthly" | "yearly" | "daily") => {
     const result = await fetchDataByTimeEpoch(epoch);
-    const intervals = result[Object.keys(result)[0]].intervals
+    const intervals = result[Object.keys(result)[0]].intervals;
 
     setData(intervals);
 
-    const newTotalVolume: number = intervals.reduce((total: string, currentValue: any) => total + currentValue.volume, 0);
+    const newTotalVolume: number = intervals.reduce(
+      (total: string, currentValue: any) => total + currentValue.volume,
+      0
+    );
     setTotalVolume(Number(Number(newTotalVolume).toFixed(5)));
   };
 
@@ -123,12 +126,11 @@ export default function Page() {
       );
     }
 
-    if(!result.length) {
+    if (!result.length) {
       return setHistory([]);
     }
 
     const tradedAssets: any = {};
-
     // Map Token Names
     const _result = await Promise.all(
       result.map(async (item) => {
@@ -143,13 +145,13 @@ export default function Page() {
 
         const assets = await Promise.all(assetInfoPromises);
 
-        for(let i = 0; i < 2; i++) {
+        for (let i = 0; i < 2; i++) {
           const assetId = assets.flat()[i]?.id;
           const tradeVal = Number(item.tradeSize);
 
-          if(!assetId) continue;
+          if (!assetId) continue;
 
-          if(!tradedAssets.hasOwnProperty(assetId)) {
+          if (!tradedAssets.hasOwnProperty(assetId)) {
             tradedAssets[assetId] = tradeVal;
           } else {
             tradedAssets[assetId] += tradeVal;
@@ -160,10 +162,11 @@ export default function Page() {
           ...item,
           // @ts-ignore
           tradeSize: Number(item.tradeSize) / 10 ** assets.flat()[0].decimals,
-          tradeValue:
-            ((Number(item.tradeValue) * Number(item.tradeSize)) /
+          tradeValue: (
+            (Number(item.tradeValue) * Number(item.tradeSize)) /
             // @ts-ignore
-            10 ** assets.flat()[0].decimals).toFixed(5),
+            10 ** assets.flat()[0].decimals
+          ).toFixed(5),
           assets: assets.flat().map((asset) => {
             return {
               name: asset?.symbol,
@@ -177,10 +180,14 @@ export default function Page() {
       })
     );
 
-    const mtAsset = Object.keys(tradedAssets).reduce((a: any, b: any) => data[a] > data[b] ? a : b)
-    const mtAssetInfo = await appStore.fetchTokenInfo(Address.fromString(mtAsset));
+    const mtAsset = Object.keys(tradedAssets).reduce((a: any, b: any) =>
+      data[a] > data[b] ? a : b
+    );
+    const mtAssetInfo = await appStore.fetchTokenInfo(
+      Address.fromString(mtAsset)
+    );
 
-    if(mtAssetInfo) {
+    if (mtAssetInfo) {
       setMostTradedAsset({
         name: mtAssetInfo?.symbol,
         icon: `cryptoIcons/${mtAssetInfo?.symbol.toLowerCase()}.svg`,
@@ -316,7 +323,7 @@ export default function Page() {
         }}
         activeView={activeView}
         setActiveView={(a) => {
-          if(a === activeView) return;
+          if (a === activeView) return;
           setHistory([]);
           setActiveView(a);
         }}

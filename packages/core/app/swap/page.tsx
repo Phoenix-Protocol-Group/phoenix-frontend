@@ -22,6 +22,7 @@ import {
   checkTrustline,
   constants,
   fetchAndIssueTrustline,
+  fetchTokenPrices,
   findBestPath,
   resolveContractError,
 } from "@phoenix-protocol/utils";
@@ -57,6 +58,9 @@ export default function SwapPage() {
   const [loadingSimulate, setLoadingSimulate] = useState<boolean>(false);
   const [exchangeRate, setExchangeRate] = useState<string>("");
   const [networkFee, setNetworkFee] = useState<string>("");
+
+  const [fromTokenValue, setFromTokenValue] = useState<number>(0);
+  const [toTokenValue, setToTokenValue] = useState<number>(0);
 
   // Trustline
   const [trustlineButtonActive, setTrustlineButtonActive] =
@@ -119,6 +123,12 @@ export default function SwapPage() {
 
   // Function for simulating swap
   const doSimulateSwap = async () => {
+    const fromTokenValue = await fetchTokenPrices(fromToken.name || "");
+    const toTokenValue = await fetchTokenPrices(toToken.name || "");
+
+
+    setFromTokenValue(fromTokenValue);
+    setToTokenValue(toTokenValue);
     setLoadingSimulate(true);
     try {
       const contract = new PhoenixMultihopContract.Contract({
@@ -323,7 +333,9 @@ export default function SwapPage() {
     setTrustlineButtonActive(!trust.exists);
     setTrustlineTokenName(trust.asset?.code || "");
     const tlAsset = await appStore.fetchTokenInfo(
-      Address.fromString("CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA")
+      Address.fromString(
+        "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA"
+      )
     );
     setTrustlineAssetAmount(
       Number(tlAsset?.balance) / 10 ** tlAsset?.decimals!

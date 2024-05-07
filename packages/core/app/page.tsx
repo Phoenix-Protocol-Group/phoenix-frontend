@@ -137,8 +137,9 @@ export default function Page() {
     const price2 = await fetchTokenPrices("USDC");
     const priceChangeXLM = await fetchTokenPrices2("XLM");
     const phoPrice = await fetchPho();
+
     setXlmPrice(price);
-    setUsdcPrice(price2);
+    setUsdcPrice(phoPrice);
     setXlmPriceChange(priceChangeXLM);
   };
 
@@ -175,12 +176,7 @@ export default function Page() {
     },
     dashboardArgs2: {
       data: [
-        [1687392000000, 0.99983713332799949],
-        [1687478400000, 0.99669248419239592],
-        [1687564800000, 0.99893807322702632],
-        [1687651200000, 1],
-        [1687737600000, 1.01],
-        [1687824000000, 1],
+        [1687392000000, 0.2],
         [1687859473000, usdcPrice],
       ],
       icon: {

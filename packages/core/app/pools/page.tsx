@@ -3,6 +3,8 @@
 import {
   PhoenixFactoryContract,
   PhoenixPairContract,
+  PhoenixStakeContract,
+  fetchPho,
 } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Pools, Skeleton } from "@phoenix-protocol/ui";
@@ -17,6 +19,7 @@ import { Address } from "stellar-sdk";
 import { Pool } from "@phoenix-protocol/types";
 import { Helmet } from "react-helmet";
 import { Box } from "@mui/material";
+import { FACTORY_ADDRESS } from "@phoenix-protocol/utils/build/constants";
 
 export default function Page() {
   const store = useAppStore(); // Global state management
@@ -57,6 +60,53 @@ export default function Page() {
           (priceB * Number(pairInfo.result.asset_b.amount)) /
             10 ** Number(tokenB?.decimals);
 
+        const stakingAddress = pairInfo.result.stake_address;
+
+        const StakeContract = new PhoenixStakeContract.Contract({
+          contractId: stakingAddress,
+          networkPassphrase: constants.NETWORK_PASSPHRASE,
+          rpcUrl: constants.RPC_URL,
+        });
+
+        const stakingInfo = await StakeContract.queryTotalStaked();
+        const totalStaked = Number(stakingInfo.result);
+
+        const FactoryContract = new PhoenixFactoryContract.Contract({
+          contractId: FACTORY_ADDRESS,
+          networkPassphrase: constants.NETWORK_PASSPHRASE,
+          rpcUrl: constants.RPC_URL,
+        });
+
+        const allPoolDetails = (await FactoryContract.queryAllPoolsDetails()).result;
+        const totalTokens = Number(allPoolDetails.find((pool) => pool.pool_address === poolAddress)?.pool_response.asset_lp_share.amount);
+        
+        const ratioStaked = totalStaked / totalTokens;
+        // Calculate APR by get the value of the total staked amount and the incentive amount
+        const poolIncentives = [
+          {
+            // XLM / USDC
+            address: "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX",
+            amount: 50000,
+          },
+          // XLM/PHO
+          {
+            address: "CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH",
+            amount: 100000,
+          },
+          {
+            // PHO/USDC
+            address: "CAZ6W4WHVGQBGURYTUOLCUOOHW6VQGAAPSPCD72VEDZMBBPY7H43AYEC",
+            amount: 75000,
+          },
+        ];
+        const valueStaked = tvl * ratioStaked;
+        const poolIncentive = poolIncentives.find((incentive) => incentive.address === poolAddress);
+        const phoprice = await fetchPho();
+        console.log(phoprice, poolIncentive?.amount, valueStaked)
+        const apr = ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
+
+
+
         // Construct and return pool object if all fetches are successful
         return {
           tokens: [
@@ -80,7 +130,7 @@ export default function Page() {
             },
           ],
           tvl: formatCurrency("USD", tvl.toString(), navigator.language),
-          maxApr: "0",
+          maxApr: `${(apr / 2).toFixed(2)}% + ${(apr / 2).toFixed(2)}% Airdrop `,
           userLiquidity: 0,
           poolAddress: poolAddress,
         };
@@ -137,6 +187,7 @@ export default function Page() {
   // On component mount, fetch pools and update loading state
   useEffect(() => {
     fetchPools().then(() => setLoading(false));
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

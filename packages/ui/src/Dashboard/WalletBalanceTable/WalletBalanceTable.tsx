@@ -270,7 +270,7 @@ const ListItem = ({
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Box component={"img"} src={icon} maxWidth={32} />
+        <Box sx={{ maxWidth: "24px"}} component={"img"} src={icon} />
         <Typography
           sx={{
             fontWeight: 700,
@@ -300,7 +300,7 @@ const ListItem = ({
             ml: "0.5rem",
           }}
         >
-          ${usdValue}
+          ${(usdValue * amount).toFixed(2)}
         </Typography>
         {!favorites.includes(name) ? (
           <Tooltip title="Add to favorites">
