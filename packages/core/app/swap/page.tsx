@@ -123,12 +123,13 @@ export default function SwapPage() {
 
   // Function for simulating swap
   const doSimulateSwap = async () => {
-    const fromTokenValue = await fetchTokenPrices(fromToken.name || "");
-    const toTokenValue = await fetchTokenPrices(toToken.name || "");
+    if (fromToken && toToken) {
+      const fromTokenValue = await fetchTokenPrices(fromToken.name || "");
+      const toTokenValue = await fetchTokenPrices(toToken.name || "");
 
-
-    setFromTokenValue(fromTokenValue);
-    setToTokenValue(toTokenValue);
+      setFromTokenValue(fromTokenValue);
+      setToTokenValue(toTokenValue);
+    }
     setLoadingSimulate(true);
     try {
       const contract = new PhoenixMultihopContract.Contract({
