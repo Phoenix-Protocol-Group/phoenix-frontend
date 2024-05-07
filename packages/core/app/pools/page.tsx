@@ -100,9 +100,8 @@ export default function Page() {
           },
         ];
         const valueStaked = tvl * ratioStaked;
-        const poolIncentive = poolIncentives.find((incentive) => incentive.address === poolAddress);
+        const poolIncentive = poolIncentives.find((incentive) => incentive.address === poolAddress)!;
         const phoprice = await fetchPho();
-        console.log(phoprice, poolIncentive?.amount, valueStaked)
         const apr = ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
 
 
