@@ -21,17 +21,23 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
 
   // Set State for filters
   const [dateRange, setDateRange] = React.useState<{
-    from: Date | null;
-    to: Date | null;
+    from: Date | undefined;
+    to: Date | undefined;
   }>({
     from: activeFilters.dateRange.from,
     to: activeFilters.dateRange.to,
   });
-  const [tradeSize, setTradeSize] = React.useState({
+  const [tradeSize, setTradeSize] = React.useState<{
+    from: number | undefined;
+    to: number | undefined;
+  }>({
     from: activeFilters.tradeSize.from,
     to: activeFilters.tradeSize.to,
   });
-  const [tradeValue, setTradeValue] = React.useState({
+  const [tradeValue, setTradeValue] = React.useState<{
+    from: number | undefined;
+    to: number | undefined;
+  }>({
     from: activeFilters.tradeValue.from,
     to: activeFilters.tradeValue.to,
   });
@@ -64,29 +70,29 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
   // Function to reset filters
   const resetFilters = () => {
     setDateRange({
-      from: new Date(),
-      to: new Date(),
+      from: undefined,
+      to: undefined,
     });
     setTradeSize({
-      from: 0,
-      to: 0,
+      from: undefined,
+      to: undefined,
     });
     setTradeValue({
-      from: 0,
-      to: 0,
+      from: undefined,
+      to: undefined,
     });
     applyFilters({
       dateRange: {
-        from: new Date(),
-        to: new Date(),
+        from: undefined,
+        to: undefined,
       },
       tradeSize: {
-        from: 0,
-        to: 0,
+        from: undefined,
+        to: undefined,
       },
       tradeValue: {
-        from: 0,
-        to: 0,
+        from: undefined,
+        to: undefined,
       },
     });
   };
@@ -180,7 +186,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
             gap: "0.75rem",
           }}
         >
-          <Box>
+          <Box flex={1}>
             <Typography
               sx={{
                 color: "#FFF",
@@ -195,9 +201,13 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
               From
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
+              <DemoContainer components={["DatePicker"]} sx={{
+                "& .MuiTextField-root": {
+                  minWidth: "0 !important"
+                }
+              }}>
                 <DatePicker
-                  value={dayjs(dateRange.from)}
+                  value={dateRange.from ? dayjs(dateRange.from) : undefined}
                   onChange={(newValue) =>
                     setDateRange({ ...dateRange, from: newValue.toDate() })
                   }
@@ -213,24 +223,21 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                       fontStyle: "normal",
                       fontWeight: 400,
                       borderRadius: "1rem",
-                      border: "1px solid #2D303A",
-                      minWidth: {
-                        xs: "unset",
-                        md: "200px"
-                      }
+                      minWidth: "unset",
                     },
                     "& legend": {
                       display: "none",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "1px solid #2D303A",
+                      top: "-2px"
                     },
                   }}
                 />
               </DemoContainer>
             </LocalizationProvider>
           </Box>
-          <Box>
+          <Box flex={1}>
             <Typography
               sx={{
                 color: "#FFF",
@@ -245,14 +252,18 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
               To
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
+              <DemoContainer components={["DatePicker"]} sx={{
+                "& .MuiTextField-root": {
+                  minWidth: "0 !important"
+                }
+              }}>
                 <DatePicker
-                  value={dayjs(dateRange.to)}
+                  value={dateRange.to ? dayjs(dateRange.to) : undefined}
                   onChange={(newValue: dayjs.Dayjs | null) =>
                     setDateRange({
                       ...dateRange,
                       // @ts-ignore
-                      to: newValue === null ? newValue : newValue.toDate(),
+                      to: newValue === null ? undefined : newValue.toDate(),
                     })
                   }
                   disableFuture
@@ -268,13 +279,17 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                       fontStyle: "normal",
                       fontWeight: 400,
                       borderRadius: "1rem",
-                      border: "1px solid #2D303A",
+                      minWidth: "unset"
+                    },
+                    "& .MuiTextField-root": {
+                      minWidth: "0 !important"
                     },
                     "& legend": {
                       display: "none",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "1px solid #2D303A",
+                      top: "-2px"
                     },
                   }}
                 />
@@ -409,9 +424,8 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
-                  border: "1px solid #2D303A",
                   "& .MuiOutlinedInput-input": {
-                    padding: "0.75rem",
+                    padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
                   },
                 },
@@ -459,9 +473,8 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
-                  border: "1px solid #2D303A",
                   "& .MuiOutlinedInput-input": {
-                    padding: "0.75rem",
+                    padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
                   },
                 },
@@ -596,9 +609,8 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
-                  border: "1px solid #2D303A",
                   "& .MuiOutlinedInput-input": {
-                    padding: "0.75rem",
+                    padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
                   },
                 },
@@ -646,9 +658,8 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
-                  border: "1px solid #2D303A",
                   "& .MuiOutlinedInput-input": {
-                    padding: "0.75rem",
+                    padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
                   },
                 },

@@ -35,16 +35,16 @@ export interface TransactionsTableProps {
 
 export interface ActiveFilters {
   dateRange: {
-    from: Date;
-    to: Date;
+    from: Date | undefined;
+    to: Date | undefined;
   };
   tradeSize: {
-    from: number;
-    to: number;
+    from: number | undefined;
+    to: number | undefined;
   };
   tradeValue: {
-    from: number;
-    to: number;
+    from: number | undefined;
+    to: number | undefined;
   };
 }
 export interface FilterMenuProps {

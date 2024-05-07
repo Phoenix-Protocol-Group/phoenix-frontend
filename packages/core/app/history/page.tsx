@@ -1,6 +1,7 @@
 "use client";
 import { Box, Typography } from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
+import { ActiveFilters } from "@phoenix-protocol/types";
 import {
   Button,
   TransactionsCards,
@@ -8,6 +9,7 @@ import {
   VolumeChart,
 } from "@phoenix-protocol/ui";
 import {
+  Address,
   fetchDataByTimeEpoch,
   fetchHistoryMetaData,
   fetchSwapHistory,
@@ -30,6 +32,11 @@ export default function Page() {
 
   // Set Total Volume
   const [totalVolume, setTotalVolume] = useState(0);
+
+  const [mostTradedAsset, setMostTradedAsset] = useState<any>({
+    name: "XLM",
+    icon: `cryptoIcons/xlm.svg`,
+  });
 
   // Set History
   const [history, setHistory] = useState<any>([]);
@@ -55,6 +62,21 @@ export default function Page() {
   // Personal or all
   const [activeView, setActiveView] = useState<"personal" | "all">("all");
 
+  const [activeFilters, setActiveFilters] = useState<ActiveFilters>({
+    dateRange: {
+      from: undefined,
+      to: undefined
+    },
+    tradeSize: {
+      from: undefined,
+      to: undefined,
+    },
+    tradeValue: {
+      from: undefined,
+      to: undefined
+    }
+  });
+
   // Load Meta Data
   const loadMetaData = async () => {
     const { activeAccountsLast24h, totalAccounts } =
@@ -65,8 +87,12 @@ export default function Page() {
   // Load Volume Data
   const loadVolumeData = async (epoch: "monthly" | "yearly" | "daily") => {
     const result = await fetchDataByTimeEpoch(epoch);
-    setData(result[Object.keys(result)[0]].intervals);
-    setTotalVolume(result[Object.keys(result)[0]].totalVolume);
+    const intervals = result[Object.keys(result)[0]].intervals
+
+    setData(intervals);
+
+    const newTotalVolume: number = intervals.reduce((total: string, currentValue: any) => total + currentValue.volume, 0);
+    setTotalVolume(Number(Number(newTotalVolume).toFixed(5)));
   };
 
   // Load more / pagination
@@ -77,12 +103,14 @@ export default function Page() {
   // Load History
   const loadHistory = async () => {
     let result = [];
+
     if (activeView === "personal" && appStorePersist.wallet.address) {
       result = await fetchSwapHistory(
         page,
         pageSize,
         sortBy,
         sortOrder.toUpperCase(),
+        activeFilters,
         appStorePersist.wallet.address
       );
     } else {
@@ -90,9 +118,16 @@ export default function Page() {
         page,
         pageSize,
         sortBy,
-        sortOrder.toUpperCase()
+        sortOrder.toUpperCase(),
+        activeFilters
       );
     }
+
+    if(!result.length) {
+      return setHistory([]);
+    }
+
+    const tradedAssets: any = {};
 
     // Map Token Names
     const _result = await Promise.all(
@@ -102,19 +137,33 @@ export default function Page() {
             asset.offer_asset
           );
           const askAssetInfo = await appStore.fetchTokenInfo(asset.ask_asset);
+
           return [offerAssetInfo, askAssetInfo];
         });
 
         const assets = await Promise.all(assetInfoPromises);
+
+        for(let i = 0; i < 2; i++) {
+          const assetId = assets.flat()[i]?.id;
+          const tradeVal = Number(item.tradeSize);
+
+          if(!assetId) continue;
+
+          if(!tradedAssets.hasOwnProperty(assetId)) {
+            tradedAssets[assetId] = tradeVal;
+          } else {
+            tradedAssets[assetId] += tradeVal;
+          }
+        }
 
         return {
           ...item,
           // @ts-ignore
           tradeSize: Number(item.tradeSize) / 10 ** assets.flat()[0].decimals,
           tradeValue:
-            (Number(item.tradeValue) * Number(item.tradeSize)) /
+            ((Number(item.tradeValue) * Number(item.tradeSize)) /
             // @ts-ignore
-            10 ** assets.flat()[0].decimals,
+            10 ** assets.flat()[0].decimals).toFixed(5),
           assets: assets.flat().map((asset) => {
             return {
               name: asset?.symbol,
@@ -127,8 +176,21 @@ export default function Page() {
         };
       })
     );
-    const updatedHistory = [...history, ..._result];
-    setHistory(updatedHistory);
+
+    const mtAsset = Object.keys(tradedAssets).reduce((a: any, b: any) => data[a] > data[b] ? a : b)
+    const mtAssetInfo = await appStore.fetchTokenInfo(Address.fromString(mtAsset));
+
+    if(mtAssetInfo) {
+      setMostTradedAsset({
+        name: mtAssetInfo?.symbol,
+        icon: `cryptoIcons/${mtAssetInfo?.symbol.toLowerCase()}.svg`,
+        amount: 100,
+        category: "Stable",
+        usdValue: 0,
+      });
+    }
+
+    setHistory(_result);
   };
 
   // Handle Sort Change
@@ -176,30 +238,6 @@ export default function Page() {
     }
   };
 
-  const mockActiveFilters = {
-    dateRange: {
-      from: null,
-      to: null,
-    },
-    tradeSize: {
-      from: 100,
-      to: 1000,
-    },
-    tradeValue: {
-      from: 5000,
-      to: 10000,
-    },
-  };
-
-  const mockApplyFilters: (newFilters: any) => void = (newFilters) => {
-    console.log("Applying filters with new values:", newFilters);
-  };
-
-  const mockProps = {
-    activeFilters: mockActiveFilters,
-    applyFilters: mockApplyFilters,
-  };
-
   // Use Effect to load volume on selected time epoch
   useEffect(() => {
     const _selected = () => {
@@ -219,7 +257,7 @@ export default function Page() {
   useEffect(() => {
     loadHistory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, sortBy, sortOrder, activeView]);
+  }, [page, pageSize, sortBy, sortOrder, activeView, activeFilters]);
 
   // Use Effect to Init Data
   useEffect(() => {
@@ -233,16 +271,6 @@ export default function Page() {
     amount: 100,
     category: "Stable",
     usdValue: 1 * 100,
-  };
-
-  const cardArgs = {
-    mostTradedAsset: {
-      name: "USDT",
-      icon: "cryptoIcons/usdt.svg",
-      amount: 100,
-      category: "Stable",
-      usdValue: 1 * 100,
-    },
   };
 
   return (
@@ -275,7 +303,7 @@ export default function Page() {
       <TransactionsCards
         activeTraders={meta.activeAccountsLast24h.toString()}
         totalTraders={meta.totalAccounts.toString()}
-        {...cardArgs}
+        mostTradedAsset={mostTradedAsset}
       />
       {/* @ts-ignore */}
       <TransactionsTable
@@ -288,12 +316,16 @@ export default function Page() {
         }}
         activeView={activeView}
         setActiveView={(a) => {
+          if(a === activeView) return;
           setHistory([]);
           setActiveView(a);
         }}
         loadingResults={false}
         loggedIn={appStorePersist.wallet.address ? true : false}
-        {...mockProps}
+        activeFilters={activeFilters}
+        applyFilters={(newFilters: ActiveFilters) => {
+          setActiveFilters(newFilters);
+        }}
         handleSort={(column) => handleSortChange(mapToSwapField(column), "asc")}
       />
       <Box sx={{ display: "flex", justifyContent: "end", mt: 3 }}>
