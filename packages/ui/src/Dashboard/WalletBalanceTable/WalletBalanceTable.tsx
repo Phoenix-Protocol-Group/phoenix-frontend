@@ -270,7 +270,7 @@ const ListItem = ({
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Box component={"img"} src={icon} />
+        <Box component={"img"} src={icon} maxWidth={32} />
         <Typography
           sx={{
             fontWeight: 700,
