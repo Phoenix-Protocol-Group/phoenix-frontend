@@ -61,11 +61,11 @@ const TransactionsCards = (props: TransactionsCardsProps) => {
       />
       <TransactionCard title="Total Traders" content={props.totalTraders} />
       {props.mostTradedAsset && (
-      <TransactionCard
-        title="Most Traded Asset"
-        content={props.mostTradedAsset.name}
-        icon={props.mostTradedAsset.icon}
-      />
+        <TransactionCard
+          title="Most Traded Asset"
+          content={props.mostTradedAsset.name}
+          icon={props.mostTradedAsset.icon}
+        />
       )}
     </Box>
   );
