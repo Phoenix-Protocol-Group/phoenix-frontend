@@ -30,14 +30,17 @@ const AssetButton = ({
           ? "none"
           : "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
         display: "inline-flex",
+        justifyContent: "space-between",
         color: "white",
         "&:hover": {
           background: hideDropdownButton ? "none" : "rgba(226, 87, 28, 0.08)",
         },
         cursor: hideDropdownButton ? "auto" : "pointer",
         pointerEvents: hideDropdownButton ? "none" : "auto",
+        minWidth: "96px"
       }}
     >
+      <Box display="flex">
       <Box
         component={"img"}
         src={token.icon}
@@ -47,6 +50,7 @@ const AssetButton = ({
         }}
       />
       {token.name}
+      </Box>
       <Box
         component={"img"}
         src="/CaretDown.svg"

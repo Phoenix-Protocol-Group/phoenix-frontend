@@ -15,19 +15,19 @@ export const NETWORK_PASSPHRASE: string =
  * The Soroban RPC endpoint used to initialize this library.
  */
 export const RPC_URL: string =
-  "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0";
+"https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0";
 
 /**
  * Factory contract address
  */
 export const FACTORY_ADDRESS: string =
-  "CC3AWJG5I7P5VMTBCPYCAGCQOSKDBQK6NWS4G4KQ3FWXJZT6FTCSLRYY";
+  "CB4SVAWJA6TSRNOJZ7W2AWFW46D5VR4ZMFZKDIKXEINZCZEGZCJZCKMI"
 
 /**
  * Multihop contract address
  */
 export const MULTIHOP_ADDRESS: string =
-  "CBLGRAHJ4OJ2TOQYQ4W2HCHXMQCEIUTP6DWKTH2OHS7FKKF3TZGYC7FW";
+  "CCLZRD4E72T7JCZCN3P7KNPYNXFYKQCL64ECLX7WP5GNVYPYJGU2IO2G";
 
 /**
  * Phoenix History Indexer

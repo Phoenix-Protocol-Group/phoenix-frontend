@@ -60,11 +60,13 @@ const TransactionsCards = (props: TransactionsCardsProps) => {
         content={props.activeTraders}
       />
       <TransactionCard title="Total Traders" content={props.totalTraders} />
-      <TransactionCard
-        title="Most Traded Asset"
-        content={props.mostTradedAsset.name}
-        icon={props.mostTradedAsset.icon}
-      />
+      {props.mostTradedAsset && (
+        <TransactionCard
+          title="Most Traded Asset"
+          content={props.mostTradedAsset.name}
+          icon={props.mostTradedAsset.icon}
+        />
+      )}
     </Box>
   );
 };

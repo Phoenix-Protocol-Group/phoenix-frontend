@@ -126,6 +126,7 @@ const GainerAndLooser = ({
           </Typography>
         </Box>
       </Box>
+      {/* 
       <Box>
         <Typography sx={{ fontSize: "0.75rem", fontWeight: 400, opacity: 0.5 }}>
           Volume (24h)
@@ -136,6 +137,7 @@ const GainerAndLooser = ({
           </Typography>
         </Box>
       </Box>
+      */}
     </Box>
   </Box>
 );

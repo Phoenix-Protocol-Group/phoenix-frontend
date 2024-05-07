@@ -23,7 +23,7 @@ const CryptoCTA = ({ onClick }: CryptoCTAProps) => {
           alignItems: "center",
         }}
       >
-        <Box component="img" src="banklocker.png" sx={{ mt: "-80px" }} />
+        <Box component="img" src="/banklocker.png" sx={{ mt: "-80px" }} />
         <Typography
           sx={{
             fontSize: "2.5rem",

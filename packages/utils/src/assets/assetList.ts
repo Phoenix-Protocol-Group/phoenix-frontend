@@ -9,4 +9,14 @@ export const assetList = [
     icon: "https://ipfs.io/ipfs/bafkreibpzncuhbk5ozhdw7xkcdoyf3xhwhcwcf6sj7axjzimxw6vm6pvyy",
     decimals: 7,
   },
+  {
+    code: "PHO",
+    issuer: "GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
+    contract: "CBZ7M5B3Y4WWBZ5XK5UZCAFOEZ23KSSZXYECYX3IXM6E2JOLQC52DK32",
+    name: "PHO",
+    org: "Phoenix",
+    domain: "phoenix-hub.io",
+    icon: "https://ipfs.io/ipfs/bafkreibpzncuhbk5ozhdw7xkcdoyf3xhwhcwcf6sj7axjzimxw6vm6pvyy",
+    decimals: 7,
+  },
 ];

@@ -18,6 +18,7 @@ import {
 } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
+  Address,
   checkTrustline,
   constants,
   fetchAndIssueTrustline,
@@ -63,6 +64,7 @@ export default function SwapPage() {
   const [trustlineTokenName, setTrustlineTokenName] = useState<string>("");
   const [trustlineTokenContract, setTrustlineTokenContract] =
     useState<string>("");
+  const [trustlineAssetAmount, setTrustlineAssetAmount] = useState<number>(0);
 
   // All Pools
   const [allPools, setAllPools] = useState<any[]>([]);
@@ -320,6 +322,12 @@ export default function SwapPage() {
 
     setTrustlineButtonActive(!trust.exists);
     setTrustlineTokenName(trust.asset?.code || "");
+    const tlAsset = await appStore.fetchTokenInfo(
+      Address.fromString("CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA")
+    );
+    setTrustlineAssetAmount(
+      Number(tlAsset?.balance) / 10 ** tlAsset?.decimals!
+    );
     setTrustlineTokenContract(trust.asset?.contract || "");
   };
 
@@ -339,7 +347,7 @@ export default function SwapPage() {
 
   // Return statement for rendering components conditionally based on state
   return isLoading ? (
-    <Box sx={{ width: "100%", maxWidth: "600px", mt: 12}}>
+    <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
       <Skeleton.Swap />
     </Box>
   ) : (
@@ -409,6 +417,7 @@ export default function SwapPage() {
             }
             trustlineButtonActive={trustlineButtonActive}
             trustlineAssetName={trustlineTokenName}
+            trustlineButtonDisabled={trustlineAssetAmount < 0.5}
             onTrustlineButtonClick={() => addTrustLine()}
           />
         )}

@@ -16,6 +16,7 @@ import {
   Menu,
   MenuItem,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import FilterMenu from "./FilterMenu";
@@ -79,6 +80,10 @@ const TransactionsTable = (props: TransactionsTableProps) => {
     lineHeight: "1.25rem", // 200%
   };
 
+  React.useEffect(() => {
+    console.log(props.activeView);
+  }, [props.activeView]);
+
   const scrollbarStyles = {
     /* Firefox */
     scrollbarWidth: "thin",
@@ -116,7 +121,7 @@ const TransactionsTable = (props: TransactionsTableProps) => {
         sx={{
           display: "flex",
           mb: 2,
-          minWidth: {xs: "80vw", md: "700px"},
+          minWidth: { xs: "80vw", md: "700px" },
           justifyContent: "space-between",
         }}
       >
@@ -131,18 +136,20 @@ const TransactionsTable = (props: TransactionsTableProps) => {
           >
             All
           </Box>
-          <Box
-            sx={
-              props.activeView === "personal"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-                : tabUnselectedStyles
-            }
-            onClick={() =>
-              props.loggedIn ? props.setActiveView("personal") : null
-            }
-          >
-            Personal
-          </Box>
+          <Tooltip title={props.loggedIn ? undefined : "Connect wallet to see personal transactions"}>
+            <Box
+              sx={
+                props.activeView === "personal"
+                  ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                  : tabUnselectedStyles
+              }
+              onClick={() =>
+                props.loggedIn ? props.setActiveView("personal") : null
+              }
+            >
+              Personal
+            </Box>
+          </Tooltip>
         </Box>
         <FilterMenu
           activeFilters={props.activeFilters}

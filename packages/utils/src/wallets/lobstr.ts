@@ -17,7 +17,9 @@ export class lobstr implements Wallet {
       throw new Error(`Lobstr is not connected`);
     }
 
-    return { publicKey: await getPublicKey() };
+    const pubKey =
+      getAddressFromLocalStorageByKey("app-storage") || (await getPublicKey());
+    return { publicKey: pubKey };
   }
   async signTransaction(
     tx: string,
@@ -38,5 +40,19 @@ export class lobstr implements Wallet {
     opts?: { accountToSign?: string }
   ): Promise<string> {
     throw new Error("Lobstr does not support signing authorization entries");
+  }
+}
+
+function getAddressFromLocalStorageByKey(key: string): string | undefined {
+  const localStorageData = JSON.parse(localStorage.getItem(key) || "{}");
+  if (
+    localStorageData &&
+    localStorageData.state &&
+    localStorageData.state.wallet &&
+    localStorageData.state.wallet.address
+  ) {
+    return localStorageData.state.wallet.address;
+  } else {
+    return undefined;
   }
 }

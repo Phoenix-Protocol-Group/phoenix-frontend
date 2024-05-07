@@ -28,7 +28,17 @@ export function lobstr(): Connector {
       };
     },
     getPublicKey(): Promise<string> {
-      return getPublicKey();
+      const pubKey: Promise<string> = getAddressFromLocalStorageByKey(
+        "app-storage"
+      )
+        ? new Promise((resolve, reject) => {
+            const pub: string =
+              getAddressFromLocalStorageByKey("app-storage") || "";
+            return pub;
+          })
+        : getPublicKey();
+
+      return pubKey;
     },
     signTransaction(
       xdr: string,
@@ -41,4 +51,18 @@ export function lobstr(): Connector {
       return signTransaction(xdr);
     },
   };
+}
+
+function getAddressFromLocalStorageByKey(key: string): string | undefined {
+  const localStorageData = JSON.parse(localStorage.getItem(key) || "{}");
+  if (
+    localStorageData &&
+    localStorageData.state &&
+    localStorageData.state.wallet &&
+    localStorageData.state.wallet.address
+  ) {
+    return localStorageData.state.wallet.address;
+  } else {
+    return undefined;
+  }
 }
