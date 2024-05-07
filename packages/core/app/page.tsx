@@ -184,7 +184,7 @@ export default function Page() {
         [1687859473000, usdcPrice],
       ],
       icon: {
-        small: "/logo_icon.svg",
+        small: "/cryptoIcons/pho.svg",
         large: "/pho-bg.png",
       },
       assetName: "PHO",
