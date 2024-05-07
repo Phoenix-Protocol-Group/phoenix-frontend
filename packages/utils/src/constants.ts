@@ -21,7 +21,7 @@ export const RPC_URL: string =
  * Factory contract address
  */
 export const FACTORY_ADDRESS: string =
-  "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX"
+  "CB4SVAWJA6TSRNOJZ7W2AWFW46D5VR4ZMFZKDIKXEINZCZEGZCJZCKMI"
 
 /**
  * Multihop contract address

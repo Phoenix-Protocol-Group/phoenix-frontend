@@ -35,7 +35,7 @@ import {
   formatCurrency,
   scValToJs,
 } from "@phoenix-protocol/utils";
-import { PhoenixFactoryContract } from "@phoenix-protocol/contracts";
+import { PhoenixFactoryContract, fetchPho } from "@phoenix-protocol/contracts";
 import DisclaimerModal from "@/components/Disclaimer";
 
 export default function Page() {
@@ -136,6 +136,7 @@ export default function Page() {
     const price = await fetchTokenPrices("XLM");
     const price2 = await fetchTokenPrices("USDC");
     const priceChangeXLM = await fetchTokenPrices2("XLM");
+    const phoPrice = await fetchPho();
     setXlmPrice(price);
     setUsdcPrice(price2);
     setXlmPriceChange(priceChangeXLM);

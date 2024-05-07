@@ -323,7 +323,7 @@ export default function SwapPage() {
     setTrustlineButtonActive(!trust.exists);
     setTrustlineTokenName(trust.asset?.code || "");
     const tlAsset = await appStore.fetchTokenInfo(
-      Address.fromString(tokenAddress)
+      Address.fromString("CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA")
     );
     setTrustlineAssetAmount(
       Number(tlAsset?.balance) / 10 ** tlAsset?.decimals!
