@@ -214,7 +214,9 @@ export default function Page({ params }: PoolPageProps) {
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
         ),
       });
+
       await tx?.signAndSend();
+      console.log(tx?.signAndSend())
       await fetchStakes();
       setLoading(false);
       //!todo view transaction id in blockexplorer
@@ -222,7 +224,7 @@ export default function Page({ params }: PoolPageProps) {
       setStakeModalOpen(true);
     } catch (error: any) {
       setLoading(false);
-      setErrorDescripption(error);
+      setErrorDescripption(JSON.stringify(error));
       setErrorModalOpen(true);
     }
   };

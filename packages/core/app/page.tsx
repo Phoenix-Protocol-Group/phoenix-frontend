@@ -48,8 +48,8 @@ export default function Page() {
   const [gainerAsset, setGainerAsset] = useState<any>({});
   const [loserAsset, setLoserAsset] = useState<any>({});
   const [allTokens, setAllTokens] = useState<any[]>([]);
-  const [xlmPrice, setXlmPrice] = useState(0);
-  const [xlmPriceChange, setXlmPriceChange] = useState(0);
+  const [xlmPrice, setXlmPrice] = useState<number>(0);
+  const [xlmPriceChange, setXlmPriceChange] = useState<number>(0);
   const [usdcPrice, setUsdcPrice] = useState(0);
   const [disclaimer, setDisclaimer] = useState(true);
 
@@ -105,7 +105,7 @@ export default function Page() {
       price: formatCurrency("USD", loser.price.toString(), navigator.language),
       change: loser.percent_change_24,
       icon: `/cryptoIcons/${loser.symbol.toLowerCase()}.svg`,
-      volume: "TBD",  
+      volume: "TBD",
     };
 
     setGainerAsset(_gainerAsset);
@@ -163,7 +163,7 @@ export default function Page() {
     },
     dashboardArgs1: {
       data: [
-        [1687392000000, Number(xlmPrice) + Number(xlmPrice) * (Number(xlmPriceChange) / 100) ],
+        [1687392000000, Number(xlmPrice) - (xlmPrice * xlmPriceChange) / 100],
         [1687859473000, xlmPrice],
       ],
       icon: {
@@ -204,7 +204,6 @@ export default function Page() {
       <Helmet>
         <title>Phoenix DeFi Hub - Dashboard</title>
       </Helmet>
-
       {anchors.length > 0 && (
         <AnchorServices
           anchors={anchors}

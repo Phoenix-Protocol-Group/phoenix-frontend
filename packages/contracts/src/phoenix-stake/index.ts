@@ -24,9 +24,9 @@ if (typeof window !== "undefined") {
 }
 
 export const networks = {
-  testnet: {
+  unknown: {
     networkPassphrase: "Public Global Stellar Network ; September 2015",
-    contractId: "0",
+    contractId: "CAHHQTOMS6VL3QBMUTLUSTBA4YCYB2BLBCO7SW624BW3C2T42KKO7OJV",
   },
 } as const;
 
@@ -114,6 +114,8 @@ export const Errors = {
   8: { message: "" },
   9: { message: "" },
   10: { message: "" },
+  11: { message: "" },
+  12: { message: "" },
 };
 /**
     
@@ -198,6 +200,10 @@ export interface Config {
   /**
     
     */
+  max_complexity: u32;
+  /**
+    
+    */
   min_bond: i128;
   /**
     
@@ -245,7 +251,7 @@ export interface BondingInfo {
   /**
     Total amount of staked tokens
     */
-  total_stake: u128;
+  total_stake: i128;
 }
 
 /**
@@ -317,7 +323,7 @@ export class Contract {
   spec: ContractSpec;
   constructor(public readonly options: ClassOptions) {
     this.spec = new ContractSpec([
-      "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAABgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAhscF90b2tlbgAAABMAAAAAAAAACG1pbl9ib25kAAAACwAAAAAAAAAKbWluX3Jld2FyZAAAAAAACwAAAAAAAAAHbWFuYWdlcgAAAAATAAAAAAAAAAVvd25lcgAAAAAAABMAAAAA",
+      "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAABwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAhscF90b2tlbgAAABMAAAAAAAAACG1pbl9ib25kAAAACwAAAAAAAAAKbWluX3Jld2FyZAAAAAAACwAAAAAAAAAHbWFuYWdlcgAAAAATAAAAAAAAAAVvd25lcgAAAAAAABMAAAAAAAAADm1heF9jb21wbGV4aXR5AAAAAAAEAAAAAA==",
       "AAAAAAAAAAAAAAAEYm9uZAAAAAIAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAGdG9rZW5zAAAAAAALAAAAAA==",
       "AAAAAAAAAAAAAAAGdW5ib25kAAAAAAADAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAADHN0YWtlX2Ftb3VudAAAAAsAAAAAAAAAD3N0YWtlX3RpbWVzdGFtcAAAAAAGAAAAAA==",
       "AAAAAAAAAAAAAAAYY3JlYXRlX2Rpc3RyaWJ1dGlvbl9mbG93AAAAAgAAAAAAAAAGc2VuZGVyAAAAAAATAAAAAAAAAAVhc3NldAAAAAAAABMAAAAA",
@@ -336,16 +342,16 @@ export class Contract {
       "AAAAAgAAAAAAAAAAAAAAE0Rpc3RyaWJ1dGlvbkRhdGFLZXkAAAAAAwAAAAEAAAAAAAAABUN1cnZlAAAAAAAAAQAAABMAAAABAAAAAAAAAAxEaXN0cmlidXRpb24AAAABAAAAEwAAAAEAAAAAAAAAEldpdGhkcmF3QWRqdXN0bWVudAAAAAAAAQAAB9AAAAAVV2l0aGRyYXdBZGp1c3RtZW50S2V5AAAA",
       "AAAAAQAAAAAAAAAAAAAADERpc3RyaWJ1dGlvbgAAAAYAAAAVQm9udXMgcGVyIHN0YWtpbmcgZGF5AAAAAAAAEWJvbnVzX3Blcl9kYXlfYnBzAAAAAAAABgAAACtUb3RhbCByZXdhcmRzIGRpc3RyaWJ1dGVkIGJ5IHRoaXMgY29udHJhY3QuAAAAABFkaXN0cmlidXRlZF90b3RhbAAAAAAAAAoAAAAjTWF4IGJvbnVzIGZvciBzdGFraW5nIGFmdGVyIDYwIGRheXMAAAAADW1heF9ib251c19icHMAAAAAAAAGAAAAXlNoYXJlcyB3aGljaCB3ZXJlIG5vdCBmdWxseSBkaXN0cmlidXRlZCBvbiBwcmV2aW91cyBkaXN0cmlidXRpb25zLCBhbmQgc2hvdWxkIGJlIHJlZGlzdHJpYnV0ZWQAAAAAAA9zaGFyZXNfbGVmdG92ZXIAAAAABgAAACVIb3cgbWFueSBzaGFyZXMgaXMgc2luZ2xlIHBvaW50IHdvcnRoAAAAAAAAEHNoYXJlc19wZXJfcG9pbnQAAAAKAAAAIFRvdGFsIHJld2FyZHMgbm90IHlldCB3aXRoZHJhd24uAAAAEndpdGhkcmF3YWJsZV90b3RhbAAAAAAACg==",
       "AAAAAQAAAAAAAAAAAAAAEldpdGhkcmF3QWRqdXN0bWVudAAAAAAAAgAAAUVSZXByZXNlbnRzIGEgY29ycmVjdGlvbiB0byB0aGUgcmV3YXJkIHBvaW50cyBmb3IgdGhlIHVzZXIuIFRoaXMgY2FuIGJlIHBvc2l0aXZlIG9yIG5lZ2F0aXZlLgpBIHBvc2l0aXZlIHZhbHVlIGluZGljYXRlcyB0aGF0IHRoZSB1c2VyIHNob3VsZCByZWNlaXZlIGFkZGl0aW9uYWwgcG9pbnRzIChlLmcuLCBmcm9tIGEgYm9udXMgb3IgYW4gZXJyb3IgY29ycmVjdGlvbiksCndoaWxlIGEgbmVnYXRpdmUgdmFsdWUgc2lnbmlmaWVzIGEgcmVkdWN0aW9uIChlLmcuLCBkdWUgdG8gYSBwZW5hbHR5IG9yIGFuIGFkanVzdG1lbnQgZm9yIHBhc3Qgb3Zlci1hbGxvY2F0aW9ucykuAAAAAAAAEXNoYXJlc19jb3JyZWN0aW9uAAAAAAAACwAAAOJSZXByZXNlbnRzIHRoZSB0b3RhbCBhbW91bnQgb2YgcmV3YXJkcyB0aGF0IHRoZSB1c2VyIGhhcyB3aXRoZHJhd24gc28gZmFyLgpUaGlzIHZhbHVlIGVuc3VyZXMgdGhhdCBhIHVzZXIgZG9lc24ndCB3aXRoZHJhdyBtb3JlIHRoYW4gdGhleSBhcmUgb3dlZCBhbmQgaXMgdXNlZCB0bwpjYWxjdWxhdGUgdGhlIG5ldCByZXdhcmRzIGEgdXNlciBjYW4gd2l0aGRyYXcgYXQgYW55IGdpdmVuIHRpbWUuAAAAAAARd2l0aGRyYXduX3Jld2FyZHMAAAAAAAAK",
-      "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAKAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAEAAAAAAAAADkludmFsaWRNaW5Cb25kAAAAAAACAAAAAAAAABBJbnZhbGlkTWluUmV3YXJkAAAAAwAAAAAAAAALSW52YWxpZEJvbmQAAAAABAAAAAAAAAAMVW5hdXRob3JpemVkAAAABQAAAAAAAAASTWluUmV3YXJkTm90RW5vdWdoAAAAAAAGAAAAAAAAAA5SZXdhcmRzSW52YWxpZAAAAAAABwAAAAAAAAANU3Rha2VOb3RGb3VuZAAAAAAAAAgAAAAAAAAAC0ludmFsaWRUaW1lAAAAAAkAAAAAAAAAEkRpc3RyaWJ1dGlvbkV4aXN0cwAAAAAACg==",
+      "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAMAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAEAAAAAAAAADkludmFsaWRNaW5Cb25kAAAAAAACAAAAAAAAABBJbnZhbGlkTWluUmV3YXJkAAAAAwAAAAAAAAALSW52YWxpZEJvbmQAAAAABAAAAAAAAAAMVW5hdXRob3JpemVkAAAABQAAAAAAAAASTWluUmV3YXJkTm90RW5vdWdoAAAAAAAGAAAAAAAAAA5SZXdhcmRzSW52YWxpZAAAAAAABwAAAAAAAAANU3Rha2VOb3RGb3VuZAAAAAAAAAgAAAAAAAAAC0ludmFsaWRUaW1lAAAAAAkAAAAAAAAAEkRpc3RyaWJ1dGlvbkV4aXN0cwAAAAAACgAAAAAAAAATSW52YWxpZFJld2FyZEFtb3VudAAAAAALAAAAAAAAABRJbnZhbGlkTWF4Q29tcGxleGl0eQAAAAw=",
       "AAAAAQAAAAAAAAAAAAAADkNvbmZpZ1Jlc3BvbnNlAAAAAAABAAAAAAAAAAZjb25maWcAAAAAB9AAAAAGQ29uZmlnAAA=",
       "AAAAAQAAAAAAAAAAAAAADlN0YWtlZFJlc3BvbnNlAAAAAAABAAAAAAAAAAZzdGFrZXMAAAAAA+oAAAfQAAAABVN0YWtlAAAA",
       "AAAAAQAAAAAAAAAAAAAAEEFubnVhbGl6ZWRSZXdhcmQAAAACAAAAAAAAAAZhbW91bnQAAAAAABAAAAAAAAAABWFzc2V0AAAAAAAAEw==",
       "AAAAAQAAAAAAAAAAAAAAGUFubnVhbGl6ZWRSZXdhcmRzUmVzcG9uc2UAAAAAAAABAAAAAAAAAAdyZXdhcmRzAAAAA+oAAAfQAAAAEEFubnVhbGl6ZWRSZXdhcmQ=",
       "AAAAAQAAAAAAAAAAAAAAEldpdGhkcmF3YWJsZVJld2FyZAAAAAAAAgAAAAAAAAAOcmV3YXJkX2FkZHJlc3MAAAAAABMAAAAAAAAADXJld2FyZF9hbW91bnQAAAAAAAAK",
       "AAAAAQAAAAAAAAAAAAAAG1dpdGhkcmF3YWJsZVJld2FyZHNSZXNwb25zZQAAAAABAAAAQUFtb3VudCBvZiByZXdhcmRzIGFzc2lnbmVkIGZvciB3aXRoZHJhd2FsIGZyb20gdGhlIGdpdmVuIGFkZHJlc3MuAAAAAAAAB3Jld2FyZHMAAAAD6gAAB9AAAAASV2l0aGRyYXdhYmxlUmV3YXJkAAA=",
-      "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAABQAAAAAAAAAIbHBfdG9rZW4AAAATAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAACG1pbl9ib25kAAAACwAAAAAAAAAKbWluX3Jld2FyZAAAAAAACwAAAAAAAAAFb3duZXIAAAAAAAAT",
+      "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAABgAAAAAAAAAIbHBfdG9rZW4AAAATAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAADm1heF9jb21wbGV4aXR5AAAAAAAEAAAAAAAAAAhtaW5fYm9uZAAAAAsAAAAAAAAACm1pbl9yZXdhcmQAAAAAAAsAAAAAAAAABW93bmVyAAAAAAAAEw==",
       "AAAAAQAAAAAAAAAAAAAABVN0YWtlAAAAAAAAAgAAABtUaGUgYW1vdW50IG9mIHN0YWtlZCB0b2tlbnMAAAAABXN0YWtlAAAAAAAACwAAACVUaGUgdGltZXN0YW1wIHdoZW4gdGhlIHN0YWtlIHdhcyBtYWRlAAAAAAAAD3N0YWtlX3RpbWVzdGFtcAAAAAAG",
-      "AAAAAQAAAAAAAAAAAAAAC0JvbmRpbmdJbmZvAAAAAAQAAAAnTGFzdCB0aW1lIHdoZW4gdXNlciBoYXMgY2xhaW1lZCByZXdhcmRzAAAAABBsYXN0X3Jld2FyZF90aW1lAAAABgAAAZpUaGUgcmV3YXJkcyBkZWJ0IGlzIGEgbWVjaGFuaXNtIHRvIGRldGVybWluZSBob3cgbXVjaCBhIHVzZXIgaGFzIGFscmVhZHkgYmVlbiBjcmVkaXRlZCBpbiB0ZXJtcyBvZiBzdGFraW5nIHJld2FyZHMuCldoZW5ldmVyIGEgdXNlciBkZXBvc2l0cyBvciB3aXRoZHJhd3Mgc3Rha2VkIHRva2VucyB0byB0aGUgcG9vbCwgdGhlIHJld2FyZHMgZm9yIHRoZSB1c2VyIGlzIHVwZGF0ZWQgYmFzZWQgb24gdGhlCmFjY3VtdWxhdGVkIHJld2FyZHMgcGVyIHNoYXJlLCBhbmQgdGhlIGRpZmZlcmVuY2UgaXMgc3RvcmVkIGFzIHJld2FyZCBkZWJ0LiBXaGVuIGNsYWltaW5nIHJld2FyZHMsIHRoaXMgcmV3YXJkIGRlYnQKaXMgdXNlZCB0byBkZXRlcm1pbmUgaG93IG11Y2ggcmV3YXJkcyBhIHVzZXIgY2FuIGFjdHVhbGx5IGNsYWltLgAAAAAAC3Jld2FyZF9kZWJ0AAAAAAoAAAAnVmVjIG9mIHN0YWtlcyBzb3J0ZWQgYnkgc3Rha2UgdGltZXN0YW1wAAAAAAZzdGFrZXMAAAAAA+oAAAfQAAAABVN0YWtlAAAAAAAAHVRvdGFsIGFtb3VudCBvZiBzdGFrZWQgdG9rZW5zAAAAAAAAC3RvdGFsX3N0YWtlAAAAAAo=",
+      "AAAAAQAAAAAAAAAAAAAAC0JvbmRpbmdJbmZvAAAAAAQAAAAnTGFzdCB0aW1lIHdoZW4gdXNlciBoYXMgY2xhaW1lZCByZXdhcmRzAAAAABBsYXN0X3Jld2FyZF90aW1lAAAABgAAAZpUaGUgcmV3YXJkcyBkZWJ0IGlzIGEgbWVjaGFuaXNtIHRvIGRldGVybWluZSBob3cgbXVjaCBhIHVzZXIgaGFzIGFscmVhZHkgYmVlbiBjcmVkaXRlZCBpbiB0ZXJtcyBvZiBzdGFraW5nIHJld2FyZHMuCldoZW5ldmVyIGEgdXNlciBkZXBvc2l0cyBvciB3aXRoZHJhd3Mgc3Rha2VkIHRva2VucyB0byB0aGUgcG9vbCwgdGhlIHJld2FyZHMgZm9yIHRoZSB1c2VyIGlzIHVwZGF0ZWQgYmFzZWQgb24gdGhlCmFjY3VtdWxhdGVkIHJld2FyZHMgcGVyIHNoYXJlLCBhbmQgdGhlIGRpZmZlcmVuY2UgaXMgc3RvcmVkIGFzIHJld2FyZCBkZWJ0LiBXaGVuIGNsYWltaW5nIHJld2FyZHMsIHRoaXMgcmV3YXJkIGRlYnQKaXMgdXNlZCB0byBkZXRlcm1pbmUgaG93IG11Y2ggcmV3YXJkcyBhIHVzZXIgY2FuIGFjdHVhbGx5IGNsYWltLgAAAAAAC3Jld2FyZF9kZWJ0AAAAAAoAAAAnVmVjIG9mIHN0YWtlcyBzb3J0ZWQgYnkgc3Rha2UgdGltZXN0YW1wAAAAAAZzdGFrZXMAAAAAA+oAAAfQAAAABVN0YWtlAAAAAAAAHVRvdGFsIGFtb3VudCBvZiBzdGFrZWQgdG9rZW5zAAAAAAAAC3RvdGFsX3N0YWtlAAAAAAs=",
       "AAAAAgAAAAtDdXJ2ZSB0eXBlcwAAAAAAAAAABUN1cnZlAAAAAAAAAwAAAAEAAAAxQ29uc3RhbiBjdXJ2ZSwgaXQgd2lsbCBhbHdheXMgaGF2ZSB0aGUgc2FtZSB2YWx1ZQAAAAAAAAhDb25zdGFudAAAAAEAAAAKAAAAAQAAAE5MaW5lYXIgY3VydmUgdGhhdCBncm93IGxpbmVhcmx5IGJ1dCBsYXRlcgp0ZW5kcyB0byBhIGNvbnN0YW50IHNhdHVyYXRlZCB2YWx1ZS4AAAAAABBTYXR1cmF0aW5nTGluZWFyAAAAAQAAB9AAAAAQU2F0dXJhdGluZ0xpbmVhcgAAAAEAAAAbQ3VydmUgd2l0aCBkaWZmZXJlbnQgc2xvcGVzAAAAAA9QaWVjZXdpc2VMaW5lYXIAAAAAAQAAB9AAAAAPUGllY2V3aXNlTGluZWFyAA==",
       "AAAAAQAAAQ1TYXR1cmF0aW5nIExpbmVhcgokJGYoeCk9XGJlZ2lue2Nhc2VzfQpbbWluKHkpICogYW1vdW50XSwgICYgXHRleHR7aWYgeCA8PSAkeF8xJCB9IFxcXFwKW3kgKiBhbW91bnRdLCAgJiBcdGV4dHtpZiAkeF8xJCA+PSB4IDw9ICR4XzIkIH0gXFxcXApbbWF4KHkpICogYW1vdW50XSwgICYgXHRleHR7aWYgeCA+PSAkeF8yJCB9ClxlbmR7Y2FzZXN9JCQKCm1pbl95IGZvciBhbGwgeCA8PSBtaW5feCwgbWF4X3kgZm9yIGFsbCB4ID49IG1heF94LCBsaW5lYXIgaW4gYmV0d2VlbgAAAAAAAAAAAAAQU2F0dXJhdGluZ0xpbmVhcgAAAAQAAAAjdGltZSB3aGVuIGN1cnZlIGhhcyBmdWxseSBzYXR1cmF0ZWQAAAAABW1heF94AAAAAAAABgAAABttYXggdmFsdWUgYXQgc2F0dXJhdGVkIHRpbWUAAAAABW1heF95AAAAAAAACgAAABV0aW1lIHdoZW4gY3VydmUgc3RhcnQAAAAAAAAFbWluX3gAAAAAAAAGAAAAF21pbiB2YWx1ZSBhdCBzdGFydCB0aW1lAAAAAAVtaW5feQAAAAAAAAo=",
       "AAAAAQAAAVlUaGlzIGlzIGEgZ2VuZXJhbGl6YXRpb24gb2YgU2F0dXJhdGluZ0xpbmVhciwgc3RlcHMgbXVzdCBiZSBhcnJhbmdlZCB3aXRoIGluY3JlYXNpbmcgdGltZSBbYHU2NGBdLgpBbnkgcG9pbnQgYmVmb3JlIGZpcnN0IHN0ZXAgZ2V0cyB0aGUgZmlyc3QgdmFsdWUsIGFmdGVyIGxhc3Qgc3RlcCB0aGUgbGFzdCB2YWx1ZS4KT3RoZXJ3aXNlLCBpdCBpcyBhIGxpbmVhciBpbnRlcnBvbGF0aW9uIGJldHdlZW4gdGhlIHR3byBjbG9zZXN0IHBvaW50cy4KVmVjIG9mIGxlbmd0aCAxIC0+IFtgQ29uc3RhbnRgXShDdXJ2ZTo6Q29uc3RhbnQpIC4KVmVjIG9mIGxlbmd0aCAyIC0+IFtgU2F0dXJhdGluZ0xpbmVhcmBdIC4AAAAAAAAAAAAABFN0ZXAAAAACAAAAAAAAAAR0aW1lAAAABgAAAAAAAAAFdmFsdWUAAAAAAAAK",
@@ -360,25 +366,23 @@ export class Contract {
     distributeRewards: () => {},
     withdrawRewards: () => {},
     fundDistribution: () => {},
-    queryConfig: (result: XDR_BASE64 | xdr.ScVal): ConfigResponse =>
+    queryConfig: (result: XDR_BASE64): ConfigResponse =>
       this.spec.funcResToNative("query_config", result),
-    queryAdmin: (result: XDR_BASE64 | xdr.ScVal): string =>
+    queryAdmin: (result: XDR_BASE64): string =>
       this.spec.funcResToNative("query_admin", result),
-    queryStaked: (result: XDR_BASE64 | xdr.ScVal): StakedResponse =>
+    queryStaked: (result: XDR_BASE64): StakedResponse =>
       this.spec.funcResToNative("query_staked", result),
-    queryTotalStaked: (result: XDR_BASE64 | xdr.ScVal): i128 =>
+    queryTotalStaked: (result: XDR_BASE64): i128 =>
       this.spec.funcResToNative("query_total_staked", result),
-    queryAnnualizedRewards: (
-      result: XDR_BASE64 | xdr.ScVal
-    ): AnnualizedRewardsResponse =>
+    queryAnnualizedRewards: (result: XDR_BASE64): AnnualizedRewardsResponse =>
       this.spec.funcResToNative("query_annualized_rewards", result),
     queryWithdrawableRewards: (
-      result: XDR_BASE64 | xdr.ScVal
+      result: XDR_BASE64
     ): WithdrawableRewardsResponse =>
       this.spec.funcResToNative("query_withdrawable_rewards", result),
-    queryDistributedRewards: (result: XDR_BASE64 | xdr.ScVal): u128 =>
+    queryDistributedRewards: (result: XDR_BASE64): u128 =>
       this.spec.funcResToNative("query_distributed_rewards", result),
-    queryUndistributedRewards: (result: XDR_BASE64 | xdr.ScVal): u128 =>
+    queryUndistributedRewards: (result: XDR_BASE64): u128 =>
       this.spec.funcResToNative("query_undistributed_rewards", result),
   };
   private txFromJSON = <T>(json: string): AssembledTransaction<T> => {
@@ -447,6 +451,7 @@ export class Contract {
       min_reward,
       manager,
       owner,
+      max_complexity,
     }: {
       admin: string;
       lp_token: string;
@@ -454,6 +459,7 @@ export class Contract {
       min_reward: i128;
       manager: string;
       owner: string;
+      max_complexity: u32;
     },
     options: {
       /**
@@ -471,6 +477,7 @@ export class Contract {
         min_reward,
         manager: new Address(manager),
         owner: new Address(owner),
+        max_complexity,
       }),
       ...options,
       ...this.options,
@@ -661,6 +668,7 @@ export class Contract {
       ...options,
       ...this.options,
       errorTypes: Errors,
+      // @ts-ignore
       parseResultXdr: this.parsers["queryConfig"],
     });
   };
@@ -682,6 +690,7 @@ export class Contract {
       ...options,
       ...this.options,
       errorTypes: Errors,
+      // @ts-ignore
       parseResultXdr: this.parsers["queryAdmin"],
     });
   };
@@ -706,6 +715,7 @@ export class Contract {
       ...options,
       ...this.options,
       errorTypes: Errors,
+      // @ts-ignore
       parseResultXdr: this.parsers["queryStaked"],
     });
   };
@@ -727,6 +737,7 @@ export class Contract {
       ...options,
       ...this.options,
       errorTypes: Errors,
+      // @ts-ignore
       parseResultXdr: this.parsers["queryTotalStaked"],
     });
   };
@@ -748,6 +759,7 @@ export class Contract {
       ...options,
       ...this.options,
       errorTypes: Errors,
+      // @ts-ignore
       parseResultXdr: this.parsers["queryAnnualizedRewards"],
     });
   };
@@ -772,6 +784,7 @@ export class Contract {
       ...options,
       ...this.options,
       errorTypes: Errors,
+      // @ts-ignore
       parseResultXdr: this.parsers["queryWithdrawableRewards"],
     });
   };
@@ -796,6 +809,7 @@ export class Contract {
       ...options,
       ...this.options,
       errorTypes: Errors,
+      // @ts-ignore
       parseResultXdr: this.parsers["queryDistributedRewards"],
     });
   };
@@ -820,6 +834,7 @@ export class Contract {
       ...options,
       ...this.options,
       errorTypes: Errors,
+      // @ts-ignore
       parseResultXdr: this.parsers["queryUndistributedRewards"],
     });
   };
