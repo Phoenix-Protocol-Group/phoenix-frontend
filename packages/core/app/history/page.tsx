@@ -1,7 +1,7 @@
 "use client";
 import { Box, Typography } from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import { ActiveFilters } from "@phoenix-protocol/types";
+import { ActiveFilters, StateToken } from "@phoenix-protocol/types";
 import {
   Button,
   TransactionsCards,
@@ -9,6 +9,7 @@ import {
   VolumeChart,
 } from "@phoenix-protocol/ui";
 import {
+  Address,
   fetchDataByTimeEpoch,
   fetchHistoryMetaData,
   fetchSwapHistory,
@@ -31,6 +32,8 @@ export default function Page() {
 
   // Set Total Volume
   const [totalVolume, setTotalVolume] = useState(0);
+
+  const [mostTradedAsset, setMostTradedAsset] = useState<any>(undefined);
 
   // Set History
   const [history, setHistory] = useState<any>([]);
@@ -81,8 +84,12 @@ export default function Page() {
   // Load Volume Data
   const loadVolumeData = async (epoch: "monthly" | "yearly" | "daily") => {
     const result = await fetchDataByTimeEpoch(epoch);
-    setData(result[Object.keys(result)[0]].intervals);
-    setTotalVolume(result[Object.keys(result)[0]].totalVolume);
+    const intervals = result[Object.keys(result)[0]].intervals
+
+    setData(intervals);
+
+    const newTotalVolume: number = intervals.reduce((total: string, currentValue: any) => total + currentValue.volume, 0);
+    setTotalVolume(Number(Number(newTotalVolume).toFixed(5)));
   };
 
   // Load more / pagination
@@ -93,6 +100,7 @@ export default function Page() {
   // Load History
   const loadHistory = async () => {
     let result = [];
+
     if (activeView === "personal" && appStorePersist.wallet.address) {
       result = await fetchSwapHistory(
         page,
@@ -116,6 +124,8 @@ export default function Page() {
       return setHistory([]);
     }
 
+    const tradedAssets: any = {};
+
     // Map Token Names
     const _result = await Promise.all(
       result.map(async (item) => {
@@ -124,19 +134,33 @@ export default function Page() {
             asset.offer_asset
           );
           const askAssetInfo = await appStore.fetchTokenInfo(asset.ask_asset);
+
           return [offerAssetInfo, askAssetInfo];
         });
 
         const assets = await Promise.all(assetInfoPromises);
+
+        for(let i = 0; i < 2; i++) {
+          const assetId = assets.flat()[i]?.id;
+          const tradeVal = Number(item.tradeSize);
+
+          if(!assetId) continue;
+
+          if(!tradedAssets.hasOwnProperty(assetId)) {
+            tradedAssets[assetId] = tradeVal;
+          } else {
+            tradedAssets[assetId] += tradeVal;
+          }
+        }
 
         return {
           ...item,
           // @ts-ignore
           tradeSize: Number(item.tradeSize) / 10 ** assets.flat()[0].decimals,
           tradeValue:
-            (Number(item.tradeValue) * Number(item.tradeSize)) /
+            ((Number(item.tradeValue) * Number(item.tradeSize)) /
             // @ts-ignore
-            10 ** assets.flat()[0].decimals,
+            10 ** assets.flat()[0].decimals).toFixed(5),
           assets: assets.flat().map((asset) => {
             return {
               name: asset?.symbol,
@@ -149,6 +173,18 @@ export default function Page() {
         };
       })
     );
+
+    const mtAsset = Object.keys(tradedAssets).reduce((a: any, b: any) => data[a] > data[b] ? a : b)
+    const mtAssetInfo = await appStore.fetchTokenInfo(Address.fromString(mtAsset));
+
+    setMostTradedAsset({
+      name: mtAssetInfo?.symbol,
+      icon: `cryptoIcons/${mtAssetInfo?.symbol.toLowerCase()}.svg`,
+      amount: 100,
+      category: "Stable",
+      usdValue: 0,
+    });
+
     setHistory(_result);
   };
 
@@ -232,16 +268,6 @@ export default function Page() {
     usdValue: 1 * 100,
   };
 
-  const cardArgs = {
-    mostTradedAsset: {
-      name: "USDT",
-      icon: "cryptoIcons/usdt.svg",
-      amount: 100,
-      category: "Stable",
-      usdValue: 1 * 100,
-    },
-  };
-
   return (
     <Box
       sx={{
@@ -272,7 +298,7 @@ export default function Page() {
       <TransactionsCards
         activeTraders={meta.activeAccountsLast24h.toString()}
         totalTraders={meta.totalAccounts.toString()}
-        {...cardArgs}
+        mostTradedAsset={mostTradedAsset}
       />
       {/* @ts-ignore */}
       <TransactionsTable
@@ -285,6 +311,7 @@ export default function Page() {
         }}
         activeView={activeView}
         setActiveView={(a) => {
+          if(a === activeView) return;
           setHistory([]);
           setActiveView(a);
         }}
