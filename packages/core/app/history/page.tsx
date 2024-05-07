@@ -87,7 +87,7 @@ export default function Page() {
     const intervals = result[Object.keys(result)[0]].intervals
 
     setData(intervals);
-    
+
     const newTotalVolume: number = intervals.reduce((total: string, currentValue: any) => total + currentValue.volume, 0);
     setTotalVolume(Number(Number(newTotalVolume).toFixed(5)));
   };
@@ -177,13 +177,15 @@ export default function Page() {
     const mtAsset = Object.keys(tradedAssets).reduce((a: any, b: any) => data[a] > data[b] ? a : b)
     const mtAssetInfo = await appStore.fetchTokenInfo(Address.fromString(mtAsset));
 
-    setMostTradedAsset({
-      name: mtAssetInfo?.symbol,
-      icon: `cryptoIcons/${mtAssetInfo?.symbol.toLowerCase()}.svg`,
-      amount: 100,
-      category: "Stable",
-      usdValue: 0,
-    });
+    if(mtAssetInfo) {
+      setMostTradedAsset({
+        name: mtAssetInfo?.symbol,
+        icon: `cryptoIcons/${mtAssetInfo?.symbol.toLowerCase()}.svg`,
+        amount: 100,
+        category: "Stable",
+        usdValue: 0,
+      });
+    }
 
     setHistory(_result);
   };
