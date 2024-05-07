@@ -186,7 +186,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
             gap: "0.75rem",
           }}
         >
-          <Box>
+          <Box flex={1}>
             <Typography
               sx={{
                 color: "#FFF",
@@ -201,7 +201,11 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
               From
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
+              <DemoContainer components={["DatePicker"]} sx={{
+                "& .MuiTextField-root": {
+                  minWidth: "0 !important"
+                }
+              }}>
                 <DatePicker
                   value={dateRange.from ? dayjs(dateRange.from) : undefined}
                   onChange={(newValue) =>
@@ -219,11 +223,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                       fontStyle: "normal",
                       fontWeight: 400,
                       borderRadius: "1rem",
-                      minWidth: {
-                        xs: "unset",
-                        md: "200px"
-                      },
-                      maxWidth: "217px"
+                      minWidth: "unset",
                     },
                     "& legend": {
                       display: "none",
@@ -237,7 +237,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
               </DemoContainer>
             </LocalizationProvider>
           </Box>
-          <Box>
+          <Box flex={1}>
             <Typography
               sx={{
                 color: "#FFF",
@@ -252,7 +252,11 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
               To
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
+              <DemoContainer components={["DatePicker"]} sx={{
+                "& .MuiTextField-root": {
+                  minWidth: "0 !important"
+                }
+              }}>
                 <DatePicker
                   value={dateRange.to ? dayjs(dateRange.to) : undefined}
                   onChange={(newValue: dayjs.Dayjs | null) =>
@@ -275,6 +279,10 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                       fontStyle: "normal",
                       fontWeight: 400,
                       borderRadius: "1rem",
+                      minWidth: "unset"
+                    },
+                    "& .MuiTextField-root": {
+                      minWidth: "0 !important"
                     },
                     "& legend": {
                       display: "none",
