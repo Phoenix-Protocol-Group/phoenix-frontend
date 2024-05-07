@@ -17,12 +17,9 @@ export async function fetchSwapHistory(
   sortBy: string,
   sortOrder: string,
   filters: ActiveFilters,
-  accountId?: string,
+  accountId?: string
 ): Promise<SwapResult[]> {
   const client = createApolloClient();
-
-  console.log(filters);
-
   const offset = page * pageSize;
 
   const GET_SWAPS = gql`
@@ -82,7 +79,7 @@ export async function fetchSwapHistory(
       }
     }
   `;
-
+  console.log(111);
   try {
     if (accountId) {
       const { data } = await client.query({
@@ -94,7 +91,7 @@ export async function fetchSwapHistory(
           sortOrder,
           accountId,
           offset,
-          filters
+          filters,
         },
       });
 
@@ -125,9 +122,11 @@ export async function fetchSwapHistory(
         sortBy,
         sortOrder,
         offset,
-        filters
+        filters,
       },
     });
+
+    console.log("data", data);
 
     if (data.swaps) {
       // Map the fetched swaps to the desired output structure

@@ -164,7 +164,7 @@ export class AssembledTransaction<T> {
   }
 
   getWalletType(): string {
-    const appStorageValue = localStorage.getItem("app-storage");
+    const appStorageValue = localStorage?.getItem("app-storage");
     if (appStorageValue !== null) {
       try {
         const parsedValue = JSON.parse(appStorageValue);
@@ -184,19 +184,20 @@ export class AssembledTransaction<T> {
   ): Promise<AssembledTransaction<T>> {
     // Can't import state here, so we need to extract the wallet type from the local storage
     let walletType = "";
-    const appStorageValue = localStorage.getItem("app-storage");
-    if (appStorageValue !== null) {
-      try {
-        const parsedValue = JSON.parse(appStorageValue);
-        const walletType_ = parsedValue?.state?.wallet?.walletType;
-        walletType = walletType_;
-      } catch (error) {
-        console.error("Error parsing app-storage value:", error);
+    if (typeof localStorage !== "undefined") {
+      const appStorageValue = localStorage?.getItem("app-storage");
+      if (appStorageValue !== null) {
+        try {
+          const parsedValue = JSON.parse(appStorageValue);
+          const walletType_ = parsedValue?.state?.wallet?.walletType;
+          walletType = walletType_;
+        } catch (error) {
+          console.error("Error parsing app-storage value:", error);
+        }
+      } else {
+        console.error("app-storage key not found in localStorage.");
       }
-    } else {
-      console.error("app-storage key not found in localStorage.");
     }
-
     const tx = new AssembledTransaction({
       ...options,
       wallet:

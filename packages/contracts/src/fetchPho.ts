@@ -13,8 +13,8 @@ export const fetchPho = async (): Promise<number> => {
   ]);
 
 
-  const usdcAmount = pairInfo.result.asset_b.amount;
-  const phoAmount = pairInfo.result.asset_a.amount;
+  const usdcAmount = Number(pairInfo.result.asset_b.amount);
+  const phoAmount = Number(pairInfo.result.asset_a.amount);
 
   return Number(usdcAmount / phoAmount);
 };
