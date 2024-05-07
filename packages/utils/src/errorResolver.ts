@@ -32,7 +32,7 @@ export function resolveContractError(eventString: string): string {
 
   switch (errorCode) {
     case ContractError.SpreadExceedsLimit:
-      return "The spread exceeds the allowable limit. Please use the gear icon on the top to adjust the spread.";
+      return "The slippage exceeds the allowable limit. In Phase 1 of the launch, it's capped at 1%. Please try to swap a lower amount of tokens.";
     case ContractError.ProvideLiquiditySlippageToleranceTooHigh:
       return "The slippage tolerance set for providing liquidity is too high.";
     case ContractError.ProvideLiquidityAtLeastOneTokenMustBeBiggerThenZero:

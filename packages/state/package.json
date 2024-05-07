@@ -25,6 +25,7 @@
     "typescript": "^5.1.3"
   },
   "dependencies": {
+    "@lobstrco/signer-extension-api": "^1.0.0-beta.0",
     "@phoenix-protocol/contracts": "workspace:^",
     "@stellar/freighter-api": "1.7.1",
     "react": "^18.2.0",

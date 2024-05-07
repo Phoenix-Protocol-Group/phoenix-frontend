@@ -31,6 +31,7 @@ import {
   constants,
   fetchBiggestWinnerAndLoser,
   fetchTokenPrices,
+  fetchTokenPrices2,
   formatCurrency,
   scValToJs,
 } from "@phoenix-protocol/utils";
@@ -47,7 +48,8 @@ export default function Page() {
   const [gainerAsset, setGainerAsset] = useState<any>({});
   const [loserAsset, setLoserAsset] = useState<any>({});
   const [allTokens, setAllTokens] = useState<any[]>([]);
-  const [xlmPrice, setXlmPrice] = useState(0);
+  const [xlmPrice, setXlmPrice] = useState<number>(0);
+  const [xlmPriceChange, setXlmPriceChange] = useState<number>(0);
   const [usdcPrice, setUsdcPrice] = useState(0);
   const [disclaimer, setDisclaimer] = useState(true);
 
@@ -133,8 +135,10 @@ export default function Page() {
   const getXlmPrice = async () => {
     const price = await fetchTokenPrices("XLM");
     const price2 = await fetchTokenPrices("USDC");
+    const priceChangeXLM = await fetchTokenPrices2("XLM");
     setXlmPrice(price);
     setUsdcPrice(price2);
+    setXlmPriceChange(priceChangeXLM);
   };
 
   const args = {
@@ -159,12 +163,7 @@ export default function Page() {
     },
     dashboardArgs1: {
       data: [
-        [1687392000000, 0.13],
-        [1687478400000, 0.131],
-        [1687564800000, 0.13],
-        [1687651200000, 0.132],
-        [1687737600000, 0.1301],
-        [1687824000000, 0.13],
+        [1687392000000, Number(xlmPrice) - (xlmPrice * xlmPriceChange) / 100],
         [1687859473000, xlmPrice],
       ],
       icon: {
@@ -205,11 +204,6 @@ export default function Page() {
       <Helmet>
         <title>Phoenix DeFi Hub - Dashboard</title>
       </Helmet>
-      <DisclaimerModal
-        open={disclaimer}
-        handleClose={() => setDisclaimer(false)}
-      />
-
       {anchors.length > 0 && (
         <AnchorServices
           anchors={anchors}

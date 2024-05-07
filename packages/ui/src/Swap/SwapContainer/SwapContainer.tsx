@@ -8,6 +8,7 @@ import {
   AccordionDetails,
   List,
   ListItem,
+  Alert,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { TokenBox } from "../TokenBox/TokenBox";
@@ -79,6 +80,7 @@ const SwapContainer = ({
   onTokenSelectorClick,
   loadingSimulate = false,
   trustlineButtonActive = false,
+  trustlineButtonDisabled = false,
   trustlineAssetName,
 }: SwapContainerProps) => {
   const [expanded, setExpanded] = React.useState(true);
@@ -149,19 +151,23 @@ const SwapContainer = ({
         <>
           <CustomButton
             onClick={onTrustlineButtonClick}
-            disabled={false}
+            disabled={trustlineButtonDisabled}
             type="primary"
-            label={`Add ${trustlineAssetName} trustline`}
+            label={
+              trustlineButtonDisabled
+                ? `You need more then 0.5 XLM on your wallet`
+                : `Add ${trustlineAssetName} trustline`
+            }
             sx={{
               marginTop: "16px",
               width: "100%",
             }}
           />
-          <Typography
-            sx={{ fontSize: "0.875rem", color: "#FFF", textAlign: "right" }}
-          >
-            Setting the trustline requires some XLM on your wallet!
-          </Typography>
+          <Alert severity="info" sx={{ mt: 2 }}>
+            To hold other tokens then XLM, you got to add a trustline first.
+            Trustlines are like permissions to hold tokens on the Stellar
+            network. Setting the trustline reserves 0.5 XLM from your account.
+          </Alert>
         </>
       ) : (
         <CustomButton

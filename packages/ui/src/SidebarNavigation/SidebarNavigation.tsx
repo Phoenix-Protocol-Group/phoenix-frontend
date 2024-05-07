@@ -6,6 +6,8 @@ import {
   Drawer as MuiDrawer,
   useMediaQuery,
   useTheme,
+  Typography,
+  Link,
 } from "@mui/material";
 import List from "@mui/material/List";
 import IconButton from "@mui/material/IconButton";
@@ -225,6 +227,46 @@ const SidebarNavigation = ({
           </ListItem>
         )}
       </List>
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 0,
+          margin: "auto",
+          width: "100%",
+          padding: "2rem",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+            borderTop: "1px solid white",
+            borderRadius: "24px",
+            border: "2px solid #E2621B",
+            padding: "0.75rem",
+            background:
+              "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: "0.6rem",
+              textAlign: "center",
+            }}
+          >
+            Found a bug? <br /> Please report it{" "}
+            <Link
+              href="https://discord.gg/FpmMt3udnf"
+              target="_blank"
+              rel="noreferrer"
+            >
+              here
+            </Link>
+            .
+          </Typography>
+        </Box>
+      </Box>
     </Drawer>
   );
 };

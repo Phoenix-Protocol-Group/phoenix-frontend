@@ -21,4 +21,5 @@ export interface SwapContainerProps {
   trustlineButtonActive?: boolean;
   trustlineAssetName: string;
   onTrustlineButtonClick: () => void;
+  trustlineButtonDisabled?: boolean;
 }
