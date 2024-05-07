@@ -1,7 +1,7 @@
 "use client";
 import { Box, Typography } from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import { ActiveFilters, StateToken } from "@phoenix-protocol/types";
+import { ActiveFilters } from "@phoenix-protocol/types";
 import {
   Button,
   TransactionsCards,
@@ -87,7 +87,7 @@ export default function Page() {
     const intervals = result[Object.keys(result)[0]].intervals
 
     setData(intervals);
-
+    
     const newTotalVolume: number = intervals.reduce((total: string, currentValue: any) => total + currentValue.volume, 0);
     setTotalVolume(Number(Number(newTotalVolume).toFixed(5)));
   };
