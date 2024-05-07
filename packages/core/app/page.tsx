@@ -183,10 +183,10 @@ export default function Page() {
         [1687859473000, usdcPrice],
       ],
       icon: {
-        small: "/cryptoIcons/usdc.svg",
+        small: "/logo_icon.svg",
         large: "/pho-bg.png",
       },
-      assetName: "USDC",
+      assetName: "PHO",
     },
     walletBalanceArgs: {
       tokens: allTokens,
