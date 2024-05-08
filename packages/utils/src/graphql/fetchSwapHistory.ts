@@ -79,7 +79,7 @@ export async function fetchSwapHistory(
       }
     }
   `;
-  console.log(111);
+  
   try {
     if (accountId) {
       const { data } = await client.query({

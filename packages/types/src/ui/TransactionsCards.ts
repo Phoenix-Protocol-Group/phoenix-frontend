@@ -4,4 +4,5 @@ export interface TransactionsCardsProps {
   activeTraders: string;
   totalTraders: string;
   mostTradedAsset: Token;
+  totalTrades: string;
 }

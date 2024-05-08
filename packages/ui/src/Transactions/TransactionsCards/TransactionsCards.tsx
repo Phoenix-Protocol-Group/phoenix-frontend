@@ -60,6 +60,7 @@ const TransactionsCards = (props: TransactionsCardsProps) => {
         content={props.activeTraders}
       />
       <TransactionCard title="Total Traders" content={props.totalTraders} />
+      <TransactionCard title="Total Trades" content={props.totalTrades} />
       {props.mostTradedAsset && (
         <TransactionCard
           title="Most Traded Asset"

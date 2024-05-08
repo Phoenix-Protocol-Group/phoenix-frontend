@@ -41,6 +41,7 @@ const asset = {
 const cardArgs = {
   activeTraders: "12 370",
   totalTraders: "420 690",
+  totalTrades: "1 234 567",
   mostTradedAsset: {
     name: "USDT",
     icon: "cryptoIcons/usdt.svg",

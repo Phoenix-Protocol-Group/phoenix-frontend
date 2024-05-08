@@ -5,6 +5,7 @@ const GET_ACCOUNT_DATA = gql`
   query GetAccountData {
     activeAccountsLast24h
     totalAccounts
+    totalTrades
   }
 `;
 

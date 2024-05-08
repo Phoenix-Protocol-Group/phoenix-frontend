@@ -25,6 +25,7 @@ export default function Page() {
   const [meta, setMeta] = useState({
     activeAccountsLast24h: 0,
     totalAccounts: 0,
+    totalTrades: 0
   });
 
   // Set Volume Chart Data
@@ -79,9 +80,9 @@ export default function Page() {
 
   // Load Meta Data
   const loadMetaData = async () => {
-    const { activeAccountsLast24h, totalAccounts } =
+    const { activeAccountsLast24h, totalAccounts, totalTrades } =
       await fetchHistoryMetaData();
-    setMeta({ activeAccountsLast24h, totalAccounts });
+    setMeta({ activeAccountsLast24h, totalAccounts, totalTrades });
   };
 
   // Load Volume Data
@@ -309,6 +310,7 @@ export default function Page() {
         activeTraders={meta.activeAccountsLast24h.toString()}
         totalTraders={meta.totalAccounts.toString()}
         mostTradedAsset={mostTradedAsset}
+        totalTrades={meta.totalTrades.toString()}
       />
       {/* @ts-ignore */}
       <TransactionsTable
