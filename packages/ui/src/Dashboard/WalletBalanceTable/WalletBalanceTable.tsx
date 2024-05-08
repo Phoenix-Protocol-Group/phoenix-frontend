@@ -385,10 +385,13 @@ const WalletBalanceTable = ({ tokens }: WalletBalanceTableProps) => {
             token.name.toLowerCase().includes(searchTerm.toLowerCase())
           )
           .sort((a, b) => {
+            const aTrueValue = a.amount * a.usdValue;
+            const bTrueValue = b.amount * b.usdValue;
+
             if (sort === "highest") {
-              return b.usdValue - a.usdValue;
+              return bTrueValue - aTrueValue;
             } else {
-              return a.usdValue - b.usdValue;
+              return aTrueValue - bTrueValue;
             }
           })
           .map((token, index) => (
