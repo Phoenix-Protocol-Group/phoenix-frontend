@@ -69,7 +69,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       appStore.setTourStep(8);
       // Navigate to pool single page
       router.push(
-        "/pools/CBT4WEAHQ72AYRD7WZFNYE6HGZEIX25754NG37LBLXTTRMWKQNKIUR6O"
+        "/pools/CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX"
       );
     }
 
