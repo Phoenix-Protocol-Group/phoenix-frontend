@@ -49,8 +49,8 @@ export const SwapSuccess: Story = {
     tokenTitles: ["From:", "To:"],
     tokens: [
       {
-        name: "USDT",
-        icon: "cryptoIcons/usdt.svg",
+        name: "PHO",
+        icon: "cryptoIcons/pho.svg",
         amount: 100,
         category: "Stable",
         usdValue: 1 * 100,

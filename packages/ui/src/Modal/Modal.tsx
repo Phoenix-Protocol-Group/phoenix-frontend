@@ -67,6 +67,11 @@ const Modal = ({
     }
   };
 
+  const phoIconStyle = {
+    position: "relative",
+    top: "-4px"
+  };
+
   return (
     <MuiModal
       open={open}
@@ -172,7 +177,7 @@ const Modal = ({
                       <Box display="flex" alignItems="center">
                         <Box
                           component="img"
-                          sx={tokenIconStyle}
+                          sx={tokens[0].name === "PHO" ? {...tokenIconStyle, ...phoIconStyle} :  tokenIconStyle}
                           src={tokens[0].icon}
                         />
                         <Typography sx={tokenAmountStyle}>
@@ -188,7 +193,7 @@ const Modal = ({
                         <Box display="flex" alignItems="center">
                           <Box
                             component="img"
-                            sx={tokenIconStyle}
+                            sx={tokens[1].name === "PHO" ? {...tokenIconStyle, ...phoIconStyle} :  tokenIconStyle}
                             src={tokens[1].icon}
                           />
                           <Typography sx={tokenAmountStyle}>
