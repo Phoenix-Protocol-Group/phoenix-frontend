@@ -163,10 +163,8 @@ export default function Page() {
           // @ts-ignore
           tradeSize: Number(item.tradeSize) / 10 ** assets.flat()[0].decimals,
           tradeValue: (
-            (Number(item.tradeValue) * Number(item.tradeSize)) /
-            // @ts-ignore
-            10 ** assets.flat()[0].decimals
-          ).toFixed(5),
+            Number(item.tradeValue).toFixed(2)
+          ),
           assets: assets.flat().map((asset) => {
             return {
               name: asset?.symbol,
