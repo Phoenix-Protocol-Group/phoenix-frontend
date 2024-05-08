@@ -233,7 +233,7 @@ const SwapContainer = ({
                 </Typography>
               </ListItem>
               <ListItem sx={listItemContainer}>
-                <Typography sx={listItemNameStyle}>Network fee</Typography>
+                <Typography sx={listItemNameStyle}>Protocol fee</Typography>
                 <Typography sx={listItemContentStyle}>{networkFee}</Typography>
               </ListItem>
               <ListItem sx={listItemContainer}>
