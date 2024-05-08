@@ -1,18 +1,19 @@
 ACCOUNTS = ["GDU57J6UIOWY77VVXDR2F3VAZDFUT5VUNPYZI7M3ED47ZZO3ITCZK7OC"]
-VERSION = "0.1.0"
-SIGNING_KEY = "GDU57J6UIOWY77VVXDR2F3VAZDFUT5VUNPYZI7M3ED47ZZO3ITCZK7OC"
 NETWORK_PASSPHRASE = "Public Global Stellar Network ; September 2015"
+SIGNING_KEY = "GDU57J6UIOWY77VVXDR2F3VAZDFUT5VUNPYZI7M3ED47ZZO3ITCZK7OC"
+VERSION = "0.1.0"
 
 [[PRINCIPALS]]
-name = "Project Phoenix"
 email = "phoenix@phoenix.phoenix"
-keybase = "phoenix"
 github = "https://github.com/Phoenix-Protocol-Group/"
+keybase = "phoenix"
+name = "Project Phoenix"
 
 [DOCUMENTATION]
-ORG_NAME = "Phoenix Protocol Group"
-ORG_URL = "https://phoenix-hub.io"
 ORG_DESCRIPTION = "Phoenix Anchor Service."
-ORG_KEYBASE = "phoenix"
-ORG_TWITTER = "PhoenixDefiHub"
 ORG_GITHUB = "Phoenix-Protocol-Group"
+ORG_KEYBASE = "phoenix"
+ORG_LOGO = "https://app.phoenix-hub.io/logoIcon.png"
+ORG_NAME = "Phoenix Protocol Group"
+ORG_TWITTER = "PhoenixDeFiHub"
+ORG_URL = "https://phoenix-hub.io"
