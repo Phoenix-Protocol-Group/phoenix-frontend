@@ -176,8 +176,10 @@ export default function Page() {
     },
     dashboardArgs2: {
       data: [
-        [1687392000000, 0.2],
-        [1687859473000, usdcPrice],
+        [1, 0.2],
+        [2, 0.8],
+        [3, 1],
+        [4, usdcPrice],
       ],
       icon: {
         small: "/cryptoIcons/pho.svg",
