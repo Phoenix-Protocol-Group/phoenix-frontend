@@ -203,7 +203,7 @@ export default function Page({ params }: PoolPageProps) {
       setStakeModalOpen(true);
     } catch (error: any) {
       setLoading(false);
-      setErrorDescripption(error);
+      setErrorDescripption(JSON.stringify(error));
       setErrorModalOpen(true);
     }
   };
@@ -237,6 +237,13 @@ export default function Page({ params }: PoolPageProps) {
   const unstake = async (lpTokenAmount: number, stake_timestamp: number) => {
     try {
       setLoading(true);
+      console.log({
+        sender: storePersist.wallet.address!,
+        stake_amount: BigInt(
+          (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+        ),
+        stake_timestamp: BigInt(stake_timestamp),
+      })
 
       const tx = await StakeContractRef.current?.unbond({
         sender: storePersist.wallet.address!,
@@ -252,7 +259,7 @@ export default function Page({ params }: PoolPageProps) {
       setUnstakeModalOpen(true);
     } catch (error: any) {
       setLoading(false);
-      setErrorDescripption(error);
+      setErrorDescripption(JSON.stringify(error));
       setErrorModalOpen(true);
     }
   };
