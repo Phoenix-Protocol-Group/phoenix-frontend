@@ -22,3 +22,4 @@ ORG_URL = "https://phoenix-hub.io"
 code="PHO"
 issuer="GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO"
 display_decimals=7
+image="https://app.phoenix-hub.io/logoIcon.png"
