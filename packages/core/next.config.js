@@ -5,6 +5,14 @@ const nextConfig = {
 
     return config;
   },
+  async rewrites() {
+    return [
+      {
+        source: "/.well-known/stellar.toml",
+        destination: "/api/stellar",
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
