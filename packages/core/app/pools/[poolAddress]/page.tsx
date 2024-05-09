@@ -216,7 +216,6 @@ export default function Page({ params }: PoolPageProps) {
       });
 
       await tx?.signAndSend();
-      console.log(tx?.signAndSend());
       await fetchStakes();
       setLoading(false);
       //!todo view transaction id in blockexplorer
