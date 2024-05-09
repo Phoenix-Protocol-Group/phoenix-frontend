@@ -17,3 +17,8 @@ ORG_LOGO = "https://app.phoenix-hub.io/logoIcon.png"
 ORG_NAME = "Phoenix Protocol Group"
 ORG_TWITTER = "PhoenixDeFiHub"
 ORG_URL = "https://phoenix-hub.io"
+
+[[CURRENCIES]]
+code="PHO"
+issuer="GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO"
+display_decimals=7
