@@ -1,9 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs";
 import path from "path";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+export async function GET(req: NextRequest, res: NextResponse) {
   const filePath = path.join(process.cwd(), "./stellar.toml");
   const fileContents = fs.readFileSync(filePath, "utf8");
 
