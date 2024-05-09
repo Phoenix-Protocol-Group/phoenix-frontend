@@ -16,6 +16,7 @@ import {
   PoolStats,
   StakingList,
   Skeleton as PhoenixSkeleton,
+  UnstakeModal,
 } from "@phoenix-protocol/ui";
 import { Token } from "@phoenix-protocol/types";
 import {
@@ -100,6 +101,10 @@ export default function Page({ params }: PoolPageProps) {
   const [StakeContract, setStakeContract, StakeContractRef] = refuse.default<
     PhoenixStakeContract.Contract | undefined
   >(undefined);
+  const [unstakeProgressModalOpen, setUnstakeProgressModalOpen] =
+    useState<boolean>(false);
+  const [unstakeTimestamp, setUnstakeTimestamp] = useState<number>(0);
+  const [timestampAmount, setTimestampAmount] = useState<number>(0);
 
   // Pool Liquidity
   const [poolLiquidity, setPoolLiquidity] = useState<number>(0);
@@ -399,7 +404,7 @@ export default function Page({ params }: PoolPageProps) {
             return {
               icon: `/cryptoIcons/poolIcon.png`,
               title: name!,
-              apr: "0",
+              apr: "",
               lockedPeriod:
                 time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
                 " days",
@@ -408,7 +413,9 @@ export default function Page({ params }: PoolPageProps) {
                 tokenValueInUsd: 0,
               },
               onClick: () => {
-                unstake(Number(stake.stake) / 10 ** 7, stake.stake_timestamp);
+                setUnstakeProgressModalOpen(true);
+                setUnstakeTimestamp(stake.stake_timestamp);
+                setTimestampAmount(Number(stake.stake) / 10 ** 7);
               },
             };
           });
@@ -450,6 +457,14 @@ export default function Page({ params }: PoolPageProps) {
           tokens={[tokenA as Token, tokenB as Token]}
         />
       )}
+      <UnstakeModal
+        open={unstakeProgressModalOpen}
+        setOpen={setUnstakeProgressModalOpen}
+        timestamp={unstakeTimestamp}
+        maxAmount={timestampAmount}
+        unstake={(amount, timestamp) => unstake(amount, timestamp)}
+        token={lpToken!}
+      />
       {errorModalOpen && (
         <PoolError
           open={errorModalOpen}
