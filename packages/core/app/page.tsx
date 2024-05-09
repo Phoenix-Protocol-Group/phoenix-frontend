@@ -85,8 +85,6 @@ export default function Page() {
     // Resolve names by fetching all assets
     const _allTokens = await appStore.getAllTokens();
 
-    console.log(winner, loser);
-
     const _winner = _allTokens.find((token) => token.name === winner.symbol);
     const _loser = _allTokens.find((token) => token.name === loser.symbol);
 

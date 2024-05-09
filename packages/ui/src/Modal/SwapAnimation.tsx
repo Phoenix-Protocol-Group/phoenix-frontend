@@ -37,6 +37,11 @@ const SwapAnimation: React.FC = ({
   fromToken: Token;
   toToken: Token;
 }) => {
+  const phoIconStyle = {
+    position: "relative",
+    top: "-4px"
+  };
+
   return (
     <Box
       sx={{ width: "130%" }}
@@ -45,7 +50,7 @@ const SwapAnimation: React.FC = ({
       justifyContent="space-between"
       gap={2}
     >
-      <Box component="img" src={fromToken.icon} />
+      <Box component="img" src={fromToken.icon} sx={fromToken.name === "PHO" ? {phoIconStyle} :  {}} />
       <Box display="flex" gap={1}>
         <motion.div
           style={{
@@ -60,7 +65,7 @@ const SwapAnimation: React.FC = ({
           animate="animate"
         />
       </Box>
-      <Box component="img" src={toToken.icon} />
+      <Box component="img" src={toToken.icon}  sx={toToken.name === "PHO" ? {phoIconStyle} :  {}} />
     </Box>
   );
 };
