@@ -13,7 +13,7 @@ const tokensAvailableAndPaired: TokenPairs = {
 // Function to fetch prices for a given token
 export async function fetchTokenPrices(tokenSymbol: string): Promise<number> {
   if (tokenSymbol === "PHO") {
-    return 0.2;
+    return await fetch("/api/pho-price").then((res) => res.json());
   }
 
 
