@@ -1,4 +1,4 @@
 export interface DisclaimerModalProps {
   open: boolean;
-  setOpen: (open: boolean) => void;
+  onAccepted: (accepted: boolean) => void;
 }

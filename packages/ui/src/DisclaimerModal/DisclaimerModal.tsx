@@ -10,7 +10,7 @@ import Colors from "../Theme/colors";
 import { Button } from "../Button/Button";
 import { DisclaimerModalProps } from "@phoenix-protocol/types";
 
-const DisclaimerModal = ({ open, setOpen }: DisclaimerModalProps): React.ReactNode => {
+const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps): React.ReactNode => {
   const style = {
     position: "absolute" as "absolute",
     top: "50%",
@@ -27,7 +27,6 @@ const DisclaimerModal = ({ open, setOpen }: DisclaimerModalProps): React.ReactNo
   return (
     <MuiModal
       open={open}
-      onClose={() => setOpen(false)}
       aria-labelledby="disclaimer-modal"
       aria-describedby="Disclaimer Message"
     >
@@ -40,7 +39,7 @@ const DisclaimerModal = ({ open, setOpen }: DisclaimerModalProps): React.ReactNo
             }}
           >
             <Box
-              onClick={() => setOpen(false)}
+              onClick={() => onAccepted(false)}
               component="img"
               sx={{
                 display: "inline-flex",
@@ -148,6 +147,7 @@ const DisclaimerModal = ({ open, setOpen }: DisclaimerModalProps): React.ReactNo
                 remove our Services (or any part of our Services) without
                 notice.
               </Typography>
+              <Button onClick={() => onAccepted(true)} label="Accept"/>
             </Box>
           </Box>
         </Box>

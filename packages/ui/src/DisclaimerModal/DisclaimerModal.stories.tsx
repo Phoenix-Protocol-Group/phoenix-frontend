@@ -17,6 +17,6 @@ type Story = StoryObj<typeof DisclaimerModal>;
 export const General: Story = {
   args: {
     open: true,
-    setOpen: () => {},
+    onAccepted: (accepted: boolean) => {alert(accepted)}
   },
 };
