@@ -177,7 +177,8 @@ export default function Page() {
         [1, 0.2],
         [2, 0.8],
         [3, 1],
-        [4, usdcPrice],
+        [4, 1.53],
+        [5, usdcPrice],
       ],
       icon: {
         small: "/cryptoIcons/pho.svg",
