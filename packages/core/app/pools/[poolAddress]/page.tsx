@@ -111,6 +111,7 @@ export default function Page({ params }: PoolPageProps) {
   const [poolLiquidityTokenB, setPoolLiquidityTokenB] = useState<number>(0);
   const [assetLpShare, setAssetLpShare] = useState<number>(0);
   const [userShare, setUserShare] = useState<number>(0);
+  const [lpTokenPrice, setLpTokenPrice] = useState<number>(0);
 
   // Stakes
   const [userStakes, setUserStakes] = useState<Entry[] | undefined>(undefined);
@@ -364,7 +365,8 @@ export default function Page({ params }: PoolPageProps) {
         const stakingInfo = await stakeContractAddress.queryTotalStaked();
         const totalStaked = Number(stakingInfo?.result);
 
-        const ratioStaked = totalStaked / Number(pairInfo.result.asset_lp_share.amount);
+        const ratioStaked =
+          totalStaked / Number(pairInfo.result.asset_lp_share.amount);
         const valueStaked = tvl * ratioStaked;
         const poolIncentive = poolIncentives.find(
           (incentive) => incentive.address === params.poolAddress
@@ -373,10 +375,14 @@ export default function Page({ params }: PoolPageProps) {
         const apr =
           ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
 
+        const tokenPrice = valueStaked / (totalStaked / 10 ** 7);
+        setLpTokenPrice(tokenPrice);
+
         const stakes = await fetchStakes(
           _lpToken?.symbol,
           stakeContractAddress,
-          apr
+          apr,
+          tokenPrice
         );
 
         // Get user share
@@ -419,7 +425,8 @@ export default function Page({ params }: PoolPageProps) {
   const fetchStakes = async (
     name = lpToken?.name,
     stakeContract = StakeContract,
-    calcApr = maxApr
+    calcApr = maxApr,
+    tokenPrice = lpTokenPrice
   ) => {
     if (storePersist.wallet.address) {
       // Get user stakes
@@ -446,7 +453,10 @@ export default function Page({ params }: PoolPageProps) {
                 " days",
               amount: {
                 tokenAmount: Number(stake.stake) / 10 ** 7,
-                tokenValueInUsd: 0,
+                tokenValueInUsd: (
+                  (Number(stake.stake) / 10 ** 7) *
+                  tokenPrice
+                ).toFixed(2),
               },
               onClick: () => {
                 unstake(Number(stake.stake) / 10 ** 7, stake.stake_timestamp);
