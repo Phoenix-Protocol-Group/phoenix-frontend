@@ -94,6 +94,8 @@ const TokenBox = ({
               disabled={disabled}
               value={value}
               onChange={(e) => {
+                if(e.target.value.split('.')[1]?.length > 7) return;
+
                 onChange(e.target.value);
                 setUsdPrice(Number(e.target.value) * Number(token.usdValue));
               }}
