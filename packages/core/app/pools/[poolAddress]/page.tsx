@@ -39,6 +39,7 @@ import { Address } from "stellar-sdk";
 import {
   PhoenixPairContract,
   PhoenixStakeContract,
+  fetchPho,
 } from "@phoenix-protocol/contracts";
 import { useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
@@ -95,6 +96,9 @@ export default function Page({ params }: PoolPageProps) {
   const [tokenA, setTokenA] = useState<_Token | undefined>(undefined);
   const [tokenB, setTokenB] = useState<_Token | undefined>(undefined);
   const [lpToken, setLpToken] = useState<_Token | undefined>(undefined);
+
+  // Set APR
+  const [maxApr, setMaxApr] = useState<number>(0);
 
   // Stake Contract
   const [StakeContract, setStakeContract, StakeContractRef] = refuse.default<
@@ -338,9 +342,41 @@ export default function Page({ params }: PoolPageProps) {
             ).toFixed(2)
           )
         );
+
+        const poolIncentives = [
+          {
+            // XLM / USDC
+            address: "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX",
+            amount: 50000,
+          },
+          // XLM/PHO
+          {
+            address: "CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH",
+            amount: 100000,
+          },
+          {
+            // PHO/USDC
+            address: "CAZ6W4WHVGQBGURYTUOLCUOOHW6VQGAAPSPCD72VEDZMBBPY7H43AYEC",
+            amount: 75000,
+          },
+        ];
+
+        const stakingInfo = await stakeContractAddress.queryTotalStaked();
+        const totalStaked = Number(stakingInfo?.result);
+
+        const ratioStaked = totalStaked / Number(pairInfo.result.asset_lp_share.amount);
+        const valueStaked = tvl * ratioStaked;
+        const poolIncentive = poolIncentives.find(
+          (incentive) => incentive.address === params.poolAddress
+        )!;
+        const phoprice = await fetchPho();
+        const apr =
+          ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
+
         const stakes = await fetchStakes(
           _lpToken?.symbol,
-          stakeContractAddress
+          stakeContractAddress,
+          apr
         );
 
         // Get user share
@@ -382,7 +418,8 @@ export default function Page({ params }: PoolPageProps) {
 
   const fetchStakes = async (
     name = lpToken?.name,
-    stakeContract = StakeContract
+    stakeContract = StakeContract,
+    calcApr = maxApr
   ) => {
     if (storePersist.wallet.address) {
       // Get user stakes
@@ -399,7 +436,11 @@ export default function Page({ params }: PoolPageProps) {
             return {
               icon: `/cryptoIcons/poolIcon.png`,
               title: name!,
-              apr: "0",
+              apr:
+                (
+                  time.daysSinceTimestamp(Number(stake.stake_timestamp)) *
+                  (calcApr / 2 / 60)
+                ).toFixed(2) + "%",
               lockedPeriod:
                 time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
                 " days",
