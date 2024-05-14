@@ -131,7 +131,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       router.push("/");
     }
 
-    if(!persistStore.disclaimer.accepted) {
+    if (!persistStore.disclaimer.accepted) {
       setDisclaimerModalOpen(true);
     }
 
@@ -144,11 +144,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   }, []);
 
   const onAcceptDisclaimer = (accepted: boolean) => {
-    if(accepted) {
+    if (accepted) {
       persistStore.setDisclaimerAccepted(true);
       setDisclaimerModalOpen(false);
     } else {
-      window.location.assign('http://google.com');
+      window.location.assign("http://google.com");
     }
   };
 
@@ -232,7 +232,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               {/* Top Navigation Bar */}
               <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
               {/* Joyride Tour */}
-              {initialized && (
+              {initialized && persistStore.disclaimer.accepted && (
                 <>
                   <TourModal
                     open={tourModalOpen}
@@ -266,12 +266,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       },
                     }}
                   />
-                  <DisclaimerModal
-                    open={disclaimerModalOpen}
-                    onAccepted={onAcceptDisclaimer}
-                  />
                 </>
               )}
+              <DisclaimerModal
+                open={!persistStore.disclaimer.accepted}
+                onAccepted={onAcceptDisclaimer}
+              />
               {/* Main Content Area */}
               <Box
                 sx={{
