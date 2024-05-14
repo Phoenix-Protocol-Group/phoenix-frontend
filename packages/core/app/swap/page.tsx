@@ -114,9 +114,8 @@ export default function SwapPage() {
       setErrorModalOpen(true);
 
       // @ts-ignore
-      setErrorDescription(resolveContractError(e.message));
+      setErrorDescription((typeof e === "string") ? e : resolveContractError(e.message));
       setTxBroadcasting(false);
-      console.error(e);
     }
     setTxBroadcasting(false);
   };
