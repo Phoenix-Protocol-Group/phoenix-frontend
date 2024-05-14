@@ -29,6 +29,9 @@ const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps): React.Reac
       open={open}
       aria-labelledby="disclaimer-modal"
       aria-describedby="Disclaimer Message"
+      sx={{
+        zIndex: 1300
+      }}
     >
       <Box sx={style}>
         <Box>
