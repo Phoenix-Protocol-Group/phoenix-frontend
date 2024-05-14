@@ -10,7 +10,7 @@ import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import JoyRideTooltip from "@/components/JoyRideTooltip";
 import { joyride } from "@phoenix-protocol/utils";
-import { TourModal } from "@phoenix-protocol/ui";
+import { TourModal, DisclaimerModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
 import Countdown from "@/components/Countdown";
 
@@ -31,6 +31,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const [initialized, setInitialized] = useState(false);
   // State to handle tour modal open/close
   const [tourModalOpen, setTourModalOpen] = useState(false);
+
+  // State to handle disclaimer modal
+  const [disclaimerModalOpen, setDisclaimerModalOpen] = useState(false);
+
   // Router
   const router = useRouter();
 
@@ -127,6 +131,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       router.push("/");
     }
 
+    if(!persistStore.disclaimer.accepted) {
+      setDisclaimerModalOpen(true);
+    }
+
     // Delay the tour to avoid hydration issues
     const timer = setTimeout(() => {
       setInitialized(true);
@@ -134,6 +142,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onAcceptDisclaimer = (accepted: boolean) => {
+    if(accepted) {
+      persistStore.setDisclaimerAccepted(true);
+      setDisclaimerModalOpen(false);
+    } else {
+      window.location.assign('http://google.com');
+    }
+  };
 
   // Style object for swap page background image
   const swapPageStyle = {
@@ -248,6 +265,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                         zIndex: 1400,
                       },
                     }}
+                  />
+                  <DisclaimerModal
+                    open={disclaimerModalOpen}
+                    onAccepted={onAcceptDisclaimer}
                   />
                 </>
               )}

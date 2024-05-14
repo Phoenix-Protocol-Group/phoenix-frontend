@@ -6,6 +6,7 @@ import { AppStore, AppStorePersist } from "@phoenix-protocol/types";
 import { createConnectWalletActions } from "./persist/createConnectWalletActions";
 import { createLayoutActions } from "./layout/actions";
 import { createUserTourActions } from "./persist/createUserTourActions";
+import { createDisclaimerAction } from "./persist/createDisclaimerActions";
 
 export const useAppStore = create<AppStore>()((set, get) => {
   // Create a new server instance.
@@ -44,11 +45,15 @@ export const usePersistStore = create<AppStorePersist>()(
       // Create a store for user tour
       const userTour = createUserTourActions();
 
+      //Create a store for disclaimer modal
+      const disclaimer = createDisclaimerAction();
+
       return {
         server,
         networkPassphrase,
         ...walletPersist,
         ...userTour,
+        ...disclaimer
       };
     },
     {
