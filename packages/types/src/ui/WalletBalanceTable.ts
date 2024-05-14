@@ -10,9 +10,15 @@ export interface FilterAndTabPanelProps {
   setSort: (sort: "highest" | "lowest") => void;
   isMobile: boolean;
 }
+
+interface TokenWithInfo extends Token {
+  contractId: string;
+}
 export interface ListItemProps {
-  token: Token;
+  token: TokenWithInfo;
+  onTokenClick: (tokenAddress: string) => void;
 }
 export interface WalletBalanceTableProps {
-  tokens: Token[];
+  tokens: TokenWithInfo[];
+  onTokenClick: (tokenAddress: string) => void;
 }
