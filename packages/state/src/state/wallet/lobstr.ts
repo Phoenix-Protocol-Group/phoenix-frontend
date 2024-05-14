@@ -9,7 +9,8 @@ export function lobstr(): Connector {
   return {
     id: "lobstr",
     name: "Lobstr",
-    iconUrl: "https://i.epvpimg.com/7tDxdab.png",
+    iconUrl:
+      "https://raw.githubusercontent.com/Lobstrco/lobstr-browser-extension/main/extension/public/static/images/icon128.png",
     iconBackground: "#fff",
     installed: true,
     downloadUrls: {
