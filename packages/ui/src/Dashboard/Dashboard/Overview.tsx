@@ -154,6 +154,7 @@ export default function Overview() {
           <CryptoCTA onClick={() => {}} />
         </Grid>
         <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
+          {/* @ts-ignore */}
           <WalletBalanceTable {...args.walletBalanceArgs} />
         </Grid>
       </Grid>

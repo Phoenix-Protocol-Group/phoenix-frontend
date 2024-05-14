@@ -64,6 +64,8 @@ type Story = StoryObj<typeof WalletBalanceTable>;
 
 export const Primary: Story = {
   args: {
+    // @ts-ignore
     tokens: testTokens,
+    onTokenClick: (token) => console.log(token),
   },
 };

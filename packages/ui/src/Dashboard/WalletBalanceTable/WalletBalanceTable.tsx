@@ -23,6 +23,7 @@ import {
   ListItemProps,
   WalletBalanceTableProps,
 } from "@phoenix-protocol/types";
+import { HelpCenter, HelpCenterOutlined } from "@mui/icons-material";
 
 function a11yProps(index: number) {
   return {
@@ -169,9 +170,14 @@ const FilterAndTabPanel = ({
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} mb={2} sx={{
-          display: "flex"
-        }}>
+        <Grid
+          item
+          xs={12}
+          mb={2}
+          sx={{
+            display: "flex",
+          }}
+        >
           <TextField
             id="search"
             type="search"
@@ -237,14 +243,15 @@ const FilterAndTabPanel = ({
               <MenuItem value={"lowest"}>Lowest Balance</MenuItem>
             </Select>
           </FormControl>
-      </Grid>
+        </Grid>
       </Grid>
     );
   }
 };
 
 const ListItem = ({
-  token: { name, icon, usdValue, amount },
+  token: { name, icon, usdValue, amount, contractId },
+  onTokenClick,
 }: ListItemProps) => {
   const [favorites, setFavorites] = useState<string[]>([]);
 
@@ -270,7 +277,7 @@ const ListItem = ({
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Box sx={{ maxWidth: "24px"}} component={"img"} src={icon} />
+        <Box sx={{ maxWidth: "24px" }} component={"img"} src={icon} />
         <Typography
           sx={{
             fontWeight: 700,
@@ -280,6 +287,12 @@ const ListItem = ({
         >
           {name}
         </Typography>
+        {name !== "XLM" && (
+          <HelpCenterOutlined
+            sx={{ fontSize: "1.125rem", cursor: "pointer" }}
+            onClick={() => onTokenClick(contractId)}
+          />
+        )}
       </Box>
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <Typography
@@ -343,7 +356,10 @@ const scrollbarStyles = {
   },
 };
 
-const WalletBalanceTable = ({ tokens }: WalletBalanceTableProps) => {
+const WalletBalanceTable = ({
+  tokens,
+  onTokenClick,
+}: WalletBalanceTableProps) => {
   const [sort, setSort] = useState("highest" as "highest" | "lowest");
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
@@ -364,8 +380,8 @@ const WalletBalanceTable = ({ tokens }: WalletBalanceTableProps) => {
         height: largerThenMd ? "26rem" : "auto",
         mb: {
           xs: 2,
-          md: 0
-        }
+          md: 0,
+        },
       }}
     >
       <FilterAndTabPanel
@@ -378,7 +394,14 @@ const WalletBalanceTable = ({ tokens }: WalletBalanceTableProps) => {
         sort={sort}
         isMobile={!largerThenMd}
       />
-      <Box sx={{ overflow: "auto", maxHeight: "19rem", mt: {xs: 2, md: 0}, ...scrollbarStyles }}>
+      <Box
+        sx={{
+          overflow: "auto",
+          maxHeight: "19rem",
+          mt: { xs: 2, md: 0 },
+          ...scrollbarStyles,
+        }}
+      >
         {[...tokens]
           .filter((token) => token.category === category || category === "All")
           .filter((token) =>
@@ -395,7 +418,7 @@ const WalletBalanceTable = ({ tokens }: WalletBalanceTableProps) => {
             }
           })
           .map((token, index) => (
-            <ListItem token={token} key={index} />
+            <ListItem token={token} onTokenClick={onTokenClick} key={index} />
           ))}
       </Box>
     </Box>
