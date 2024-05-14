@@ -16,7 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Address } from "stellar-sdk";
-import { Pool } from "@phoenix-protocol/types";
+import { Pool, PoolsFilter } from "@phoenix-protocol/types";
 import { Helmet } from "react-helmet";
 import { Box } from "@mui/material";
 import { FACTORY_ADDRESS } from "@phoenix-protocol/utils/build/constants";
@@ -27,6 +27,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true); // Loading state for async operations
   const [allPools, setAllPools] = useState<Pool[]>([]); // State to hold pool data
   const storePersist = usePersistStore(); // Persisted state
+  const [poolFilter, setPoolFilter] = useState<PoolsFilter>("ALL");
 
   // Fetch pool information by its address
   const fetchPool = async (poolAddress: string) => {
@@ -215,13 +216,15 @@ export default function Page() {
       </Helmet>
       <Pools
         pools={allPools}
-        filter="ALL"
+        filter={poolFilter}
         sort="HighAPR"
         onAddLiquidityClick={() => {}}
         onShowDetailsClick={(pool) => {
           router.push(`/pools/${pool.poolAddress}`);
         }}
-        onFilterClick={() => {}}
+        onFilterClick={(by: string) => {
+          setPoolFilter(by as PoolsFilter)
+        }}
         onSortSelect={() => {}}
       />
     </Box>

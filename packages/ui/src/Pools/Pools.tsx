@@ -306,15 +306,20 @@ const Pools = ({
           </FormControl>
       </Box>
       <Grid container spacing={2}>
-        {pools.map((pool, index) => (
-          <PoolItem
-            key={index}
-            filter={filter}
-            onAddLiquidityClick={() => onAddLiquidityClick(pool)}
-            onShowDetailsClick={onShowDetailsClick}
-            pool={pool}
-          />
-        ))}
+        {pools.map((pool, index) => {
+          if (filter === "ALL" || filter === "MY" && pool.userLiquidity > 0) {
+            return (
+              <PoolItem
+                key={index}
+                filter={filter}
+                onAddLiquidityClick={() => onAddLiquidityClick(pool)}
+                onShowDetailsClick={onShowDetailsClick}
+                pool={pool}
+              />
+            );
+          } 
+          return null;
+        })}
       </Grid>
     </Box>
   );
