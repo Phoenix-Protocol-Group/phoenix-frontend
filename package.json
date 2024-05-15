@@ -38,5 +38,13 @@
     "@types/jest": "^29.5.2",
     "jest": "^29.5.0"
   },
-  "packageManager": "yarn@3.6.4"
+  "packageManager": "yarn@3.6.4",
+  "dependencies": {
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/wallet-adapter-material-ui": "^0.16.34",
+    "@solana/wallet-adapter-react": "^0.15.35",
+    "@solana/wallet-standard-core": "^1.1.1",
+    "@solana/web3.js": "^1.91.8",
+    "@web3-react/coinbase-wallet": "^8.2.3"
+  }
 }
