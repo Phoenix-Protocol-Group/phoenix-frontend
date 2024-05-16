@@ -306,10 +306,7 @@ export default function Page() {
             onClick={() =>
               window.open(
                 `https://app.kado.money/
-?onPayAmount=250
-&onPayCurrency=USD
-&onRevCurrency=USDC
-&cryptoList=XLM,USDC
+?cryptoList=XLM,USDC
 &network=STELLAR
 &networkList=STELLAR
 &product=BUY
