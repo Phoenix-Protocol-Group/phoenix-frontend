@@ -1,3 +1,5 @@
+import { fetchTokenPrices } from "./graphql";
+
 interface TokenPairs {
   [key: string]: string;
 }
@@ -9,32 +11,6 @@ const tokensAvailableAndPaired: TokenPairs = {
   XLM: "xlmusd",
   USDC: "usdcusd", // TODO, for testing
 };
-
-// Function to fetch prices for a given token
-export async function fetchTokenPrices(tokenSymbol: string): Promise<number> {
-  if (tokenSymbol === "PHO") {
-    return await fetch("/api/pho-price").then((res) => res.json());
-  }
-
-
-  if (tokenSymbol === "USDC") {
-    return 1;
-  }
-  const tokenPair = tokensAvailableAndPaired[tokenSymbol.toUpperCase()];
-  if (!tokenPair) {
-    throw new Error(`Token ${tokenSymbol} not supported`);
-  }
-  const targetUrl = `https://www.bitstamp.net/api/v2/ticker/${tokenPair}/`;
-  const response = await fetch("/api/proxy", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ targetUrl }),
-  });
-  const data = await response.json();
-  return data.data.last;
-}
 
 export async function fetchTokenPrices2(tokenSymbol: string): Promise<number> {
   const tokenPair = tokensAvailableAndPaired[tokenSymbol.toUpperCase()];

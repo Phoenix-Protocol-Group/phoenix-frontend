@@ -30,6 +30,7 @@ import {
   getAllAnchors,
 } from "@phoenix-protocol/utils/build/sep24";
 import { Anchor, AssetInfo } from "@phoenix-protocol/types";
+import { fetchHistoricalPrices } from "@phoenix-protocol/utils";
 import {
   constants,
   fetchBiggestWinnerAndLoser,
@@ -57,6 +58,8 @@ export default function Page() {
   const [disclaimer, setDisclaimer] = useState(true);
   const [selectedTokenForInfo, setSelectedTokenForInfo] = useState<AssetInfo>();
   const [tokenInfoOpen, setTokenInfoOpen] = useState<boolean>(false);
+  const [xlmPriceChart, setXlmPriceChart] = useState<any[]>([]);
+  const [phoPriceChart, setPhoPriceChart] = useState<any[]>([]);
 
   // Loading states
   const [loadingBalances, setLoadingBalances] = useState(true);
@@ -144,6 +147,12 @@ export default function Page() {
     setXlmPrice(price);
     setUsdcPrice(phoPrice);
     setXlmPriceChange(priceChangeXLM);
+
+    const xlmPrices = await fetchHistoricalPrices(1440, "XLM");
+    setXlmPriceChart(xlmPrices);
+
+    const phoPrices = await fetchHistoricalPrices(1440, "PHO");
+    setPhoPriceChart(phoPrices);
   };
 
   const fetchTokenInfo = async (tokenId: string) => {
@@ -194,10 +203,7 @@ export default function Page() {
       ],
     },
     dashboardArgs1: {
-      data: [
-        [1687392000000, Number(xlmPrice) - (xlmPrice * xlmPriceChange) / 100],
-        [1687859473000, xlmPrice],
-      ],
+      data: xlmPriceChart,
       icon: {
         small: "/image-103.png",
         large: "/image-stellar.png",
@@ -205,13 +211,7 @@ export default function Page() {
       assetName: "XLM",
     },
     dashboardArgs2: {
-      data: [
-        [1, 0.2],
-        [2, 0.8],
-        [3, 1],
-        [4, 1.53],
-        [5, usdcPrice],
-      ],
+      data: phoPriceChart,
       icon: {
         small: "/cryptoIcons/pho.svg",
         large: "/pho-bg.png",

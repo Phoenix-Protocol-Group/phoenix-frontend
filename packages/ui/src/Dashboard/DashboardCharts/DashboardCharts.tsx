@@ -48,8 +48,8 @@ const DashboardPriceCharts = ({
   icon,
   assetName,
 }: DashboardChartsProps) => {
-  const differencePercent: number =
-    ((data[data.length - 1][1] - data[0][1]) / data[data.length - 1][1]) * 100;
+  const differencePercent: number = data.length ?
+    ((data[data.length - 1][1] - data[0][1]) / data[data.length - 1][1]) * 100 : 0;
   const theme = useTheme();
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
   return (
@@ -133,7 +133,7 @@ const DashboardPriceCharts = ({
               letterSpacing: "-0.0625rem",
             }}
           >
-            ${data[data.length - 1][1].toString().slice(0, 5)}
+            ${data.length ? data[data.length - 1][1].toString().slice(0, 5) : 0}
           </Typography>
           {largerThenMd && (
             <Chip

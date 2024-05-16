@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { createApolloClient } from "./apolloClient";
 
-export async function newFetchTokenPrices(symbol?: string, tokenId?: string) {
+export async function fetchTokenPrices(symbol?: string, tokenId?: string) {
   const client = createApolloClient();
 
   const GET_PRICES = gql`
@@ -77,7 +77,9 @@ export async function fetchHistoricalPrices(
       },
     });
 
-    return data.historicalPrices;
+    const parsedPrices = data.historicalPrices.map((item: any) => [new Date(item.timestamp).getTime(), item.usdValue]);
+
+    return parsedPrices;
   } catch(error) {
     console.error("Error fetching prices:", error);
     throw error;
