@@ -6,8 +6,9 @@ import {
   AllbridgeCoreSdk,
   nodeRpcUrlsDefault,
   ChainSymbol,
+  Messenger,
 } from "@allbridge/bridge-core-sdk";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import Web3 from "web3";
 import { useEffect } from "react";
 import { useSignMessage, useAccount } from "wagmi";
@@ -16,8 +17,7 @@ export default function Page() {
   const sdk = new AllbridgeCoreSdk({
     ...nodeRpcUrlsDefault,
   });
-  const { signMessage } = useSignMessage();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
 
   const bridge = async () => {
     // fetch information about supported chains
@@ -30,21 +30,27 @@ export default function Page() {
     const trxChain = chains[ChainSymbol.STLR];
     const usdcToken = trxChain.tokens.find((token) => token.symbol === "USDC");
 
-    const rawTx = await sdk.bridge.rawTxBuilder.approve({
+    // @ts-ignore
+    const web3 = new Web3(window.ethereum);
+    // authorize a transfer of tokens from sender's address
+    await sdk.bridge.approve(web3, {
       token: busdToken!,
-      owner: address as string,
+      owner: address!,
     });
 
-    // Sign the transaction
-    const signature = await signMessage({ message: rawTx.toString() });
+    // initiate transfer
+    const response = await sdk.bridge.send(web3, {
+      amount: "1.01",
+      fromAccountAddress: address!,
+      toAccountAddress:
+        "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
+      sourceToken: busdToken!,
+      destinationToken: usdcToken!,
+      messenger: Messenger.ALLBRIDGE,
+    });
 
-    const rawTransactionApprove = await sdk.bridge.rawTxBuilder.send;
+    console.log("Tokens sent:", response.txId);
   };
-
-  useEffect(() => {
-    bridge();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <Web3ModalProvider>
@@ -57,6 +63,7 @@ export default function Page() {
       >
         <ModalOpenButton />
       </Box>
+      <Button onClick={() => bridge()}>Bridge</Button>
     </Web3ModalProvider>
   );
 }
