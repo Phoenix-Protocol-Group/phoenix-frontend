@@ -126,8 +126,6 @@ export async function fetchSwapHistory(
       },
     });
 
-    console.log("data", data);
-
     if (data.swaps) {
       // Map the fetched swaps to the desired output structure
       const swapResults: SwapResult[] = data.swaps.map((swap: any) => ({
