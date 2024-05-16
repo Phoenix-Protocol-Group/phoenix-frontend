@@ -95,15 +95,15 @@ const DashboardPriceCharts = ({
               sx={{
                 borderRadius: "16px",
                 border:
-                  differencePercent > 0
+                  differencePercent >= 0
                     ? "1px solid #5BFF22"
                     : "1px solid #F22",
                 background:
-                  differencePercent > 0
+                  differencePercent >= 0
                     ? "rgba(91, 255, 34, 0.20)"
                     : "rgba(255, 34, 34, 0.20)",
                 backdropFilter: "blur(2.5px)",
-                color: differencePercent > 0 ? "#5BFF22" : "#F22",
+                color: differencePercent >= 0 ? "#5BFF22" : "#F22",
               }}
             />
           )}
@@ -141,15 +141,15 @@ const DashboardPriceCharts = ({
               sx={{
                 borderRadius: "16px",
                 border:
-                  differencePercent > 0
+                  differencePercent >= 0
                     ? "1px solid #5BFF22"
                     : "1px solid #F22",
                 background:
-                  differencePercent > 0
+                  differencePercent >= 0
                     ? "rgba(91, 255, 34, 0.20)"
                     : "rgba(255, 34, 34, 0.20)",
                 backdropFilter: "blur(2.5px)",
-                color: differencePercent > 0 ? "#5BFF22" : "#F22",
+                color: differencePercent >= 0 ? "#5BFF22" : "#F22",
               }}
             />
           )}
