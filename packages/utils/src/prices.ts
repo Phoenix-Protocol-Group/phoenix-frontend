@@ -1,4 +1,4 @@
-import { fetchTokenPrices } from "./graphql";
+import { fetchTokenPrices, fetchTokenPrices2 } from "./graphql";
 
 interface TokenPairs {
   [key: string]: string;
@@ -12,22 +12,6 @@ const tokensAvailableAndPaired: TokenPairs = {
   USDC: "usdcusd", // TODO, for testing
 };
 
-export async function fetchTokenPrices2(tokenSymbol: string): Promise<number> {
-  const tokenPair = tokensAvailableAndPaired[tokenSymbol.toUpperCase()];
-  if (!tokenPair) {
-    throw new Error(`Token ${tokenSymbol} not supported`);
-  }
-  const targetUrl = `https://www.bitstamp.net/api/v2/ticker/${tokenPair}/`;
-  const response = await fetch("/api/proxy", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ targetUrl }),
-  });
-  const data = await response.json();
-  return data.data.percent_change_24;
-}
 // Function to check biggest winner and loser in the last 24 hours
 // Fetch all prices and return biggest loser and winner symbol by percent_change_24
 export async function fetchBiggestWinnerAndLoser(): Promise<{

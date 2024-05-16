@@ -87,7 +87,7 @@ export async function fetchHistoricalPrices(
   }
 }
 
-export async function fetchTokenPrices2(symbol?: string, tokenId?: string) {
+export async function fetchTokenPrices2(symbol?: string, tokenId?: string): Promise<number> {
   const client = createApolloClient();
 
   const timestampLimit = 1440; //24 hours
@@ -128,7 +128,7 @@ export async function fetchTokenPrices2(symbol?: string, tokenId?: string) {
     const oldValue = data.historicalPrices[0].usdValue;
     const newValue = data.historicalPrices[1].usdValue;
 
-    return (((newValue - oldValue) / oldValue) * 100).toFixed(2);
+    return Number((((newValue - oldValue) / oldValue) * 100).toFixed(2));
   } catch (error) {
     console.error("Error fetching prices:", error);
     throw error;
