@@ -87,13 +87,13 @@ const PoolItem = ({
   onShowDetailsClick: (pool: Pool) => void;
 }) => {
   return (
-    <Grid item xs={6} md={4} lg={3} className="pool-card">
+    <Grid item xs={6} md={4} lg={3} xl={2} className="pool-card">
       <Box
         sx={{
           padding: "16px",
           borderRadius: "8px",
-          background:
-            "linear-gradient(180deg, #292B2C 0%, #222426 100%), #242529",
+          background: "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          backdropFilter: "blur(42px)",
           position: "relative",
         }}
       >

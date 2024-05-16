@@ -172,6 +172,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     },
   };
 
+  // Style object for swap page background image
+  const poolPageStyles = {
+    backgroundImage: `url("/BG.svg")`,
+    backgroundRepeat: "no-repeat",
+    backgroundAttachment: "fixed",
+    backgroundPosition: "center",
+    backgroundSize: "cover",
+    paddingBottom: "50px",
+    width: {
+      xs: "100vw",
+      md: largerThenMd
+        ? navOpen
+          ? "calc(100% - 240px)"
+          : "calc(100% - 60px)"
+        : navOpen
+        ? "0"
+        : "100%",
+    },
+  };
+
   // Hacky way to avoid overflows
   const css = `
     body {
@@ -281,7 +301,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   display: "flex",
                   justifyContent: "center",
                   padding: "16px",
-                  ...swapPageStyle,
+                  ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
                 }}
               >
                 {/* Child Components */}
