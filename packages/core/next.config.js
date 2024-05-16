@@ -1,8 +1,15 @@
+const path = require("path");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.resolve.alias.canvas = false;
-
+    const browserPath = path.resolve(
+      __dirname,
+      "../../node_modules/@allbridge/bridge-core-sdk/dist/browser/index.js"
+    );
+    console.log("Browser path:", browserPath); // Log the resolved path
+    config.resolve.alias["@allbridge/bridge-core-sdk"] = browserPath;
     return config;
   },
   async rewrites() {

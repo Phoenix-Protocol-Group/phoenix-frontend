@@ -4684,7 +4684,7 @@ __metadata:
     "@types/react-dom": ^18.2.0
     "@types/react-helmet": ^6.1.11
     "@vercel/analytics": ^1.1.3
-    "@web3modal/wagmi": ^4.2.0
+    "@web3modal/wagmi": ^4.2.1
     css-loader: ^6.8.1
     eslint: 8.45.0
     eslint-config-next: 13.4.10
@@ -8297,41 +8297,41 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@web3modal/common@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@web3modal/common@npm:4.2.0"
+"@web3modal/common@npm:4.2.1":
+  version: 4.2.1
+  resolution: "@web3modal/common@npm:4.2.1"
   dependencies:
     bignumber.js: 9.1.2
     dayjs: 1.11.10
-  checksum: f3929a0f7e3e205db67741e0c3c5d0d7cd9ee28841ec3a63c66bac16780e6c1200b68e48493306d239255e639f7e2d38b8638661a710fd0d79bdb5d8309be342
+  checksum: e4a25b1a40c92f5c02e2f2a59081d17ae360fc960adc8a34606bb9724824e57e9f815e87acefeb213350dfc8ae491177079b4e6e4cdfac10e935271043e911c2
   languageName: node
   linkType: hard
 
-"@web3modal/core@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@web3modal/core@npm:4.2.0"
+"@web3modal/core@npm:4.2.1":
+  version: 4.2.1
+  resolution: "@web3modal/core@npm:4.2.1"
   dependencies:
-    "@web3modal/common": 4.2.0
-    "@web3modal/wallet": 4.2.0
+    "@web3modal/common": 4.2.1
+    "@web3modal/wallet": 4.2.1
     valtio: 1.11.2
-  checksum: 82222a33b2a2e2c32d728a7f685134129dcc4bda284f738eb49f7e0a572c74b7f1cfe8b0c7b41db7b2933b32de2ae9b80459e96b35032d2173e1b6898e4b7570
+  checksum: 8ad82b8f9d4ea39058b06a3a9a7c0edf59e5887750a3f085a6e0e1e153b2e4159e658a516be6040648c6086dddf1b450c660fcb4d12e22864e3e07b02a9da7ea
   languageName: node
   linkType: hard
 
-"@web3modal/polyfills@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@web3modal/polyfills@npm:4.2.0"
+"@web3modal/polyfills@npm:4.2.1":
+  version: 4.2.1
+  resolution: "@web3modal/polyfills@npm:4.2.1"
   dependencies:
     buffer: 6.0.3
-  checksum: 4821d11a582102b1e40ad1c6c5ceb01fea202f978a11f8d4ea24fb04d396b0034fc722623b2d97b5f5cf5de6f715036c7949039c1b133d83f0d6ea39d9d51035
+  checksum: 5dd86cb768b5f333a8efff841e5c56c0f3e33d0589040b0d40042ef3e6c78c886012e9eae881aa743ec51f61bd055aeebb88f59a2ca53ec3948601d6c6250dcd
   languageName: node
   linkType: hard
 
-"@web3modal/scaffold-react@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@web3modal/scaffold-react@npm:4.2.0"
+"@web3modal/scaffold-react@npm:4.2.1":
+  version: 4.2.1
+  resolution: "@web3modal/scaffold-react@npm:4.2.1"
   dependencies:
-    "@web3modal/scaffold": 4.2.0
+    "@web3modal/scaffold": 4.2.1
   peerDependencies:
     react: ">=17"
     react-dom: ">=17"
@@ -8340,83 +8340,83 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: dec33a6e08acd1b3503a42d1cae62cbf50fa03b072100e149d64c89fa2aff2f76344d19d39b918d151ed0735770bf58aac386d7efebb19e9c50816b3178ca4d6
+  checksum: d9ba7ac59279275d33990f412158bcda7ab7ff427a1b36cd207408bb3cc88121580abba7d44e2bf25145f85c0275af7f159c9f0886e9108dc7475088e4ae7107
   languageName: node
   linkType: hard
 
-"@web3modal/scaffold-utils@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@web3modal/scaffold-utils@npm:4.2.0"
+"@web3modal/scaffold-utils@npm:4.2.1":
+  version: 4.2.1
+  resolution: "@web3modal/scaffold-utils@npm:4.2.1"
   dependencies:
-    "@web3modal/core": 4.2.0
-    "@web3modal/polyfills": 4.2.0
+    "@web3modal/core": 4.2.1
+    "@web3modal/polyfills": 4.2.1
     valtio: 1.11.2
-  checksum: f4e0e767aa4a026d9ddad8de765e5a88b3e021793de82acffeede44e6da4b63422c93dbd9d0524228ccb6e8c27a670f11e0223dea8871d701a8a26a12b2f1f12
+  checksum: a2a68638d7fb37bde50013853daa50743f3b2bb27fb0fbf68e3f31e72c2b4d613369ca8e6e5cd2f24c6ba7e49e2e91f5aada168f05095413868459e386583179
   languageName: node
   linkType: hard
 
-"@web3modal/scaffold-vue@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@web3modal/scaffold-vue@npm:4.2.0"
+"@web3modal/scaffold-vue@npm:4.2.1":
+  version: 4.2.1
+  resolution: "@web3modal/scaffold-vue@npm:4.2.1"
   dependencies:
-    "@web3modal/scaffold": 4.2.0
+    "@web3modal/scaffold": 4.2.1
   peerDependencies:
     vue: ">=3"
   peerDependenciesMeta:
     vue:
       optional: true
-  checksum: af6753cacfedd60cf36b24614997b6597f3aac08d08c45547bfe219756aa40ae828e4a102dff4f5dee16b057e27a60748c790fee60da043800e80071bd8ecfaa
+  checksum: d412a038d9710bb2da6b8cb776f45a5bc05b9e6c6e93c66b38ba9035171d00be1c15cc7ac8a2132505900658f4dfe0deb41c27aa750cf3cb69b71f17f3d114b2
   languageName: node
   linkType: hard
 
-"@web3modal/scaffold@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@web3modal/scaffold@npm:4.2.0"
+"@web3modal/scaffold@npm:4.2.1":
+  version: 4.2.1
+  resolution: "@web3modal/scaffold@npm:4.2.1"
   dependencies:
-    "@web3modal/common": 4.2.0
-    "@web3modal/core": 4.2.0
-    "@web3modal/siwe": 4.2.0
-    "@web3modal/ui": 4.2.0
-    "@web3modal/wallet": 4.2.0
+    "@web3modal/common": 4.2.1
+    "@web3modal/core": 4.2.1
+    "@web3modal/siwe": 4.2.1
+    "@web3modal/ui": 4.2.1
+    "@web3modal/wallet": 4.2.1
     lit: 3.1.0
-  checksum: b4d5387bf8b366c7a6171a38ffe5cdea5d9ba1a186466e8ce62d20c719554d168d0f870c2e0e0205f02768537cb5936760b19493d67cdc917c6ef912c041b580
+  checksum: bdf7f48d9a12fef20b9ab117d6e219450d245c915de8da9058605d4c03383624a6511600d43b668a6cc839c1f0815984e59522c91ab550bfa6d0417658209e39
   languageName: node
   linkType: hard
 
-"@web3modal/siwe@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@web3modal/siwe@npm:4.2.0"
+"@web3modal/siwe@npm:4.2.1":
+  version: 4.2.1
+  resolution: "@web3modal/siwe@npm:4.2.1"
   dependencies:
     "@walletconnect/utils": 2.12.0
-    "@web3modal/core": 4.2.0
-    "@web3modal/scaffold-utils": 4.2.0
+    "@web3modal/core": 4.2.1
+    "@web3modal/scaffold-utils": 4.2.1
     lit: 3.1.0
     valtio: 1.11.2
-  checksum: 86c097f78dc49f4fdec320563bc487b56dc739e86c8b71c5782746dec703797da36a604c15aa84bcf7cdca63cb2cb5562c7668810a26201c0378700a46885e72
+  checksum: 6170df02a0b73d95bd9eece42014f287b1fa8fae337447bb1575bf2948ff5e8ec1fda5a39b2465bad3c57017b6d932abbcb53cf4805cdb8e78a7619afa2d3ab2
   languageName: node
   linkType: hard
 
-"@web3modal/ui@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@web3modal/ui@npm:4.2.0"
+"@web3modal/ui@npm:4.2.1":
+  version: 4.2.1
+  resolution: "@web3modal/ui@npm:4.2.1"
   dependencies:
     lit: 3.1.0
     qrcode: 1.5.3
-  checksum: 911eb2528e4727b6049fd8032fc72fbbf11af5cc80ffede27a3024da39be06ce946da92916e552201310ffe115618ef6920dc69fb056e901ec6540b60ca62e66
+  checksum: 90d2887b9a86f3970efebcb0f75214c6532b3c3af3362bcbbabf54264b33058c0288cad0c07e1e14c3a42fc2ed379e241e36c4dfc7595bcd7591ec3566e6f396
   languageName: node
   linkType: hard
 
-"@web3modal/wagmi@npm:^4.2.0":
-  version: 4.2.0
-  resolution: "@web3modal/wagmi@npm:4.2.0"
+"@web3modal/wagmi@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "@web3modal/wagmi@npm:4.2.1"
   dependencies:
     "@walletconnect/ethereum-provider": 2.13.0
-    "@web3modal/polyfills": 4.2.0
-    "@web3modal/scaffold": 4.2.0
-    "@web3modal/scaffold-react": 4.2.0
-    "@web3modal/scaffold-utils": 4.2.0
-    "@web3modal/scaffold-vue": 4.2.0
-    "@web3modal/siwe": 4.2.0
+    "@web3modal/polyfills": 4.2.1
+    "@web3modal/scaffold": 4.2.1
+    "@web3modal/scaffold-react": 4.2.1
+    "@web3modal/scaffold-utils": 4.2.1
+    "@web3modal/scaffold-vue": 4.2.1
+    "@web3modal/siwe": 4.2.1
   peerDependencies:
     "@wagmi/connectors": ">=4"
     "@wagmi/core": ">=2.0.0"
@@ -8431,17 +8431,17 @@ __metadata:
       optional: true
     vue:
       optional: true
-  checksum: 7edf2c328624dfa31688f9ded59c1f197c571e5b10790163bc6a1c70e1b0b958e606da707b95dc21d859b2b2ce959b92e91845675f954b7b1912b25cd5dd8902
+  checksum: c1ed797210ea04921319daea8a0402646b29c39acde2f2e2dcab4a3b45d4b4057e52ab19383ca3b939c4a0a0d178a23e54cf840822a654541fa96baa9669fb91
   languageName: node
   linkType: hard
 
-"@web3modal/wallet@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@web3modal/wallet@npm:4.2.0"
+"@web3modal/wallet@npm:4.2.1":
+  version: 4.2.1
+  resolution: "@web3modal/wallet@npm:4.2.1"
   dependencies:
-    "@web3modal/polyfills": 4.2.0
+    "@web3modal/polyfills": 4.2.1
     zod: 3.22.4
-  checksum: 1d58b96f2e12768154a9899c304eb7ac839f9a595047ad904605d43fe45c1a4fbac347daac6da579b3d8c7abd698875b8a9d0374522dd1655dc2b37236e09779
+  checksum: 4aae1ea55a5253d75cf03603eff081743438dca6c77243ee26390c4863a294bb5599787b86090ccd1284d907ab23f221f419426cfa86cffde72efed5d20e944f
   languageName: node
   linkType: hard
 

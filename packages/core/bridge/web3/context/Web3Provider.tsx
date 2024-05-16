@@ -41,6 +41,7 @@ createWeb3Modal({
 });
 
 export function Web3ModalProvider({ children }: any) {
+  const { supportedNetworks } = useConfig();
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
