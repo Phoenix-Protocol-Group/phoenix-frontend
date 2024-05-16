@@ -92,7 +92,8 @@ const PoolItem = ({
         sx={{
           padding: "16px",
           borderRadius: "8px",
-          background: "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          background:
+            "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
           backdropFilter: "blur(42px)",
           position: "relative",
         }}
@@ -185,7 +186,7 @@ const PoolItem = ({
             />
           </Grid>
         </Grid>
-        <Tooltip title="During the initial phase of the DEX, your APR will be doubled. The extra amount will be paid out as a vested, claimable reward after the end of this period.">
+        <Tooltip title="During the initial phase of the DEX (May 7-July 7), APR earned during this period will be doubled. The doubled APR will be paid out as a vested, claimable airdrop at the end of this period.">
           <Box
             sx={{
               width: "100%",
