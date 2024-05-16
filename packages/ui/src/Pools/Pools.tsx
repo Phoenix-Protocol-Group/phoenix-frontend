@@ -87,14 +87,28 @@ const PoolItem = ({
   onShowDetailsClick: (pool: Pool) => void;
 }) => {
   return (
-    <Grid item xs={6} md={4} lg={3} xl={2} className="pool-card">
+    <Grid
+      item
+      xs={6}
+      md={4}
+      lg={3}
+      xl={2}
+      className="pool-card"
+      onClick={() => onShowDetailsClick(pool)}
+    >
       <Box
         sx={{
           padding: "16px",
           borderRadius: "8px",
-          background: "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          background:
+            "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
           backdropFilter: "blur(42px)",
           position: "relative",
+          cursor: "pointer",
+          "&:hover": {
+            background:
+              "linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.2) 100%)",
+          },
         }}
       >
         <Box
@@ -170,22 +184,7 @@ const PoolItem = ({
             </Typography>
           </Grid>
         </Grid>
-
-        <Grid container spacing={1}>
-          <Grid item xs={12} md={5}>
-            <CustomButton
-              onClick={() => onShowDetailsClick(pool)}
-              sx={{
-                padding: "12px 16px",
-                width: "100%",
-              }}
-              label="Details"
-              type="secondary"
-              size="small"
-            />
-          </Grid>
-        </Grid>
-        <Tooltip title="During the initial phase of the DEX, your APR will be doubled. The extra amount will be paid out as a vested, claimable reward after the end of this period.">
+        <Tooltip title="During the initial phase of the DEX (May 7-July 7), APR earned during this period will be doubled. The doubled APR will be paid out as a vested, claimable airdrop at the end of this period.">
           <Box
             sx={{
               width: "100%",

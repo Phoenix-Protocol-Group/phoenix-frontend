@@ -105,7 +105,7 @@ const StakeInput = ({
         }}
         inputProps={{
           min: 0,
-          max: balance
+          max: balance,
         }}
         InputProps={{
           endAdornment: (
@@ -189,7 +189,9 @@ const ClaimRewards = ({
     <Box
       sx={{
         borderRadius: "0.5rem",
-        background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
+        background:
+          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+        backdropFilter: "blur(42px)",
         position: "relative",
         padding: "1rem",
         height: !largerThenMd ? "calc(100% + 44px)" : "100%",
@@ -199,7 +201,6 @@ const ClaimRewards = ({
         <Typography sx={{ opacity: 0.7, fontSize: "0.875rem" }}>
           Total rewards
         </Typography>
-
         {rewards.length > 0 ? (
           rewards.map((reward, index) => (
             <Box

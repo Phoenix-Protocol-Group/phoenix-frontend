@@ -101,7 +101,7 @@ export default function Page() {
 
   // Load more / pagination
   const loadMore = () => {
-    setPage(page + 1);
+    setPageSize(pageSize + 10);
   };
 
   // Load History

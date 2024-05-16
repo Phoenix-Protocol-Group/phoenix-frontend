@@ -133,7 +133,7 @@ const VolumeChart: React.FC<VolumeChartProps> = ({
               fontWeight: 700,
             }}
           >
-            ${totalVolume}
+            ${totalVolume.toFixed(2)}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
