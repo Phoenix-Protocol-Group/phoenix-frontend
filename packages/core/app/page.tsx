@@ -313,7 +313,9 @@ export default function Page() {
 &network=STELLAR
 &networkList=STELLAR
 &product=BUY
-&productList=BUY`,
+&productList=BUY` + persistStore.wallet.address
+                  ? `&onToAddress=${persistStore.wallet.address}`
+                  : "",
                 "_blank",
                 "toolbar=yes,scrollbars=yes,resizable=yes,top=0,left=0,width=480,height=620"
               )
