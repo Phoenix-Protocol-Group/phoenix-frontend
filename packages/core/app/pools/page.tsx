@@ -78,9 +78,13 @@ export default function Page() {
           rpcUrl: constants.RPC_URL,
         });
 
-        const allPoolDetails = (await FactoryContract.queryAllPoolsDetails()).result;
-        const totalTokens = Number(allPoolDetails.find((pool) => pool.pool_address === poolAddress)?.pool_response.asset_lp_share.amount);
-        
+        const allPoolDetails = (await FactoryContract.queryAllPoolsDetails())
+          .result;
+        const totalTokens = Number(
+          allPoolDetails.find((pool) => pool.pool_address === poolAddress)
+            ?.pool_response.asset_lp_share.amount
+        );
+
         const ratioStaked = totalStaked / totalTokens;
         // Calculate APR by get the value of the total staked amount and the incentive amount
         const poolIncentives = [
@@ -101,11 +105,12 @@ export default function Page() {
           },
         ];
         const valueStaked = tvl * ratioStaked;
-        const poolIncentive = poolIncentives.find((incentive) => incentive.address === poolAddress)!;
+        const poolIncentive = poolIncentives.find(
+          (incentive) => incentive.address === poolAddress
+        )!;
         const phoprice = await fetchPho();
-        const apr = ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
-
-
+        const apr =
+          ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
 
         // Construct and return pool object if all fetches are successful
         return {
@@ -130,7 +135,7 @@ export default function Page() {
             },
           ],
           tvl: formatCurrency("USD", tvl.toString(), navigator.language),
-          maxApr: `${(apr / 2).toFixed(2)}% + ${(apr / 2).toFixed(2)}% Airdrop `,
+          maxApr: `${(apr / 2).toFixed(2)}%`,
           userLiquidity: 0,
           poolAddress: poolAddress,
         };
@@ -223,7 +228,7 @@ export default function Page() {
           router.push(`/pools/${pool.poolAddress}`);
         }}
         onFilterClick={(by: string) => {
-          setPoolFilter(by as PoolsFilter)
+          setPoolFilter(by as PoolsFilter);
         }}
         onSortSelect={() => {}}
       />

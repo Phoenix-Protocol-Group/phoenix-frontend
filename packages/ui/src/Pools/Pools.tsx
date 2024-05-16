@@ -7,6 +7,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React from "react";
@@ -16,6 +17,7 @@ import {
   PoolsProps,
   PoolsFilter as Filter,
 } from "@phoenix-protocol/types";
+import { Info } from "@mui/icons-material";
 
 const descriptionHeader = {
   color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
@@ -92,6 +94,7 @@ const PoolItem = ({
           borderRadius: "8px",
           background:
             "linear-gradient(180deg, #292B2C 0%, #222426 100%), #242529",
+          position: "relative",
         }}
       >
         <Box
@@ -106,7 +109,7 @@ const PoolItem = ({
             component={"img"}
             src={pool.tokens[0].icon}
             sx={{
-              width: {
+              height: {
                 xs: "48px",
                 md: "64px",
               },
@@ -116,7 +119,7 @@ const PoolItem = ({
             component={"img"}
             src={pool.tokens[1].icon}
             sx={{
-              width: {
+              height: {
                 xs: "48px",
                 md: "64px",
               },
@@ -182,6 +185,35 @@ const PoolItem = ({
             />
           </Grid>
         </Grid>
+        <Tooltip title="During the initial phase of the DEX, your APR will be doubled. The extra amount will be paid out as a vested, claimable reward after the end of this period.">
+          <Box
+            sx={{
+              width: "100%",
+              mt: 1,
+              border: "1px solid #E2621B",
+              display: "flex",
+              alignItems: "center",
+              padding: 1,
+              cursor: "help",
+              borderRadius: "0.5rem",
+              justifyContent: "space-between",
+              background:
+                "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
+            }}
+          >
+            <Info />
+            <Typography
+              sx={{
+                color: "#FFF",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                lineHeight: "140%",
+              }}
+            >
+              This pool is qualified for the PHO Airdrop.
+            </Typography>
+          </Box>
+        </Tooltip>
       </Box>
     </Grid>
   );
@@ -232,82 +264,86 @@ const Pools = ({
           />
         </Grid>
       </Grid>
-      <Box sx={{
-        display: "flex"
-      }}>
-          <Input
-            placeholder="Search"
-            onChange={(e: any) => setSearchValue(e.target.value)}
+      <Box
+        sx={{
+          display: "flex",
+        }}
+      >
+        <Input
+          placeholder="Search"
+          onChange={(e: any) => setSearchValue(e.target.value)}
+          sx={{
+            width: "100%",
+            mr: 2,
+            borderRadius: "16px",
+            border: "1px solid #2D303A",
+            background: "#1D1F21",
+            padding: "8px 16px",
+            lineHeight: "18px",
+            fontSize: "13px",
+            marginBottom: "16px",
+            "&:before": {
+              content: "none",
+            },
+            "&:after": {
+              content: "none",
+            },
+          }}
+          startAdornment={
+            <img style={{ marginRight: "8px" }} src="/MagnifyingGlass.svg" />
+          }
+        />
+        <FormControl
+          sx={{
+            minWidth: "180px",
+          }}
+        >
+          <InputLabel
             sx={{
-              width: "100%",
-              mr: 2,
-              borderRadius: "16px",
-              border: "1px solid #2D303A",
-              background: "#1D1F21",
-              padding: "8px 16px",
-              lineHeight: "18px",
-              fontSize: "13px",
-              marginBottom: "16px",
-              "&:before": {
-                content: "none",
-              },
-              "&:after": {
-                content: "none",
+              fontSize: "13px !important",
+              paddingBottom: "12px",
+              top: "-2px",
+              color: "rgba(255, 255, 255, 0.70) !important",
+              borderColor: "transparent",
+              "&:hover": {
+                borderColor: "transparent",
               },
             }}
-            startAdornment={
-              <img style={{ marginRight: "8px" }} src="/MagnifyingGlass.svg" />
-            }
-          />
-          <FormControl sx={{
-            minWidth: "180px"
-          }}>
-            <InputLabel
-              sx={{
-                fontSize: "13px !important",
-                paddingBottom: "12px",
-                top: "-2px",
-                color: "rgba(255, 255, 255, 0.70) !important",
-                borderColor: "transparent",
-                "&:hover": {
-                  borderColor: "transparent",
-                }
-              }}
-            >
-              Sort by
-            </InputLabel>
-            <Select
-              onChange={(event: any) => onSortSelect(event.target.value)}
-              autoWidth
-              label="Sort by"
-              value={sort}
-              sx={{
-                padding: "16px",
-                height: "46px",
-                borderRadius: "16px",
-                border: "1px solid #2D303A !important",
-                background: "#1F2123",
-                fontSize: "14px !important",
-              }}
-            >
-              <MenuItem value={"HighTVL"}>
-                <Typography fontSize="14px">TVL High to Low</Typography>
-              </MenuItem>
-              <MenuItem value={"HighTVL"}>
-                <Typography fontSize="14px">TVL Low to High</Typography>
-              </MenuItem>
-              <MenuItem value={"HighAPR"}>
-                <Typography fontSize="14px">APR High to Low</Typography>
-              </MenuItem>
-              <MenuItem value={"HighAPR"}>
-                <Typography fontSize="14px">APR Low to High</Typography>
-              </MenuItem>
-            </Select>
-          </FormControl>
+          >
+            Sort by
+          </InputLabel>
+          <Select
+            onChange={(event: any) => onSortSelect(event.target.value)}
+            autoWidth
+            label="Sort by"
+            value={sort}
+            sx={{
+              padding: "16px",
+              height: "46px",
+              borderRadius: "16px",
+              border: "1px solid #2D303A !important",
+              background: "#1F2123",
+              fontSize: "14px !important",
+            }}
+          >
+            <MenuItem value={"HighTVL"}>
+              <Typography fontSize="14px">TVL High to Low</Typography>
+            </MenuItem>
+            <MenuItem value={"HighTVL"}>
+              <Typography fontSize="14px">TVL Low to High</Typography>
+            </MenuItem>
+            <MenuItem value={"HighAPR"}>
+              <Typography fontSize="14px">APR High to Low</Typography>
+            </MenuItem>
+            <MenuItem value={"HighAPR"}>
+              <Typography fontSize="14px">APR Low to High</Typography>
+            </MenuItem>
+          </Select>
+        </FormControl>
       </Box>
       <Grid container spacing={2}>
         {pools.map((pool, index) => {
-          if (filter === "ALL" || filter === "MY" && pool.userLiquidity > 0) {
+          if (filter === "ALL" || (filter === "MY" && pool.userLiquidity > 0)) {
             return (
               <PoolItem
                 key={index}
@@ -317,7 +353,7 @@ const Pools = ({
                 pool={pool}
               />
             );
-          } 
+          }
           return null;
         })}
       </Grid>
