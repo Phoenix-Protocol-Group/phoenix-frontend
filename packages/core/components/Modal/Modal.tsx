@@ -42,7 +42,7 @@ export const SwapError = ({
   <ModalUI
     type="ERROR"
     open={open}
-    title={error.includes("declined") ? "Transaction Rejected" : "Unsuccessful Swap"}
+    title={error.includes("declined") || error.includes("request denied") ? "Transaction Rejected" : "Unsuccessful Swap"}
     setOpen={setOpen}
     description="There was a problem with your swap"
     error={error}

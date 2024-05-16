@@ -110,11 +110,11 @@ export default function SwapPage() {
         return;
       }
       setSuccessModalOpen(true);
-    } catch (e) {
+    } catch (e: any) {
       setErrorModalOpen(true);
 
       // @ts-ignore
-      setErrorDescription((typeof e === "string") ? e : resolveContractError(e.message));
+      setErrorDescription((typeof e === "string") ? e : e.message.includes("request denied") ? e.message : resolveContractError(e.message));
       setTxBroadcasting(false);
     }
     setTxBroadcasting(false);
