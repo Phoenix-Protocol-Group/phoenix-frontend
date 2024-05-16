@@ -8,7 +8,6 @@ const nextConfig = {
       __dirname,
       "../../node_modules/@allbridge/bridge-core-sdk/dist/browser/index.js"
     );
-    console.log("Browser path:", browserPath); // Log the resolved path
     config.resolve.alias["@allbridge/bridge-core-sdk"] = browserPath;
     return config;
   },

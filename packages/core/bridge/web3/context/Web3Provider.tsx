@@ -1,6 +1,6 @@
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
-import { cookieStorage, createStorage } from "wagmi";
+import { cookieStorage, createStorage, useConfig } from "wagmi";
 import { WagmiProvider } from "wagmi";
 import { arbitrum, mainnet } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -41,7 +41,6 @@ createWeb3Modal({
 });
 
 export function Web3ModalProvider({ children }: any) {
-  const { supportedNetworks } = useConfig();
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

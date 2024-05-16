@@ -14,46 +14,56 @@ import { useEffect } from "react";
 import { useSignMessage, useAccount } from "wagmi";
 
 export default function Page() {
+  return (
+    <Web3ModalProvider>
+      <ContentComponent />
+    </Web3ModalProvider>
+  );
+}
+
+const ContentComponent = () => {
   const sdk = new AllbridgeCoreSdk({
     ...nodeRpcUrlsDefault,
   });
+
   const { address } = useAccount();
 
   const bridge = async () => {
     // fetch information about supported chains
-    const chains = await sdk.chainDetailsMap();
+    const tokens = await sdk.tokens();
 
     // Get chain info and token info
-    const bscChain = chains[ChainSymbol.ETH];
-    const busdToken = bscChain.tokens.find((token) => token.symbol === "USDT");
+    const ethUSDT = tokens.find(
+      (token) => token.symbol === "USDT" && token.chainSymbol === "ETH"
+    );
 
-    const trxChain = chains[ChainSymbol.STLR];
-    const usdcToken = trxChain.tokens.find((token) => token.symbol === "USDC");
+    const stlrUSDT = tokens.find(
+      (token) => token.symbol === "USDT" && token.chainSymbol === "SRB"
+    );
 
     // @ts-ignore
     const web3 = new Web3(window.ethereum);
     // authorize a transfer of tokens from sender's address
     await sdk.bridge.approve(web3, {
-      token: busdToken!,
+      token: ethUSDT!,
       owner: address!,
     });
 
     // initiate transfer
     const response = await sdk.bridge.send(web3, {
-      amount: "1.01",
+      amount: "0.5",
       fromAccountAddress: address!,
       toAccountAddress:
         "GBUHRWJBXS4YAEOVDRWFW6ZC5LLF2SAOMATH4I6YOTZYHE65FQRFOKG2",
-      sourceToken: busdToken!,
-      destinationToken: usdcToken!,
+      sourceToken: ethUSDT!,
+      destinationToken: stlrUSDT!,
       messenger: Messenger.ALLBRIDGE,
     });
 
     console.log("Tokens sent:", response.txId);
   };
-
   return (
-    <Web3ModalProvider>
+    <>
       <Box
         sx={{
           width: "100%",
@@ -64,6 +74,6 @@ export default function Page() {
         <ModalOpenButton />
       </Box>
       <Button onClick={() => bridge()}>Bridge</Button>
-    </Web3ModalProvider>
+    </>
   );
-}
+};
