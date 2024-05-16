@@ -131,7 +131,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       router.push("/");
     }
 
-    if(!persistStore.disclaimer.accepted) {
+    if (!persistStore.disclaimer.accepted) {
       setDisclaimerModalOpen(true);
     }
 
@@ -144,11 +144,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   }, []);
 
   const onAcceptDisclaimer = (accepted: boolean) => {
-    if(accepted) {
+    if (accepted) {
       persistStore.setDisclaimerAccepted(true);
       setDisclaimerModalOpen(false);
     } else {
-      window.location.assign('http://google.com');
+      window.location.assign("http://google.com");
     }
   };
 
@@ -159,6 +159,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     backgroundAttachment: "fixed",
     backgroundPosition: "center",
     backgroundSize: { xs: "cover", md: "50% 100%" },
+    paddingBottom: "50px",
+    width: {
+      xs: "100vw",
+      md: largerThenMd
+        ? navOpen
+          ? "calc(100% - 240px)"
+          : "calc(100% - 60px)"
+        : navOpen
+        ? "0"
+        : "100%",
+    },
+  };
+
+  // Style object for swap page background image
+  const poolPageStyles = {
+    backgroundImage: `url("/BG.svg")`,
+    backgroundRepeat: "no-repeat",
+    backgroundAttachment: "fixed",
+    backgroundPosition: "center",
+    backgroundSize: "cover",
     paddingBottom: "50px",
     width: {
       xs: "100vw",
@@ -232,7 +252,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               {/* Top Navigation Bar */}
               <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
               {/* Joyride Tour */}
-              {initialized && (
+              {initialized && persistStore.disclaimer.accepted && (
                 <>
                   <TourModal
                     open={tourModalOpen}
@@ -266,12 +286,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       },
                     }}
                   />
-                  <DisclaimerModal
-                    open={disclaimerModalOpen}
-                    onAccepted={onAcceptDisclaimer}
-                  />
                 </>
               )}
+              <DisclaimerModal
+                open={!persistStore.disclaimer.accepted}
+                onAccepted={onAcceptDisclaimer}
+              />
               {/* Main Content Area */}
               <Box
                 sx={{
@@ -281,7 +301,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   display: "flex",
                   justifyContent: "center",
                   padding: "16px",
-                  ...swapPageStyle,
+                  ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
                 }}
               >
                 {/* Child Components */}

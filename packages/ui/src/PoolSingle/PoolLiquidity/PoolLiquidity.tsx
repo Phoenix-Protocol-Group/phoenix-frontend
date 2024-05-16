@@ -183,7 +183,9 @@ const PoolLiquidity = ({
     <Box
       sx={{
         borderRadius: "0.5rem",
-        background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
+        background:
+          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+        backdropFilter: "blur(42px)",
       }}
     >
       <Box

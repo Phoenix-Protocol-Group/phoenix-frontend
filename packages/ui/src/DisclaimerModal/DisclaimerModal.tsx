@@ -17,6 +17,7 @@ const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps): React.Reac
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: 512,
+    maxWidth: "calc(100vw - 16px)",
     background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
     borderRadius: "16px",
     display: "flex",
@@ -29,6 +30,9 @@ const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps): React.Reac
       open={open}
       aria-labelledby="disclaimer-modal"
       aria-describedby="Disclaimer Message"
+      sx={{
+        zIndex: 1300
+      }}
     >
       <Box sx={style}>
         <Box>

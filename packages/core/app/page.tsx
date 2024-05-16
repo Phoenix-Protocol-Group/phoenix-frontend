@@ -18,15 +18,18 @@ import {
   WalletBalanceTable,
   AnchorServices,
   Skeleton,
+  AssetInfoModal,
 } from "@phoenix-protocol/ui";
 import Link from "next/link";
+
+import { SorobanTokenContract } from "@phoenix-protocol/contracts";
 
 import { useEffect, useState } from "react";
 import {
   DepositManager,
   getAllAnchors,
 } from "@phoenix-protocol/utils/build/sep24";
-import { Anchor } from "@phoenix-protocol/types";
+import { Anchor, AssetInfo } from "@phoenix-protocol/types";
 import {
   constants,
   fetchBiggestWinnerAndLoser,
@@ -52,6 +55,8 @@ export default function Page() {
   const [xlmPriceChange, setXlmPriceChange] = useState<number>(0);
   const [usdcPrice, setUsdcPrice] = useState(0);
   const [disclaimer, setDisclaimer] = useState(true);
+  const [selectedTokenForInfo, setSelectedTokenForInfo] = useState<AssetInfo>();
+  const [tokenInfoOpen, setTokenInfoOpen] = useState<boolean>(false);
 
   // Loading states
   const [loadingBalances, setLoadingBalances] = useState(true);
@@ -141,6 +146,33 @@ export default function Page() {
     setXlmPriceChange(priceChangeXLM);
   };
 
+  const fetchTokenInfo = async (tokenId: string) => {
+    const TokenContract = new SorobanTokenContract.Contract({
+      contractId: tokenId,
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
+      rpcUrl: constants.RPC_URL,
+    });
+    const tokenName = (await TokenContract.name()).result
+      .toLowerCase()
+      .replace(":", "-");
+
+    const fetchedInfo = await (
+      await fetch(
+        `https://api.stellar.expert/explorer/public/asset?search=${tokenName}`
+      )
+    ).json();
+
+    const info = fetchedInfo._embedded.records.find(
+      (el: any) =>
+        el.asset === tokenName.toUpperCase() ||
+        el.asset === tokenName.toUpperCase() + "-1" ||
+        el.asset === tokenName.toUpperCase() + "-2"
+    );
+
+    setSelectedTokenForInfo(info);
+    setTokenInfoOpen(true);
+  };
+
   const args = {
     mainstatsArgs: {
       stats: [
@@ -188,6 +220,9 @@ export default function Page() {
     },
     walletBalanceArgs: {
       tokens: allTokens,
+      onTokenClick: (token: string) => {
+        fetchTokenInfo(token);
+      },
     },
     dashboardStatsArgs: {
       gainer: gainerAsset,
@@ -278,8 +313,10 @@ export default function Page() {
 &network=STELLAR
 &networkList=STELLAR
 &product=BUY
-&productList=BUY
-&mode=minimal`,
+&productList=BUY` +
+                  (persistStore.wallet.address
+                    ? `&onToAddress=${persistStore.wallet.address}`
+                    : ""),
                 "_blank",
                 "toolbar=yes,scrollbars=yes,resizable=yes,top=0,left=0,width=480,height=620"
               )
@@ -294,6 +331,13 @@ export default function Page() {
           )}
         </Grid>
       </Grid>
+      {selectedTokenForInfo && (
+        <AssetInfoModal
+          open={tokenInfoOpen}
+          onClose={() => setTokenInfoOpen(false)}
+          asset={selectedTokenForInfo}
+        />
+      )}
     </Box>
   );
 }
