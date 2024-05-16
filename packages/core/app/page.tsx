@@ -148,10 +148,10 @@ export default function Page() {
     setUsdcPrice(phoPrice);
     setXlmPriceChange(priceChangeXLM);
 
-    const xlmPrices = await fetchHistoricalPrices(1440, "XLM");
+    const xlmPrices = await fetchHistoricalPrices(1440, "XLM", undefined, 20);
     setXlmPriceChart(xlmPrices);
 
-    const phoPrices = await fetchHistoricalPrices(1440, "PHO");
+    const phoPrices = await fetchHistoricalPrices(1440, "PHO", undefined, 20);
     setPhoPriceChart(phoPrices);
   };
 

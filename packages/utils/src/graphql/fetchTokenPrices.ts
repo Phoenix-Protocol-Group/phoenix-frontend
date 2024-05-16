@@ -44,7 +44,8 @@ export async function fetchTokenPrices(symbol?: string, tokenId?: string) {
 export async function fetchHistoricalPrices(
   timestampLimit: number,
   symbol?: string,
-  tokenId?: string
+  tokenId?: string,
+  maxEntries?: number,
 ) {
   const client = createApolloClient();
 
@@ -53,11 +54,13 @@ export async function fetchHistoricalPrices(
       $symbol: String
       $tokenId: String
       $timestampLimit: Int
+      $maxEntries: Int
     ) {
       historicalPrices(
         symbol: $symbol
         tokenId: $tokenId
         timestampLimit: $timestampLimit
+        maxEntries: $maxEntries
       ) {
         symbol
         timestamp
@@ -73,7 +76,8 @@ export async function fetchHistoricalPrices(
       variables: {
         symbol,
         tokenId,
-        timestampLimit
+        timestampLimit,
+        maxEntries,
       },
     });
 
