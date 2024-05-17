@@ -8,6 +8,7 @@ export interface SidebarItems {
 
 export interface DrawerProps extends MuiDrawerProps {
   items: SidebarItems[];
+  bottomItems?: SidebarItems[];
   open: boolean;
   setOpen: (open: boolean) => void;
   onNavClick: (href: string) => void;
