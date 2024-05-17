@@ -109,7 +109,7 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
           </Grid>
           <Grid item xs={2}>
             <Typography sx={{ ...typoStyle, fontWeight: 400 }}>
-              Locked Period
+              Days Staked
             </Typography>
           </Grid>
           <Grid item xs={4}>
