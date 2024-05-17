@@ -70,6 +70,7 @@ const SideNav = ({
     <SidebarNavigation
       onNavClick={onNavClick}
       items={navItems}
+      bottomItems={[]}
       open={navOpen}
       setOpen={setNavOpen}
     />
