@@ -160,7 +160,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       borderRadius: "1000px",
       top: "10%",
       left: "50%",
-      opacity: "0.15",
+      opacity: "0.10",
       zIndex: -1,
       transform: "translateX(-50%)",
       width: "100vw",
