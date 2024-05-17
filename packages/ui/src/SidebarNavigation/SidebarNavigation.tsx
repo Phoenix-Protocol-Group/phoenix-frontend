@@ -182,15 +182,17 @@ const SidebarNavigation = ({
           </ListItem>
         )}
       </List>
-      <List sx={{ position: "absolute", bottom: "2rem", width: "100%" }}>
-        <ItemList
-          items={bottomItems}
-          setOpen={setOpen}
-          largerThenMd={largerThenMd}
-          onNavClick={onNavClick}
-          open={open}
-        />
-      </List>
+      {bottomItems && (
+        <List sx={{ position: "absolute", bottom: "2rem", width: "100%" }}>
+          <ItemList
+            items={bottomItems}
+            setOpen={setOpen}
+            largerThenMd={largerThenMd}
+            onNavClick={onNavClick}
+            open={open}
+          />
+        </List>
+      )}
     </Drawer>
   );
 };
@@ -205,7 +207,7 @@ const ItemList = ({
   items: any[];
   setOpen: (open: boolean) => void;
   largerThenMd: boolean;
-  onNavClick: (href: string) => void;
+  onNavClick: (href: string, target?: string) => void;
   open: boolean;
 }) => {
   return (
@@ -235,7 +237,7 @@ const ItemList = ({
               if (!largerThenMd) {
                 setOpen(false);
               }
-              onNavClick(item.href);
+              onNavClick(item.href, item.target);
             }}
             sx={{
               padding: 0,

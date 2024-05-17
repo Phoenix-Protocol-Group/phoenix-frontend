@@ -14,3 +14,4 @@ export * from "./graphql";
 export * from "./prices";
 export * from "./errorResolver";
 export * from "./trustlines";
+export * as HelpCenter from "./help-center";
