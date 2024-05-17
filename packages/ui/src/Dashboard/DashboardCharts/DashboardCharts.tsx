@@ -48,8 +48,8 @@ const DashboardPriceCharts = ({
   icon,
   assetName,
 }: DashboardChartsProps) => {
-  const differencePercent: number =
-    ((data[data.length - 1][1] - data[0][1]) / data[data.length - 1][1]) * 100;
+  const differencePercent: number = data.length ?
+    ((data[data.length - 1][1] - data[0][1]) / data[data.length - 1][1]) * 100 : 0;
   const theme = useTheme();
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
   return (
@@ -95,15 +95,15 @@ const DashboardPriceCharts = ({
               sx={{
                 borderRadius: "16px",
                 border:
-                  differencePercent > 0
+                  differencePercent >= 0
                     ? "1px solid #5BFF22"
                     : "1px solid #F22",
                 background:
-                  differencePercent > 0
+                  differencePercent >= 0
                     ? "rgba(91, 255, 34, 0.20)"
                     : "rgba(255, 34, 34, 0.20)",
                 backdropFilter: "blur(2.5px)",
-                color: differencePercent > 0 ? "#5BFF22" : "#F22",
+                color: differencePercent >= 0 ? "#5BFF22" : "#F22",
               }}
             />
           )}
@@ -133,7 +133,7 @@ const DashboardPriceCharts = ({
               letterSpacing: "-0.0625rem",
             }}
           >
-            ${data[data.length - 1][1].toString().slice(0, 5)}
+            ${data.length ? data[data.length - 1][1].toString().slice(0, 5) : 0}
           </Typography>
           {largerThenMd && (
             <Chip
@@ -141,15 +141,15 @@ const DashboardPriceCharts = ({
               sx={{
                 borderRadius: "16px",
                 border:
-                  differencePercent > 0
+                  differencePercent >= 0
                     ? "1px solid #5BFF22"
                     : "1px solid #F22",
                 background:
-                  differencePercent > 0
+                  differencePercent >= 0
                     ? "rgba(91, 255, 34, 0.20)"
                     : "rgba(255, 34, 34, 0.20)",
                 backdropFilter: "blur(2.5px)",
-                color: differencePercent > 0 ? "#5BFF22" : "#F22",
+                color: differencePercent >= 0 ? "#5BFF22" : "#F22",
               }}
             />
           )}
