@@ -6,6 +6,7 @@ import {
   Button,
   TransactionsCards,
   TransactionsTable,
+  Skeleton,
   VolumeChart,
 } from "@phoenix-protocol/ui";
 import {
@@ -340,7 +341,7 @@ export default function Page() {
           }
         />
       ) : (
-        <Box></Box>
+        <Skeleton.TransactionsTable />
       )}
 
       <Box sx={{ display: "flex", justifyContent: "end", mt: 3 }}>
