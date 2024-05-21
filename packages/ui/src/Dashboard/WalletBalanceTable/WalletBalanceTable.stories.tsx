@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import WalletBalanceTable from "./WalletBalanceTable";
 import { Grid } from "@mui/material";
 
-export const testTokens = [
+const testTokens = [
   {
     name: "USDT",
     icon: "cryptoIcons/usdt.svg",
@@ -66,6 +66,14 @@ export const Primary: Story = {
   args: {
     // @ts-ignore
     tokens: testTokens,
+    onTokenClick: (token) => console.log(token),
+  },
+};
+
+export const NoEntries: Story = {
+  args: {
+    // @ts-ignore
+    tokens: [],
     onTokenClick: (token) => console.log(token),
   },
 };
