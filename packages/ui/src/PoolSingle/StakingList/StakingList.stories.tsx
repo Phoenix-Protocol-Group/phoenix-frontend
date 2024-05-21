@@ -98,3 +98,9 @@ export const Primary: Story = {
     entries,
   },
 };
+
+export const NoEntries: Story = {
+  args: {
+    entries: []
+  },
+};
