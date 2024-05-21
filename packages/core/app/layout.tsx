@@ -9,7 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import JoyRideTooltip from "@/components/JoyRideTooltip";
-import { fetchHistoricalPrices, joyride } from "@phoenix-protocol/utils";
+import { joyride } from "@phoenix-protocol/utils";
 import { TourModal, DisclaimerModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
 import Countdown from "@/components/Countdown";
