@@ -1,28 +1,12 @@
 import {
-  ArrowDownward,
-  ArrowRightAlt,
-  ExpandMore,
-  ManageSearch,
-  SwapVert,
-  Tune,
-} from "@mui/icons-material";
-import {
   Box,
-  Button,
-  Divider,
   Grid,
-  IconButton,
-  Input,
-  Menu,
-  MenuItem,
-  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
 import FilterMenu from "./FilterMenu";
 import {
   TransactionsTableProps,
-  TransactionTableEntryProps,
 } from "@phoenix-protocol/types";
 import React from "react";
 import TransactionEntry from "./TransactionEntry";
@@ -136,7 +120,13 @@ const TransactionsTable = (props: TransactionsTableProps) => {
           >
             All
           </Box>
-          <Tooltip title={props.loggedIn ? undefined : "Connect wallet to see personal transactions"}>
+          <Tooltip
+            title={
+              props.loggedIn
+                ? undefined
+                : "Connect wallet to see personal transactions"
+            }
+          >
             <Box
               sx={
                 props.activeView === "personal"
@@ -227,16 +217,31 @@ const TransactionsTable = (props: TransactionsTableProps) => {
         </Grid>
       </Box>
       <Box sx={{ minWidth: "700px" }}>
-        {props.entries.map((entry, index) => (
-          <TransactionEntry
-            type={entry.type}
-            assets={entry.assets}
-            tradeSize={entry.tradeSize}
-            tradeValue={entry.tradeValue}
-            date={entry.date}
-            txHash={entry.txHash}
-          />
-        ))}
+        {props.entries.length ? (
+          props.entries.map((entry, index) => (
+            <TransactionEntry
+              type={entry.type}
+              assets={entry.assets}
+              tradeSize={entry.tradeSize}
+              tradeValue={entry.tradeValue}
+              date={entry.date}
+              txHash={entry.txHash}
+            />
+          ))
+        ) : (
+          <Box>
+            <Typography
+              sx={{
+                color: "#FFF",
+                fontSize: "14px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              No Entries found
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );
