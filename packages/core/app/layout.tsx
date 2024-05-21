@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   // Media query to check screen size
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
   // State to manage navigation open/close status
-  const [navOpen, setNavOpen] = useState(window && window.innerWidth >= 900 ? true : false); //use window object instead of useMediaQuery to execute faster
+  const [navOpen, setNavOpen] = useState(typeof window !== "undefined" && window.innerWidth >= 900 ? true : false); //use window object instead of useMediaQuery to execute faster
   // Retrieve the current pathname
   const pathname = usePathname();
   // Get AppStore
