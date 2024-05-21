@@ -206,7 +206,7 @@ const TransactionsTable = (props: TransactionsTableProps) => {
           <Grid item xs={1}>
             <TransactionHeader
               handleSort={props.handleSort}
-              label="Actions"
+              label="Unbond"
               active={
                 props.activeSort.column === "actions"
                   ? props.activeSort.direction
