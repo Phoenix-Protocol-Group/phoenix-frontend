@@ -41,3 +41,12 @@ export const Primary: Story = {
     }]
   },
 };
+
+export const NoEntries: Story = {
+  args: {
+    activeSort: {column: "tradeSize", direction: "asc"},
+    activeView: "personal",
+    activeFilters: {dateRange: {from: null, to: null}, tradeSize: {from: null, to: null}, tradeValue: {from: null, to: null}},
+    entries: []
+  },
+};

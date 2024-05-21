@@ -236,9 +236,11 @@ const TransactionsTable = (props: TransactionsTableProps) => {
                 fontSize: "14px",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
+                pt: 1
               }}
             >
-              No Entries found
+              {props.activeView === "personal" ? "It looks like you haven't made any transactions yet." : "No transactions found."}
             </Typography>
           </Box>
         )}
