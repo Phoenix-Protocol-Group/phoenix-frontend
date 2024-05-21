@@ -22,6 +22,8 @@ const asset = {
 
 export const Primary: Story = {
   args: {
+    activeSort: {column: "tradeSize", direction: "asc"},
+    activeFilters: {dateRange: {from: null, to: null}, tradeSize: {from: null, to: null}, tradeValue: {from: null, to: null}},
     entries: [{
       type: "Success",
       assets: [asset, asset],
