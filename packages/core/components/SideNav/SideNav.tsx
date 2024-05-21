@@ -1,5 +1,6 @@
 import { useMediaQuery, useTheme } from "@mui/material";
 import { SidebarNavigation } from "@phoenix-protocol/ui";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 
@@ -17,7 +18,10 @@ const SideNav = ({
     {
       label: "Dashboard",
       icon: (
-        <img
+        <Image
+          alt="Dashboard Icon"
+          width={24}
+          height={24}
           src={
             pathname == "/" ? "/dashboardIconActive.svg" : "/dashboardIcon.svg"
           }
@@ -29,7 +33,10 @@ const SideNav = ({
     {
       label: "Swap",
       icon: (
-        <img
+        <Image
+          width={24}
+          height={24}
+          alt="Swap Icon"
           src={pathname == "/swap" ? "/swapIconActive.svg" : "/swapIcon.svg"}
         />
       ),
@@ -39,7 +46,10 @@ const SideNav = ({
     {
       label: "Pools",
       icon: (
-        <img
+        <Image
+          alt="Pools Icon"
+          width={24}
+          height={24}
           src={pathname == "/pools" ? "/poolsIconActive.svg" : "/poolsIcon.svg"}
         />
       ),
@@ -49,7 +59,10 @@ const SideNav = ({
     {
       label: "Trade History",
       icon: (
-        <img
+        <Image
+          alt="History Icon"
+          width={24}
+          height={24}
           src={
             pathname == "/history"
               ? "/tradeHistoryIconActive.svg"
