@@ -11,7 +11,7 @@ const meta: Meta<typeof TransactionsTable> = {
     (Story) => (
       <Grid container>
         {/* 👇 Decorators in Storybook also accept a function. Replace <Story/> with Story() to enable it  */}
-        <Grid item xs={12} md={7}>
+        <Grid item xs={12}>
           <Story />
         </Grid>
       </Grid>
