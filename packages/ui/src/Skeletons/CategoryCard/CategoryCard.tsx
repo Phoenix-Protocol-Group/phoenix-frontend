@@ -1,20 +1,11 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Skeleton } from "@mui/material";
 import React from "react";
 import Colors from "../../Theme/colors";
 
-interface CategoryCardProps {
-  category: {
-    name: string;
-    description: string;
-    thumbnail: string;
-  };
-}
-
-const CategoryCard = ({ category }: CategoryCardProps) => {
-  const { name, description, thumbnail } = category;
+const CategoryCard = () => {
   return (
     <Box
-      sx={{
+      style={{
         display: "inline-block",
         background: "linear-gradient(180deg, #E2391B 0%, #E29E1B 100%)",
         padding: "1px", // This is the border witdh
@@ -30,31 +21,14 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
           alignItems: "center",
           flexShrink: 0,
           borderRadius: "16px",
-          transition: "all 0.3s ease-in-out",
-          "&:hover": {
-            cursor: "pointer",
-            opacity: 0.9,
-          },
         }}
       >
-        <Box
-          component="img"
-          src={thumbnail}
-          sx={{
-            display: "flex",
-            width: "5rem",
-            height: "5rem",
-            justifyContent: "center",
-            alignItems: "center",
-            flexShrink: 0,
-            borderRadius: "8px",
-          }}
-        />
+        <Skeleton variant="rounded" width={32} height={32} />
         <Box>
           <Typography
             sx={{ fontSize: "1.125rem", fontWeight: 700, ml: "1rem" }}
           >
-            {name}
+            <Skeleton variant="text" sx={{ height: "1.125rem", width: "8rem"}} />
           </Typography>
           <Typography
             sx={{
@@ -64,7 +38,7 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
               color: "#BFBFBF",
             }}
           >
-            {description}
+            <Skeleton variant="text" />
           </Typography>
         </Box>
       </Box>

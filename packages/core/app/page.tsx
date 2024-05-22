@@ -22,6 +22,8 @@ import {
 } from "@phoenix-protocol/ui";
 import Link from "next/link";
 
+import results from "./results.json";
+
 import { SorobanTokenContract } from "@phoenix-protocol/contracts";
 
 import { useEffect, useState } from "react";
@@ -30,7 +32,7 @@ import {
   getAllAnchors,
 } from "@phoenix-protocol/utils/build/sep24";
 import { Anchor, AssetInfo } from "@phoenix-protocol/types";
-import { fetchHistoricalPrices } from "@phoenix-protocol/utils";
+import { fetchHistoricalPrices, scValStrToJs } from "@phoenix-protocol/utils";
 import {
   constants,
   fetchBiggestWinnerAndLoser,

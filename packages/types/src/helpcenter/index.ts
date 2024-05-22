@@ -8,5 +8,6 @@ export interface HelpCenterArticle {
   description: string;
   thumbnail: string;
   title: string;
+  featured?: boolean;
   updated: string;
 }

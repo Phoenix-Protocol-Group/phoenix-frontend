@@ -30,6 +30,12 @@ export const getFeaturedArticles = async () => {
 
 export const getArticleById = async (id: string) => {
   return await pb.collection("articles").getList(1, 50, {
-    filter: 'id = "' + id + '"',
+    filter: `id="${id}"`,
+  });
+};
+
+export const getArticlesByCategory = async (category: string) => {
+  return await pb.collection("categories").getOne(category, {
+    expand: "articles",
   });
 };

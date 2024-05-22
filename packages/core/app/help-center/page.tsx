@@ -1,7 +1,7 @@
 "use client";
 import { Box, Container, Grid, Typography } from "@mui/material";
 import { HelpCenterArticle } from "@phoenix-protocol/types";
-import { ArticleCard, CategoryCard } from "@phoenix-protocol/ui";
+import { ArticleCard, CategoryCard, Skeleton } from "@phoenix-protocol/ui";
 import { HelpCenter } from "@phoenix-protocol/utils";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
@@ -13,6 +13,7 @@ export default function Page() {
       name: string;
       description: string;
       thumbnail: string;
+      id: string;
     }[]
   >([]);
 
@@ -32,17 +33,15 @@ export default function Page() {
         return {
           name:
             category.title.charAt(0).toUpperCase() + category.title.slice(1),
-          description: fetchCategories.length + " Articles",
+          description: category.articles.length + " Articles",
           thumbnail: `https://phoenix-helpcenter.pockethost.io/api/files/${category.collectionId}/${category.id}/${category.thumbnail}`,
+          id: category.id,
         };
       });
       setCategories(_categories);
 
-      console.log(fetchCategories);
-
       // Fetch featured articles
       const fetchFeaturedArticles = await HelpCenter.getFeaturedArticles();
-      console.log(fetchFeaturedArticles);
       // Map correct categories
       const _featuredCategories = fetchFeaturedArticles.items.map((article) => {
         return {
@@ -88,11 +87,26 @@ export default function Page() {
           </Typography>
         </Box>
         <Grid container spacing={3} sx={{ mt: 2 }}>
-          {categories.map((category) => (
-            <Grid item xs={12} sm={6} md={4} key={category.name}>
-              <CategoryCard category={category} />
-            </Grid>
-          ))}
+          {categories.length > 0
+            ? categories.map((category) => (
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  key={category.name}
+                  onClick={() =>
+                    router.push(`/help-center/category/${category.id}`)
+                  }
+                >
+                  <CategoryCard category={category} />
+                </Grid>
+              ))
+            : Array.from({ length: 3 }).map((_, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Skeleton.CategoryCard />
+                </Grid>
+              ))}
         </Grid>
       </Box>
       <Box sx={{ mt: 7 }}>
@@ -110,18 +124,26 @@ export default function Page() {
           </Typography>
         </Box>
         <Grid container spacing={3} sx={{ mt: 2 }}>
-          {featuredArticles.map((article) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              key={article.id}
-              onClick={() => router.push(`/help-center/articles/${article.id}`)}
-            >
-              <ArticleCard article={article} />
-            </Grid>
-          ))}
+          {featuredArticles.length > 0
+            ? featuredArticles.map((article) => (
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  key={article.id}
+                  onClick={() =>
+                    router.push(`/help-center/articles/${article.id}`)
+                  }
+                >
+                  <ArticleCard article={article} />
+                </Grid>
+              ))
+            : Array.from({ length: 6 }).map((_, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Skeleton.ArticleCard />
+                </Grid>
+              ))}
         </Grid>
       </Box>
     </Container>
