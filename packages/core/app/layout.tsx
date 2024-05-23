@@ -9,7 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import JoyRideTooltip from "@/components/JoyRideTooltip";
-import { fetchHistoricalPrices, joyride } from "@phoenix-protocol/utils";
+import { joyride } from "@phoenix-protocol/utils";
 import { TourModal, DisclaimerModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
 import Countdown from "@/components/Countdown";
@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   // Media query to check screen size
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
   // State to manage navigation open/close status
-  const [navOpen, setNavOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(typeof window !== "undefined" && window.innerWidth >= 900 ? true : false); //use window object instead of useMediaQuery to execute faster
   // Retrieve the current pathname
   const pathname = usePathname();
   // Get AppStore
