@@ -249,8 +249,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <>
               {/* Side Navigation Component */}
               <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
-              {/* Top Navigation Bar */}
-              <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
+
               {/* Joyride Tour */}
               {initialized && persistStore.disclaimer.accepted && (
                 <>
@@ -304,6 +303,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
                 }}
               >
+                {/* Top Navigation Bar */}
+                <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
                 {/* Child Components */}
                 {children}
               </Box>

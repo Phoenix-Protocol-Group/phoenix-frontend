@@ -26,7 +26,7 @@ export default function Page({ params }: ArticlePageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <Container sx={{ mt: 2, maxWidth: "68rem" }}>
+    <Container sx={{ mt: { xs: 8, md: 2 }, maxWidth: "68rem" }}>
       {article && (
         <>
           <Box>

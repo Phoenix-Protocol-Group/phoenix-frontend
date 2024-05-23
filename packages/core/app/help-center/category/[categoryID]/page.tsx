@@ -50,7 +50,7 @@ export default function Page({ params }: CategoryPageProps) {
     }
   };
   return (
-    <Container>
+    <Container sx={{ mt: { xs: 8, md: 2 } }}>
       <Box>
         <Typography
           sx={{

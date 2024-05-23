@@ -130,7 +130,7 @@ export default function Page() {
   }, [searchValue]);
 
   return (
-    <Container sx={{ mt: "3.5rem" }}>
+    <Container sx={{ mt: { xs: 8, md: 2 } }}>
       <Grid container>
         <Grid sx={{ position: "relative" }} item xs={12} md={6}>
           <Typography
