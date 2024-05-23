@@ -154,11 +154,22 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
   // Style object for swap page background image
   const swapPageStyle = {
-    backgroundImage: `url("/swapBg.png")`,
-    backgroundRepeat: "no-repeat",
-    backgroundAttachment: "fixed",
-    backgroundPosition: "center",
-    backgroundSize: { xs: "cover", md: "50% 100%" },
+    "&:after": {
+      position: "absolute",
+      pointerEvents: "none",
+      borderRadius: "1000px",
+      top: "10%",
+      left: "50%",
+      opacity: "0.10",
+      zIndex: -1,
+      transform: "translateX(-50%)",
+      width: "100vw",
+      height: "100vh",
+      content: "' '",
+      background:
+      "linear-gradient(135deg, #E2491A 0%, #E21B1B 17.08%, #E2491A 42.71%, #E2AA1B 100%)",
+      filter: "blur(182px)"
+    },
     paddingBottom: "50px",
     width: {
       xs: "100vw",
