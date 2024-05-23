@@ -1,4 +1,4 @@
-enum ContractError {
+enum PoolContractError {
   SpreadExceedsLimit = 1,
 
   ProvideLiquiditySlippageToleranceTooHigh = 2,
@@ -19,6 +19,42 @@ enum ContractError {
   MinAmountsBelowZero = 15,
 }
 
+enum VestingContractError {
+  Std = 0,
+  VestingNotFoundForAddress = 1,
+  AllowanceNotFoundForGivenPair = 2,
+  MinterNotFound = 3,
+  NoBalanceFoundForAddress = 4,
+  NoConfigFound = 5,
+  NoAdminFound = 6,
+  MissingBalance = 7,
+  VestingComplexityTooHigh = 8,
+  TotalVestedOverCapacity = 9,
+  InvalidTransferAmount = 10,
+  CantMoveVestingTokens = 11,
+  NotEnoughCapacity = 12,
+  NotAuthorized = 13,
+  NeverFullyVested = 14,
+  VestsMoreThanSent = 15,
+  InvalidBurnAmount = 16,
+  InvalidMintAmount = 17,
+  InvalidAllowanceAmount = 18,
+  DuplicateInitialBalanceAddresses = 19,
+  CurveError = 20,
+  NoWhitelistFound = 21,
+  NoTokenInfoFound = 22,
+  NoVestingComplexityValueFound = 23,
+  NoAddressesToAdd = 24,
+  NoEnoughtTokensToStart = 25,
+  NotEnoughBalance = 26,
+
+  VestingBothPresent = 27,
+  VestingNonePresent = 28,
+
+  CurveConstant = 29,
+  CurveSLNotDecreasing = 30,
+}
+
 function extractErrorCodeFromDiagnosticEvent(
   eventString: string
 ): number | null {
@@ -27,39 +63,41 @@ function extractErrorCodeFromDiagnosticEvent(
   return match ? parseInt(match[1], 10) : null;
 }
 
-export function resolveContractError(eventString: string): string {
+export function resolvePoolContractError(eventString: string): string {
   const errorCode = extractErrorCodeFromDiagnosticEvent(eventString);
 
+  if(!errorCode) return eventString;
+
   switch (errorCode) {
-    case ContractError.SpreadExceedsLimit:
+    case PoolContractError.SpreadExceedsLimit:
       return "The slippage exceeds the allowable limit. In Phase 1 of the launch, it's capped at 1%. Please try to swap a lower amount of tokens.";
-    case ContractError.ProvideLiquiditySlippageToleranceTooHigh:
+    case PoolContractError.ProvideLiquiditySlippageToleranceTooHigh:
       return "The slippage tolerance set for providing liquidity is too high.";
-    case ContractError.ProvideLiquidityAtLeastOneTokenMustBeBiggerThenZero:
+    case PoolContractError.ProvideLiquidityAtLeastOneTokenMustBeBiggerThenZero:
       return "To provide liquidity, at least one token amount must be greater than zero.";
-    case ContractError.WithdrawLiquidityMinimumAmountOfAOrBIsNotSatisfied:
+    case PoolContractError.WithdrawLiquidityMinimumAmountOfAOrBIsNotSatisfied:
       return "The minimum amount of either token A or B is not satisfied for withdrawal.";
-    case ContractError.SplitDepositBothPoolsAndDepositMustBePositive:
+    case PoolContractError.SplitDepositBothPoolsAndDepositMustBePositive:
       return "Both pools and deposit amounts must be positive for a split deposit.";
-    case ContractError.ValidateFeeBpsTotalFeesCantBeGreaterThen100:
+    case PoolContractError.ValidateFeeBpsTotalFeesCantBeGreaterThen100:
       return "The total fees in basis points cannot be greater than 100.";
-    case ContractError.GetDepositAmountsMinABiggerThenDesiredA:
+    case PoolContractError.GetDepositAmountsMinABiggerThenDesiredA:
       return "The minimum amount of token A is bigger than the desired amount.";
-    case ContractError.GetDepositAmountsMinBBiggerThenDesiredB:
+    case PoolContractError.GetDepositAmountsMinBBiggerThenDesiredB:
       return "The minimum amount of token B is bigger than the desired amount.";
-    case ContractError.GetDepositAmountsAmountABiggerThenDesiredA:
+    case PoolContractError.GetDepositAmountsAmountABiggerThenDesiredA:
       return "The amount of token A is bigger than the desired amount.";
-    case ContractError.GetDepositAmountsAmountALessThenMinA:
+    case PoolContractError.GetDepositAmountsAmountALessThenMinA:
       return "The amount of token A is less than the minimum required amount.";
-    case ContractError.GetDepositAmountsAmountBBiggerThenDesiredB:
+    case PoolContractError.GetDepositAmountsAmountBBiggerThenDesiredB:
       return "The amount of token B is bigger than the desired amount.";
-    case ContractError.GetDepositAmountsAmountBLessThenMinB:
+    case PoolContractError.GetDepositAmountsAmountBLessThenMinB:
       return "The amount of token B is less than the minimum required amount.";
-    case ContractError.TotalSharesEqualZero:
+    case PoolContractError.TotalSharesEqualZero:
       return "The total shares amount cannot be zero.";
-    case ContractError.DesiredAmountsBelowOrEqualZero:
+    case PoolContractError.DesiredAmountsBelowOrEqualZero:
       return "The desired amounts must be above zero.";
-    case ContractError.MinAmountsBelowZero:
+    case PoolContractError.MinAmountsBelowZero:
       return "The minimum amounts cannot be below zero.";
     default:
       return "Unknown error.";

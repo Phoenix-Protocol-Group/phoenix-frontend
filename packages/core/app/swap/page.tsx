@@ -32,8 +32,7 @@ import {
   Loading,
   LoadingSwap,
 } from "@/components/Modal/Modal";
-import { Alert, Box } from "@mui/material";
-import { init } from "next/dist/compiled/@vercel/og/satori";
+import { Box } from "@mui/material";
 import { Helmet } from "react-helmet";
 
 export default function SwapPage() {
@@ -114,7 +113,7 @@ export default function SwapPage() {
       setErrorModalOpen(true);
 
       // @ts-ignore
-      setErrorDescription((typeof e === "string") ? e : e.message.includes("request denied") ? e.message : resolveContractError(e.message));
+      setErrorDescription((typeof e === "string") ? resolveContractError(e) : resolveContractError(e.message));
       setTxBroadcasting(false);
     }
     setTxBroadcasting(false);
