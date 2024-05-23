@@ -9,7 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import JoyRideTooltip from "@/components/JoyRideTooltip";
-import { joyride } from "@phoenix-protocol/utils";
+import { fetchHistoricalPrices, joyride } from "@phoenix-protocol/utils";
 import { TourModal, DisclaimerModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
 import Countdown from "@/components/Countdown";
@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   // Media query to check screen size
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
   // State to manage navigation open/close status
-  const [navOpen, setNavOpen] = useState(typeof window !== "undefined" && window.innerWidth >= 900 ? true : false); //use window object instead of useMediaQuery to execute faster
+  const [navOpen, setNavOpen] = useState(false);
   // Retrieve the current pathname
   const pathname = usePathname();
   // Get AppStore
@@ -154,22 +154,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
   // Style object for swap page background image
   const swapPageStyle = {
-    "&:after": {
-      position: "absolute",
-      pointerEvents: "none",
-      borderRadius: "1000px",
-      top: "10%",
-      left: "50%",
-      opacity: "0.10",
-      zIndex: -1,
-      transform: "translateX(-50%)",
-      width: "100vw",
-      height: "100vh",
-      content: "' '",
-      background:
-      "linear-gradient(135deg, #E2491A 0%, #E21B1B 17.08%, #E2491A 42.71%, #E2AA1B 100%)",
-      filter: "blur(182px)"
-    },
+    backgroundImage: `url("/swapBg.png")`,
+    backgroundRepeat: "no-repeat",
+    backgroundAttachment: "fixed",
+    backgroundPosition: "center",
+    backgroundSize: { xs: "cover", md: "50% 100%" },
     paddingBottom: "50px",
     width: {
       xs: "100vw",
@@ -260,7 +249,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <>
               {/* Side Navigation Component */}
               <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
-
+              {/* Top Navigation Bar */}
+              <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
               {/* Joyride Tour */}
               {initialized && persistStore.disclaimer.accepted && (
                 <>
@@ -314,8 +304,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
                 }}
               >
-                {/* Top Navigation Bar */}
-                <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
                 {/* Child Components */}
                 {children}
               </Box>
