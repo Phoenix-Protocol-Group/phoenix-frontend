@@ -39,3 +39,13 @@ export const getArticlesByCategory = async (category: string) => {
     expand: "articles",
   });
 };
+
+export const searchArticles = async (query: string) => {
+  return await pb.collection("articles").getList(1, 20, {
+    filter: pb.filter(
+      "id ~ {:search} || category ~ {:search} || title ~ {:search} || description ~ {:search} || content ~ {:search}",
+      { search: query }
+    ),
+    fields: "*, content:excerpt(100, true)",
+  });
+};
