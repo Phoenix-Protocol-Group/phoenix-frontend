@@ -3598,6 +3598,7 @@ __metadata:
   dependencies:
     "@phoenix-protocol/utils": "workspace:^"
     "@stellar/freighter-api": 1.7.1
+    "@stellar/stellar-sdk": ^12.0.0-rc.3
     bigint-conversion: 2.4.1
     buffer: 6.0.3
     stellar-sdk: ^11.2.1
@@ -3947,6 +3948,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stellar/js-xdr@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "@stellar/js-xdr@npm:3.1.1"
+  checksum: b17bf89551cb3a2f334ae14aebf8d12c9c601ed54616d6df3b370eacdf87db4114a8d909d46091a8944a4f8a751cfe1e639164fe021336f57c83dd524bce2d7b
+  languageName: node
+  linkType: hard
+
 "@stellar/stellar-base@npm:^10.0.2":
   version: 10.0.2
   resolution: "@stellar/stellar-base@npm:10.0.2"
@@ -3963,6 +3971,39 @@ __metadata:
     sodium-native:
       optional: true
   checksum: daff4108da43d07030e04811af39e73dbb058e0af54ff8b69414afa759b2e8e715fa2675158938d81c50ed6fa12dad8a44a820c035cdac5edd5c51158e47d8ac
+  languageName: node
+  linkType: hard
+
+"@stellar/stellar-base@npm:^11.0.1":
+  version: 11.0.1
+  resolution: "@stellar/stellar-base@npm:11.0.1"
+  dependencies:
+    "@stellar/js-xdr": ^3.1.1
+    base32.js: ^0.1.0
+    bignumber.js: ^9.1.2
+    buffer: ^6.0.3
+    sha.js: ^2.3.6
+    sodium-native: ^4.0.10
+    tweetnacl: ^1.0.3
+  dependenciesMeta:
+    sodium-native:
+      optional: true
+  checksum: 1653dcf59e47d71d8eb0a6fd226b50ecef7134414611d5cf62875394f0d54497ff247b42dd2aee5b45eca36364757c4ae44422e03e51a032ab023c5db772ece5
+  languageName: node
+  linkType: hard
+
+"@stellar/stellar-sdk@npm:^12.0.0-rc.3":
+  version: 12.0.0
+  resolution: "@stellar/stellar-sdk@npm:12.0.0"
+  dependencies:
+    "@stellar/stellar-base": ^11.0.1
+    axios: ^1.6.8
+    bignumber.js: ^9.1.2
+    eventsource: ^2.0.2
+    randombytes: ^2.1.0
+    toml: ^3.0.0
+    urijs: ^1.19.1
+  checksum: 05617def38b8f93a575651dc9923a93c453cac6d6d829ee3daed94ffc52bb362b2772708c39ac4680067b7b36879e74c7725d718a6d8aff01f5843b070b7ea1e
   languageName: node
   linkType: hard
 
@@ -6636,6 +6677,17 @@ __metadata:
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
   checksum: 87d4d429927d09942771f3b3a6c13580c183e31d7be0ee12f09be6d5655304996bb033d85e54be81606f4e89684df43be7bf52d14becb73a12727bf33298a082
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.6.8":
+  version: 1.7.2
+  resolution: "axios@npm:1.7.2"
+  dependencies:
+    follow-redirects: ^1.15.6
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: e457e2b0ab748504621f6fa6609074ac08c824bf0881592209dfa15098ece7e88495300e02cd22ba50b3468fd712fe687e629dcb03d6a3f6a51989727405aedf
   languageName: node
   linkType: hard
 
@@ -9662,6 +9714,16 @@ __metadata:
     debug:
       optional: true
   checksum: 5ca49b5ce6f44338cbfc3546823357e7a70813cecc9b7b768158a1d32c1e62e7407c944402a918ea8c38ae2e78266312d617dc68783fac502cbb55e1047b34ec
+  languageName: node
+  linkType: hard
+
+"follow-redirects@npm:^1.15.6":
+  version: 1.15.6
+  resolution: "follow-redirects@npm:1.15.6"
+  peerDependenciesMeta:
+    debug:
+      optional: true
+  checksum: a62c378dfc8c00f60b9c80cab158ba54e99ba0239a5dd7c81245e5a5b39d10f0c35e249c3379eae719ff0285fff88c365dd446fab19dee771f1d76252df1bbf5
   languageName: node
   linkType: hard
 
@@ -13082,6 +13144,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-gyp-build@npm:^4.8.0":
+  version: 4.8.1
+  resolution: "node-gyp-build@npm:4.8.1"
+  bin:
+    node-gyp-build: bin.js
+    node-gyp-build-optional: optional.js
+    node-gyp-build-test: build-test.js
+  checksum: fe6e95da6f4608c1a98655f6bf2fe4e8dd9c877cd13256056a8acaf585cc7f98718823fe9366be11b78c2f332d5a184b00cf07a4af96c9d8fea45f640c019f98
+  languageName: node
+  linkType: hard
+
 "node-gyp@npm:latest":
   version: 9.4.0
   resolution: "node-gyp@npm:9.4.0"
@@ -15684,6 +15757,16 @@ __metadata:
     node-gyp: latest
     node-gyp-build: ^4.6.0
   checksum: 5697e7d8fa49b0ccde9b15beda2664c09ccc55450304b78287a6522e3e5db02c7fc3de415df5b2273bbc45e3f5e17966bf487c8a8bff7a84c8cbbee8fcd5e7b2
+  languageName: node
+  linkType: hard
+
+"sodium-native@npm:^4.0.10":
+  version: 4.1.1
+  resolution: "sodium-native@npm:4.1.1"
+  dependencies:
+    node-gyp: latest
+    node-gyp-build: ^4.8.0
+  checksum: 45941133773d70d20feb688e98023dcdc6b9fa33084ecd34f4fca66661c9e63587daf761d1ba9d46570564712613a567fd4b4934c6be6445bc49a0afc863c232
   languageName: node
   linkType: hard
 
