@@ -4,8 +4,8 @@ import { Grid } from "@mui/material";
 
 export const testTokens = [
   {
-    name: "USDT",
-    icon: "cryptoIcons/usdt.svg",
+    name: "PHO",
+    icon: "cryptoIcons/pho.svg",
     amount: 100,
     category: "Stable",
     usdValue: 1 * 100,

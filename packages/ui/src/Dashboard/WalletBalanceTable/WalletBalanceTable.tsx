@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   FormControl,
   Grid,
   IconButton,
@@ -23,7 +24,8 @@ import {
   ListItemProps,
   WalletBalanceTableProps,
 } from "@phoenix-protocol/types";
-import { HelpCenter, HelpCenterOutlined } from "@mui/icons-material";
+import { HelpCenterOutlined } from "@mui/icons-material";
+import { AreaChart, Area, YAxis, ResponsiveContainer } from "recharts";
 
 function a11yProps(index: number) {
   return {
@@ -31,6 +33,36 @@ function a11yProps(index: number) {
     "aria-controls": `category-tabpanel-${index}`,
   };
 }
+
+const GlowingChart = ({ data }: { data: any[] }) => ( //@todo replace any with data type
+  <ResponsiveContainer width="100%" height={250}>
+    <AreaChart
+      data={data}
+      margin={{ top: 0, right: -10, left: -10, bottom: 0 }}
+    >
+      <defs>
+        <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="5%" stopColor="#E2491A" stopOpacity={0.2} />
+          <stop offset="95%" stopColor="#E2491A" stopOpacity={0.02} />
+        </linearGradient>
+      </defs>
+      <YAxis
+        hide={true}
+        dataKey={(v) => v[1]}
+        domain={[(dataMin: number) => dataMin * 0.9, "dataMax"]}
+      />
+      <Area
+        type="monotone"
+        dataKey={(v) => v[1]}
+        stroke="#E2491A"
+        strokeWidth={2}
+        isAnimationActive={true}
+        fillOpacity={1}
+        fill="url(#colorUv)"
+      />
+    </AreaChart>
+  </ResponsiveContainer>
+);
 
 const FilterAndTabPanel = ({
   categories,
@@ -252,6 +284,7 @@ const FilterAndTabPanel = ({
 const ListItem = ({
   token: { name, icon, usdValue, amount, contractId },
   onTokenClick,
+  onClaimVestedClick,
 }: ListItemProps) => {
   const [favorites, setFavorites] = useState<string[]>([]);
 
@@ -295,6 +328,9 @@ const ListItem = ({
         )}
       </Box>
       <Box sx={{ display: "flex", alignItems: "center" }}>
+        {name === "PHO" && (
+          <Button size="small" sx={{textTransform: "none", mr: 1, fontSize: "12px"}} onClick={() => onClaimVestedClick(contractId)}>Show Vested</Button>
+        )}
         <Typography
           sx={{
             fontWeight: 700,
@@ -359,6 +395,7 @@ const scrollbarStyles = {
 const WalletBalanceTable = ({
   tokens,
   onTokenClick,
+  onClaimVestedClick,
 }: WalletBalanceTableProps) => {
   const [sort, setSort] = useState("highest" as "highest" | "lowest");
   const [searchTerm, setSearchTerm] = useState("");
@@ -418,7 +455,12 @@ const WalletBalanceTable = ({
             }
           })
           .map((token, index) => (
-            <ListItem token={token} onTokenClick={onTokenClick} key={index} />
+            <ListItem
+              token={token}
+              onTokenClick={onTokenClick}
+              onClaimVestedClick={onClaimVestedClick}
+              key={index}
+            />
           ))}
       </Box>
     </Box>

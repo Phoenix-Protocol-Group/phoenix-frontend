@@ -218,12 +218,6 @@ export default function Page() {
       },
       assetName: "PHO",
     },
-    walletBalanceArgs: {
-      tokens: allTokens,
-      onTokenClick: (token: string) => {
-        fetchTokenInfo(token);
-      },
-    },
     dashboardStatsArgs: {
       gainer: gainerAsset,
       loser: loserAsset,
@@ -327,7 +321,12 @@ export default function Page() {
           {loadingBalances ? (
             <Skeleton.WalletBalanceTable />
           ) : (
-            <WalletBalanceTable {...args.walletBalanceArgs} />
+            <WalletBalanceTable
+              tokens={allTokens}
+              onTokenClick={(token: string) => {
+                fetchTokenInfo(token);
+              }}
+            />
           )}
         </Grid>
       </Grid>

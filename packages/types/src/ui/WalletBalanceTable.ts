@@ -17,8 +17,10 @@ interface TokenWithInfo extends Token {
 export interface ListItemProps {
   token: TokenWithInfo;
   onTokenClick: (tokenAddress: string) => void;
+  onClaimVestedClick: (tokenAddress: string) => void;
 }
 export interface WalletBalanceTableProps {
   tokens: TokenWithInfo[];
   onTokenClick: (tokenAddress: string) => void;
+  onClaimVestedClick: (tokenAddress: string) => void;
 }
