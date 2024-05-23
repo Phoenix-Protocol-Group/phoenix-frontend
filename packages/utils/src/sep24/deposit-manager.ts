@@ -64,7 +64,6 @@ export class DepositManager {
       const signedChallengeTransaction = await sep10AuthSign({
         networkPassphrase: NETWORK_PASSPHRASE,
         challengeTransaction,
-        wallet: (await import("@stellar/freighter-api")).default,
       });
 
       return await sep10AuthSend({

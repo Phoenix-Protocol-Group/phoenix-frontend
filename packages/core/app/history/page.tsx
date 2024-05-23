@@ -9,7 +9,6 @@ import {
   VolumeChart,
 } from "@phoenix-protocol/ui";
 import {
-  Address,
   fetchDataByTimeEpoch,
   fetchHistoryMetaData,
   fetchSwapHistory,
@@ -25,7 +24,7 @@ export default function Page() {
   const [meta, setMeta] = useState({
     activeAccountsLast24h: 0,
     totalAccounts: 0,
-    totalTrades: 0
+    totalTrades: 0,
   });
 
   // Set Volume Chart Data
@@ -163,9 +162,7 @@ export default function Page() {
           ...item,
           // @ts-ignore
           tradeSize: Number(item.tradeSize) / 10 ** assets.flat()[0].decimals,
-          tradeValue: (
-            Number(item.tradeValue).toFixed(2)
-          ),
+          tradeValue: Number(item.tradeValue).toFixed(2),
           assets: assets.flat().map((asset) => {
             return {
               name: asset?.symbol,

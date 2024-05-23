@@ -11,8 +11,12 @@ import {
   fetchPho,
 } from "@phoenix-protocol/contracts";
 import { usePersistStore } from "../store";
-import { constants, fetchTokenPrices } from "@phoenix-protocol/utils";
-import { Address } from "stellar-sdk";
+import {
+  constants,
+  fetchTokenPrices,
+  parseResults,
+} from "@phoenix-protocol/utils";
+import { Address } from "@phoenix-protocol/utils";
 
 export const createWalletActions = (
   setState: SetStateType,
@@ -24,20 +28,22 @@ export const createWalletActions = (
 
     getAllTokens: async () => {
       // Factory contract
-      const factoryContract = new PhoenixFactoryContract.Contract({
+      const factoryContract = new PhoenixFactoryContract.Client({
         contractId: constants.FACTORY_ADDRESS,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
       });
-
       // Fetch all available tokens from chain
-      const allPoolsDetails = await factoryContract.queryAllPoolsDetails();
+      const allPoolsDetails = await factoryContract.query_all_pools_details();
+      const result = parseResults(allPoolsDetails);
+
+      console.log(result);
 
       // Loop through all pools and get asset_a and asset_b addresses in an array
-      const _allAssets = allPoolsDetails.result
+      const _allAssets = result
         .map((pool) => [
-          pool.pool_response.asset_a.address.toString(),
-          pool.pool_response.asset_b.address.toString(),
+          pool.pool_response.asset_a.address,
+          pool.pool_response.asset_b.address,
         ])
         // Flatten the array
         .reduce((acc: string[], curr: string[]) => [...acc, ...curr], [])
@@ -46,7 +52,7 @@ export const createWalletActions = (
 
       const allAssets = _allAssets
         ? _allAssets.map(async (asset) => {
-            await getState().fetchTokenInfo(Address.fromString(asset));
+            await getState().fetchTokenInfo(asset);
           })
         : [];
 
@@ -65,10 +71,11 @@ export const createWalletActions = (
             }.svg`,
             amount: Number(token?.balance) / 10 ** token?.decimals,
             category: "Non-Stable", // todo: add category
-            usdValue: 
-              Number((token?.symbol === "PHO" ? await fetchPho() :
-              await fetchTokenPrices(token?.symbol)))
-            .toFixed(2),
+            usdValue: Number(
+              token?.symbol === "PHO"
+                ? await fetchPho()
+                : await fetchTokenPrices(token?.symbol)
+            ).toFixed(2),
             contractId: token?.id,
           };
         });
@@ -81,63 +88,65 @@ export const createWalletActions = (
     },
 
     fetchTokenInfo: async (
-      tokenAddress: Address,
+      tokenAddress: string,
       isStakingToken: boolean = false
     ) => {
+      if (
+        tokenAddress !==
+        "CBTCSVZBJFGMW7E2LKFKRIUARUKZK2DTBUC7X5QPQJLXMAH42DB3ALE5"
+      )
+        return;
       let updatedTokenInfo: Token | undefined;
       // Check if account, server, and network passphrase are set
       if (!getState().server || !getState().networkPassphrase) {
         throw new Error("Missing account, server, or network passphrase");
       }
 
-      const TokenContract = new SorobanTokenContract.Contract({
-        contractId: tokenAddress.toString(),
+      const TokenContract = new SorobanTokenContract.Client({
+        contractId: tokenAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
       });
-
+      const test = await TokenContract.balance({
+        id: usePersistStore.getState().wallet.address!,
+      });
+      console.log(test);
+      return;
       let balance: bigint;
       try {
-        balance = BigInt(
-          (
-            await TokenContract.balance({
-              id: usePersistStore.getState().wallet.address!,
-            })
-          ).result
+        balance = parseResults(
+          await TokenContract.balance({
+            id: usePersistStore.getState().wallet.address!,
+          })
         );
+        console.log(balance, "balance");
       } catch (e) {
         balance = BigInt(0);
       }
       let symbol: string;
       try {
         const _symbol: string =
-          getState().tokens.find(
-            (token: Token) => token.id === tokenAddress.toString()
-          )?.symbol || (await TokenContract.symbol()).result;
+          getState().tokens.find((token: Token) => token.id === tokenAddress)
+            ?.symbol || (await TokenContract.symbol()).result;
         symbol = _symbol === "native" ? "XLM" : _symbol;
       } catch (e) {
         return;
       }
       const decimals =
-        getState().tokens.find(
-          (token: Token) => token.id === tokenAddress.toString()
-        )?.decimals || Number((await TokenContract.decimals()).result);
+        getState().tokens.find((token: Token) => token.id === tokenAddress)
+          ?.decimals || Number((await TokenContract.decimals()).result);
 
       // Update token balance
       setState((state: AppStore) => {
         const updatedTokens = state.tokens.map((token: Token) =>
-          token.id === tokenAddress.toString()
+          token.id === tokenAddress
             ? { ...token, balance, decimals, symbol, isStakingToken }
             : token
         );
         // If token couldnt be found, add it
-        if (
-          !updatedTokens.find(
-            (token: Token) => token.id === tokenAddress.toString()
-          )
-        ) {
+        if (!updatedTokens.find((token: Token) => token.id === tokenAddress)) {
           updatedTokens.push({
-            id: tokenAddress.toString(),
+            id: tokenAddress,
             balance,
             decimals: decimals,
             symbol: symbol === "native" ? "XLM" : symbol,
@@ -145,7 +154,7 @@ export const createWalletActions = (
           });
         }
         updatedTokenInfo = updatedTokens.find(
-          (token: Token) => token.id === tokenAddress.toString()
+          (token: Token) => token.id === tokenAddress
         );
         return { tokens: updatedTokens };
       });
