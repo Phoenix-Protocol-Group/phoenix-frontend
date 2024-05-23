@@ -42,6 +42,14 @@ export const Open: Story = {
         href: "#",
       },
     ],
+    bottomItems: [
+      {
+        label: "Nav Item 4",
+        icon: <MailIcon />,
+        active: false,
+        href: "#",
+      },
+    ],
   },
 };
 
@@ -67,6 +75,14 @@ export const Closed: Story = {
         active: false,
         href: "#",
       },
+      {
+        label: "Nav Item 4",
+        icon: <MailIcon />,
+        active: false,
+        href: "#",
+      },
+    ],
+    bottomItems: [
       {
         label: "Nav Item 4",
         icon: <MailIcon />,

@@ -4,11 +4,13 @@ export interface SidebarItems {
   icon: any;
   active: boolean;
   href: string;
+  target?: string;
 }
 
 export interface DrawerProps extends MuiDrawerProps {
   items: SidebarItems[];
+  bottomItems?: SidebarItems[];
   open: boolean;
   setOpen: (open: boolean) => void;
-  onNavClick: (href: string) => void;
+  onNavClick: (href: string, target?: string) => void;
 }

@@ -7,8 +7,12 @@ import WalletBalanceTable from "./WalletBalanceTable/WalletBalanceTable";
 import PoolLiquidity from "./PoolLiquidity/PoolLiquidity";
 import { AssetSelector } from "./AssetSelector/AssetSelector";
 import { Swap } from "./Swap/Swap";
+import { ArticleCard } from "./ArticleCard/ArticleCard";
+import CategoryCard from "./CategoryCard/CategoryCard";
 
 export {
+  ArticleCard,
+  CategoryCard,
   DashboardStats,
   DashBoardCharts,
   LiquidityMining,

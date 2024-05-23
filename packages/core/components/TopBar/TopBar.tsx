@@ -1,5 +1,5 @@
 "use client";
-import { NoSsr, Typography } from "@mui/material";
+import { Box, NoSsr, Typography } from "@mui/material";
 import {
   freighter,
   useAppStore,
@@ -66,21 +66,23 @@ const TopBar = ({
 
   return (
     <NoSsr>
-      <AppBar
-        mobileNavOpen={navOpen}
-        toggleMobileNav={(open) => setNavOpen(open)}
-        balance={tokenBalance}
-        walletAddress={storePersist.wallet.address}
-        connectWallet={() => store.setWalletModalOpen(true)}
-        disconnectWallet={disconnectWallet}
-      />
-      <ConnectWallet
-        open={store.walletModalOpen}
-        // @ts-ignore
-        connectors={[freighter(), xbull(), lobstr()]}
-        setOpen={() => store.setWalletModalOpen(!store.walletModalOpen)}
-        connect={connect}
-      />
+      <Box sx={{ mb: 4 }}>
+        <AppBar
+          mobileNavOpen={navOpen}
+          toggleMobileNav={(open) => setNavOpen(open)}
+          balance={tokenBalance}
+          walletAddress={storePersist.wallet.address}
+          connectWallet={() => store.setWalletModalOpen(true)}
+          disconnectWallet={disconnectWallet}
+        />
+        <ConnectWallet
+          open={store.walletModalOpen}
+          // @ts-ignore
+          connectors={[freighter(), xbull(), lobstr()]}
+          setOpen={() => store.setWalletModalOpen(!store.walletModalOpen)}
+          connect={connect}
+        />
+      </Box>
     </NoSsr>
   );
 };

@@ -10,6 +10,7 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "downlevelIteration": true,
+    "resolveJsonModule": true,
     "moduleResolution": "node"
   },
   "include": ["src/**/*"],
