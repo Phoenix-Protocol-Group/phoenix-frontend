@@ -6,6 +6,7 @@ import {
   Button,
   TransactionsCards,
   TransactionsTable,
+  Skeleton,
   VolumeChart,
 } from "@phoenix-protocol/ui";
 import {
@@ -25,7 +26,7 @@ export default function Page() {
   const [meta, setMeta] = useState({
     activeAccountsLast24h: 0,
     totalAccounts: 0,
-    totalTrades: 0
+    totalTrades: 0,
   });
 
   // Set Volume Chart Data
@@ -41,6 +42,7 @@ export default function Page() {
 
   // Set History
   const [history, setHistory] = useState<any>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
 
   // Set Search Term
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,6 +108,7 @@ export default function Page() {
 
   // Load History
   const loadHistory = async () => {
+    setHistoryLoading(true);
     let result = [];
 
     if (activeView === "personal" && appStorePersist.wallet.address) {
@@ -128,6 +131,7 @@ export default function Page() {
     }
 
     if (!result.length) {
+      setHistoryLoading(false);
       return setHistory([]);
     }
 
@@ -163,9 +167,7 @@ export default function Page() {
           ...item,
           // @ts-ignore
           tradeSize: Number(item.tradeSize) / 10 ** assets.flat()[0].decimals,
-          tradeValue: (
-            Number(item.tradeValue).toFixed(2)
-          ),
+          tradeValue: Number(item.tradeValue).toFixed(2),
           assets: assets.flat().map((asset) => {
             return {
               name: asset?.symbol,
@@ -197,6 +199,7 @@ export default function Page() {
     }
 
     setHistory(_result);
+    setHistoryLoading(false);
   };
 
   // Handle Sort Change
@@ -312,29 +315,35 @@ export default function Page() {
         mostTradedAsset={mostTradedAsset}
         totalTrades={meta.totalTrades.toString()}
       />
-      {/* @ts-ignore */}
-      <TransactionsTable
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        entries={history}
-        activeSort={{
-          column: mapFromSwapField(sortBy),
-          direction: sortOrder,
-        }}
-        activeView={activeView}
-        setActiveView={(a) => {
-          if (a === activeView) return;
-          setHistory([]);
-          setActiveView(a);
-        }}
-        loadingResults={false}
-        loggedIn={appStorePersist.wallet.address ? true : false}
-        activeFilters={activeFilters}
-        applyFilters={(newFilters: ActiveFilters) => {
-          setActiveFilters(newFilters);
-        }}
-        handleSort={(column) => handleSortChange(mapToSwapField(column), "asc")}
-      />
+
+      {!historyLoading ? (
+        <TransactionsTable
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          entries={history}
+          activeSort={{
+            column: mapFromSwapField(sortBy),
+            direction: sortOrder,
+          }}
+          activeView={activeView}
+          setActiveView={(a) => {
+            if (a === activeView) return;
+            setHistory([]);
+            setActiveView(a);
+          }}
+          loggedIn={appStorePersist.wallet.address ? true : false}
+          activeFilters={activeFilters}
+          applyFilters={(newFilters: ActiveFilters) => {
+            setActiveFilters(newFilters);
+          }}
+          handleSort={(column) =>
+            handleSortChange(mapToSwapField(column), "asc")
+          }
+        />
+      ) : (
+        <Skeleton.TransactionsTable />
+      )}
+
       <Box sx={{ display: "flex", justifyContent: "end", mt: 3 }}>
         <Button type="secondary" label="Load more" onClick={() => loadMore()} />
       </Box>

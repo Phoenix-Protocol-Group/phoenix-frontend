@@ -27,7 +27,6 @@ export interface TransactionsTableProps {
   setActiveView: (view: "personal" | "all") => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  loadingResults: boolean;
   activeFilters: ActiveFilters;
   applyFilters: (newFilters: ActiveFilters) => void;
   loggedIn?: boolean;

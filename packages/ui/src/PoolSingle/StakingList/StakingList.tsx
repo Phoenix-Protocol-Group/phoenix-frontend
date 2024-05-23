@@ -130,9 +130,16 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
         ))
       ) : (
         <Typography
-          sx={{ ...typoStyle, textAlign: "center", opacity: 0.5, mt: 2 }}
+          sx={{
+            color: "#FFF",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            pt: 1,
+          }}
         >
-          No stakes
+          It looks like you haven't staked yet.
         </Typography>
       )}
     </Box>

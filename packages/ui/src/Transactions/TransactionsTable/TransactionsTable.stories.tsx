@@ -22,6 +22,8 @@ const asset = {
 
 export const Primary: Story = {
   args: {
+    activeSort: {column: "tradeSize", direction: "asc"},
+    activeFilters: {dateRange: {from: null, to: null}, tradeSize: {from: null, to: null}, tradeValue: {from: null, to: null}},
     entries: [{
       type: "Success",
       assets: [asset, asset],
@@ -37,5 +39,14 @@ export const Primary: Story = {
       date: "1.1.2024",
       txHash: "0x1234567890",
     }]
+  },
+};
+
+export const NoEntries: Story = {
+  args: {
+    activeSort: {column: "tradeSize", direction: "asc"},
+    activeView: "personal",
+    activeFilters: {dateRange: {from: null, to: null}, tradeSize: {from: null, to: null}, tradeValue: {from: null, to: null}},
+    entries: []
   },
 };

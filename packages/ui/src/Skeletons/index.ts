@@ -5,6 +5,7 @@ import MainStats from "./MainStats/MainStats";
 import { Pools } from "./Pools/Pools";
 import WalletBalanceTable from "./WalletBalanceTable/WalletBalanceTable";
 import PoolLiquidity from "./PoolLiquidity/PoolLiquidity";
+import TransactionsTable from "./TransactionsTable/TransactionsTable";
 import { AssetSelector } from "./AssetSelector/AssetSelector";
 import { Swap } from "./Swap/Swap";
 import { ArticleCard } from "./ArticleCard/ArticleCard";
@@ -21,5 +22,6 @@ export {
   WalletBalanceTable,
   PoolLiquidity,
   AssetSelector,
+  TransactionsTable,
   Swap,
 };
