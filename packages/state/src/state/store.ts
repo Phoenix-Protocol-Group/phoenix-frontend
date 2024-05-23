@@ -1,13 +1,14 @@
 import { create } from "zustand";
 import { createWalletActions } from "./wallet/actions";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { Horizon } from "stellar-sdk";
+import { Horizon } from "@stellar/stellar-sdk";
 import { AppStore, AppStorePersist } from "@phoenix-protocol/types";
 import { createConnectWalletActions } from "./persist/createConnectWalletActions";
 import { createLayoutActions } from "./layout/actions";
 import { createUserTourActions } from "./persist/createUserTourActions";
 import { createDisclaimerAction } from "./persist/createDisclaimerActions";
 
+//@ts-ignore
 export const useAppStore = create<AppStore>()((set, get) => {
   // Create a new server instance.
   const server = new Horizon.Server("https://soroban-rpc.stellar.org");
@@ -53,7 +54,7 @@ export const usePersistStore = create<AppStorePersist>()(
         networkPassphrase,
         ...walletPersist,
         ...userTour,
-        ...disclaimer
+        ...disclaimer,
       };
     },
     {

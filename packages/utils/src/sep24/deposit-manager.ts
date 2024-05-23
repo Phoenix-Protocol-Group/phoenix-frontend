@@ -1,7 +1,7 @@
 import { Anchor } from "@phoenix-protocol/types";
 import { TransferServer, openTransferServer } from "./transfer-server";
 import { TransferServerInfo, fetchTransferInfos } from "./info";
-import { Asset, Networks } from "stellar-sdk";
+import { Asset, Networks } from "@stellar/stellar-sdk";
 import { sep10AuthSend, sep10AuthSign, sep10AuthStart } from "../sep10";
 import { NETWORK_PASSPHRASE } from "../constants";
 import { Deposit } from "./deposit";

@@ -15,7 +15,7 @@ import {
 } from "@phoenix-protocol/utils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Address } from "stellar-sdk";
+import { Address } from "@stellar/stellar-sdk";
 import { Pool, PoolsFilter } from "@phoenix-protocol/types";
 import { Helmet } from "react-helmet";
 import { Box } from "@mui/material";

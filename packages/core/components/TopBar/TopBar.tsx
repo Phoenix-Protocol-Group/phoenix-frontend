@@ -9,7 +9,7 @@ import {
 } from "@phoenix-protocol/state";
 import { AppBar, ConnectWallet } from "@phoenix-protocol/ui";
 import React, { useEffect, useState } from "react";
-import { Address } from "stellar-sdk";
+import { Address } from "@stellar/stellar-sdk";
 
 const TopBar = ({
   navOpen,

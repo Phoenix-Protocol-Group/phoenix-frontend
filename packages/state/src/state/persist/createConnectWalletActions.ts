@@ -1,4 +1,4 @@
-import { Horizon } from "stellar-sdk";
+import { Horizon } from "@stellar/stellar-sdk";
 import {
   AppStore,
   SetStateType,
@@ -77,6 +77,7 @@ export const createConnectWalletActions = () => {
         });
 
       // Update the state to store the wallet address and server.
+      // @ts-ignore
       usePersistStore.setState((state: AppStorePersist) => ({
         ...state,
         wallet: { address, activeChain, server, walletType: wallet },

@@ -1,4 +1,4 @@
-import { xdr, nativeToScVal, scValToBigInt, ScInt } from "stellar-sdk";
+import { xdr, nativeToScVal, scValToBigInt, ScInt } from "@stellar/stellar-sdk";
 import { Address } from "./Address";
 import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract_client/index.js";
 

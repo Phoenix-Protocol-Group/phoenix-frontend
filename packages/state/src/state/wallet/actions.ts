@@ -17,6 +17,7 @@ import {
   parseResults,
 } from "@phoenix-protocol/utils";
 import { Address } from "@phoenix-protocol/utils";
+import { parse } from "urijs";
 
 export const createWalletActions = (
   setState: SetStateType,
@@ -27,20 +28,37 @@ export const createWalletActions = (
     allTokens: [],
 
     getAllTokens: async () => {
+      // If wallet is connected, use it, otherwise some demo account
+      const appStorageValue = localStorage?.getItem("app-storage");
+
+      let address: string = "";
+
+      if (appStorageValue !== null) {
+        try {
+          const parsedValue = JSON.parse(appStorageValue);
+          address = parsedValue?.state?.wallet?.address;
+        } catch (error) {
+          console.error("Error parsing app-storage value:", error);
+        }
+      }
+
+      const publicKey = address || constants.TESTING_SOURCE.accountId();
+
       // Factory contract
       const factoryContract = new PhoenixFactoryContract.Client({
+        publicKey,
         contractId: constants.FACTORY_ADDRESS,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
       });
       // Fetch all available tokens from chain
       const allPoolsDetails = await factoryContract.query_all_pools_details();
-      const result = parseResults(allPoolsDetails);
 
-      console.log(result);
+      // Parse results
+      const parsedResults = parseResults(allPoolsDetails);
 
       // Loop through all pools and get asset_a and asset_b addresses in an array
-      const _allAssets = result
+      const _allAssets = parsedResults
         .map((pool) => [
           pool.pool_response.asset_a.address,
           pool.pool_response.asset_b.address,
@@ -49,7 +67,7 @@ export const createWalletActions = (
         .reduce((acc: string[], curr: string[]) => [...acc, ...curr], [])
         // Remove duplicates
         .filter((address, index, self) => self.indexOf(address) === index);
-
+      console.log("Hier!");
       const allAssets = _allAssets
         ? _allAssets.map(async (asset) => {
             await getState().fetchTokenInfo(asset);
@@ -91,18 +109,28 @@ export const createWalletActions = (
       tokenAddress: string,
       isStakingToken: boolean = false
     ) => {
-      if (
-        tokenAddress !==
-        "CBTCSVZBJFGMW7E2LKFKRIUARUKZK2DTBUC7X5QPQJLXMAH42DB3ALE5"
-      )
-        return;
       let updatedTokenInfo: Token | undefined;
       // Check if account, server, and network passphrase are set
       if (!getState().server || !getState().networkPassphrase) {
         throw new Error("Missing account, server, or network passphrase");
       }
+      const appStorageValue = localStorage?.getItem("app-storage");
+
+      let address: string = "";
+
+      if (appStorageValue !== null) {
+        try {
+          const parsedValue = JSON.parse(appStorageValue);
+          address = parsedValue?.state?.wallet?.address;
+        } catch (error) {
+          console.error("Error parsing app-storage value:", error);
+        }
+      }
+
+      const publicKey = address || constants.TESTING_SOURCE.accountId();
 
       const TokenContract = new SorobanTokenContract.Client({
+        publicKey,
         contractId: tokenAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
@@ -110,16 +138,16 @@ export const createWalletActions = (
       const test = await TokenContract.balance({
         id: usePersistStore.getState().wallet.address!,
       });
+
       console.log(test);
       return;
       let balance: bigint;
       try {
-        balance = parseResults(
+        balance = (
           await TokenContract.balance({
             id: usePersistStore.getState().wallet.address!,
           })
-        );
-        console.log(balance, "balance");
+        ).result;
       } catch (e) {
         balance = BigInt(0);
       }

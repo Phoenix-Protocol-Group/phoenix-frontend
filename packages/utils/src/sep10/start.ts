@@ -1,4 +1,4 @@
-import { WebAuth } from "stellar-sdk";
+import { WebAuth } from "@stellar/stellar-sdk";
 
 export const start = async ({
   authEndpoint,

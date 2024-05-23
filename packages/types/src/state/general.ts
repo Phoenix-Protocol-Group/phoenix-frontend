@@ -1,7 +1,7 @@
 import { Server } from "soroban-client";
 import { PersistWalletActions } from "./persist";
 import { LayoutActions } from "./layout";
-import { Horizon } from "stellar-sdk";
+import { Horizon } from "@stellar/stellar-sdk";
 import { WalletActions } from "./wallet";
 
 interface GeneralStore {

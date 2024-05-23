@@ -1,5 +1,5 @@
 import { WalletChain } from "@phoenix-protocol/types";
-import { Networks } from "stellar-sdk";
+import { Networks } from "@stellar/stellar-sdk";
 
 export const public_chain: WalletChain = {
   id: "public",

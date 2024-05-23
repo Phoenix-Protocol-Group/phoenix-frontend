@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { Asset } from "stellar-sdk";
+import { Asset } from "@stellar/stellar-sdk";
 import { TransferServer } from "./transfer-server";
 import { WithdrawalType } from "./withdrawal";
 

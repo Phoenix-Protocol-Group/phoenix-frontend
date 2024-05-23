@@ -34,7 +34,7 @@ import {
   time,
 } from "@phoenix-protocol/utils";
 
-import { Address } from "stellar-sdk";
+import { Address } from "@stellar/stellar-sdk";
 
 import {
   PhoenixPairContract,

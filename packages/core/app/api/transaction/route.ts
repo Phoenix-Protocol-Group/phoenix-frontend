@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Transaction, Keypair, Operation } from "stellar-sdk";
+import { Transaction, Keypair, Operation } from "@stellar/stellar-sdk";
 
 export async function POST(req: NextRequest) {
   try {

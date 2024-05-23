@@ -35,7 +35,7 @@ import {
 import { Alert, Box } from "@mui/material";
 import { init } from "next/dist/compiled/@vercel/og/satori";
 import { Helmet } from "react-helmet";
-import { Address } from "stellar-sdk";
+import { Address } from "@stellar/stellar-sdk";
 
 export default function SwapPage() {
   // State variables declaration and initialization
