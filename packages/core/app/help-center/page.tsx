@@ -76,9 +76,11 @@ export default function Page() {
       const _categories = fetchCategories.map((category) => {
         return {
           name:
-            category.title.charAt(0).toUpperCase() + category.title.slice(1),
-          description: category.articles.length + " Articles",
+            category.title!.charAt(0).toUpperCase() + category.title!.slice(1),
+          description: category.articles!.length + " Articles",
+          // @ts-ignore
           thumbnail: `https://phoenix-helpcenter.pockethost.io/api/files/${category.collectionId}/${category.id}/${category.thumbnail}`,
+          // @ts-ignore
           id: category.id,
         };
       });
@@ -87,12 +89,13 @@ export default function Page() {
       // Fetch featured articles
       const fetchFeaturedArticles = await HelpCenter.getFeaturedArticles();
       // Map correct categories
-      const _featuredCategories = fetchFeaturedArticles.items.map((article) => {
+      const _featuredCategories = fetchFeaturedArticles.map((article) => {
         return {
           ...article,
           category:
             fetchCategories.find(
-              (category) => category.id === article.category[0]
+              // @ts-ignore
+              (category) => category.id === article.category![0]
             )?.title || "",
         };
       });
@@ -109,7 +112,7 @@ export default function Page() {
         try {
           const searchResults = await HelpCenter.searchArticles(searchValue);
           setResults(
-            searchResults.items.map((article) => {
+            searchResults.map((article: any) => {
               return {
                 id: article.id,
                 title: article.title,

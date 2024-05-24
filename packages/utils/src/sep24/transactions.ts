@@ -1,4 +1,4 @@
-import { TransferServer } from "./transfer-server"
+import { TransferServer } from "./transfer-server";
 
 export enum TransferStatus {
   /** deposit/withdrawal fully completed. */
@@ -27,52 +27,52 @@ export enum TransferStatus {
   /** deposit/withdrawal size exceeded max_amount. */
   too_large = "too_large",
   /** catch-all for any error not enumerated above. */
-  error = "error"
+  error = "error",
 }
 
 export interface TransferTransactionBase {
-  id: string
-  kind: "deposit" | "withdrawal"
-  status: TransferStatus
-  status_eta?: number
-  more_info_url: string
-  amount_in: string
-  amount_out: string
-  amount_fee: string
-  started_at: string
-  completed_at: string | null
-  stellar_transaction_id: string
-  external_transaction_id?: string
-  message?: string
-  refunded: boolean
+  id: string;
+  kind: "deposit" | "withdrawal";
+  status: TransferStatus;
+  status_eta?: number;
+  more_info_url: string;
+  amount_in: string;
+  amount_out: string;
+  amount_fee: string;
+  started_at: string;
+  completed_at: string | null;
+  stellar_transaction_id: string;
+  external_transaction_id?: string;
+  message?: string;
+  refunded: boolean;
 }
 
 export interface DepositTransaction extends TransferTransactionBase {
-  deposit_memo?: string
-  deposit_memo_type?: string
-  from: string
-  to: string
+  deposit_memo?: string;
+  deposit_memo_type?: string;
+  from: string;
+  to: string;
 }
 
 export interface WithdrawalTransaction extends TransferTransactionBase {
-  withdraw_anchor_account: string
-  withdraw_memo: string
-  withdraw_memo_type: string
-  from: string
-  to: string
+  withdraw_anchor_account: string;
+  withdraw_memo: string;
+  withdraw_memo_type: string;
+  from: string;
+  to: string;
 }
 
-export type TransferTransaction = DepositTransaction | WithdrawalTransaction
+export type TransferTransaction = DepositTransaction | WithdrawalTransaction;
 
 export interface FetchTransactionsOptions {
   /** The response should contain transactions starting on or after this date & time. */
-  noOlderThan?: string
+  noOlderThan?: string;
   /** The response should contain at most limit transactions. */
-  limit?: number
+  limit?: number;
   /** The kind of transaction that is desired. Should be either deposit or withdrawal. */
-  kind?: "deposit" | "withdrawal"
+  kind?: "deposit" | "withdrawal";
   /** The response should contain transactions starting prior to this ID (exclusive). */
-  pagingId?: string
+  pagingId?: string;
 }
 
 export async function fetchTransaction(
@@ -81,11 +81,11 @@ export async function fetchTransaction(
   idType: "transfer" | "stellar" | "external" = "transfer",
   authToken?: string
 ): Promise<{ transaction: TransferTransaction }> {
-  const headers: any = {}
+  const headers: any = {};
 
   if (authToken) {
     // tslint:disable-next-line no-string-literal
-    headers["Authorization"] = `Bearer ${authToken}`
+    headers["Authorization"] = `Bearer ${authToken}`;
   }
 
   const idParamName =
@@ -93,15 +93,15 @@ export async function fetchTransaction(
       ? "stellar_transaction_id"
       : idType === "external"
       ? "external_transaction_id"
-      : "id"
+      : "id";
 
   const response = await transferServer.get("/transaction", {
     headers,
     params: {
-      [idParamName]: id
-    }
-  })
-  return response.data
+      [idParamName]: id,
+    },
+  });
+  return response.data;
 }
 
 export async function fetchTransactions(
@@ -110,11 +110,11 @@ export async function fetchTransactions(
   authToken?: string,
   options: FetchTransactionsOptions = {}
 ): Promise<{ transactions: TransferTransaction[] }> {
-  const headers: any = {}
+  const headers: any = {};
 
   if (authToken) {
     // tslint:disable-next-line no-string-literal
-    headers["Authorization"] = `Bearer ${authToken}`
+    headers["Authorization"] = `Bearer ${authToken}`;
   }
 
   const response = await transferServer.get("/transactions", {
@@ -124,8 +124,8 @@ export async function fetchTransactions(
       kind: options.kind,
       limit: options.limit,
       no_older_than: options.noOlderThan,
-      paging_id: options.pagingId
-    }
-  })
-  return response.data
+      paging_id: options.pagingId,
+    },
+  });
+  return response.data;
 }

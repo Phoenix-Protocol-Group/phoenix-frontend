@@ -166,12 +166,12 @@ export default function Page() {
           )
         : [];
 
-    const poolsFiltered = poolWithData.filter(
-      (el: any) =>
+    const poolsFiltered: Pool[] = poolWithData.filter(
+      (el) =>
         el !== undefined ||
         el?.tokens.length >= 2 ||
         el.poolAddress !==
-          "CBXBKAB6QIRUGTG77OQZHC46BIIPA5WDKIKZKPA2H7Q7CPKQ555W3EVB" // TODO TESTNET DEBUG
+          "CBXBKAB6QIRUGTG77OQZHC46BIIPA5WDKIKZKPA2H7Q7CPKQ555W3EVB"
     );
     setAllPools(poolsFiltered as Pool[]);
   };

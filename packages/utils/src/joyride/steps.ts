@@ -1,3 +1,7 @@
+/**
+ * @packageDocumentation
+ * @module Joyride
+ */
 export const steps = [
   {
     target: ".connect-wallet",

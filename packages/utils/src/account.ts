@@ -1,8 +1,8 @@
 import freighter from "@stellar/freighter-api";
-import { Account, Horizon } from "@stellar/stellar-sdk";
+import { Account } from "@stellar/stellar-sdk";
 import { Server } from "./server";
 // working around ESM compatibility issues
-const { isConnected, isAllowed, getUserInfo, signTransaction } = freighter;
+const { isConnected, isAllowed, getUserInfo } = freighter;
 
 /**
  * Get account details from the Soroban network for the publicKey currently
