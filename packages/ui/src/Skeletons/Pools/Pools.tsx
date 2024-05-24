@@ -24,7 +24,7 @@ const descriptionContent = {
 
 const PoolItem = () => {
   return (
-    <Grid item xs={6} md={4} lg={3}>
+    <Grid item xs={6} md={4} lg={3} xl={2}>
       <Box
         sx={{
           padding: "16px",

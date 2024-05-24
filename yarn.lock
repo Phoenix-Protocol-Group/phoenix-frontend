@@ -3504,6 +3504,7 @@ __metadata:
     graphql: ^16.8.1
     jest: ^29.7.0
     jest-mock: ^29.7.0
+    pocketbase: ^0.21.2
     react-joyride: ^2.7.2
     soroban-client: ^1.0.0
     toml: ^3.0.0
@@ -13442,6 +13443,13 @@ __metadata:
   dependencies:
     find-up: ^6.3.0
   checksum: 94298b20a446bfbbd66604474de8a0cdd3b8d251225170970f15d9646f633e056c80520dd5b4c1d1050c9fed8f6a9e5054b141c93806439452efe72e57562c03
+  languageName: node
+  linkType: hard
+
+"pocketbase@npm:^0.21.2":
+  version: 0.21.2
+  resolution: "pocketbase@npm:0.21.2"
+  checksum: e4a8e015c4286506231683301648f8b3005daad876d31d655d13a98cc0d85324fb5128364e0f065576403b8489bf7726411ef50af5e3bc55098d508e7ffe66cf
   languageName: node
   linkType: hard
 

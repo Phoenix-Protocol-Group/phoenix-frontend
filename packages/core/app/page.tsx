@@ -4,13 +4,13 @@ import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Helmet } from "react-helmet";
 import "./style.css";
 import {
-  AnchorServices,
-  AssetInfoModal,
   CryptoCTA,
   DashboardPriceCharts,
   DashboardStats,
-  Skeleton,
   WalletBalanceTable,
+  AnchorServices,
+  Skeleton,
+  AssetInfoModal,
 } from "@phoenix-protocol/ui";
 
 import { fetchPho, SorobanTokenContract } from "@phoenix-protocol/contracts";
