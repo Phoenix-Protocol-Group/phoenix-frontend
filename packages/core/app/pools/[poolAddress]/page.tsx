@@ -24,6 +24,7 @@ import {
   fetchTokenPrices,
   formatCurrency,
   resolveContractError,
+  Signer,
   time,
 } from "@phoenix-protocol/utils";
 
@@ -145,11 +146,13 @@ export default function Page({ params }: PoolPageProps) {
   ) => {
     try {
       setLoading(true);
+      const stakeSigner = new Signer();
       const SigningPairContract = new PhoenixPairContract.Client({
         publicKey: storePersist.wallet.address!,
         contractId: params.poolAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) => stakeSigner.sign(tx),
       });
       const tx = await SigningPairContract.provide_liquidity({
         sender: storePersist.wallet.address!,
@@ -184,11 +187,13 @@ export default function Page({ params }: PoolPageProps) {
   const removeLiquidity = async (lpTokenAmount: number) => {
     try {
       setLoading(true);
+      const stakeSigner = new Signer();
       const SigningPairContract = new PhoenixPairContract.Client({
         publicKey: storePersist.wallet.address!,
         contractId: params.poolAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) => stakeSigner.sign(tx),
       });
       const tx = await SigningPairContract.withdraw_liquidity({
         sender: storePersist.wallet.address!,
@@ -213,11 +218,15 @@ export default function Page({ params }: PoolPageProps) {
   const stake = async (lpTokenAmount: number) => {
     try {
       setLoading(true);
+
+      const stakeSigner = new Signer();
+
       const SigningStakeContract = new PhoenixStakeContract.Client({
         publicKey: storePersist.wallet.address!,
         contractId: stakeContractAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) => stakeSigner.sign(tx),
       });
 
       const tx = await SigningStakeContract.bond({
@@ -244,11 +253,15 @@ export default function Page({ params }: PoolPageProps) {
   const unstake = async (lpTokenAmount: number, stake_timestamp: number) => {
     try {
       setLoading(true);
+
+      const stakeSigner = new Signer();
+
       const SigningStakeContract = new PhoenixStakeContract.Client({
         publicKey: storePersist.wallet.address!,
         contractId: stakeContractAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) => stakeSigner.sign(tx),
       });
       const tx = await SigningStakeContract.unbond({
         sender: storePersist.wallet.address!,
