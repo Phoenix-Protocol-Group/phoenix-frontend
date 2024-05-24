@@ -34,7 +34,9 @@ function a11yProps(index: number) {
   };
 }
 
-const GlowingChart = ({ data }: { data: any[] }) => ( //@todo replace any with data type
+const GlowingChart = (
+  { data }: { data: any[] } //@todo replace any with data type
+) => (
   <ResponsiveContainer width="100%" height={250}>
     <AreaChart
       data={data}
@@ -329,7 +331,13 @@ const ListItem = ({
       </Box>
       <Box sx={{ display: "flex", alignItems: "center" }}>
         {name === "PHO" && (
-          <Button size="small" sx={{textTransform: "none", mr: 1, fontSize: "12px"}} onClick={() => onClaimVestedClick(contractId)}>Show Vested</Button>
+          <Button
+            size="small"
+            sx={{ textTransform: "none", mr: 1, fontSize: "12px" }}
+            onClick={() => onClaimVestedClick(contractId)}
+          >
+            Show Vested
+          </Button>
         )}
         <Typography
           sx={{
@@ -459,11 +467,11 @@ const WalletBalanceTable = ({
             })
             .map((token, index) => (
               <ListItem
-              token={token}
-              onTokenClick={onTokenClick}
-              onClaimVestedClick={onClaimVestedClick}
-              key={index}
-            />
+                token={token}
+                onTokenClick={onTokenClick}
+                onClaimVestedClick={onClaimVestedClick}
+                key={index}
+              />
             ))
         ) : (
           <Typography

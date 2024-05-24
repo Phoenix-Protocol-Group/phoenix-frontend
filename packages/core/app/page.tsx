@@ -81,8 +81,8 @@ export default function Page() {
     // Resolve names by fetching all assets
     const _allTokens = await appStore.getAllTokens();
 
-    const _winner = _allTokens.find((token) => token.name === winner.symbol);
-    const _loser = _allTokens.find((token) => token.name === loser.symbol);
+    const _winner = _allTokens.find((token: any) => token.name === winner.symbol);
+    const _loser = _allTokens.find((token: any) => token.name === loser.symbol);
 
     const _gainerAsset = {
       name: _winner.name,
@@ -311,6 +311,7 @@ export default function Page() {
           ) : (
             <WalletBalanceTable
               tokens={allTokens}
+              onClaimVestedClick={() => {}}
               onTokenClick={(token: string) => {
                 fetchTokenInfo(token);
               }}
