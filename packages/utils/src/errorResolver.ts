@@ -55,6 +55,23 @@ enum VestingContractError {
   CurveSLNotDecreasing = 30,
 }
 
+enum StakeContractError {
+  AlreadyInitialized = 1,
+  InvalidMinBond = 2,
+  InvalidMinReward = 3,
+  InvalidBond = 4,
+  Unauthorized = 5,
+  MinRewardNotEnough = 6,
+  RewardsInvalid = 7,
+  StakeNotFound = 8,
+  InvalidTime = 9,
+  DistributionExists = 10,
+  InvalidRewardAmount = 11,
+  InvalidMaxComplexity = 12,
+}
+
+type ActionType = 'vesting' | 'pool' | 'stake';
+
 function extractErrorCodeFromDiagnosticEvent(
   eventString: string
 ): number | null {
@@ -63,10 +80,22 @@ function extractErrorCodeFromDiagnosticEvent(
   return match ? parseInt(match[1], 10) : null;
 }
 
-export function resolvePoolContractError(eventString: string): string {
+export function resolvePoolContractError(eventString: string, type: ActionType = "pool"): string {
   const errorCode = extractErrorCodeFromDiagnosticEvent(eventString);
 
   if(!errorCode) return eventString;
+
+  if(type === "vesting") {
+    switch(errorCode) {
+      case VestingContractError.VestingNotFoundForAddress:
+      return ""
+    }
+  } else if(type === "stake") {
+    switch(errorCode) {
+      case StakeContractError.InvalidBond:
+      return ""
+    }
+  }
 
   switch (errorCode) {
     case PoolContractError.SpreadExceedsLimit:
