@@ -3496,8 +3496,6 @@ __metadata:
   resolution: "@phoenix-protocol/utils@workspace:packages/utils"
   dependencies:
     "@apollo/client": ^3.9.0
-    "@stellar/stellar-base": 11.0.1
-    "@stellar/stellar-sdk": 11.3.0
     big.js: ^6.2.1
     bignumber.js: ^9.1.1
     date-fns: ^3.3.1
@@ -4252,7 +4250,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stellar/stellar-base@npm:11.0.1, @stellar/stellar-base@npm:^11.0.1":
+"@stellar/stellar-base@npm:^11.0.1":
   version: 11.0.1
   resolution: "@stellar/stellar-base@npm:11.0.1"
   dependencies:

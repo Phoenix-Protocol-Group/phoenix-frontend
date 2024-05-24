@@ -1,6 +1,6 @@
-import { xdr, nativeToScVal, scValToBigInt, ScInt } from "@stellar/stellar-sdk";
+import { nativeToScVal, ScInt, scValToBigInt, xdr } from "@stellar/stellar-sdk";
 import { Address } from "./Address";
-import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract_client/index.js";
+import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract";
 
 export function strToScVal(base64Xdr: string): xdr.ScVal {
   return xdr.ScVal.fromXDR(base64Xdr, "base64");
