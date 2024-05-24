@@ -81,6 +81,7 @@ export default function SwapPage() {
 
       // Create contract instance
       const contract = new PhoenixMultihopContract.Client({
+        publicKey: storePersist.wallet.address!,
         contractId: constants.MULTIHOP_ADDRESS,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,

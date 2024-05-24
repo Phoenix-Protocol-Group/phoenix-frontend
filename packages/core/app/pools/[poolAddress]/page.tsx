@@ -105,6 +105,7 @@ export default function Page({ params }: PoolPageProps) {
 
   // Stakes
   const [userStakes, setUserStakes] = useState<Entry[] | undefined>(undefined);
+  const [stakeContractAddress, setStakeContractAddress] = useState<string>("");
 
   const PairContract = new PhoenixPairContract.Client({
     contractId: params.poolAddress,
@@ -144,8 +145,13 @@ export default function Page({ params }: PoolPageProps) {
   ) => {
     try {
       setLoading(true);
-
-      const tx = await PairContract.provide_liquidity({
+      const SigningPairContract = new PhoenixPairContract.Client({
+        publicKey: storePersist.wallet.address!,
+        contractId: params.poolAddress,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+      const tx = await SigningPairContract.provide_liquidity({
         sender: storePersist.wallet.address!,
         desired_a: BigInt(
           (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
@@ -178,8 +184,13 @@ export default function Page({ params }: PoolPageProps) {
   const removeLiquidity = async (lpTokenAmount: number) => {
     try {
       setLoading(true);
-
-      const tx = await PairContract.withdraw_liquidity({
+      const SigningPairContract = new PhoenixPairContract.Client({
+        publicKey: storePersist.wallet.address!,
+        contractId: params.poolAddress,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+      const tx = await SigningPairContract.withdraw_liquidity({
         sender: storePersist.wallet.address!,
         share_amount: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
@@ -202,8 +213,14 @@ export default function Page({ params }: PoolPageProps) {
   const stake = async (lpTokenAmount: number) => {
     try {
       setLoading(true);
+      const SigningStakeContract = new PhoenixStakeContract.Client({
+        publicKey: storePersist.wallet.address!,
+        contractId: stakeContractAddress,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
 
-      const tx = await StakeContractRef.current?.bond({
+      const tx = await SigningStakeContract.bond({
         sender: storePersist.wallet.address!,
         tokens: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
@@ -227,8 +244,13 @@ export default function Page({ params }: PoolPageProps) {
   const unstake = async (lpTokenAmount: number, stake_timestamp: number) => {
     try {
       setLoading(true);
-
-      const tx = await StakeContractRef.current?.unbond({
+      const SigningStakeContract = new PhoenixStakeContract.Client({
+        publicKey: storePersist.wallet.address!,
+        contractId: stakeContractAddress,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+      const tx = await SigningStakeContract.unbond({
         sender: storePersist.wallet.address!,
         stake_amount: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
@@ -270,7 +292,7 @@ export default function Page({ params }: PoolPageProps) {
               rpcUrl: constants.RPC_URL,
             }),
           ]);
-
+        setStakeContractAddress(pairConfig.result.stake_contract.toString());
         // Fetch prices and calculate TVL
         const [priceA, priceB] = await Promise.all([
           await fetchTokenPrices(_tokenA?.symbol || ""),
