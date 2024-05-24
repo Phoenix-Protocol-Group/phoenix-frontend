@@ -1,28 +1,21 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as refuse from "react-usestateref";
-import {
-  Box,
-  Typography,
-  Grid,
-  GlobalStyles,
-  Button,
-  Skeleton,
-} from "@mui/material";
+import { Box, GlobalStyles, Grid, Skeleton, Typography } from "@mui/material";
 import {
   LiquidityMining,
   PoolLiquidity,
   PoolStats,
-  StakingList,
   Skeleton as PhoenixSkeleton,
+  StakingList,
 } from "@phoenix-protocol/ui";
 import { Token } from "@phoenix-protocol/types";
 import {
-  PoolSuccess,
-  PoolError,
-  StakeSuccess,
   Loading,
+  PoolError,
+  PoolSuccess,
+  StakeSuccess,
   UnstakeSuccess,
 } from "../../../components/Modal/Modal";
 
@@ -34,14 +27,11 @@ import {
   time,
 } from "@phoenix-protocol/utils";
 
-import { Address } from "@stellar/stellar-sdk";
-
 import {
+  fetchPho,
   PhoenixPairContract,
   PhoenixStakeContract,
-  fetchPho,
 } from "@phoenix-protocol/contracts";
-import { useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import Link from "next/link";
 import { Helmet } from "react-helmet";
@@ -271,12 +261,9 @@ export default function Page({ params }: PoolPageProps) {
         // Fetch token infos from chain and save in global appstore
         const [_tokenA, _tokenB, _lpToken, stakeContractAddress] =
           await Promise.all([
-            store.fetchTokenInfo(Address.fromString(pairConfig.result.token_a)),
-            store.fetchTokenInfo(Address.fromString(pairConfig.result.token_b)),
-            store.fetchTokenInfo(
-              Address.fromString(pairConfig.result.share_token),
-              true
-            ),
+            store.fetchTokenInfo(pairConfig.result.token_a),
+            store.fetchTokenInfo(pairConfig.result.token_b),
+            store.fetchTokenInfo(pairConfig.result.share_token, true),
             new PhoenixStakeContract.Client({
               contractId: pairConfig.result.stake_contract.toString(),
               networkPassphrase: constants.NETWORK_PASSPHRASE,

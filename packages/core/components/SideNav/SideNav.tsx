@@ -1,4 +1,3 @@
-import { useMediaQuery, useTheme } from "@mui/material";
 import { SidebarNavigation } from "@phoenix-protocol/ui";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";

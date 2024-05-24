@@ -9,10 +9,10 @@ import { usePathname, useRouter } from "next/navigation";
 import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import JoyRideTooltip from "@/components/JoyRideTooltip";
-import { fetchHistoricalPrices, joyride } from "@phoenix-protocol/utils";
-import { TourModal, DisclaimerModal } from "@phoenix-protocol/ui";
+import { joyride } from "@phoenix-protocol/utils";
+import { DisclaimerModal, TourModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
-import Countdown from "@/components/Countdown";
+import Joyride from "react-joyride/dist";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   // Use theme for responsive design
@@ -242,73 +242,66 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <body suppressHydrationWarning={true}>
           <style>{css}</style>
 
-          {/* Pre-Launch */}
-          {false ? (
-            <Countdown />
-          ) : (
+          {/* Side Navigation Component */}
+          <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
+          {/* Top Navigation Bar */}
+          <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
+          {/* Joyride Tour */}
+          {initialized && persistStore.disclaimer.accepted && (
             <>
-              {/* Side Navigation Component */}
-              <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
-              {/* Top Navigation Bar */}
-              <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
-              {/* Joyride Tour */}
-              {initialized && persistStore.disclaimer.accepted && (
-                <>
-                  <TourModal
-                    open={tourModalOpen}
-                    setOpen={(state) => {
-                      setTourModalOpen(state);
-                      appStore.setTourRunning(false);
-                      persistStore.skipUserTour();
-                    }}
-                    onClick={() => {
-                      setTourModalOpen(false);
-                      appStore.setTourRunning(true);
-                      persistStore.setUserTourActive(true);
-                      persistStore.setUserTourStep(0);
-                    }}
-                  />
-                  <Joyride
-                    // @ts-ignore
-                    steps={joyride.steps}
-                    continuous={true}
-                    tooltipComponent={JoyRideTooltip}
-                    run={appStore.tourRunning}
-                    stepIndex={appStore.tourStep}
-                    callback={handleJoyrideCallback}
-                    disableScrolling={true}
-                    disableOverlayClose={true}
-                    keyboardNavigation={false}
-                    styles={{
-                      options: {
-                        arrowColor: "#1F2123",
-                        zIndex: 1400,
-                      },
-                    }}
-                  />
-                </>
-              )}
-              <DisclaimerModal
-                open={!persistStore.disclaimer.accepted}
-                onAccepted={onAcceptDisclaimer}
-              />
-              {/* Main Content Area */}
-              <Box
-                sx={{
-                  marginLeft: largerThenMd ? (navOpen ? "240px" : "60px") : "0",
-                  minHeight: "100vh",
-                  transition: "all 0.2s ease-in-out",
-                  display: "flex",
-                  justifyContent: "center",
-                  padding: "16px",
-                  ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
+              <TourModal
+                open={tourModalOpen}
+                setOpen={(state) => {
+                  setTourModalOpen(state);
+                  appStore.setTourRunning(false);
+                  persistStore.skipUserTour();
                 }}
-              >
-                {/* Child Components */}
-                {children}
-              </Box>
+                onClick={() => {
+                  setTourModalOpen(false);
+                  appStore.setTourRunning(true);
+                  persistStore.setUserTourActive(true);
+                  persistStore.setUserTourStep(0);
+                }}
+              />
+              <Joyride
+                // @ts-ignore
+                steps={joyride.steps}
+                continuous={true}
+                tooltipComponent={JoyRideTooltip}
+                run={appStore.tourRunning}
+                stepIndex={appStore.tourStep}
+                callback={handleJoyrideCallback}
+                disableScrolling={true}
+                disableOverlayClose={true}
+                keyboardNavigation={false}
+                styles={{
+                  options: {
+                    arrowColor: "#1F2123",
+                    zIndex: 1400,
+                  },
+                }}
+              />
             </>
           )}
+          <DisclaimerModal
+            open={!persistStore.disclaimer.accepted}
+            onAccepted={onAcceptDisclaimer}
+          />
+          {/* Main Content Area */}
+          <Box
+            sx={{
+              marginLeft: largerThenMd ? (navOpen ? "240px" : "60px") : "0",
+              minHeight: "100vh",
+              transition: "all 0.2s ease-in-out",
+              display: "flex",
+              justifyContent: "center",
+              padding: "16px",
+              ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
+            }}
+          >
+            {/* Child Components */}
+            {children}
+          </Box>
         </body>
       </Providers>
       <Analytics />

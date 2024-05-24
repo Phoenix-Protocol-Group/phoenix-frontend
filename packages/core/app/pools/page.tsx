@@ -1,10 +1,10 @@
 "use client";
 
 import {
+  fetchPho,
   PhoenixFactoryContract,
   PhoenixPairContract,
   PhoenixStakeContract,
-  fetchPho,
 } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Pools, Skeleton } from "@phoenix-protocol/ui";
@@ -15,11 +15,11 @@ import {
 } from "@phoenix-protocol/utils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Address } from "@stellar/stellar-sdk";
 import { Pool, PoolsFilter } from "@phoenix-protocol/types";
 import { Helmet } from "react-helmet";
 import { Box } from "@mui/material";
 import { FACTORY_ADDRESS } from "@phoenix-protocol/utils/build/constants";
+import { LiquidityPoolInfo } from "@phoenix-protocol/contracts/build/phoenix-pair";
 
 export default function Page() {
   const store = useAppStore(); // Global state management
@@ -32,21 +32,21 @@ export default function Page() {
   // Fetch pool information by its address
   const fetchPool = async (poolAddress: string) => {
     try {
-      const PairContract = new PhoenixPairContract.Contract({
+      const PairContract = new PhoenixPairContract.Client({
         contractId: poolAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
       });
 
       const [pairConfig, pairInfo] = await Promise.all([
-        PairContract.queryConfig(),
-        PairContract.queryPoolInfo(),
+        PairContract.query_config(),
+        PairContract.query_pool_info(),
       ]);
 
       if (pairConfig?.result && pairInfo?.result) {
         const [tokenA, tokenB] = await Promise.all([
-          store.fetchTokenInfo(Address.fromString(pairConfig.result.token_a)),
-          store.fetchTokenInfo(Address.fromString(pairConfig.result.token_b)),
+          store.fetchTokenInfo(pairConfig.result.token_a),
+          store.fetchTokenInfo(pairConfig.result.token_b),
         ]);
 
         // Fetch prices and calculate TVL
@@ -63,23 +63,24 @@ export default function Page() {
 
         const stakingAddress = pairInfo.result.stake_address;
 
-        const StakeContract = new PhoenixStakeContract.Contract({
+        const StakeContract = new PhoenixStakeContract.Client({
           contractId: stakingAddress,
           networkPassphrase: constants.NETWORK_PASSPHRASE,
           rpcUrl: constants.RPC_URL,
         });
 
-        const stakingInfo = await StakeContract.queryTotalStaked();
+        const stakingInfo = await StakeContract.query_total_staked();
         const totalStaked = Number(stakingInfo.result);
 
-        const FactoryContract = new PhoenixFactoryContract.Contract({
+        const FactoryContract = new PhoenixFactoryContract.Client({
           contractId: FACTORY_ADDRESS,
           networkPassphrase: constants.NETWORK_PASSPHRASE,
           rpcUrl: constants.RPC_URL,
         });
 
-        const allPoolDetails = (await FactoryContract.queryAllPoolsDetails())
-          .result;
+        const allPoolDetails: LiquidityPoolInfo[] = (
+          await FactoryContract.query_all_pools_details()
+        ).result;
         const totalTokens = Number(
           allPoolDetails.find((pool) => pool.pool_address === poolAddress)
             ?.pool_response.asset_lp_share.amount
@@ -148,13 +149,13 @@ export default function Page() {
 
   // Fetch all pools' data
   const fetchPools = async () => {
-    const FactoryContract = new PhoenixFactoryContract.Contract({
+    const FactoryContract = new PhoenixFactoryContract.Client({
       contractId: constants.FACTORY_ADDRESS,
       networkPassphrase: constants.NETWORK_PASSPHRASE,
       rpcUrl: constants.RPC_URL,
     });
 
-    const pools = await FactoryContract.queryPools({});
+    const pools = await FactoryContract.query_pools({});
 
     const poolWithData =
       pools && Array.isArray(pools.result)

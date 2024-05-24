@@ -26,16 +26,9 @@ import {
   resolveContractError,
   Signer,
 } from "@phoenix-protocol/utils";
-import {
-  SwapError,
-  SwapSuccess,
-  Loading,
-  LoadingSwap,
-} from "@/components/Modal/Modal";
-import { Alert, Box } from "@mui/material";
-import { init } from "next/dist/compiled/@vercel/og/satori";
+import { LoadingSwap, SwapError, SwapSuccess } from "@/components/Modal/Modal";
+import { Box } from "@mui/material";
 import { Helmet } from "react-helmet";
-import { Address } from "@stellar/stellar-sdk";
 
 export default function SwapPage() {
   // State variables declaration and initialization
@@ -343,9 +336,7 @@ export default function SwapPage() {
     setTrustlineButtonActive(!trust.exists);
     setTrustlineTokenName(trust.asset?.code || "");
     const tlAsset = await appStore.fetchTokenInfo(
-      Address.fromString(
-        "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA"
-      )
+      "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA"
     );
     setTrustlineAssetAmount(
       Number(tlAsset?.balance) / 10 ** tlAsset?.decimals!
@@ -371,9 +362,8 @@ export default function SwapPage() {
   return isLoading ? (
     <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
       <Skeleton.Swap />
-    </Box>
+    </Box> // JSX for UI when data is loaded
   ) : (
-    // JSX for UI when data is loaded
     <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
       <Helmet>
         <title>Phoenix DeFi Hub - Swap your tokens</title>
