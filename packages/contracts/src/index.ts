@@ -3,4 +3,5 @@ export * as SorobanTokenContract from "./soroban-token";
 export * as PhoenixStakeContract from "./phoenix-stake";
 export * as PhoenixFactoryContract from "./phoenix-factory";
 export * as PhoenixMultihopContract from "./phoenix-multihop";
+export * as PhoenixVestingContract from "./phoenix-vesting";
 export * from "./fetchPho";
