@@ -1,5 +1,10 @@
-import { nativeToScVal, ScInt, scValToBigInt, xdr } from "@stellar/stellar-sdk";
-import { Address } from "./Address";
+import {
+  Address,
+  nativeToScVal,
+  ScInt,
+  scValToBigInt,
+  xdr,
+} from "@stellar/stellar-sdk";
 import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract";
 
 export function strToScVal(base64Xdr: string): xdr.ScVal {

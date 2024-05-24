@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { Asset, Networks, Horizon } from "@stellar/stellar-sdk";
+import { Asset, Horizon, Networks } from "@stellar/stellar-sdk";
 import { StellarToml } from "./stellar-toml";
 import { joinURL } from "./util";
 import * as toml from "toml";

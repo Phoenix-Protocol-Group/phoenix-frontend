@@ -11,8 +11,7 @@ export * from "./graphql";
 export * from "./prices";
 export * from "./errorResolver";
 export * from "./trustlines";
-import { Address } from "./Address";
 import Signer from "./wallets/Signer";
+
 export { Signer };
-export { Address };
 export * as HelpCenter from "./help-center";

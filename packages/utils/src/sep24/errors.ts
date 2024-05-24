@@ -1,5 +1,5 @@
-import { AxiosResponse } from "axios"
-import { TransferServer } from "./transfer-server"
+import { AxiosResponse } from "axios";
+import { TransferServer } from "./transfer-server";
 
 export function ResponseError(
   response: AxiosResponse,
@@ -7,16 +7,14 @@ export function ResponseError(
 ) {
   const isJsonResponse =
     response.headers["content-type"] &&
-    /json/.test(response.headers["content-type"])
+    /json/.test(response.headers["content-type"]);
   const message =
     isJsonResponse &&
     response.data &&
-    (response.data.error || response.data.message)
+    (response.data.error || response.data.message);
   return Error(
     message
       ? `Request to ${transferServer.domain} failed: ${message}`
-      : `Request to ${transferServer.domain} failed with status ${
-          response.status
-        }`
-  )
+      : `Request to ${transferServer.domain} failed with status ${response.status}`
+  );
 }

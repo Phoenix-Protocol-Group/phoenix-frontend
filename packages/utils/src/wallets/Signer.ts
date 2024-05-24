@@ -1,13 +1,18 @@
-/**
- * This class is getting the sign method of the connected wallet and returns the signature function
- * to pass it to the contract call
- */
-
-import { scValToJs } from "../convert";
 import { lobstr } from "./lobstr";
 import { Wallet } from "./types";
 import { xBull } from "./xbull";
 
+/**
+ * Signer class
+ * @class Signer
+ * @export Signer
+ * @description This class is getting the sign method of the connected wallet and returns the signature function
+ * to pass it to the contract call
+ *
+ * @example
+ * const signer = new Signer();
+ * const signature = await signer.sign("message");
+ */
 export default class Signer {
   walletType: string;
   wallet: Wallet | undefined;

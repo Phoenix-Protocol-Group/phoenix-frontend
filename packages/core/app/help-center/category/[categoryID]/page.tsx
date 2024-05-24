@@ -35,6 +35,7 @@ export default function Page({ params }: CategoryPageProps) {
         params.categoryID
       );
 
+      // @ts-ignore
       const _articles = fetchArticles.expand?.articles;
 
       // Split articles in featured and normal
@@ -42,7 +43,7 @@ export default function Page({ params }: CategoryPageProps) {
         (article: HelpCenterArticle) => article.featured === true
       );
 
-      setCategoryName(fetchArticles.title);
+      setCategoryName(fetchArticles.title!);
       setFeaturedArticles(featuredArticles as HelpCenterArticle[]);
       setArticles(_articles);
     } catch (error) {
