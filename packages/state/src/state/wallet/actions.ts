@@ -2,6 +2,7 @@ import {AppStore, GetStateType, SetStateType, StateToken as Token, WalletActions
 import {fetchPho, PhoenixFactoryContract, SorobanTokenContract,} from "@phoenix-protocol/contracts";
 import {usePersistStore} from "../store";
 import {constants, fetchTokenPrices,} from "@phoenix-protocol/utils";
+import {LiquidityPoolInfo} from "@phoenix-protocol/contracts/build/phoenix-pair";
 
 export const createWalletActions = (setState: SetStateType, getState: GetStateType): WalletActions => {
     return {
@@ -35,7 +36,7 @@ export const createWalletActions = (setState: SetStateType, getState: GetStateTy
             const allPoolsDetails = await factoryContract.query_all_pools_details();
 
             // Parse results
-            const parsedResults = allPoolsDetails.result;
+            const parsedResults: LiquidityPoolInfo[] = allPoolsDetails.result;
 
             // Loop through all pools and get asset_a and asset_b addresses in an array
             const _allAssets = parsedResults
