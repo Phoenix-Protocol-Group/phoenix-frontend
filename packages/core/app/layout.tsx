@@ -12,7 +12,6 @@ import JoyRideTooltip from "@/components/JoyRideTooltip";
 import { joyride } from "@phoenix-protocol/utils";
 import { DisclaimerModal, TourModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
-import Joyride from "react-joyride/dist";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   // Use theme for responsive design
