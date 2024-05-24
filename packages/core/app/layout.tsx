@@ -121,10 +121,25 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     // If the user never started or skipped the tour, we need to start it from the beginning
     // This means, from the modal, which then starts the tour
     // Also we got to redirect the user to the home page
+
+    const appStorageValue = localStorage?.getItem("app-storage");
+
+    let skippedTour: boolean = false;
+
+    if (appStorageValue !== null) {
+      try {
+        const parsedValue = JSON.parse(appStorageValue);
+        skippedTour = parsedValue?.state?.userTour?.skipped;
+      } catch (error) {
+        console.error("Error parsing app-storage value:", error);
+      }
+    }
+
     if (
       !persistStore.userTour.active &&
       !persistStore.userTour.skipped &&
-      persistStore.userTour.step === 0
+      persistStore.userTour.step === 0 &&
+      !skippedTour
     ) {
       setTourModalOpen(true);
       router.push("/");
