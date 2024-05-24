@@ -3351,7 +3351,6 @@ __metadata:
   dependencies:
     "@phoenix-protocol/utils": "workspace:^"
     "@stellar/freighter-api": 1.7.1
-    "@stellar/stellar-sdk": 11.3.0
     bigint-conversion: 2.4.1
     buffer: 6.0.3
     typescript: 5.0.4
@@ -3391,7 +3390,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/phoenix-frontend@workspace:."
   dependencies:
-    "@stellar/stellar-sdk": 11.3.0
+    "@stellar/stellar-sdk": 12.0.0-rc.3
     "@tsconfig/recommended": ^1.0.2
     "@types/jest": ^29.5.2
     jest: ^29.5.0
@@ -4270,6 +4269,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stellar/stellar-base@npm:^12.0.0-rc.1":
+  version: 12.0.0-rc.1
+  resolution: "@stellar/stellar-base@npm:12.0.0-rc.1"
+  dependencies:
+    "@stellar/js-xdr": ^3.1.1
+    base32.js: ^0.1.0
+    bignumber.js: ^9.1.2
+    buffer: ^6.0.3
+    sha.js: ^2.3.6
+    sodium-native: ^4.1.1
+    tweetnacl: ^1.0.3
+  dependenciesMeta:
+    sodium-native:
+      optional: true
+  checksum: f9599552c31c8bc2e8af868786b7bf74db1399e3f00c884d49f578e2946055c8dfd36beb33f27483e64dc09db4dfe2a8c794977455d3f2499deb6a6968bfe8a9
+  languageName: node
+  linkType: hard
+
 "@stellar/stellar-sdk@npm:11.3.0":
   version: 11.3.0
   resolution: "@stellar/stellar-sdk@npm:11.3.0"
@@ -4282,6 +4299,21 @@ __metadata:
     toml: ^3.0.0
     urijs: ^1.19.1
   checksum: 3ef7429ba0938d076b807d11f0c461da1afb4eff371160f04375b4d9443b4d805ab08002e81d8a3fd86aacd7b72fef70b9106757b55ceff5ebcd2e0e9a3bc766
+  languageName: node
+  linkType: hard
+
+"@stellar/stellar-sdk@npm:12.0.0-rc.3":
+  version: 12.0.0-rc.3
+  resolution: "@stellar/stellar-sdk@npm:12.0.0-rc.3"
+  dependencies:
+    "@stellar/stellar-base": ^12.0.0-rc.1
+    axios: ^1.6.8
+    bignumber.js: ^9.1.2
+    eventsource: ^2.0.2
+    randombytes: ^2.1.0
+    toml: ^3.0.0
+    urijs: ^1.19.1
+  checksum: e5841f0f6dc2dab51b04602b6cfe6baf0a5b5c6d1d15778f9994d419bb51bb251b5c3d2458821d65ea813ff4afa1014d04d67d59cf6fdb455e62a1beea25b08c
   languageName: node
   linkType: hard
 
@@ -15327,7 +15359,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sodium-native@npm:^4.0.1, sodium-native@npm:^4.0.10":
+"sodium-native@npm:^4.0.1, sodium-native@npm:^4.0.10, sodium-native@npm:^4.1.1":
   version: 4.1.1
   resolution: "sodium-native@npm:4.1.1"
   dependencies:

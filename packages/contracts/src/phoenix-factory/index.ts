@@ -1,27 +1,15 @@
-import { ContractSpec, Address } from "@stellar/stellar-sdk";
-import { Buffer } from "buffer";
+import {Buffer} from "buffer";
+import type {i128, i64, Option, u32, u64,} from '@stellar/stellar-sdk/contract';
 import {
-  AssembledTransaction,
-  ContractClient,
-  ContractClientOptions,
-} from "@stellar/stellar-sdk/lib/contract_client/index.js";
-import type {
-  u32,
-  i32,
-  u64,
-  i64,
-  u128,
-  i128,
-  u256,
-  i256,
-  Option,
-  Typepoint,
-  Duration,
-} from "@stellar/stellar-sdk/lib/contract_client";
-import { Result } from "@stellar/stellar-sdk/lib/rust_types/index.js";
-export * from "@stellar/stellar-sdk";
-export * from "@stellar/stellar-sdk/lib/contract_client/index.js";
-export * from "@stellar/stellar-sdk/lib/rust_types/index.js";
+    AssembledTransaction,
+    Client as ContractClient,
+    ClientOptions as ContractClientOptions,
+    Spec as ContractSpec,
+} from '@stellar/stellar-sdk/contract';
+
+export * from '@stellar/stellar-sdk'
+export * as contract from '@stellar/stellar-sdk/contract'
+export * as rpc from '@stellar/stellar-sdk/rpc'
 
 if (typeof window !== "undefined") {
   //@ts-ignore Buffer exists
