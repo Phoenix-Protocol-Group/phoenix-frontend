@@ -29,9 +29,9 @@
     "bignumber.js": "^9.1.1",
     "date-fns": "^3.3.1",
     "graphql": "^16.8.1",
+    "pocketbase": "^0.21.2",
     "react-joyride": "^2.7.2",
     "soroban-client": "^1.0.0",
-    "stellar-sdk": "^11.2.1",
     "toml": "^3.0.0",
     "xBull-Wallet-Connect": "https://github.com/Creit-Tech/xBull-Wallet-Connect.git"
   }

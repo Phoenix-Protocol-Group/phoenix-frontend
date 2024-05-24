@@ -1,6 +1,7 @@
-import { useMediaQuery, useTheme } from "@mui/material";
 import { SidebarNavigation } from "@phoenix-protocol/ui";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { BugReport } from "@mui/icons-material";
 import React from "react";
 
 const SideNav = ({
@@ -17,7 +18,10 @@ const SideNav = ({
     {
       label: "Dashboard",
       icon: (
-        <img
+        <Image
+          alt="Dashboard Icon"
+          width={24}
+          height={24}
           src={
             pathname == "/" ? "/dashboardIconActive.svg" : "/dashboardIcon.svg"
           }
@@ -29,7 +33,10 @@ const SideNav = ({
     {
       label: "Swap",
       icon: (
-        <img
+        <Image
+          width={24}
+          height={24}
+          alt="Swap Icon"
           src={pathname == "/swap" ? "/swapIconActive.svg" : "/swapIcon.svg"}
         />
       ),
@@ -39,7 +46,10 @@ const SideNav = ({
     {
       label: "Pools",
       icon: (
-        <img
+        <Image
+          alt="Pools Icon"
+          width={24}
+          height={24}
           src={pathname == "/pools" ? "/poolsIconActive.svg" : "/poolsIcon.svg"}
         />
       ),
@@ -49,7 +59,10 @@ const SideNav = ({
     {
       label: "Trade History",
       icon: (
-        <img
+        <Image
+          alt="History Icon"
+          width={24}
+          height={24}
           src={
             pathname == "/history"
               ? "/tradeHistoryIconActive.svg"
@@ -62,7 +75,35 @@ const SideNav = ({
     },
   ];
 
-  const onNavClick = (href: string) => {
+  const bottomNavItems = [
+    {
+      label: "Help Center",
+      icon: (
+        <img
+          src={
+            pathname == "/help-center"
+              ? "/helpCenterIconActive.svg"
+              : "/helpCenterIcon.svg"
+          }
+        />
+      ),
+      active: pathname == "/help-center",
+      href: "/help-center",
+    },
+    {
+      label: "Report Bug",
+      icon: <BugReport />,
+      active: pathname == "/bugreport",
+      href: "https://discord.gg/2nGnFaprqy",
+      target: "_blank",
+    },
+  ];
+
+  const onNavClick = (href: string, target?: string) => {
+    if (target === "_blank") {
+      window.open(href, "_blank");
+      return;
+    }
     router.push(href);
   };
 
@@ -70,6 +111,7 @@ const SideNav = ({
     <SidebarNavigation
       onNavClick={onNavClick}
       items={navItems}
+      bottomItems={bottomNavItems}
       open={navOpen}
       setOpen={setNavOpen}
     />

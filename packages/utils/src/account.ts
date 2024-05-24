@@ -1,5 +1,5 @@
 import freighter from "@stellar/freighter-api";
-import { Account, Horizon } from "stellar-sdk";
+import { Account, Horizon } from "@stellar/stellar-sdk";
 import { Server } from "./server";
 // working around ESM compatibility issues
 const { isConnected, isAllowed, getUserInfo, signTransaction } = freighter;

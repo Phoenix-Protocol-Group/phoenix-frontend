@@ -1,28 +1,21 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as refuse from "react-usestateref";
-import {
-  Box,
-  Typography,
-  Grid,
-  GlobalStyles,
-  Button,
-  Skeleton,
-} from "@mui/material";
+import { Box, GlobalStyles, Grid, Skeleton, Typography } from "@mui/material";
 import {
   LiquidityMining,
   PoolLiquidity,
   PoolStats,
-  StakingList,
   Skeleton as PhoenixSkeleton,
+  StakingList,
 } from "@phoenix-protocol/ui";
 import { Token } from "@phoenix-protocol/types";
 import {
-  PoolSuccess,
-  PoolError,
-  StakeSuccess,
   Loading,
+  PoolError,
+  PoolSuccess,
+  StakeSuccess,
   UnstakeSuccess,
 } from "../../../components/Modal/Modal";
 
@@ -31,17 +24,15 @@ import {
   fetchTokenPrices,
   formatCurrency,
   resolveContractError,
+  Signer,
   time,
 } from "@phoenix-protocol/utils";
 
-import { Address } from "stellar-sdk";
-
 import {
+  fetchPho,
   PhoenixPairContract,
   PhoenixStakeContract,
-  fetchPho,
 } from "@phoenix-protocol/contracts";
-import { useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import Link from "next/link";
 import { Helmet } from "react-helmet";
@@ -102,7 +93,7 @@ export default function Page({ params }: PoolPageProps) {
 
   // Stake Contract
   const [StakeContract, setStakeContract, StakeContractRef] = refuse.default<
-    PhoenixStakeContract.Contract | undefined
+    PhoenixStakeContract.Client | undefined
   >(undefined);
 
   // Pool Liquidity
@@ -115,8 +106,9 @@ export default function Page({ params }: PoolPageProps) {
 
   // Stakes
   const [userStakes, setUserStakes] = useState<Entry[] | undefined>(undefined);
+  const [stakeContractAddress, setStakeContractAddress] = useState<string>("");
 
-  const PairContract = new PhoenixPairContract.Contract({
+  const PairContract = new PhoenixPairContract.Client({
     contractId: params.poolAddress,
     networkPassphrase: constants.NETWORK_PASSPHRASE,
     rpcUrl: constants.RPC_URL,
@@ -154,8 +146,15 @@ export default function Page({ params }: PoolPageProps) {
   ) => {
     try {
       setLoading(true);
-
-      const tx = await PairContract.provideLiquidity({
+      const stakeSigner = new Signer();
+      const SigningPairContract = new PhoenixPairContract.Client({
+        publicKey: storePersist.wallet.address!,
+        contractId: params.poolAddress,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) => stakeSigner.sign(tx),
+      });
+      const tx = await SigningPairContract.provide_liquidity({
         sender: storePersist.wallet.address!,
         desired_a: BigInt(
           (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
@@ -188,8 +187,15 @@ export default function Page({ params }: PoolPageProps) {
   const removeLiquidity = async (lpTokenAmount: number) => {
     try {
       setLoading(true);
-
-      const tx = await PairContract.withdrawLiquidity({
+      const stakeSigner = new Signer();
+      const SigningPairContract = new PhoenixPairContract.Client({
+        publicKey: storePersist.wallet.address!,
+        contractId: params.poolAddress,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) => stakeSigner.sign(tx),
+      });
+      const tx = await SigningPairContract.withdraw_liquidity({
         sender: storePersist.wallet.address!,
         share_amount: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
@@ -213,7 +219,17 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      const tx = await StakeContractRef.current?.bond({
+      const stakeSigner = new Signer();
+
+      const SigningStakeContract = new PhoenixStakeContract.Client({
+        publicKey: storePersist.wallet.address!,
+        contractId: stakeContractAddress,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) => stakeSigner.sign(tx),
+      });
+
+      const tx = await SigningStakeContract.bond({
         sender: storePersist.wallet.address!,
         tokens: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
@@ -238,7 +254,16 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      const tx = await StakeContractRef.current?.unbond({
+      const stakeSigner = new Signer();
+
+      const SigningStakeContract = new PhoenixStakeContract.Client({
+        publicKey: storePersist.wallet.address!,
+        contractId: stakeContractAddress,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) => stakeSigner.sign(tx),
+      });
+      const tx = await SigningStakeContract.unbond({
         sender: storePersist.wallet.address!,
         stake_amount: BigInt(
           (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
@@ -262,8 +287,8 @@ export default function Page({ params }: PoolPageProps) {
     try {
       // Fetch pool config and info from chain
       const [pairConfig, pairInfo] = await Promise.all([
-        PairContract.queryConfig(),
-        PairContract.queryPoolInfo(),
+        PairContract.query_config(),
+        PairContract.query_pool_info(),
       ]);
 
       // When results ok...
@@ -271,19 +296,16 @@ export default function Page({ params }: PoolPageProps) {
         // Fetch token infos from chain and save in global appstore
         const [_tokenA, _tokenB, _lpToken, stakeContractAddress] =
           await Promise.all([
-            store.fetchTokenInfo(Address.fromString(pairConfig.result.token_a)),
-            store.fetchTokenInfo(Address.fromString(pairConfig.result.token_b)),
-            store.fetchTokenInfo(
-              Address.fromString(pairConfig.result.share_token),
-              true
-            ),
-            new PhoenixStakeContract.Contract({
+            store.fetchTokenInfo(pairConfig.result.token_a),
+            store.fetchTokenInfo(pairConfig.result.token_b),
+            store.fetchTokenInfo(pairConfig.result.share_token, true),
+            new PhoenixStakeContract.Client({
               contractId: pairConfig.result.stake_contract.toString(),
               networkPassphrase: constants.NETWORK_PASSPHRASE,
               rpcUrl: constants.RPC_URL,
             }),
           ]);
-
+        setStakeContractAddress(pairConfig.result.stake_contract.toString());
         // Fetch prices and calculate TVL
         const [priceA, priceB] = await Promise.all([
           await fetchTokenPrices(_tokenA?.symbol || ""),
@@ -362,7 +384,7 @@ export default function Page({ params }: PoolPageProps) {
           },
         ];
 
-        const stakingInfo = await stakeContractAddress.queryTotalStaked();
+        const stakingInfo = await stakeContractAddress.query_total_staked();
         const totalStaked = Number(stakingInfo?.result);
 
         const ratioStaked =
@@ -430,7 +452,7 @@ export default function Page({ params }: PoolPageProps) {
   ) => {
     if (storePersist.wallet.address) {
       // Get user stakes
-      const stakes = await stakeContract?.queryStaked({
+      const stakes = await stakeContract?.query_staked({
         address: storePersist.wallet.address!,
       });
 

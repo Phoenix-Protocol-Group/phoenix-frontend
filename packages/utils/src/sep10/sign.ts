@@ -1,14 +1,11 @@
-import { Transaction } from "stellar-sdk";
-import { Wallet } from "../method-options";
+import { Transaction } from "@stellar/stellar-sdk";
 
 export const sign = async ({
   challengeTransaction,
   networkPassphrase,
-  wallet,
 }: {
   challengeTransaction: Transaction;
   networkPassphrase: string;
-  wallet: Wallet;
 }): Promise<string> => {
   // Serialize the transaction to a string
   const transactionXDR = challengeTransaction.toXDR();

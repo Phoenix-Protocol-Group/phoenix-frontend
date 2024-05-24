@@ -16,7 +16,6 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { useEffect } from "react";
 import { DrawerProps } from "@phoenix-protocol/types";
 
 const drawerWidth = 240;
@@ -81,6 +80,7 @@ const SidebarNavigation = ({
   open,
   setOpen,
   onNavClick,
+  bottomItems,
   ...props
 }: DrawerProps) => {
   const theme = useTheme();
@@ -156,59 +156,13 @@ const SidebarNavigation = ({
         >
           Menu
         </ListSubheader>
-        {items.map((item, index) => (
-          <ListItem
-            key={item.label}
-            disablePadding
-            className={item.label}
-            sx={{
-              margin: "0 16px",
-              width: "unset",
-              borderRadius: "12px",
-              overflow: "hidden",
-              border:
-                item.active && open
-                  ? "1px solid #E2491A"
-                  : "1px solid transparent",
-              background:
-                item.active && open ? "rgba(226, 73, 26, 0.10)" : "transparent",
-              height: open ? "unset" : "32px",
-              marginBottom: open ? 0 : "16px",
-            }}
-          >
-            <ListItemButton
-              onClick={() => {
-                if (!largerThenMd) {
-                  setOpen(false);
-                }
-                onNavClick(item.href);
-              }}
-              sx={{
-                padding: 0,
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: "24px",
-                  marginLeft: open ? "20px" : "1px",
-                }}
-              >
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText
-                primaryTypographyProps={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                }}
-                sx={{
-                  padding: "16px 24px 16px 20px",
-                  opacity: item.active ? 1 : 0.6000000238418579,
-                }}
-                primary={item.label}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        <ItemList
+          items={items}
+          setOpen={setOpen}
+          largerThenMd={largerThenMd}
+          onNavClick={onNavClick}
+          open={open}
+        />
         {!open && (
           <ListItem>
             <IconButton
@@ -227,49 +181,90 @@ const SidebarNavigation = ({
           </ListItem>
         )}
       </List>
-      {open && (
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 0,
-            margin: "auto",
-            width: "100%",
-            padding: "2rem",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              flexDirection: "column",
-              borderTop: "1px solid white",
-              borderRadius: "24px",
-              border: "2px solid #E2621B",
-              padding: "0.75rem",
-              background:
-                "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "0.6rem",
-                textAlign: "center",
-              }}
-            >
-              Found a bug? <br /> Please report it{" "}
-              <Link
-                href="https://discord.gg/FpmMt3udnf"
-                target="_blank"
-                rel="noreferrer"
-              >
-                here
-              </Link>
-              .
-            </Typography>
-          </Box>
-        </Box>
+      {bottomItems && (
+        <List sx={{ position: "absolute", bottom: "2rem", width: "100%" }}>
+          <ItemList
+            items={bottomItems}
+            setOpen={setOpen}
+            largerThenMd={largerThenMd}
+            onNavClick={onNavClick}
+            open={open}
+          />
+        </List>
       )}
     </Drawer>
+  );
+};
+
+const ItemList = ({
+  items,
+  setOpen,
+  largerThenMd,
+  onNavClick,
+  open,
+}: {
+  items: any[];
+  setOpen: (open: boolean) => void;
+  largerThenMd: boolean;
+  onNavClick: (href: string, target?: string) => void;
+  open: boolean;
+}) => {
+  return (
+    <>
+      {items.map((item, index) => (
+        <ListItem
+          key={item.label}
+          disablePadding
+          className={item.label}
+          sx={{
+            margin: "0 16px",
+            width: "unset",
+            borderRadius: "12px",
+            overflow: "hidden",
+            border:
+              item.active && open
+                ? "1px solid #E2491A"
+                : "1px solid transparent",
+            background:
+              item.active && open ? "rgba(226, 73, 26, 0.10)" : "transparent",
+            height: open ? "unset" : "32px",
+            marginBottom: open ? 0 : "16px",
+          }}
+        >
+          <ListItemButton
+            onClick={() => {
+              if (!largerThenMd) {
+                setOpen(false);
+              }
+              onNavClick(item.href, item.target);
+            }}
+            sx={{
+              padding: 0,
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: "24px",
+                marginLeft: open ? "20px" : "1px",
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText
+              primaryTypographyProps={{
+                fontSize: "14px",
+                lineHeight: "20px",
+              }}
+              sx={{
+                padding: "16px 24px 16px 20px",
+                opacity: item.active ? 1 : 0.6000000238418579,
+              }}
+              primary={item.label}
+            />
+          </ListItemButton>
+        </ListItem>
+      ))}
+    </>
   );
 };
 

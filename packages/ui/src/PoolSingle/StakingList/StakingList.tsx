@@ -109,7 +109,7 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
           </Grid>
           <Grid item xs={2}>
             <Typography sx={{ ...typoStyle, fontWeight: 400 }}>
-              Locked Period
+              Days Staked
             </Typography>
           </Grid>
           <Grid item xs={4}>
@@ -130,9 +130,16 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
         ))
       ) : (
         <Typography
-          sx={{ ...typoStyle, textAlign: "center", opacity: 0.5, mt: 2 }}
+          sx={{
+            color: "#FFF",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            pt: 1,
+          }}
         >
-          No stakes
+          It looks like you haven't staked yet.
         </Typography>
       )}
     </Box>

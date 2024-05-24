@@ -1,15 +1,14 @@
 "use client";
-import { NoSsr, Typography } from "@mui/material";
+import { NoSsr } from "@mui/material";
 import {
   freighter,
+  lobstr,
   useAppStore,
   usePersistStore,
   xbull,
-  lobstr,
 } from "@phoenix-protocol/state";
 import { AppBar, ConnectWallet } from "@phoenix-protocol/ui";
-import React, { useEffect, useState } from "react";
-import { Address } from "stellar-sdk";
+import React, { useEffect } from "react";
 
 const TopBar = ({
   navOpen,
@@ -42,9 +41,7 @@ const TopBar = ({
 
   const fetch = async () =>
     await store.fetchTokenInfo(
-      Address.fromString(
-        "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA"
-      )
+      "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA"
     );
 
   useEffect(() => {

@@ -18,22 +18,16 @@ import {
 } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
-  Address,
   checkTrustline,
   constants,
   fetchAndIssueTrustline,
   fetchTokenPrices,
   findBestPath,
   resolveContractError,
+  Signer,
 } from "@phoenix-protocol/utils";
-import {
-  SwapError,
-  SwapSuccess,
-  Loading,
-  LoadingSwap,
-} from "@/components/Modal/Modal";
-import { Alert, Box } from "@mui/material";
-import { init } from "next/dist/compiled/@vercel/og/satori";
+import { LoadingSwap, SwapError, SwapSuccess } from "@/components/Modal/Modal";
+import { Box } from "@mui/material";
 import { Helmet } from "react-helmet";
 
 export default function SwapPage() {
@@ -83,11 +77,15 @@ export default function SwapPage() {
   const doSwap = async () => {
     setTxBroadcasting(true);
     try {
+      const swapSigner = new Signer();
+
       // Create contract instance
-      const contract = new PhoenixMultihopContract.Contract({
+      const contract = new PhoenixMultihopContract.Client({
+        publicKey: storePersist.wallet.address!,
         contractId: constants.MULTIHOP_ADDRESS,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) => swapSigner.sign(tx),
       });
 
       // Execute swap
@@ -114,7 +112,13 @@ export default function SwapPage() {
       setErrorModalOpen(true);
 
       // @ts-ignore
-      setErrorDescription((typeof e === "string") ? e : e.message.includes("request denied") ? e.message : resolveContractError(e.message));
+      setErrorDescription(
+        typeof e === "string"
+          ? e
+          : e.message.includes("request denied")
+          ? e.message
+          : resolveContractError(e.message)
+      );
       setTxBroadcasting(false);
     }
     setTxBroadcasting(false);
@@ -131,13 +135,13 @@ export default function SwapPage() {
     }
     setLoadingSimulate(true);
     try {
-      const contract = new PhoenixMultihopContract.Contract({
+      const contract = new PhoenixMultihopContract.Client({
         contractId: constants.MULTIHOP_ADDRESS,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
       });
 
-      const tx = await contract.simulateSwap({
+      const tx = await contract.simulate_swap({
         operations: operations,
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
       });
@@ -222,14 +226,14 @@ export default function SwapPage() {
       setToToken(allTokens[1]);
       setIsLoading(false);
       // Get all pools
-      const factoryContract = new PhoenixFactoryContract.Contract({
+      const factoryContract = new PhoenixFactoryContract.Client({
         contractId: constants.FACTORY_ADDRESS,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
       });
 
       // Fetch all available tokens from chain
-      const { result } = await factoryContract.queryAllPoolsDetails();
+      const { result } = await factoryContract.query_all_pools_details();
 
       const allPairs = result.map((pool: any) => {
         return {
@@ -333,9 +337,7 @@ export default function SwapPage() {
     setTrustlineButtonActive(!trust.exists);
     setTrustlineTokenName(trust.asset?.code || "");
     const tlAsset = await appStore.fetchTokenInfo(
-      Address.fromString(
-        "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA"
-      )
+      "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA"
     );
     setTrustlineAssetAmount(
       Number(tlAsset?.balance) / 10 ** tlAsset?.decimals!
@@ -361,9 +363,8 @@ export default function SwapPage() {
   return isLoading ? (
     <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
       <Skeleton.Swap />
-    </Box>
+    </Box> // JSX for UI when data is loaded
   ) : (
-    // JSX for UI when data is loaded
     <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
       <Helmet>
         <title>Phoenix DeFi Hub - Swap your tokens</title>

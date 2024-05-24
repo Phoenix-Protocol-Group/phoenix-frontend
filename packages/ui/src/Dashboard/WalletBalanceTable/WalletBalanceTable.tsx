@@ -439,29 +439,46 @@ const WalletBalanceTable = ({
           ...scrollbarStyles,
         }}
       >
-        {[...tokens]
-          .filter((token) => token.category === category || category === "All")
-          .filter((token) =>
-            token.name.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .sort((a, b) => {
-            const aTrueValue = a.amount * a.usdValue;
-            const bTrueValue = b.amount * b.usdValue;
+        {tokens.length ? (
+          [...tokens]
+            .filter(
+              (token) => token.category === category || category === "All"
+            )
+            .filter((token) =>
+              token.name.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .sort((a, b) => {
+              const aTrueValue = a.amount * a.usdValue;
+              const bTrueValue = b.amount * b.usdValue;
 
-            if (sort === "highest") {
-              return bTrueValue - aTrueValue;
-            } else {
-              return aTrueValue - bTrueValue;
-            }
-          })
-          .map((token, index) => (
-            <ListItem
+              if (sort === "highest") {
+                return bTrueValue - aTrueValue;
+              } else {
+                return aTrueValue - bTrueValue;
+              }
+            })
+            .map((token, index) => (
+              <ListItem
               token={token}
               onTokenClick={onTokenClick}
               onClaimVestedClick={onClaimVestedClick}
               key={index}
             />
-          ))}
+            ))
+        ) : (
+          <Typography
+            sx={{
+              color: "#FFF",
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              pt: 1,
+            }}
+          >
+            Looks like you haven't acquired any tokens.
+          </Typography>
+        )}
       </Box>
     </Box>
   );

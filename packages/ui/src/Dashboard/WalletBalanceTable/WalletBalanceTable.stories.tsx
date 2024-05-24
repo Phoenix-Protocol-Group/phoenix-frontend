@@ -69,3 +69,11 @@ export const Primary: Story = {
     onTokenClick: (token) => console.log(token),
   },
 };
+
+export const NoEntries: Story = {
+  args: {
+    // @ts-ignore
+    tokens: [],
+    onTokenClick: (token) => console.log(token),
+  },
+};

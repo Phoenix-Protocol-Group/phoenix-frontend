@@ -1,12 +1,5 @@
 "use client";
-import {
-  Alert,
-  Box,
-  Grid,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Helmet } from "react-helmet";
 import "./style.css";
@@ -14,15 +7,13 @@ import {
   CryptoCTA,
   DashboardPriceCharts,
   DashboardStats,
-  MainStats,
   WalletBalanceTable,
   AnchorServices,
   Skeleton,
   AssetInfoModal,
 } from "@phoenix-protocol/ui";
-import Link from "next/link";
 
-import { SorobanTokenContract } from "@phoenix-protocol/contracts";
+import { fetchPho, SorobanTokenContract } from "@phoenix-protocol/contracts";
 
 import { useEffect, useState } from "react";
 import {
@@ -30,17 +21,14 @@ import {
   getAllAnchors,
 } from "@phoenix-protocol/utils/build/sep24";
 import { Anchor, AssetInfo } from "@phoenix-protocol/types";
-import { fetchHistoricalPrices } from "@phoenix-protocol/utils";
 import {
   constants,
   fetchBiggestWinnerAndLoser,
+  fetchHistoricalPrices,
   fetchTokenPrices,
   fetchTokenPrices2,
   formatCurrency,
-  scValToJs,
 } from "@phoenix-protocol/utils";
-import { PhoenixFactoryContract, fetchPho } from "@phoenix-protocol/contracts";
-import DisclaimerModal from "@/components/Disclaimer";
 
 export default function Page() {
   const theme = useTheme();
@@ -156,7 +144,7 @@ export default function Page() {
   };
 
   const fetchTokenInfo = async (tokenId: string) => {
-    const TokenContract = new SorobanTokenContract.Contract({
+    const TokenContract = new SorobanTokenContract.Client({
       contractId: tokenId,
       networkPassphrase: constants.NETWORK_PASSPHRASE,
       rpcUrl: constants.RPC_URL,

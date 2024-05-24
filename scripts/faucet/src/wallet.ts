@@ -1,5 +1,5 @@
 import { SigningKeypair, walletSdk } from "@stellar/typescript-wallet-sdk";
-import { TransactionBuilder, Networks } from "stellar-sdk";
+import { TransactionBuilder, Networks } from "@stellar/stellar-sdk";
 
 type XDR_BASE64 = string;
 
