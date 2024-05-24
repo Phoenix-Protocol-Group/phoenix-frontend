@@ -7,7 +7,7 @@
  * This file was @generated using pocketbase-typegen
  */
 
-import type PocketBase, { RecordService } from "pocketbase";
+import PocketBase, { RecordService } from "pocketbase";
 
 export enum Collections {
   Articles = "articles",
