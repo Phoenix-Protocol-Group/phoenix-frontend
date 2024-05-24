@@ -19,6 +19,14 @@ enum ContractError {
   MinAmountsBelowZero = 15,
 }
 
+/**
+ * Extracts the error code from a diagnostic event string.
+ * @param {string} eventString
+ * @returns {number | null} The error code or null if not found
+ * @example
+ * extractErrorCodeFromDiagnosticEvent("Error(Contract, #1)") // 1
+ * extractErrorCodeFromDiagnosticEvent("Error(Contract, #2)") // 2
+ */
 function extractErrorCodeFromDiagnosticEvent(
   eventString: string
 ): number | null {

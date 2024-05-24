@@ -1,12 +1,10 @@
 import {
-  StrKey,
-  Horizon,
-  TransactionBuilder,
-  Operation,
   Asset,
+  Horizon,
+  Operation,
   SorobanRpc,
-  Keypair,
-  BASE_FEE,
+  StrKey,
+  TransactionBuilder,
 } from "@stellar/stellar-sdk";
 import { constants } from ".";
 import { assetList } from "./assets/assetList";

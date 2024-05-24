@@ -1,3 +1,4 @@
+// Description: This file contains the implementation of the findBestPath function.
 type Operation = {
   ask_asset: string;
   offer_asset: string;
@@ -7,13 +8,44 @@ type Pool = {
   asset_a: string;
   asset_b: string;
 };
+
+/**
+ * Find the best path between two assets
+ * @param {string} fromAsset
+ * @param {string} toAsset
+ * @param {Pool[]} pools
+ * @returns {Operation[]}
+ * @example
+ * const pools = [
+ *  { asset_a: "USD", asset_b: "BTC" },
+ *  { asset_a: "BTC", asset_b: "ETH" },
+ *  { asset_a: "ETH", asset_b: "USD" },
+ *  { asset_a: "USD", asset_b: "ETH" },
+ *  { asset_a: "ETH", asset_b: "BTC" },
+ *  { asset_a: "BTC", asset_b: "USD" },
+ *  { asset_a: "BTC", asset_b: "XLM" },
+ *  { asset_a: "XLM", asset_b: "USD" },
+ * ];
+ * findBestPath("USD", "XLM", pools);
+ * // Returns [{ ask_asset: "USD", offer_asset: "BTC" }, { ask_asset: "BTC", offer_asset: "XLM" }]
+ * @module utils
+ * @function findBestPath
+ */
 export function findBestPath(
   fromAsset: string,
   toAsset: string,
   pools: Pool[]
 ): { operations: Operation[] } {
   const operations: Operation[] = [];
-  // Helper function to avoid duplicate operations
+
+  /**
+   * Add an operation to the list of operations
+   * @param {string} ask
+   * @param {string} offer
+   * @returns {void}
+   * @memberof findBestPath
+   * @instance addOperation
+   */
   const addOperation = (ask: string, offer: string) => {
     if (
       !operations.some((op) => op.ask_asset === ask && op.offer_asset === offer)

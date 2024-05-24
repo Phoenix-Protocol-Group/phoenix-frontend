@@ -17,8 +17,8 @@ export default function Page({ params }: ArticlePageProps) {
   );
 
   const init = async () => {
-    const articles = await HelpCenter.getArticleById(params.articleID);
-    setArticle(articles.items[0] as HelpCenterArticle);
+    const article = await HelpCenter.getArticleById(params.articleID);
+    setArticle(article as HelpCenterArticle);
   };
 
   useEffect(() => {
