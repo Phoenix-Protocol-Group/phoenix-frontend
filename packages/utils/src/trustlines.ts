@@ -7,8 +7,8 @@ import {
   SorobanRpc,
   Keypair,
   BASE_FEE,
-} from "stellar-sdk";
-import { AssembledTransaction, constants, withExponentialBackoff } from ".";
+} from "@stellar/stellar-sdk";
+import { constants } from ".";
 import { assetList } from "./assets/assetList";
 import { xBull } from "./wallets/xbull";
 import { lobstr } from "./wallets/lobstr";

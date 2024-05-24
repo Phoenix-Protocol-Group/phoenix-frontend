@@ -1,4 +1,3 @@
-import { useMediaQuery, useTheme } from "@mui/material";
 import { SidebarNavigation } from "@phoenix-protocol/ui";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";

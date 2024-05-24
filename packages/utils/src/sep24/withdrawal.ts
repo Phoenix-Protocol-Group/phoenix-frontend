@@ -7,7 +7,7 @@ import {
   OperationOptions,
   Transaction,
   TransactionBuilder,
-} from "stellar-sdk";
+} from "@stellar/stellar-sdk";
 import { ResponseError } from "./errors";
 import { createKYCInstructions, isKYCRequired, KYCInstructions } from "./kyc";
 import { TransferResultType } from "./result";

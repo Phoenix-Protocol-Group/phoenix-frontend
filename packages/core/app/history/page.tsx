@@ -10,7 +10,6 @@ import {
   VolumeChart,
 } from "@phoenix-protocol/ui";
 import {
-  Address,
   fetchDataByTimeEpoch,
   fetchHistoryMetaData,
   fetchSwapHistory,
@@ -184,9 +183,7 @@ export default function Page() {
     const mtAsset = Object.keys(tradedAssets).reduce((a: any, b: any) =>
       data[a] > data[b] ? a : b
     );
-    const mtAssetInfo = await appStore.fetchTokenInfo(
-      Address.fromString(mtAsset)
-    );
+    const mtAssetInfo = await appStore.fetchTokenInfo(mtAsset);
 
     if (mtAssetInfo) {
       setMostTradedAsset({

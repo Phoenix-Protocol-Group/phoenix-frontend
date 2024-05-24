@@ -4,6 +4,7 @@
   "compilerOptions": {
     "jsx": "react",
     "outDir": "./build",
-    "target": "ESNext"
+    "target": "ESNext",
+    "moduleResolution": "Node16"
   }
 }
