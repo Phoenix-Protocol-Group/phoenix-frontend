@@ -13,7 +13,7 @@ import {
   AssetInfoModal,
 } from "@phoenix-protocol/ui";
 
-import { fetchPho, SorobanTokenContract } from "@phoenix-protocol/contracts";
+import { fetchPho, SorobanTokenContract, PhoenixVestingContract } from "@phoenix-protocol/contracts";
 
 import { useEffect, useState } from "react";
 import {
@@ -28,6 +28,7 @@ import {
   fetchTokenPrices,
   fetchTokenPrices2,
   formatCurrency,
+  Signer,
 } from "@phoenix-protocol/utils";
 
 export default function Page() {
@@ -40,6 +41,7 @@ export default function Page() {
   const [gainerAsset, setGainerAsset] = useState<any>({});
   const [loserAsset, setLoserAsset] = useState<any>({});
   const [allTokens, setAllTokens] = useState<any[]>([]);
+  const [allVestedTokens, setAllVestedTokens] = useState<PhoenixVestingContract.VestingInfo[]>([]);
   const [xlmPrice, setXlmPrice] = useState<number>(0);
   const [xlmPriceChange, setXlmPriceChange] = useState<number>(0);
   const [usdcPrice, setUsdcPrice] = useState(0);
@@ -107,10 +109,49 @@ export default function Page() {
     setLoadingDashboard(false);
   };
 
+  const getVestedTokens = async () => {
+    if(!persistStore.wallet.address) return [];
+
+    const VestingContract = new PhoenixVestingContract.Client({
+      contractId: constants.VESTING_ADDRESS,
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
+      rpcUrl: constants.RPC_URL
+    });
+
+    return VestingContract.query_all_vesting_info({
+      address: persistStore.wallet.address //@TODO handle more vested tokens than just pho
+    })
+  }
+
+  const claimVestedTokens = async () => {
+    const vestingSigner = new Signer();
+
+    try {
+      const VestingContract = new PhoenixVestingContract.Client({
+        publicKey: persistStore.wallet.address!,
+        contractId: constants.VESTING_ADDRESS,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) => vestingSigner.sign(tx),
+      });
+
+      const tx = await VestingContract.claim({
+        sender: persistStore.wallet.address,
+        index: BigInt(0)
+      })
+  
+      const result = await tx.signAndSend();
+    } catch (error: any) {
+
+    }
+  }
+
   const loadAllBalances = async () => {
     setLoadingBalances(true);
     const _allTokens = await appStore.getAllTokens();
+    const _allVestedTokens = await getVestedTokens();
     setAllTokens(_allTokens);
+    setAllVestedTokens(_allVestedTokens);
     setLoadingBalances(false);
   };
 

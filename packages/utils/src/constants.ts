@@ -30,6 +30,12 @@ export const MULTIHOP_ADDRESS: string =
   "CCLZRD4E72T7JCZCN3P7KNPYNXFYKQCL64ECLX7WP5GNVYPYJGU2IO2G";
 
 /**
+ * Vesting contract address
+ */
+export const VESTING_ADDRESS: string =
+  "CAA2VJ4SBQJORUKCY2NHTEQ7ZJ4CAJJDK2TOGNBH6VWVAWK6HPEIIYKY";
+
+/**
  * Phoenix History Indexer
  */
 export const PHOENIX_HISTORY_INDEXER: string = "https://graphql.phoenix-hub.io";
