@@ -11,6 +11,7 @@ import {
   AnchorServices,
   Skeleton,
   AssetInfoModal,
+  VestedTokensModal,
 } from "@phoenix-protocol/ui";
 
 import { fetchPho, SorobanTokenContract, PhoenixVestingContract } from "@phoenix-protocol/contracts";
@@ -28,8 +29,10 @@ import {
   fetchTokenPrices,
   fetchTokenPrices2,
   formatCurrency,
+  resolveContractError,
   Signer,
 } from "@phoenix-protocol/utils";
+import { VestingError, VestingSuccess } from "@/components/Modal/Modal";
 
 export default function Page() {
   const theme = useTheme();
@@ -41,7 +44,6 @@ export default function Page() {
   const [gainerAsset, setGainerAsset] = useState<any>({});
   const [loserAsset, setLoserAsset] = useState<any>({});
   const [allTokens, setAllTokens] = useState<any[]>([]);
-  const [allVestedTokens, setAllVestedTokens] = useState<PhoenixVestingContract.VestingInfo[]>([]);
   const [xlmPrice, setXlmPrice] = useState<number>(0);
   const [xlmPriceChange, setXlmPriceChange] = useState<number>(0);
   const [usdcPrice, setUsdcPrice] = useState(0);
@@ -50,6 +52,15 @@ export default function Page() {
   const [tokenInfoOpen, setTokenInfoOpen] = useState<boolean>(false);
   const [xlmPriceChart, setXlmPriceChart] = useState<any[]>([]);
   const [phoPriceChart, setPhoPriceChart] = useState<any[]>([]);
+
+  //vesting modal states
+  const [vestingInfo, setVestingInfo] = useState<PhoenixVestingContract.VestingInfo[]>([]);
+  const [vestingIndexes, setVestingIndexes] = useState<number[]>([]);
+  const [vestingModalOpen, setVestingModalOpen] = useState<boolean>(false);
+  const [claimSuccessModalOpen, setClaimSuccessModalOpen] = useState<boolean>(false);
+  const [claimErrorModalOpen, setClaimErrorModalOpen] = useState<boolean>(false);
+  const [claimErrorMessage, setClaimErrorMessage] = useState<string>("");
+  const [claimTransactionLoading, setClaimTransactionLoading] = useState<boolean>(false);
 
   // Loading states
   const [loadingBalances, setLoadingBalances] = useState(true);
@@ -123,8 +134,10 @@ export default function Page() {
     })
   }
 
-  const claimVestedTokens = async () => {
+  const claimVestedTokens = async (index: number) => {
     const vestingSigner = new Signer();
+
+    setClaimTransactionLoading(true);
 
     try {
       const VestingContract = new PhoenixVestingContract.Client({
@@ -137,21 +150,44 @@ export default function Page() {
 
       const tx = await VestingContract.claim({
         sender: persistStore.wallet.address,
-        index: BigInt(0)
+        index: BigInt(index)
       })
   
       const result = await tx.signAndSend();
-    } catch (error: any) {
 
+      if (result.getTransactionResponse?.status === "FAILED") {
+        setClaimErrorModalOpen(true);
+
+        // @ts-ignore
+        setClaimErrorMessage(tx?.resultXdr);
+
+        setClaimTransactionLoading(false);
+        return;
+      }
+
+      setVestingModalOpen(false);
+      setClaimSuccessModalOpen(true);
+    } catch (e: any) {
+      setClaimTransactionLoading(false);
+
+      setClaimErrorMessage(
+        typeof e === "string"
+          ? e
+          : e.message.includes("request denied")
+          ? e.message
+          : resolveContractError(e.message)
+      );
+
+      setClaimErrorModalOpen(true);
     }
   }
 
   const loadAllBalances = async () => {
     setLoadingBalances(true);
     const _allTokens = await appStore.getAllTokens();
-    const _allVestedTokens = await getVestedTokens();
+    const _vestingInfo = await getVestedTokens();
     setAllTokens(_allTokens);
-    setAllVestedTokens(_allVestedTokens);
+    setVestingInfo(_vestingInfo.result);
     setLoadingBalances(false);
   };
 
@@ -166,6 +202,27 @@ export default function Page() {
     getXlmPrice();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const indexes: number[] = [];
+
+    if(!vestingInfo) return;
+
+    vestingInfo.map((info: any, _index: number) => {
+      const { max_x } = info.schedule.values[0];
+
+      const balance = parseInt(info.balance, 10);
+      const maxX = parseInt(max_x, 10);
+
+      if (balance === 0 || maxX < Math.floor(maxX / 1000)) {
+        return;
+      }
+
+      indexes.push(_index);
+    });
+
+    setVestingIndexes(indexes);
+  }, [vestingInfo])
 
   const getXlmPrice = async () => {
     const price = await fetchTokenPrices("XLM");
@@ -352,7 +409,10 @@ export default function Page() {
           ) : (
             <WalletBalanceTable
               tokens={allTokens}
-              onClaimVestedClick={() => {}}
+              activeVesting={Boolean(vestingIndexes.length)}
+              onClaimVestedClick={(address: string) => {
+                setVestingModalOpen(true);
+              }}
               onTokenClick={(token: string) => {
                 fetchTokenInfo(token);
               }}
@@ -367,6 +427,25 @@ export default function Page() {
           asset={selectedTokenForInfo}
         />
       )}
+      <VestedTokensModal
+        open={vestingModalOpen}
+        onClose={() => setVestingModalOpen(false)}
+        vestingInfo={vestingInfo}
+        onButtonClick={claimVestedTokens}
+        loading={claimTransactionLoading}
+      />
+
+      <VestingError
+        open={claimErrorModalOpen}
+        setOpen={setClaimErrorModalOpen}
+        error={claimErrorMessage}
+      />
+
+      <VestingSuccess
+        open={claimSuccessModalOpen}
+        setOpen={setClaimSuccessModalOpen}
+        onButtonClick={() => setClaimSuccessModalOpen(false)}
+      />
     </Box>
   );
 }
