@@ -186,6 +186,7 @@ export default function Page() {
     setLoadingBalances(true);
     const _allTokens = await appStore.getAllTokens();
     const _vestingInfo = await getVestedTokens();
+    console.log(_vestingInfo.result);
     setAllTokens(_allTokens);
     setVestingInfo(_vestingInfo.result);
     setLoadingBalances(false);

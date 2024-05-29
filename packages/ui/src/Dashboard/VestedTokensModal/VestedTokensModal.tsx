@@ -30,17 +30,19 @@ interface CustomTooltipProps extends TooltipProps<number, string> {}
 
 const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
   if (active && payload && payload.length) {
-    const y = payload[0].payload?.y.toFixed(2);
-    const x = new Date(payload[0].payload?.x * 1000).toLocaleDateString()
+    const y = parseFloat(payload[0].payload?.y);
+    const x = new Date(payload[0].payload?.x * 1000).toLocaleDateString();
 
     return (
-      <Box sx={{
-        backgroundColor: 'rgba(0, 0, 0, 0.75)', // Dark background with 75% opacity
-        color: '#fff', // White text color for contrast
-        padding: '10px',
-        border: '1px solid #E2491A', // Border color matching the line color
-        borderRadius: '4px'
-      }}>
+      <Box
+        sx={{
+          backgroundColor: "rgba(0, 0, 0, 0.75)", // Dark background with 75% opacity
+          color: "#fff", // White text color for contrast
+          padding: "10px",
+          border: "1px solid #E2491A", // Border color matching the line color
+          borderRadius: "4px",
+        }}
+      >
         <Typography fontSize={12}>{x}</Typography>
         <Typography fontSize={12}>Vested: {y}</Typography>
       </Box>
@@ -109,10 +111,10 @@ const VestedTokensModal = ({
   onClose,
   vestingInfo,
   onButtonClick,
-  loading
+  loading,
 }: VestedTokensModalProps): React.ReactNode => {
   const [linearData, setLinearData] = useState([]);
-  const [balance, setBalance] = useState("0");
+  const [balance, setBalance] = useState(0);
   const [index, setIndex] = useState<number>(0);
 
   const generateLinearData = (vestingInfo: any[]) => {
@@ -120,44 +122,57 @@ const VestedTokensModal = ({
 
     //@TODO take indexes state instead of looping all vested infos again
     vestingInfo.map((info: any, _index: number) => {
-      const { max_x, max_y, min_x, min_y } = info.schedule.values[0];
-
-      //convert bigints from contract to numbers and transform token values to readable amounts
       const balance = parseInt(info.balance, 10);
-      const maxX = parseInt(max_x, 10);
-      const maxY = Number((parseInt(max_y, 10) / 10 ** 7).toFixed(2));
-      const minX = parseInt(min_x, 10);
-      const minY = Number((parseInt(min_y, 10) / 10 ** 7).toFixed(2));
-
-      if (balance === 0 || maxX < Math.floor(maxX / 1000)) {
-        return;
-      }
-
-      const slope = (maxY - minY) / (maxX - minX);
-      const intercept = minY - slope * minX;
-
-      const data = [];
+      const type = info.schedule.tag;
       const oneDay = 86400;
 
-      //sets correct index which is later used for claim
-      setIndex(_index);
-      setBalance((balance / 10 ** 7).toFixed(2));
+      if (balance === 0 || graphData.length) return;
 
-      if (maxX - minX < oneDay) {
-        //when time is below 24 hours -> step hourly 
-        for (let x = minX; x <= maxX; x += 3600) {
-          const y = slope * x + intercept;
-          data.push({ x, y });
-        }
-      } else {
-        //when time is above 24 hours -> step daily 
+      setIndex(_index);
+      setBalance(balance / 10 ** 7);
+
+      if (type === "SaturatingLinear") {
+        const { max_x, max_y, min_x, min_y } = info.schedule.values[0];
+
+        const maxX = parseInt(max_x, 10);
+        const maxY = parseInt(max_y, 10) / 10 ** 7;
+        const minX = parseInt(min_x, 10);
+        const minY = parseInt(min_y, 10) / 10 ** 7;
+
+        const slope = (maxY - minY) / (maxX - minX);
+        const intercept = minY - slope * minX;
+
+        const data = [];
+
         for (let x = minX; x <= maxX; x += oneDay) {
           const y = slope * x + intercept;
           data.push({ x, y });
         }
-      }
 
-      graphData.push(data);
+        graphData.push(data);
+      } else if (type === "PiecewiseLinear") {
+        const items = info.schedule.values[0].steps;
+
+        const data = []
+        items.forEach((segment, index) => {
+          if (index < items.length - 1) {
+            const startTime = parseInt(segment.time, 10);
+            const endTime = parseInt(items[index + 1].time, 10);
+            const startValue = parseInt(segment.value, 10) / 10 ** 7;
+            const endValue = parseInt(items[index + 1].value, 10) / 10 ** 7;
+      
+            const slope = (endValue - startValue) / (endTime - startTime);
+            const intercept = startValue - slope * startTime;
+
+            for (let time = startTime; time <= endTime; time += oneDay) {
+              const value = slope * time + intercept;
+              data.push({ x: time, y: value });
+            }
+          }
+        });
+
+        graphData.push(data);
+      }
     });
 
     return graphData;
@@ -166,6 +181,7 @@ const VestedTokensModal = ({
   useEffect(() => {
     if (vestingInfo) {
       const data = generateLinearData(vestingInfo);
+      console.log(data);
       setLinearData(data);
     }
   }, [vestingInfo]);
@@ -236,9 +252,14 @@ const VestedTokensModal = ({
               <GlowingChart data={linearData[0] || undefined} />
             </Box>
             <Box mb={2}>
-              <Typography>Claimable: {balance}</Typography>
+              <Typography>
+                Claimable: {parseFloat(balance.toString())}
+              </Typography>
             </Box>
-            <Button onClick={() => onButtonClick(index)} label={loading ? "Loading..." : "Claim"} />
+            <Button
+              onClick={() => onButtonClick(index)}
+              label={loading ? "Loading..." : "Claim"}
+            />
           </Box>
         </Box>
       </Box>
