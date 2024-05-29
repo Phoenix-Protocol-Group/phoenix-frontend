@@ -148,6 +148,8 @@ export default function Page() {
         signTransaction: (tx: string) => vestingSigner.sign(tx),
       });
 
+      if(!persistStore.wallet.address) return;
+
       const tx = await VestingContract.claim({
         sender: persistStore.wallet.address,
         index: BigInt(index)
