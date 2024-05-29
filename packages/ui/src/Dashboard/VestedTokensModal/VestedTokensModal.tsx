@@ -3,14 +3,6 @@ import {
   Box,
   Typography,
   Modal as MuiModal,
-  Grid,
-  CircularProgress,
-  Avatar,
-  IconButton,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
 } from "@mui/material";
 import Colors from "../../Theme/colors";
 import { VestedTokensModalProps } from "@phoenix-protocol/types";
@@ -153,6 +145,7 @@ const VestedTokensModal = ({
       } else if (type === "PiecewiseLinear") {
         const items = info.schedule.values[0].steps;
 
+        //needed for nested array in recharts
         const data = []
         items.forEach((segment, index) => {
           if (index < items.length - 1) {
