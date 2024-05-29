@@ -102,6 +102,43 @@ export const UnstakeSuccess = ({
   />
 );
 
+export const VestingSuccess = ({
+  setOpen,
+  open,
+  onButtonClick,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  onButtonClick: () => void;
+}) => (
+  <ModalUI
+    type="SUCCESS"
+    open={open}
+    title="Successfully Claimed"
+    setOpen={setOpen}
+    onButtonClick={onButtonClick}
+  />
+);
+
+export const VestingError = ({
+  setOpen,
+  open,
+  error,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  error: string;
+}) => (
+  <ModalUI
+    type="ERROR"
+    open={open}
+    title="Error"
+    setOpen={setOpen}
+    error={error}
+    onButtonClick={() => copyToClipBoard(error)}
+  />
+);
+
 export const StakeSuccess = ({
   token,
   tokenAmounts,
