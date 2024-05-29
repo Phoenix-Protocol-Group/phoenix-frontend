@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -6,7 +6,6 @@ import {
   Grid,
   CircularProgress,
   Avatar,
-  Tooltip,
   IconButton,
   Table,
   TableBody,
@@ -14,13 +13,158 @@ import {
   TableCell,
 } from "@mui/material";
 import Colors from "../../Theme/colors";
-import { AssetInfoModalProps } from "@phoenix-protocol/types";
+import { VestedTokensModalProps } from "@phoenix-protocol/types";
+import {
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  YAxis,
+  Tooltip,
+  TooltipProps,
+  Dot,
+  XAxis,
+} from "recharts";
+import { Button } from "../../Button/Button";
+
+interface CustomTooltipProps extends TooltipProps<number, string> {}
+
+const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const y = payload[0].payload?.y.toFixed(2);
+    const x = new Date(payload[0].payload?.x * 1000).toLocaleDateString()
+
+    return (
+      <Box sx={{
+        backgroundColor: 'rgba(0, 0, 0, 0.75)', // Dark background with 75% opacity
+        color: '#fff', // White text color for contrast
+        padding: '10px',
+        border: '1px solid #E2491A', // Border color matching the line color
+        borderRadius: '4px'
+      }}>
+        <Typography fontSize={12}>{x}</Typography>
+        <Typography fontSize={12}>Vested: {y}</Typography>
+      </Box>
+    );
+  }
+
+  return null;
+};
+
+const CustomDot = (props) => {
+  const { cx, cy, value } = props;
+  if (!cx || !cy) return null;
+  return (
+    <g>
+      <Dot
+        cx={cx}
+        cy={cy}
+        r={4}
+        stroke="#E2491A"
+        strokeWidth={2}
+        fill="#E2491A"
+      />
+    </g>
+  );
+};
+
+const GlowingChart = ({ data }) => (
+  <ResponsiveContainer width="100%" height={250}>
+    <AreaChart
+      data={data}
+      margin={{ top: 0, right: -10, left: -10, bottom: 0 }}
+    >
+      <defs>
+        <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="5%" stopColor="#E2491A" stopOpacity={0.2} />
+          <stop offset="95%" stopColor="#E2491A" stopOpacity={0.02} />
+        </linearGradient>
+      </defs>
+      <YAxis
+        hide={true}
+        dataKey="y"
+        domain={[(dataMin) => dataMin * 0.9, "dataMax"]}
+      />
+      <XAxis
+        dataKey="x"
+        tickFormatter={(tick) => new Date(tick * 1000).toLocaleDateString()}
+        interval="preserveStartEnd"
+      />
+      <Area
+        type="monotone"
+        dataKey="y"
+        stroke="#E2491A"
+        strokeWidth={2}
+        isAnimationActive={true}
+        fillOpacity={1}
+        fill="url(#colorUv)"
+        activeDot={<CustomDot />}
+      />
+      <Tooltip content={<CustomTooltip />} cursor={false} />
+    </AreaChart>
+  </ResponsiveContainer>
+);
 
 const VestedTokensModal = ({
   open,
   onClose,
-  asset,
-}: AssetInfoModalProps): React.ReactNode => {
+  vestingInfo,
+  onButtonClick,
+  loading
+}: VestedTokensModalProps): React.ReactNode => {
+  const [linearData, setLinearData] = useState([]);
+  const [balance, setBalance] = useState("0");
+  const [index, setIndex] = useState<number>(0);
+
+  const generateLinearData = (vestingInfo: any[]) => {
+    const graphData = [];
+
+    vestingInfo.map((info: any, _index: number) => {
+      const { max_x, max_y, min_x, min_y } = info.schedule.values[0];
+
+      const balance = parseInt(info.balance, 10);
+      const maxX = parseInt(max_x, 10);
+      const maxY = Number((parseInt(max_y, 10) / 10 ** 7).toFixed(2));
+      const minX = parseInt(min_x, 10);
+      const minY = Number((parseInt(min_y, 10) / 10 ** 7).toFixed(2));
+
+      if (balance === 0 || maxX < Math.floor(maxX / 1000)) {
+        return;
+      }
+
+      const slope = (maxY - minY) / (maxX - minX);
+      const intercept = minY - slope * minX;
+
+      const data = [];
+      const oneDay = 86400;
+
+      setIndex(_index);
+      setBalance((balance / 10 ** 7).toFixed(2));
+
+      if (maxX - minX < oneDay) {
+        for (let x = minX; x <= maxX; x += 3600) {
+          const y = slope * x + intercept;
+          data.push({ x, y });
+        }
+      } else {
+        for (let x = minX; x <= maxX; x += oneDay) {
+          const y = slope * x + intercept;
+          data.push({ x, y });
+        }
+      }
+
+      graphData.push(data);
+    });
+
+    return graphData;
+  };
+
+  useEffect(() => {
+    if (vestingInfo) {
+      const data = generateLinearData(vestingInfo);
+      setLinearData(data);
+    }
+  }, [vestingInfo]);
+
   const style = {
     position: "absolute" as "absolute",
     top: "50%",
@@ -83,7 +227,13 @@ const VestedTokensModal = ({
               Vested Tokens
             </Typography>
 
-            
+            <Box p={2} width={"100%"}>
+              <GlowingChart data={linearData[0] || undefined} />
+            </Box>
+            <Box mb={2}>
+              <Typography>Claimable: {balance}</Typography>
+            </Box>
+            <Button onClick={() => onButtonClick(index)} label={loading ? "Loading..." : "Claim"} />
           </Box>
         </Box>
       </Box>

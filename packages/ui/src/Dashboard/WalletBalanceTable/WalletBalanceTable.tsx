@@ -252,6 +252,7 @@ const FilterAndTabPanel = ({
 
 const ListItem = ({
   token: { name, icon, usdValue, amount, contractId },
+  activeVesting,
   onTokenClick,
   onClaimVestedClick,
 }: ListItemProps) => {
@@ -297,7 +298,7 @@ const ListItem = ({
         )}
       </Box>
       <Box sx={{ display: "flex", alignItems: "center" }}>
-        {name === "PHO" && (
+        {name === "PHO" && activeVesting && (
           <Button
             size="small"
             sx={{ textTransform: "none", mr: 1, fontSize: "12px" }}
@@ -369,6 +370,7 @@ const scrollbarStyles = {
 
 const WalletBalanceTable = ({
   tokens,
+  activeVesting,
   onTokenClick,
   onClaimVestedClick,
 }: WalletBalanceTableProps) => {
@@ -435,6 +437,7 @@ const WalletBalanceTable = ({
             .map((token, index) => (
               <ListItem
                 token={token}
+                activeVesting={activeVesting}
                 onTokenClick={onTokenClick}
                 onClaimVestedClick={onClaimVestedClick}
                 key={index}
