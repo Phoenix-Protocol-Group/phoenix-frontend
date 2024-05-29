@@ -120,7 +120,7 @@ export default function Page() {
     setLoadingDashboard(false);
   };
 
-  const getVestedTokens = async () => {
+  const getVestingInfo = async () => {
     if(!persistStore.wallet.address) return [];
 
     const VestingContract = new PhoenixVestingContract.Client({
@@ -167,6 +167,10 @@ export default function Page() {
 
       setVestingModalOpen(false);
       setClaimSuccessModalOpen(true);
+
+      //update vested tokens to hide vested button when there are no new entries
+      const newVestingInfo = await getVestingInfo();
+      setVestingInfo(newVestingInfo);
     } catch (e: any) {
       setClaimTransactionLoading(false);
 
@@ -185,7 +189,7 @@ export default function Page() {
   const loadAllBalances = async () => {
     setLoadingBalances(true);
     const _allTokens = await appStore.getAllTokens();
-    const _vestingInfo = await getVestedTokens();
+    const _vestingInfo = await getVestingInfo();
     console.log(_vestingInfo.result);
     setAllTokens(_allTokens);
     setVestingInfo(_vestingInfo.result);
