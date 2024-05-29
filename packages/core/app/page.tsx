@@ -208,6 +208,7 @@ export default function Page() {
 
     if(!vestingInfo) return;
 
+    //filters old vesting info out where balance is claimed
     vestingInfo.map((info: any, _index: number) => {
       const { max_x } = info.schedule.values[0];
 

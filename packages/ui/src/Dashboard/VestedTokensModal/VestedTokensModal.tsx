@@ -118,9 +118,11 @@ const VestedTokensModal = ({
   const generateLinearData = (vestingInfo: any[]) => {
     const graphData = [];
 
+    //@TODO take indexes state instead of looping all vested infos again
     vestingInfo.map((info: any, _index: number) => {
       const { max_x, max_y, min_x, min_y } = info.schedule.values[0];
 
+      //convert bigints from contract to numbers and transform token values to readable amounts
       const balance = parseInt(info.balance, 10);
       const maxX = parseInt(max_x, 10);
       const maxY = Number((parseInt(max_y, 10) / 10 ** 7).toFixed(2));
@@ -137,15 +139,18 @@ const VestedTokensModal = ({
       const data = [];
       const oneDay = 86400;
 
+      //sets correct index which is later used for claim
       setIndex(_index);
       setBalance((balance / 10 ** 7).toFixed(2));
 
       if (maxX - minX < oneDay) {
+        //when time is below 24 hours -> step hourly 
         for (let x = minX; x <= maxX; x += 3600) {
           const y = slope * x + intercept;
           data.push({ x, y });
         }
       } else {
+        //when time is above 24 hours -> step daily 
         for (let x = minX; x <= maxX; x += oneDay) {
           const y = slope * x + intercept;
           data.push({ x, y });
