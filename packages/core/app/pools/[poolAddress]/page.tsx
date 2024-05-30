@@ -177,7 +177,7 @@ export default function Page({ params }: PoolPageProps) {
     } catch (error: any) {
       setErrorModalOpen(true);
 
-      setErrorDescripption(resolveContractError(error.message));
+      setErrorDescripption(resolveContractError(JSON.stringify(error.message)));
       setLoading(false);
       console.error(error);
     }
@@ -277,7 +277,7 @@ export default function Page({ params }: PoolPageProps) {
       setUnstakeModalOpen(true);
     } catch (error: any) {
       setLoading(false);
-      setErrorDescripption(error);
+      setErrorDescripption(JSON.stringify(error.message));
       setErrorModalOpen(true);
     }
   };
