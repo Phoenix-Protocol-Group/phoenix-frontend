@@ -18,6 +18,7 @@ export default function Page({ params }: ArticlePageProps) {
 
   const init = async () => {
     const article = await HelpCenter.getArticleById(params.articleID);
+    // @ts-ignore
     setArticle(article as HelpCenterArticle);
   };
 

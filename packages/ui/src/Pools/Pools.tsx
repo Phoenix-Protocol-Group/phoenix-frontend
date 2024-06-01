@@ -11,13 +11,13 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { Button as CustomButton } from "../Button/Button";
 import {
   Pool,
-  PoolsProps,
   PoolsFilter as Filter,
+  PoolsProps,
 } from "@phoenix-protocol/types";
 import { Info } from "@mui/icons-material";
+import { AIRDROP_POOL_ADDRESSES } from "@phoenix-protocol/utils/build/constants";
 
 const descriptionHeader = {
   color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
@@ -184,35 +184,37 @@ const PoolItem = ({
             </Typography>
           </Grid>
         </Grid>
-        <Tooltip title="During the initial phase of the DEX (May 7-July 7), APR earned during this period will be doubled. The doubled APR will be paid out as a vested, claimable airdrop at the end of this period.">
-          <Box
-            sx={{
-              width: "100%",
-              mt: 1,
-              border: "1px solid #E2621B",
-              display: "flex",
-              alignItems: "center",
-              padding: 1,
-              cursor: "help",
-              borderRadius: "0.5rem",
-              justifyContent: "space-between",
-              background:
-                "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
-            }}
-          >
-            <Info />
-            <Typography
+        {AIRDROP_POOL_ADDRESSES.includes(pool.poolAddress) && (
+          <Tooltip title="During the initial phase of the DEX (May 7-July 7), APR earned during this period will be doubled. The doubled APR will be paid out as a vested, claimable airdrop at the end of this period.">
+            <Box
               sx={{
-                color: "#FFF",
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                lineHeight: "140%",
+                width: "100%",
+                mt: 1,
+                border: "1px solid #E2621B",
+                display: "flex",
+                alignItems: "center",
+                padding: 1,
+                cursor: "help",
+                borderRadius: "0.5rem",
+                justifyContent: "space-between",
+                background:
+                  "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
               }}
             >
-              This pool is qualified for the PHO Airdrop.
-            </Typography>
-          </Box>
-        </Tooltip>
+              <Info />
+              <Typography
+                sx={{
+                  color: "#FFF",
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  lineHeight: "140%",
+                }}
+              >
+                This pool is qualified for the PHO Airdrop.
+              </Typography>
+            </Box>
+          </Tooltip>
+        )}
       </Box>
     </Grid>
   );
