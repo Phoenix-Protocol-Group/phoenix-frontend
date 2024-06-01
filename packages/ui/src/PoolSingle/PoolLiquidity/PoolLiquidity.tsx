@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button as MuiButton,
@@ -6,13 +6,12 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
 import TabPanel from "@mui/lab/TabPanel";
 import TabContext from "@mui/lab/TabContext";
 import { TokenBox } from "../../Swap";
 import { Button } from "../../Button/Button";
-import { PoolLiquidityProps, LabTabProps } from "@phoenix-protocol/types";
+import { LabTabProps, PoolLiquidityProps } from "@phoenix-protocol/types";
 
 const GlowingChart = ({ data }: { data: number[][] }) => (
   <ResponsiveContainer width="100%" height={200}>
@@ -62,16 +61,10 @@ const LabTabs = ({
 
   const keepRatioA = (val: string) => {
     setTokenAValue(val);
-
-    const valB = Number(val) / liquidityRatio;
-    setTokenBValue(valB.toFixed(4));
   };
 
   const keepRatioB = (val: string) => {
     setTokenBValue(val);
-
-    const valA = Number(val) * liquidityRatio;
-    setTokenAValue(valA.toFixed(4));
   };
 
   const buttonStyles = {

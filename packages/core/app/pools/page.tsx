@@ -110,9 +110,10 @@ export default function Page() {
           (incentive) => incentive.address === poolAddress
         )!;
         const phoprice = await fetchPho();
-        const apr =
+        const _apr =
           ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
 
+        const apr = isNaN(_apr) ? 0 : _apr;
         // Construct and return pool object if all fetches are successful
         return {
           tokens: [
