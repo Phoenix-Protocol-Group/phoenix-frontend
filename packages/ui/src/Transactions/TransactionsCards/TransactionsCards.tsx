@@ -38,7 +38,13 @@ const TransactionCard = ({
         alignItems: "center",
       }}
     >
-      {icon && <Box component="img" src={icon} sx={{ pr: 1 }} />}
+      {icon && (
+        <Box
+          component="img"
+          src={icon}
+          sx={{ pr: 1, width: "32px", height: "32px" }}
+        />
+      )}
       {content}
     </Typography>
   </Grid>

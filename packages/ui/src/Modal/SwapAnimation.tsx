@@ -1,5 +1,5 @@
 // components/SwapAnimation.tsx
-import { Box, styled } from "@mui/material";
+import { Box } from "@mui/material";
 import { Token } from "@phoenix-protocol/types";
 import { motion } from "framer-motion";
 import React from "react";
@@ -39,7 +39,7 @@ const SwapAnimation: React.FC = ({
 }) => {
   const phoIconStyle = {
     position: "relative",
-    top: "-4px"
+    top: "-4px",
   };
 
   return (
@@ -50,7 +50,11 @@ const SwapAnimation: React.FC = ({
       justifyContent="space-between"
       gap={2}
     >
-      <Box component="img" src={fromToken.icon} sx={fromToken.name === "PHO" ? {phoIconStyle} :  {}} />
+      <Box
+        component="img"
+        src={fromToken.icon}
+        sx={fromToken.name === "PHO" ? { phoIconStyle } : {}}
+      />
       <Box display="flex" gap={1}>
         <motion.div
           style={{
@@ -65,7 +69,15 @@ const SwapAnimation: React.FC = ({
           animate="animate"
         />
       </Box>
-      <Box component="img" src={toToken.icon}  sx={toToken.name === "PHO" ? {phoIconStyle} :  {}} />
+      <Box
+        component="img"
+        src={toToken.icon}
+        sx={
+          toToken.name === "PHO"
+            ? { phoIconStyle }
+            : { width: "32px", height: "32px" }
+        }
+      />
     </Box>
   );
 };

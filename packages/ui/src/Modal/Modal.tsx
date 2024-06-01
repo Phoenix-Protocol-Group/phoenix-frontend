@@ -1,10 +1,10 @@
 import React from "react";
 import {
   Box,
-  Typography,
-  Modal as MuiModal,
-  Grid,
   CircularProgress,
+  Grid,
+  Modal as MuiModal,
+  Typography,
 } from "@mui/material";
 import Colors from "../Theme/colors";
 import { Button } from "../Button/Button";
@@ -46,8 +46,8 @@ const Modal = ({
   };
 
   const tokenIconStyle = {
-    w: "24px",
-    h: "24px",
+    width: "24px",
+    height: "24px",
     marginRight: "8px",
   };
 
@@ -70,7 +70,7 @@ const Modal = ({
 
   const phoIconStyle = {
     position: "relative",
-    top: "-4px"
+    top: "-4px",
   };
 
   return (
@@ -178,7 +178,11 @@ const Modal = ({
                       <Box display="flex" alignItems="center">
                         <Box
                           component="img"
-                          sx={tokens[0].name === "PHO" ? {...tokenIconStyle, ...phoIconStyle} :  tokenIconStyle}
+                          sx={
+                            tokens[0].name === "PHO"
+                              ? { ...tokenIconStyle, ...phoIconStyle }
+                              : tokenIconStyle
+                          }
                           src={tokens[0].icon}
                         />
                         <Typography sx={tokenAmountStyle}>
@@ -194,7 +198,11 @@ const Modal = ({
                         <Box display="flex" alignItems="center">
                           <Box
                             component="img"
-                            sx={tokens[1].name === "PHO" ? {...tokenIconStyle, ...phoIconStyle} :  tokenIconStyle}
+                            sx={
+                              tokens[1].name === "PHO"
+                                ? { ...tokenIconStyle, ...phoIconStyle }
+                                : tokenIconStyle
+                            }
                             src={tokens[1].icon}
                           />
                           <Typography sx={tokenAmountStyle}>
