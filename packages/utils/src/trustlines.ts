@@ -61,7 +61,6 @@ export async function checkTrustline(
   // Fetch Account
   const account = await fetchAccount(publicKey);
 
-  console.log(account);
   if (!account) {
     return {
       exists: false,

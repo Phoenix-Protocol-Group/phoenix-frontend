@@ -19,4 +19,14 @@ export const assetList = [
     icon: "https://ipfs.io/ipfs/bafkreibpzncuhbk5ozhdw7xkcdoyf3xhwhcwcf6sj7axjzimxw6vm6pvyy",
     decimals: 7,
   },
+  {
+    code: "EURC",
+    issuer: "GDHU6WRG4IEQXM5NZ4BMPKOXHW76MZM4Y2IEMFDVXBSDP6SJY4ITNPP2",
+    contract: "CDTKPWPLOURQA2SGTKTUQOWRCBZEORB4BWBOMJ3D3ZTQQSGE5F6JBQLV",
+    name: "EURO Coin",
+    org: "Centre Consortium LLC dba Centre Consortium",
+    domain: "centre.io",
+    icon: "https://ipfs.io/ipfs/bafkreibpzncuhbk5ozhdw7xkcdoyf3xhwhcwcf6sj7axjzimxw6vm6pvyy",
+    decimals: 7,
+  },
 ];
