@@ -139,6 +139,34 @@ export default function Page({ params }: PoolPageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
+  const fetchStakingAddress = async (): Promise<string | undefined> => {
+    try {
+      // Fetch pool config and info from chain
+      const [pairConfig, pairInfo] = await Promise.all([
+        PairContract.query_config(),
+        PairContract.query_pool_info(),
+      ]);
+
+      // When results ok...
+      if (pairConfig?.result && pairInfo?.result) {
+        // Fetch token infos from chain and save in global appstore
+        const [_tokenA, _tokenB, _lpToken, stakeContractAddress] =
+          await Promise.all([
+            store.fetchTokenInfo(pairConfig.result.token_a),
+            store.fetchTokenInfo(pairConfig.result.token_b),
+            store.fetchTokenInfo(pairConfig.result.share_token, true),
+            new PhoenixStakeContract.Client({
+              contractId: pairConfig.result.stake_contract.toString(),
+              networkPassphrase: constants.NETWORK_PASSPHRASE,
+              rpcUrl: constants.RPC_URL,
+            }),
+          ]);
+        return pairConfig.result.stake_contract.toString();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
   // Provide Liquidity
   const provideLiquidity = async (
     tokenAAmount: number,
@@ -221,9 +249,14 @@ export default function Page({ params }: PoolPageProps) {
 
       const stakeSigner = new Signer();
 
+      let stakeAddress: string | undefined = stakeContractAddress;
+      if (stakeContractAddress === "") {
+        stakeAddress = await fetchStakingAddress();
+      }
+
       const SigningStakeContract = new PhoenixStakeContract.Client({
         publicKey: storePersist.wallet.address!,
-        contractId: stakeContractAddress,
+        contractId: stakeAddress!,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
         signTransaction: (tx: string) => stakeSigner.sign(tx),
@@ -256,9 +289,14 @@ export default function Page({ params }: PoolPageProps) {
 
       const stakeSigner = new Signer();
 
+      let stakeAddress: string | undefined = stakeContractAddress;
+      if (stakeContractAddress === "") {
+        stakeAddress = await fetchStakingAddress();
+      }
+
       const SigningStakeContract = new PhoenixStakeContract.Client({
         publicKey: storePersist.wallet.address!,
-        contractId: stakeContractAddress,
+        contractId: stakeAddress!,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
         signTransaction: (tx: string) => stakeSigner.sign(tx),
