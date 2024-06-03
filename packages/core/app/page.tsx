@@ -54,8 +54,9 @@ export default function Page() {
   const [phoPriceChart, setPhoPriceChart] = useState<any[]>([]);
 
   //vesting modal states
-  const [vestingInfo, setVestingInfo] = useState<PhoenixVestingContract.VestingInfo[]>([]);
-  const [vestingIndexes, setVestingIndexes] = useState<number[]>([]);
+  const [vestingGraphData, setVestingGraphData] = useState<any[]>([]);
+  const [vestingIndex, setVestingIndex] = useState<number>(0);
+  const [claimableAmount, setClaimableAmount] = useState<number>(0);
   const [vestingModalOpen, setVestingModalOpen] = useState<boolean>(false);
   const [claimSuccessModalOpen, setClaimSuccessModalOpen] = useState<boolean>(false);
   const [claimErrorModalOpen, setClaimErrorModalOpen] = useState<boolean>(false);
@@ -134,7 +135,7 @@ export default function Page() {
     })
   }
 
-  const claimVestedTokens = async (index: number) => {
+  const claimVestedTokens = async () => {
     const vestingSigner = new Signer();
 
     setClaimTransactionLoading(true);
@@ -152,7 +153,7 @@ export default function Page() {
 
       const tx = await VestingContract.claim({
         sender: persistStore.wallet.address,
-        index: BigInt(index)
+        index: BigInt(vestingIndex)
       })
   
       const result = await tx.signAndSend();
@@ -171,8 +172,8 @@ export default function Page() {
       setClaimSuccessModalOpen(true);
 
       //update vested tokens to hide vested button when there are no new entries
-      const newVestingInfo = await getVestingInfo();
-      setVestingInfo(newVestingInfo);
+      const newVestedGraphData = await generateVestingGraphData();
+      setVestingGraphData(newVestedGraphData);
     } catch (e: any) {
       setClaimTransactionLoading(false);
 
@@ -188,13 +189,79 @@ export default function Page() {
     }
   }
 
+  const generateVestingGraphData = async () => {
+    const vestingInfo = (await getVestingInfo()).result;
+    let graphData: any = [];
+
+    if(!vestingInfo) return [];
+
+    //@TODO take indexes state instead of looping all vested infos again
+    vestingInfo.map((info: any, _index: number) => {
+      const balance = parseInt(info.balance, 10);
+      const type = info.schedule.tag;
+      const oneDay = 86400;
+
+      if (balance === 0 || graphData.length) return;
+
+      setVestingIndex(_index);
+      setClaimableAmount(balance / 10 ** 7);
+
+      if (type === "SaturatingLinear") {
+        const { max_x, max_y, min_x, min_y } = info.schedule.values[0];
+
+        const maxX = parseInt(max_x, 10);
+        const maxY = parseInt(max_y, 10) / 10 ** 7;
+        const minX = parseInt(min_x, 10);
+        const minY = parseInt(min_y, 10) / 10 ** 7;
+
+        const slope = (maxY - minY) / (maxX - minX);
+        const intercept = minY - slope * minX;
+
+        const data = [];
+
+        for (let x = minX; x <= maxX; x += oneDay) {
+          const y = slope * x + intercept;
+          data.push({ x, y });
+        }
+
+        graphData = data;
+      } else if (type === "PiecewiseLinear") {
+        const items = info.schedule.values[0].steps;
+
+        //needed for nested array in recharts
+        const data: any = []
+        items.forEach((segment: any, index: number) => {
+          if (index < items.length - 1) {
+            const startTime = parseInt(segment.time, 10);
+            const endTime = parseInt(items[index + 1].time, 10);
+            const startValue = parseInt(segment.value, 10) / 10 ** 7;
+            const endValue = parseInt(items[index + 1].value, 10) / 10 ** 7;
+      
+            const slope = (endValue - startValue) / (endTime - startTime);
+            const intercept = startValue - slope * startTime;
+
+            for (let time = startTime; time <= endTime; time += oneDay) {
+              const value = slope * time + intercept;
+              data.push({ x: time, y: value });
+            }
+          }
+        });
+
+        graphData = data;
+      }
+    });
+
+    return graphData;
+  };
+
   const loadAllBalances = async () => {
     setLoadingBalances(true);
     const _allTokens = await appStore.getAllTokens();
-    const _vestingInfo = await getVestingInfo();
-    console.log(_vestingInfo.result);
+
+    const _vestingData = await generateVestingGraphData();
+    setVestingGraphData(_vestingData);
+
     setAllTokens(_allTokens);
-    setVestingInfo(_vestingInfo.result);
     setLoadingBalances(false);
   };
 
@@ -209,28 +276,6 @@ export default function Page() {
     getXlmPrice();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    const indexes: number[] = [];
-
-    if(!vestingInfo) return;
-
-    //filters old vesting info out where balance is claimed
-    vestingInfo.map((info: any, _index: number) => {
-      const { max_x } = info.schedule.values[0];
-
-      const balance = parseInt(info.balance, 10);
-      const maxX = parseInt(max_x, 10);
-
-      if (balance === 0 || maxX < Math.floor(maxX / 1000)) {
-        return;
-      }
-
-      indexes.push(_index);
-    });
-
-    setVestingIndexes(indexes);
-  }, [vestingInfo])
 
   const getXlmPrice = async () => {
     const price = await fetchTokenPrices("XLM");
@@ -417,7 +462,7 @@ export default function Page() {
           ) : (
             <WalletBalanceTable
               tokens={allTokens}
-              activeVesting={Boolean(vestingIndexes.length)}
+              activeVesting={Boolean(vestingGraphData.length)}
               onClaimVestedClick={(address: string) => {
                 setVestingModalOpen(true);
               }}
@@ -438,7 +483,8 @@ export default function Page() {
       <VestedTokensModal
         open={vestingModalOpen}
         onClose={() => setVestingModalOpen(false)}
-        vestingInfo={vestingInfo}
+        graphData={vestingGraphData}
+        claimableAmount={claimableAmount}
         onButtonClick={claimVestedTokens}
         loading={claimTransactionLoading}
       />
