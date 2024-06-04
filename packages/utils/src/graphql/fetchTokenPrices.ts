@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { createApolloClient } from "./apolloClient";
+import { priceExport } from "./exportedPrices";
 
 export async function fetchTokenPrices(symbol?: string, tokenId?: string) {
   const client = createApolloClient();
@@ -77,6 +78,13 @@ export async function fetchHistoricalPrices(
     });
 
     if (notParse) {
+      if (symbol === "PHO") {
+        const res = [...priceExport, ...data.historicalPrices];
+        return res.sort(
+          (a: any, b: any) =>
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
+      }
       return data.historicalPrices;
     }
 
