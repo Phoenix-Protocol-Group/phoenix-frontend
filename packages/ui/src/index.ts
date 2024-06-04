@@ -16,4 +16,5 @@ export * from "./Swap";
 export * as Skeleton from "./Skeletons";
 export * from "./AnchorServices/AnchorServices";
 export * from "./Transactions";
+export * from "./Marketplace";
 export * from "./HelpCenter";
