@@ -36,10 +36,11 @@ export async function fetchTokenPrices(symbol?: string, tokenId?: string) {
 }
 
 export async function fetchHistoricalPrices(
-  timestampLimit: number,
+  timestampLimit?: number,
   symbol?: string,
   tokenId?: string,
-  maxEntries?: number
+  maxEntries?: number,
+  notParse?: boolean
 ) {
   const client = createApolloClient();
 
@@ -75,6 +76,10 @@ export async function fetchHistoricalPrices(
       },
     });
 
+    if (notParse) {
+      return data.historicalPrices;
+    }
+
     const parsedPrices = data.historicalPrices.map((item: any) => [
       new Date(item.timestamp).getTime(),
       item.usdValue,
@@ -87,7 +92,10 @@ export async function fetchHistoricalPrices(
   }
 }
 
-export async function fetchTokenPrices2(symbol?: string, tokenId?: string): Promise<number> {
+export async function fetchTokenPrices2(
+  symbol?: string,
+  tokenId?: string
+): Promise<number> {
   const client = createApolloClient();
 
   const timestampLimit = 1440; //24 hours
