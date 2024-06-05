@@ -197,7 +197,6 @@ export default function Page() {
     let claimableAmount: any = {};
     
     if(!vestingInfo) {
-      setVestingAvailable(false);
       return {};
     }
 
@@ -207,8 +206,7 @@ export default function Page() {
       const oneDay = 86400;
 
       if (balance === 0) {
-        setVestingAvailable(false);
-        return {};
+        return;
       };
 
       claimableAmount[_index] = balance / 10 ** 7;
@@ -258,7 +256,6 @@ export default function Page() {
       }
     });
 
-    setVestingAvailable(true);
     return {graphData, claimableAmount};
   };
 
@@ -273,6 +270,14 @@ export default function Page() {
     const {graphData, claimableAmount} = await generateVestingGraphData();
     setVestingGraphData(graphData);
     setClaimableAmounts(claimableAmount);
+
+    //check if there are any claimable amounts -> hide show vested tokens button if not
+    if(claimableAmount && Object.keys(claimableAmount).length) {
+      setVestingAvailable(true);
+    } else {
+      //needs to be set for reload after user claimed
+      setVestingAvailable(false);
+    }
 
     setAllTokens(_allTokens);
     setLoadingBalances(false);
