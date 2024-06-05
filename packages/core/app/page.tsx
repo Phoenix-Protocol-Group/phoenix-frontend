@@ -21,7 +21,7 @@ import {
   DepositManager,
   getAllAnchors,
 } from "@phoenix-protocol/utils/build/sep24";
-import { Anchor, AssetInfo } from "@phoenix-protocol/types";
+import { Anchor, AssetInfo, Token } from "@phoenix-protocol/types";
 import {
   constants,
   fetchBiggestWinnerAndLoser,
@@ -54,9 +54,11 @@ export default function Page() {
   const [phoPriceChart, setPhoPriceChart] = useState<any[]>([]);
 
   //vesting modal states
-  const [vestingGraphData, setVestingGraphData] = useState<any[]>([]);
+  const [vestingAvailable, setVestingAvailable] = useState<boolean>(false);
+  const [vestingGraphData, setVestingGraphData] = useState<any>({});
   const [vestingIndex, setVestingIndex] = useState<number>(0);
-  const [claimableAmount, setClaimableAmount] = useState<number>(0);
+  const [vestingToken, setVestingToken] = useState<Token | undefined>(undefined);
+  const [claimableAmounts, setClaimableAmounts] = useState<any>({});
   const [vestingModalOpen, setVestingModalOpen] = useState<boolean>(false);
   const [claimSuccessModalOpen, setClaimSuccessModalOpen] = useState<boolean>(false);
   const [claimErrorModalOpen, setClaimErrorModalOpen] = useState<boolean>(false);
@@ -191,20 +193,25 @@ export default function Page() {
 
   const generateVestingGraphData = async () => {
     const vestingInfo = (await getVestingInfo()).result;
-    let graphData: any = [];
+    let graphData: any = {};
+    let claimableAmount: any = {};
+    
+    if(!vestingInfo) {
+      setVestingAvailable(false);
+      return {};
+    }
 
-    if(!vestingInfo) return [];
-
-    //@TODO take indexes state instead of looping all vested infos again
     vestingInfo.map((info: any, _index: number) => {
       const balance = parseInt(info.balance, 10);
       const type = info.schedule.tag;
       const oneDay = 86400;
 
-      if (balance === 0 || graphData.length) return;
+      if (balance === -1) { //change back to 0
+        setVestingAvailable(false);
+        return {};
+      };
 
-      setVestingIndex(_index);
-      setClaimableAmount(balance / 10 ** 7);
+      claimableAmount[_index] = balance / 10 ** 7;
 
       if (type === "SaturatingLinear") {
         const { max_x, max_y, min_x, min_y } = info.schedule.values[0];
@@ -224,7 +231,7 @@ export default function Page() {
           data.push({ x, y });
         }
 
-        graphData = data;
+        graphData[_index] = data;
       } else if (type === "PiecewiseLinear") {
         const items = info.schedule.values[0].steps;
 
@@ -247,19 +254,25 @@ export default function Page() {
           }
         });
 
-        graphData = data;
+        graphData[_index] = data;
       }
     });
 
-    return graphData;
+    setVestingAvailable(true);
+    return {graphData, claimableAmount};
   };
+
+  const getTokenByAddress = (address: string) => {
+    return allTokens.find(item => item.contractId === address) || undefined;
+  }
 
   const loadAllBalances = async () => {
     setLoadingBalances(true);
     const _allTokens = await appStore.getAllTokens();
 
-    const _vestingData = await generateVestingGraphData();
-    setVestingGraphData(_vestingData);
+    const {graphData, claimableAmount} = await generateVestingGraphData();
+    setVestingGraphData(graphData);
+    setClaimableAmounts(claimableAmount);
 
     setAllTokens(_allTokens);
     setLoadingBalances(false);
@@ -462,8 +475,11 @@ export default function Page() {
           ) : (
             <WalletBalanceTable
               tokens={allTokens}
-              activeVesting={Boolean(vestingGraphData.length)}
+              activeVesting={vestingAvailable}
               onClaimVestedClick={(address: string) => {
+                const _token = getTokenByAddress(address);
+
+                setVestingToken(_token);
                 setVestingModalOpen(true);
               }}
               onTokenClick={(token: string) => {
@@ -484,7 +500,10 @@ export default function Page() {
         open={vestingModalOpen}
         onClose={() => setVestingModalOpen(false)}
         graphData={vestingGraphData}
-        claimableAmount={claimableAmount}
+        claimableAmount={claimableAmounts}
+        token={vestingToken}
+        index={vestingIndex}
+        setIndex={setVestingIndex}
         onButtonClick={claimVestedTokens}
         loading={claimTransactionLoading}
       />

@@ -3,6 +3,8 @@ import {
   Box,
   Typography,
   Modal as MuiModal,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import Colors from "../../Theme/colors";
 import { VestedTokensModalProps } from "@phoenix-protocol/types";
@@ -98,14 +100,49 @@ const GlowingChart = ({ data }) => (
   </ResponsiveContainer>
 );
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const CustomTabPanel = ({ children, value, index, ...other }: TabPanelProps) => {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box>{children}</Box>}
+    </div>
+  );
+}
+
+
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
 const VestedTokensModal = ({
   open,
   onClose,
   graphData,
   claimableAmount,
+  token, 
+  index,
+  setIndex,
   onButtonClick,
   loading,
 }: VestedTokensModalProps): React.ReactNode => {
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setIndex(newValue);
+  };
+
   const style = {
     position: "absolute" as "absolute",
     top: "50%",
@@ -168,12 +205,24 @@ const VestedTokensModal = ({
               Vested Tokens
             </Typography>
 
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', width: "100%", my: 1 }}>
+              <Tabs value={index} onChange={handleChange} aria-label="tabs of vested tokens">
+                {graphData && Object.entries(graphData).map(([key, val]) => (
+                  <Tab key={key} label={`Vesting ${key+1}`} {...a11yProps(0)} />
+                ))}
+              </Tabs>
+            </Box>
+
             <Box p={2} width={"100%"}>
-              <GlowingChart data={graphData} />
+              {graphData && Object.entries(graphData).map(([key, val]) => (
+                <CustomTabPanel value={index} index={Number(key)} key={key}>
+                  <GlowingChart data={val} />
+                </CustomTabPanel>
+              ))}
             </Box>
             <Box mb={2}>
               <Typography>
-                Claimable: {parseFloat(claimableAmount.toString())}
+                Claimable: {claimableAmount && claimableAmount[index] && parseFloat(claimableAmount[index].toString())} {token && token.name}
               </Typography>
             </Box>
             <Button
