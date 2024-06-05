@@ -11,16 +11,17 @@ import {
   AnchorServices,
   Skeleton,
   AssetInfoModal,
+  VestedTokensModal,
 } from "@phoenix-protocol/ui";
 
-import { fetchPho, SorobanTokenContract } from "@phoenix-protocol/contracts";
+import { fetchPho, SorobanTokenContract, PhoenixVestingContract } from "@phoenix-protocol/contracts";
 
 import { useEffect, useState } from "react";
 import {
   DepositManager,
   getAllAnchors,
 } from "@phoenix-protocol/utils/build/sep24";
-import { Anchor, AssetInfo } from "@phoenix-protocol/types";
+import { Anchor, AssetInfo, Token } from "@phoenix-protocol/types";
 import {
   constants,
   fetchBiggestWinnerAndLoser,
@@ -28,7 +29,10 @@ import {
   fetchTokenPrices,
   fetchTokenPrices2,
   formatCurrency,
+  resolveContractError,
+  Signer,
 } from "@phoenix-protocol/utils";
+import { VestingError, VestingSuccess } from "@/components/Modal/Modal";
 
 export default function Page() {
   const theme = useTheme();
@@ -48,6 +52,18 @@ export default function Page() {
   const [tokenInfoOpen, setTokenInfoOpen] = useState<boolean>(false);
   const [xlmPriceChart, setXlmPriceChart] = useState<any[]>([]);
   const [phoPriceChart, setPhoPriceChart] = useState<any[]>([]);
+
+  //vesting modal states
+  const [vestingAvailable, setVestingAvailable] = useState<boolean>(false);
+  const [vestingGraphData, setVestingGraphData] = useState<any>({});
+  const [vestingIndex, setVestingIndex] = useState<number>(0);
+  const [vestingToken, setVestingToken] = useState<Token | undefined>(undefined);
+  const [claimableAmounts, setClaimableAmounts] = useState<any>({});
+  const [vestingModalOpen, setVestingModalOpen] = useState<boolean>(false);
+  const [claimSuccessModalOpen, setClaimSuccessModalOpen] = useState<boolean>(false);
+  const [claimErrorModalOpen, setClaimErrorModalOpen] = useState<boolean>(false);
+  const [claimErrorMessage, setClaimErrorMessage] = useState<string>("");
+  const [claimTransactionLoading, setClaimTransactionLoading] = useState<boolean>(false);
 
   // Loading states
   const [loadingBalances, setLoadingBalances] = useState(true);
@@ -81,8 +97,8 @@ export default function Page() {
     // Resolve names by fetching all assets
     const _allTokens = await appStore.getAllTokens();
 
-    const _winner = _allTokens.find((token) => token.name === winner.symbol);
-    const _loser = _allTokens.find((token) => token.name === loser.symbol);
+    const _winner = _allTokens.find((token: any) => token.name === winner.symbol);
+    const _loser = _allTokens.find((token: any) => token.name === loser.symbol);
 
     const _gainerAsset = {
       name: _winner.name,
@@ -107,9 +123,162 @@ export default function Page() {
     setLoadingDashboard(false);
   };
 
+  const getVestingInfo = async () => {
+    if(!persistStore.wallet.address) return [];
+
+    const VestingContract = new PhoenixVestingContract.Client({
+      contractId: constants.VESTING_ADDRESS,
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
+      rpcUrl: constants.RPC_URL
+    });
+
+    return VestingContract.query_all_vesting_info({
+      address: persistStore.wallet.address //@TODO handle more vested tokens than just pho
+    })
+  }
+
+  const claimVestedTokens = async () => {
+    const vestingSigner = new Signer();
+
+    setClaimTransactionLoading(true);
+
+    try {
+      const VestingContract = new PhoenixVestingContract.Client({
+        publicKey: persistStore.wallet.address!,
+        contractId: constants.VESTING_ADDRESS,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) => vestingSigner.sign(tx),
+      });
+
+      if(!persistStore.wallet.address) return;
+
+      const tx = await VestingContract.claim({
+        sender: persistStore.wallet.address,
+        index: BigInt(vestingIndex)
+      })
+  
+      const result = await tx.signAndSend();
+
+      if (result.getTransactionResponse?.status === "FAILED") {
+        setClaimErrorModalOpen(true);
+
+        // @ts-ignore
+        setClaimErrorMessage(tx?.resultXdr);
+
+        setClaimTransactionLoading(false);
+        return;
+      }
+
+      setVestingModalOpen(false);
+      setClaimSuccessModalOpen(true);
+
+      //update vested tokens to hide vested button when there are no new entries
+      const newVestedGraphData = await generateVestingGraphData();
+      setVestingGraphData(newVestedGraphData);
+    } catch (e: any) {
+      setClaimTransactionLoading(false);
+
+      setClaimErrorMessage(
+        typeof e === "string"
+          ? e
+          : e.message.includes("request denied")
+          ? e.message
+          : resolveContractError(e.message)
+      );
+
+      setClaimErrorModalOpen(true);
+    }
+  }
+
+  const generateVestingGraphData = async () => {
+    const vestingInfo = (await getVestingInfo()).result;
+    let graphData: any = {};
+    let claimableAmount: any = {};
+    
+    if(!vestingInfo) {
+      return {};
+    }
+
+    vestingInfo.map((info: any, _index: number) => {
+      const balance = parseInt(info.balance, 10);
+      const type = info.schedule.tag;
+      const oneDay = 86400;
+
+      if (balance === 0) {
+        return;
+      };
+
+      claimableAmount[_index] = balance / 10 ** 7;
+
+      if (type === "SaturatingLinear") {
+        const { max_x, max_y, min_x, min_y } = info.schedule.values[0];
+
+        const maxX = parseInt(max_x, 10);
+        const maxY = parseInt(max_y, 10) / 10 ** 7;
+        const minX = parseInt(min_x, 10);
+        const minY = parseInt(min_y, 10) / 10 ** 7;
+
+        const slope = (maxY - minY) / (maxX - minX);
+        const intercept = minY - slope * minX;
+
+        const data = [];
+
+        for (let x = minX; x <= maxX; x += oneDay) {
+          const y = slope * x + intercept;
+          data.push({ x, y });
+        }
+
+        graphData[_index] = data;
+      } else if (type === "PiecewiseLinear") {
+        const items = info.schedule.values[0].steps;
+
+        //needed for nested array in recharts
+        const data: any = []
+        items.forEach((segment: any, index: number) => {
+          if (index < items.length - 1) {
+            const startTime = parseInt(segment.time, 10);
+            const endTime = parseInt(items[index + 1].time, 10);
+            const startValue = parseInt(segment.value, 10) / 10 ** 7;
+            const endValue = parseInt(items[index + 1].value, 10) / 10 ** 7;
+      
+            const slope = (endValue - startValue) / (endTime - startTime);
+            const intercept = startValue - slope * startTime;
+
+            for (let time = startTime; time <= endTime; time += oneDay) {
+              const value = slope * time + intercept;
+              data.push({ x: time, y: value });
+            }
+          }
+        });
+
+        graphData[_index] = data;
+      }
+    });
+
+    return {graphData, claimableAmount};
+  };
+
+  const getTokenByAddress = (address: string) => {
+    return allTokens.find(item => item.contractId === address) || undefined;
+  }
+
   const loadAllBalances = async () => {
     setLoadingBalances(true);
     const _allTokens = await appStore.getAllTokens();
+
+    const {graphData, claimableAmount} = await generateVestingGraphData();
+    setVestingGraphData(graphData);
+    setClaimableAmounts(claimableAmount);
+
+    //check if there are any claimable amounts -> hide show vested tokens button if not
+    if(claimableAmount && Object.keys(claimableAmount).length) {
+      setVestingAvailable(true);
+    } else {
+      //needs to be set for reload after user claimed
+      setVestingAvailable(false);
+    }
+
     setAllTokens(_allTokens);
     setLoadingBalances(false);
   };
@@ -205,12 +374,6 @@ export default function Page() {
         large: "/pho-bg.png",
       },
       assetName: "PHO",
-    },
-    walletBalanceArgs: {
-      tokens: allTokens,
-      onTokenClick: (token: string) => {
-        fetchTokenInfo(token);
-      },
     },
     dashboardStatsArgs: {
       gainer: gainerAsset,
@@ -315,7 +478,19 @@ export default function Page() {
           {loadingBalances ? (
             <Skeleton.WalletBalanceTable />
           ) : (
-            <WalletBalanceTable {...args.walletBalanceArgs} />
+            <WalletBalanceTable
+              tokens={allTokens}
+              activeVesting={vestingAvailable}
+              onClaimVestedClick={(address: string) => {
+                const _token = getTokenByAddress(address);
+
+                setVestingToken(_token);
+                setVestingModalOpen(true);
+              }}
+              onTokenClick={(token: string) => {
+                fetchTokenInfo(token);
+              }}
+            />
           )}
         </Grid>
       </Grid>
@@ -326,6 +501,29 @@ export default function Page() {
           asset={selectedTokenForInfo}
         />
       )}
+      <VestedTokensModal
+        open={vestingModalOpen}
+        onClose={() => setVestingModalOpen(false)}
+        graphData={vestingGraphData}
+        claimableAmount={claimableAmounts}
+        token={vestingToken}
+        index={vestingIndex}
+        setIndex={setVestingIndex}
+        onButtonClick={claimVestedTokens}
+        loading={claimTransactionLoading}
+      />
+
+      <VestingError
+        open={claimErrorModalOpen}
+        setOpen={setClaimErrorModalOpen}
+        error={claimErrorMessage}
+      />
+
+      <VestingSuccess
+        open={claimSuccessModalOpen}
+        setOpen={setClaimSuccessModalOpen}
+        onButtonClick={() => setClaimSuccessModalOpen(false)}
+      />
     </Box>
   );
 }

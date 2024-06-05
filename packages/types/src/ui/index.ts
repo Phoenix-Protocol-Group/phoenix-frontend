@@ -9,6 +9,7 @@ export * from "./LiquidityMining";
 export * from "./MainStats";
 export * from "./Modal";
 export * from "./DisclaimerModal";
+export * from "./VestedTokensModal";
 export * from "./Pools";
 export * from "./PoolStats";
 export * from "./Sidebar";

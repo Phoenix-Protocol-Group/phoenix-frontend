@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   FormControl,
   Grid,
   IconButton,
@@ -23,7 +24,7 @@ import {
   ListItemProps,
   WalletBalanceTableProps,
 } from "@phoenix-protocol/types";
-import { HelpCenter, HelpCenterOutlined } from "@mui/icons-material";
+import { HelpCenterOutlined } from "@mui/icons-material";
 
 function a11yProps(index: number) {
   return {
@@ -251,7 +252,9 @@ const FilterAndTabPanel = ({
 
 const ListItem = ({
   token: { name, icon, usdValue, amount, contractId },
+  activeVesting,
   onTokenClick,
+  onClaimVestedClick,
 }: ListItemProps) => {
   const [favorites, setFavorites] = useState<string[]>([]);
 
@@ -295,6 +298,15 @@ const ListItem = ({
         )}
       </Box>
       <Box sx={{ display: "flex", alignItems: "center" }}>
+        {name === "PHO" && activeVesting && (
+          <Button
+            size="small"
+            sx={{ textTransform: "none", mr: 1, fontSize: "12px" }}
+            onClick={() => onClaimVestedClick(contractId)}
+          >
+            Show Vested
+          </Button>
+        )}
         <Typography
           sx={{
             fontWeight: 700,
@@ -358,7 +370,9 @@ const scrollbarStyles = {
 
 const WalletBalanceTable = ({
   tokens,
+  activeVesting,
   onTokenClick,
+  onClaimVestedClick,
 }: WalletBalanceTableProps) => {
   const [sort, setSort] = useState("highest" as "highest" | "lowest");
   const [searchTerm, setSearchTerm] = useState("");
@@ -421,7 +435,13 @@ const WalletBalanceTable = ({
               }
             })
             .map((token, index) => (
-              <ListItem token={token} onTokenClick={onTokenClick} key={index} />
+              <ListItem
+                token={token}
+                activeVesting={activeVesting}
+                onTokenClick={onTokenClick}
+                onClaimVestedClick={onClaimVestedClick}
+                key={index}
+              />
             ))
         ) : (
           <Typography
