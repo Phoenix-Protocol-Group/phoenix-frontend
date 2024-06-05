@@ -206,7 +206,7 @@ export default function Page() {
       const type = info.schedule.tag;
       const oneDay = 86400;
 
-      if (balance === -1) { //change back to 0
+      if (balance === 0) {
         setVestingAvailable(false);
         return {};
       };
