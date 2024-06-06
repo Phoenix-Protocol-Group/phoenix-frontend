@@ -1,14 +1,7 @@
-import React, { useState } from "react";
-import {
-  Area,
-  AreaChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { Box, Typography } from "@mui/material";
-import { format } from "date-fns";
+import React, {useState} from "react";
+import {Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
+import {Box, Typography} from "@mui/material";
+import {format} from "date-fns";
 
 type HistoricalPrice = {
   tokenId: string;
@@ -181,7 +174,8 @@ const GlowingChart = ({
             <stop offset="95%" stopColor="#E2491A" stopOpacity={0.02} />
           </linearGradient>
         </defs>
-        <YAxis hide={false} dataKey="usdValue" />
+        <YAxis hide={false} dataKey="usdValue" domain={["dataMin - 0.2", "dataMax + 0.1"]}
+               tickFormatter={(tick) => tick.toFixed(2)}/>
         <XAxis
           hide={false}
           dataKey="timestamp"
