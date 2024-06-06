@@ -55,6 +55,17 @@ const tabSelectedStyles = {
   lineHeight: "1.25rem", // 200%
 };
 
+const ArrowButtonStyles = {
+  background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
+  width: "38px",
+  height: "38px",
+  borderRadius: "8px",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  cursor: "pointer",
+};
+
 export interface NftCardProps {
   image: string;
   collectionName: string;
@@ -74,17 +85,6 @@ export interface FeaturedProps {
 }
 
 const PopularNfts = (props: FeaturedProps) => {
-  const ArrowButtonStyles = {
-    background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
-    width: "38px",
-    height: "38px",
-    borderRadius: "8px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
-  };
-
   const [ready, setReady] = React.useState<boolean>(false);
 
   const theme = useTheme();
@@ -236,7 +236,7 @@ const PopularNfts = (props: FeaturedProps) => {
           )}
         </Box>
       </Box>
-      <Grid container spacing={1}>
+      <Grid container spacing={2}>
         {props.entries
           .slice(0, entryLength)
           .map((item: NftCardProps, index: number) => (
