@@ -1,5 +1,4 @@
 import { Horizon } from "@stellar/stellar-sdk";
-import { WalletConnect } from "@phoenix-protocol/utils";
 
 export type StateToken = {
   id: string;
@@ -24,7 +23,7 @@ export interface WalletActions {
     isStakingToken?: boolean
   ) => Promise<StateToken | undefined>;
   getAllTokens: () => Promise<any[]>;
-  walletConnectInstance?: WalletConnect;
+  walletConnectInstance?: any;
 }
 
 export interface WalletChain {

@@ -116,7 +116,7 @@ export class WalletConnect implements Wallet {
     updatedXdr = await this.client
       .request({
         topic: targetSession.id,
-        chainId: NETWORK_PASSPHRASE,
+        chainId: "stellar:pubnet",
         request: {
           method: this.wcParams.method,
           params: { xdr: tx },

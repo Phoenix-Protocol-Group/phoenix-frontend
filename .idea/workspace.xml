@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d4e4788e-0992-4eba-bad6-62c4e7bddfcf" name="Changes" comment="Connect wallet" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="optimize-utils" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;msteiner96&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="e2b607a4-505d-493c-9684-06d4f951b163" />
+        <option name="url" value="git@github.com:Phoenix-Protocol-Group/phoenix-frontend.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2guNfUV8crA8k45Pw8WD6gVf9ZU" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "add-walletconnect",
+    "js.linters.configure.manually.selectedeslint": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.standard": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.standard": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "yarn",
+    "npm.core > install pino-pretty.executor": "Run",
+    "npm.phoenix-frontend > install @walletconnect/modal.executor": "Run",
+    "prettierjs.PrettierConfiguration.Package": "/Users/milan/workspace/phoenix/phoenix-frontend/node_modules/prettier",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "/Users/milan/workspace/phoenix/phoenix-frontend/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="ReactDesignerToolWindowState">
+    <option name="myId2Visible">
+      <map>
+        <entry key="com.intellij.reactbuddy.reactComponents" value="false" />
+        <entry key="com.intellij.reactbuddy.reactInspector" value="false" />
+        <entry key="com.intellij.reactbuddy.storybook" value="false" />
+      </map>
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/packages/core/public/cryptoIcons" />
+      <recent name="$PROJECT_DIR$/packages/core/app" />
+      <recent name="$PROJECT_DIR$/packages/ui/public/cryptoIcons" />
+      <recent name="$PROJECT_DIR$/packages/core/assets" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d4e4788e-0992-4eba-bad6-62c4e7bddfcf" name="Changes" comment="" />
+      <created>1716543609060</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1716543609060</updated>
+      <workItem from="1716543610048" duration="324000" />
+      <workItem from="1716543971450" duration="423000" />
+      <workItem from="1716544402646" duration="1359000" />
+      <workItem from="1716545766998" duration="7447000" />
+      <workItem from="1716559144326" duration="86000" />
+      <workItem from="1716559238484" duration="4120000" />
+      <workItem from="1716591218073" duration="1210000" />
+      <workItem from="1716901225543" duration="2389000" />
+      <workItem from="1716976844348" duration="1904000" />
+      <workItem from="1717073018406" duration="4385000" />
+      <workItem from="1717112177667" duration="3864000" />
+      <workItem from="1717236831233" duration="5829000" />
+      <workItem from="1717416370197" duration="714000" />
+      <workItem from="1717417934282" duration="8843000" />
+      <workItem from="1717506259144" duration="28000" />
+      <workItem from="1717507775750" duration="4841000" />
+      <workItem from="1717532670692" duration="25000" />
+      <workItem from="1717584742427" duration="510000" />
+      <workItem from="1717585918726" duration="368000" />
+      <workItem from="1717588378791" duration="610000" />
+      <workItem from="1717673612909" duration="8576000" />
+    </task>
+    <task id="LOCAL-00001" summary="Upgrade to js sdk 12 rc3">
+      <option name="closed" value="true" />
+      <created>1716545778834</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1716545778834</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Add missing type">
+      <option name="closed" value="true" />
+      <created>1716545824355</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1716545824355</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Fix all contract calls">
+      <option name="closed" value="true" />
+      <created>1716546594494</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1716546594494</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Fix build">
+      <option name="closed" value="true" />
+      <created>1716547138375</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1716547138375</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Fix build">
+      <option name="closed" value="true" />
+      <created>1716547163040</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1716547163040</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Fix build">
+      <option name="closed" value="true" />
+      <created>1716547182918</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1716547182918</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Fix build">
+      <option name="closed" value="true" />
+      <created>1716547323948</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1716547323948</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Export vesting contract">
+      <option name="closed" value="true" />
+      <created>1716547890065</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1716547890065</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Remove unneeded localStorage usage">
+      <option name="closed" value="true" />
+      <created>1716548043454</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1716548043454</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Add publicKey to signing transactions">
+      <option name="closed" value="true" />
+      <created>1716549465264</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1716549465264</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Add signTransaction param to all SigningClients">
+      <option name="closed" value="true" />
+      <created>1716549993800</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1716549993800</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Add jsdocs, sort imports, reformating code">
+      <option name="closed" value="true" />
+      <created>1716561796730</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1716561796730</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Fix import // fix build">
+      <option name="closed" value="true" />
+      <created>1716562053101</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1716562053101</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Remove unused imports in @phoenix-protocol/contracts">
+      <option name="closed" value="true" />
+      <created>1716562162639</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1716562162639</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Avoid that redirect to dashboard every reload">
+      <option name="closed" value="true" />
+      <created>1716562756859</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1716562756859</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Fix error handling in pools">
+      <option name="closed" value="true" />
+      <created>1717073132143</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1717073132143</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Mobile app tests">
+      <option name="closed" value="true" />
+      <created>1717237166970</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1717237166970</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Not all pools are part of the airdrop program.">
+      <option name="closed" value="true" />
+      <created>1717237635667</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1717237635667</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Add eurc pool adjustments">
+      <option name="closed" value="true" />
+      <created>1717244100661</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1717244100661</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Revert unwanted changes">
+      <option name="closed" value="true" />
+      <created>1717244137459</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1717244137459</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Add EURC to assetlist.ts for trustlines.ts">
+      <option name="closed" value="true" />
+      <created>1717245200287</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1717245200287</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Fix icon sizes">
+      <option name="closed" value="true" />
+      <created>1717245977624</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1717245977624</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Adjust price api cache">
+      <option name="closed" value="true" />
+      <created>1717370983459</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1717370983459</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Fix staking contract rerender issue">
+      <option name="closed" value="true" />
+      <created>1717416722033</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1717416722033</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Add PHO Token price chart">
+      <option name="closed" value="true" />
+      <created>1717500843534</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1717500843534</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Add more PHO Token datasets from the past">
+      <option name="closed" value="true" />
+      <created>1717518062996</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1717518062996</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Connect wallet">
+      <option name="closed" value="true" />
+      <created>1717680634690</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1717680634690</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT_PROFILE" value="Project Default" />
+    <option name="CHECK_NEW_TODO" value="false" />
+    <MESSAGE value="Upgrade to js sdk 12 rc3" />
+    <MESSAGE value="Add missing type" />
+    <MESSAGE value="Fix all contract calls" />
+    <MESSAGE value="Fix build" />
+    <MESSAGE value="Export vesting contract" />
+    <MESSAGE value="Remove unneeded localStorage usage" />
+    <MESSAGE value="Add publicKey to signing transactions" />
+    <MESSAGE value="Add signTransaction param to all SigningClients" />
+    <MESSAGE value="Add jsdocs, sort imports, reformating code" />
+    <MESSAGE value="Fix import // fix build" />
+    <MESSAGE value="Remove unused imports in @phoenix-protocol/contracts" />
+    <MESSAGE value="Avoid that redirect to dashboard every reload" />
+    <MESSAGE value="Fix error handling in pools" />
+    <MESSAGE value="Mobile app tests" />
+    <MESSAGE value="Not all pools are part of the airdrop program." />
+    <MESSAGE value="Add eurc pool adjustments" />
+    <MESSAGE value="Revert unwanted changes" />
+    <MESSAGE value="Add EURC to assetlist.ts for trustlines.ts" />
+    <MESSAGE value="Fix icon sizes" />
+    <MESSAGE value="Adjust price api cache" />
+    <MESSAGE value="Fix staking contract rerender issue" />
+    <MESSAGE value="Add PHO Token price chart" />
+    <MESSAGE value="Add more PHO Token datasets from the past" />
+    <MESSAGE value="Connect wallet" />
+    <option name="LAST_COMMIT_MESSAGE" value="Connect wallet" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+</project>

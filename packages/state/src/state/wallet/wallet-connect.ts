@@ -34,7 +34,7 @@ export function WalletConnect(): Connector {
         url: "https://app.phoenix-hub.io",
         icons: [],
         method: WalletConnectAllowedMethods.SIGN_AND_SUBMIT,
-        network: NETWORK_PASSPHRASE,
+        network: "stellar:pubnet",
       });
 
       return Client.getPublicKey();
