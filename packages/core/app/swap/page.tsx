@@ -1,22 +1,14 @@
 "use client";
 
 // React-related imports
-import React, { useEffect, useState } from "react";
-import { useDebounce } from "use-debounce";
+import React, {useEffect, useState} from "react";
+import {useDebounce} from "use-debounce";
 
 // Component and utility imports
-import {
-  AssetSelector,
-  Skeleton,
-  SlippageSettings,
-  SwapContainer,
-} from "@phoenix-protocol/ui";
-import { Token } from "@phoenix-protocol/types";
-import {
-  PhoenixFactoryContract,
-  PhoenixMultihopContract,
-} from "@phoenix-protocol/contracts";
-import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
+import {AssetSelector, Skeleton, SlippageSettings, SwapContainer,} from "@phoenix-protocol/ui";
+import {Token} from "@phoenix-protocol/types";
+import {PhoenixFactoryContract, PhoenixMultihopContract,} from "@phoenix-protocol/contracts";
+import {useAppStore, usePersistStore} from "@phoenix-protocol/state";
 import {
   checkTrustline,
   constants,
@@ -25,9 +17,9 @@ import {
   findBestPath,
   resolveContractError,
 } from "@phoenix-protocol/utils";
-import { LoadingSwap, SwapError, SwapSuccess } from "@/components/Modal/Modal";
-import { Box } from "@mui/material";
-import { Helmet } from "react-helmet";
+import {LoadingSwap, SwapError, SwapSuccess} from "@/components/Modal/Modal";
+import {Box} from "@mui/material";
+import {Helmet} from "react-helmet";
 
 export default function SwapPage() {
   // State variables declaration and initialization
@@ -95,7 +87,8 @@ export default function SwapPage() {
         max_spread_bps: BigInt(maxSpread * 100),
       });
 
-      const result = await tx.signAndSend();
+      const result = await swapSigner.signTransaction(tx.resultXdr);
+      console.log(result)
 
       if (result.getTransactionResponse?.status === "FAILED") {
         setErrorModalOpen(true);
