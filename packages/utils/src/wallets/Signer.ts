@@ -1,6 +1,31 @@
 import { lobstr } from "./lobstr";
 import { Wallet } from "./types";
 import { xBull } from "./xbull";
+import {
+  WalletConnect as WalletClient,
+  WalletConnectAllowedMethods,
+} from "./wallet-connect";
+import { NETWORK_PASSPHRASE } from "../constants";
+
+const initializeWalletConnect = async () => {
+  const walletConnectInstance = new WalletClient({
+    projectId: "1cca500fbafdda38a70f8bf3bcb91b15",
+    name: "Phoenix DeFi Hub",
+    description: "Serving only the tastiest DeFi",
+    url: "https://app.phoenix-hub.io",
+    icons: [],
+    method: WalletConnectAllowedMethods.SIGN_AND_SUBMIT,
+    network: NETWORK_PASSPHRASE,
+  });
+  console.log("Initialized Wallet Connect");
+
+  while (!(await walletConnectInstance.isConnected())) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  console.log("Wallet connected", walletConnectInstance);
+
+  return walletConnectInstance;
+};
 
 /**
  * Signer class
@@ -55,6 +80,8 @@ export default class Signer {
       this.wallet = new xBull();
     } else if (this.walletType === "lobstr") {
       this.wallet = new lobstr();
+    } else if (this.walletType === "wallet-connect") {
+      this.wallet = await initializeWalletConnect();
     } else {
       console.error("Wallet type not supported.");
     }

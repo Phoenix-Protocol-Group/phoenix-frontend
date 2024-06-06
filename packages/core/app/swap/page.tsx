@@ -24,7 +24,6 @@ import {
   fetchTokenPrices,
   findBestPath,
   resolveContractError,
-  Signer,
 } from "@phoenix-protocol/utils";
 import { LoadingSwap, SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
@@ -77,7 +76,7 @@ export default function SwapPage() {
   const doSwap = async () => {
     setTxBroadcasting(true);
     try {
-      const swapSigner = new Signer();
+      const swapSigner = appStore.walletConnectInstance;
 
       // Create contract instance
       const contract = new PhoenixMultihopContract.Client({
@@ -85,7 +84,7 @@ export default function SwapPage() {
         contractId: constants.MULTIHOP_ADDRESS,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) => swapSigner.sign(tx),
+        signTransaction: (tx: string) => swapSigner.signTransaction(tx),
       });
 
       // Execute swap
@@ -110,6 +109,8 @@ export default function SwapPage() {
       setSuccessModalOpen(true);
     } catch (e: any) {
       setErrorModalOpen(true);
+
+      console.error(e);
 
       // @ts-ignore
       setErrorDescription(

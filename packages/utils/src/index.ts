@@ -13,5 +13,7 @@ export * from "./errorResolver";
 export * from "./trustlines";
 import Signer from "./wallets/Signer";
 
+export { WalletConnect } from "./wallets/wallet-connect";
+
 export { Signer };
 export * as HelpCenter from "./help-center";

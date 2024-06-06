@@ -2,6 +2,7 @@
 export { freighter } from "./state/wallet/freighter";
 export { xbull } from "./state/wallet/xbull";
 export { lobstr } from "./state/wallet/lobstr";
+export { WalletConnect } from "./state/wallet/wallet-connect";
 
 // Export chains
 export {
