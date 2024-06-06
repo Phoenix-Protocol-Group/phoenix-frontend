@@ -16,7 +16,7 @@ const GettingStartedCard = (props: GettingStartedCardProps) => {
       "&:after": {
         content: "' '",
         position: "absolute",
-        top: "30%",
+        top: "20%",
         width: "100%",
         height: "100%",
         background: "linear-gradient(360deg, rgba(226, 73, 26, 0.19) 0%, rgba(226, 73, 26, 0) 100%)"
