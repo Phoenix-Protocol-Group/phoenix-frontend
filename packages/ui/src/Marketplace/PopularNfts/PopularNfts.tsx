@@ -6,31 +6,73 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { ArrowForward } from "@mui/icons-material";
+import { ArrowForward, ArrowBack, ArrowRightAlt } from "@mui/icons-material";
 import React from "react";
 
-export interface FeaturedCardProps {
+const tabUnselectedStyles = {
+  display: "flex",
+  width: "2.75rem",
+  height: "2.3125rem",
+  padding: "1.125rem 1.5rem",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "0.625rem",
+  borderRadius: "1rem",
+  cursor: "pointer",
+  background:
+    "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+  color: "#FFF",
+  opacity: 0.6,
+  textAlign: "center",
+  fontFeatureSettings: "'clig' off, 'liga' off",
+  fontFamily: "Ubuntu",
+  fontSize: "0.625rem",
+  fontStyle: "normal",
+  fontWeight: 700,
+  lineHeight: "1.25rem", // 200%
+};
+
+const tabSelectedStyles = {
+  display: "flex",
+  height: "2.25rem",
+  padding: "1.125rem 1.5rem",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "0.625rem",
+  flex: "1 0 0",
+  borderRadius: "1rem",
+  border: "1px solid var(--Primary-P3, #E2571C)",
+  background: "rgba(226, 73, 26, 0.10)",
+  color: "#FFF",
+  opacity: 1,
+  textAlign: "center",
+  fontFeatureSettings: "'clig' off, 'liga' off",
+  fontFamily: "Ubuntu",
+  fontSize: "0.625rem",
+  fontStyle: "normal",
+  fontWeight: 700,
+  lineHeight: "1.25rem", // 200%
+};
+
+export interface NftCardProps {
   image: string;
-  name: string;
+  collectionName: string;
+  nftName: string;
   price: string;
   volume: string;
   icon: string;
 }
 
 export interface FeaturedProps {
-  items: FeaturedCardProps[];
+  entries: NftCardProps[];
   forwardClick?: () => void;
   backwardClick?: () => void;
+  activeTime: "6h" | "1d" | "7d" | "30d";
+  setActiveTime: (time: "6h" | "1d" | "7d" | "30d") => void;
+  onViewAllClick: () => void;
 }
 
-const FeaturedCard = ({
-  image,
-  name,
-  price,
-  volume,
-  icon,
-}: FeaturedCardProps) => {
+const NftCard = (props: NftCardProps) => {
   return (
     <Box
       sx={{
@@ -56,7 +98,7 @@ const FeaturedCard = ({
             maxWidth: "100%",
           }}
           alt="nft preview image"
-          src={image}
+          src={props.image}
         />
       </Box>
       <Grid
@@ -67,7 +109,18 @@ const FeaturedCard = ({
             "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%)",
         }}
       >
-        <Grid item xs={12}>
+        <Grid item xs={12} mb={1}>
+          <Typography
+            sx={{
+              fontSize: "11px",
+              fontWeight: 500,
+              lineHeight: "16px",
+              mb: 0.5,
+              color: "#BDBEBE",
+            }}
+          >
+            {props.collectionName}
+          </Typography>
           <Typography
             sx={{
               fontSize: "14px",
@@ -76,7 +129,7 @@ const FeaturedCard = ({
               marginBottom: "8px",
             }}
           >
-            {name}
+            {props.nftName}
           </Typography>
         </Grid>
         <Grid item xs={6}>
@@ -102,7 +155,7 @@ const FeaturedCard = ({
                 marginRight: "4px",
               }}
               alt="asset icon"
-              src={icon}
+              src={props.icon}
             />
             <Typography
               sx={{
@@ -111,7 +164,7 @@ const FeaturedCard = ({
                 fontWeight: 400,
               }}
             >
-              {price}
+              {props.price}
             </Typography>
           </Box>
         </Grid>
@@ -138,7 +191,7 @@ const FeaturedCard = ({
                 marginRight: "4px",
               }}
               alt="asset icon"
-              src={icon}
+              src={props.icon}
             />
             <Typography
               sx={{
@@ -147,7 +200,7 @@ const FeaturedCard = ({
                 fontWeight: 400,
               }}
             >
-              {volume}
+              {props.volume}
             </Typography>
           </Box>
         </Grid>
@@ -156,7 +209,7 @@ const FeaturedCard = ({
   );
 };
 
-const Featured = ({ items, backwardClick, forwardClick }: FeaturedProps) => {
+const PopularNfts = (props: FeaturedProps) => {
   const ArrowButtonStyles = {
     background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
     width: "38px",
@@ -200,7 +253,7 @@ const Featured = ({ items, backwardClick, forwardClick }: FeaturedProps) => {
 
   React.useEffect(() => {
     setReady(true);
-  }, [items]);
+  }, [props.entries]);
 
   return (
     <Box>
@@ -226,31 +279,103 @@ const Featured = ({ items, backwardClick, forwardClick }: FeaturedProps) => {
         >
           Featured
         </Typography>
-        {backwardClick && (
-          <Box mr={1}>
+        <Box display="flex">
+          <Box
+            mr={0.5}
+            sx={
+              props.activeTime === "6h"
+                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                : tabUnselectedStyles
+            }
+            onClick={() => props.setActiveTime("6h")}
+          >
+            6H
+          </Box>
+          <Box
+            mr={0.5}
+            sx={
+              props.activeTime === "1d"
+                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                : tabUnselectedStyles
+            }
+            onClick={() => props.setActiveTime("1d")}
+          >
+            1D
+          </Box>
+          <Box
+            mr={0.5}
+            sx={
+              props.activeTime === "7d"
+                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                : tabUnselectedStyles
+            }
+            onClick={() => props.setActiveTime("7d")}
+          >
+            7D
+          </Box>
+          <Box
+            mr={2}
+            sx={
+              props.activeTime === "30d"
+                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                : tabUnselectedStyles
+            }
+            onClick={() => props.setActiveTime("30d")}
+          >
+            30D
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              height: "2.3125rem",
+              padding: "1.125rem 0.7rem 1.125rem 1rem",
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: "1rem",
+              cursor: "pointer",
+              background:
+                "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+              color: "#FFF",
+              textAlign: "center",
+              fontSize: "0.625rem",
+              fontStyle: "normal",
+              fontWeight: 700,
+              lineHeight: "1.25rem",
+              mr: 2,
+            }}
+            onClick={props.onViewAllClick}
+          >
+            <Box mr={0.5} whiteSpace="nowrap">
+              View All
+            </Box>
+            <ArrowRightAlt sx={{ fontSize: "16px" }} />
+          </Box>
+          {props.backwardClick && (
+            <Box mr={1}>
+              <Box sx={ArrowButtonStyles}>
+                <ArrowBack
+                  sx={{
+                    fontSize: "16px",
+                  }}
+                />
+              </Box>
+            </Box>
+          )}
+          {props.forwardClick && (
             <Box sx={ArrowButtonStyles}>
-              <ArrowBackIcon
+              <ArrowForward
                 sx={{
                   fontSize: "16px",
                 }}
               />
             </Box>
-          </Box>
-        )}
-        {forwardClick && (
-          <Box sx={ArrowButtonStyles}>
-            <ArrowForward
-              sx={{
-                fontSize: "16px",
-              }}
-            />
-          </Box>
-        )}
+          )}
+        </Box>
       </Box>
       <Grid container spacing={1}>
-        {items
+        {props.entries
           .slice(0, entryLength)
-          .map((item: FeaturedCardProps, index: number) => (
+          .map((item: NftCardProps, index: number) => (
             <Fade
               key={index}
               in={ready}
@@ -258,7 +383,7 @@ const Featured = ({ items, backwardClick, forwardClick }: FeaturedProps) => {
               unmountOnExit
             >
               <Grid item xs={6} md={3} lg={12 / 5}>
-                <FeaturedCard {...item} />
+                <NftCard {...item} />
               </Grid>
             </Fade>
           ))}
@@ -267,4 +392,4 @@ const Featured = ({ items, backwardClick, forwardClick }: FeaturedProps) => {
   );
 };
 
-export default Featured;
+export default PopularNfts;

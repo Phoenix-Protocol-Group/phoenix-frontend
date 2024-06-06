@@ -225,7 +225,7 @@ const TopCollections = (props: TopCollectionsProps) => {
             sx={{
               display: "flex",
               height: "2.3125rem",
-              padding: "1.125rem 1rem",
+              padding: "1.125rem 0.7rem 1.125rem 1rem",
               justifyContent: "center",
               alignItems: "center",
               borderRadius: "1rem",
