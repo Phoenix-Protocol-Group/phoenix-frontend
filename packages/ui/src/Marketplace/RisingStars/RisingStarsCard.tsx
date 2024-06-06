@@ -12,6 +12,14 @@ const RisingStarsCard = (props: RisingStarCardProps) => {
         borderRadius: "8px",
         overflowY: "hidden",
         display: "flex",
+        flexDirection: {
+          xs: "column",
+          md: "row"
+        },
+        alignItems: {
+          xs: "center",
+          md: "unset"
+        },
         p: 2,
         "&:hover": {
           borderColor: "#E2621B",
@@ -23,7 +31,14 @@ const RisingStarsCard = (props: RisingStarCardProps) => {
         height: "56px",
         borderRadius: "50%",
         overflow: "hidden",
-        mr: 2
+        mr: {
+          xs: 0,
+          md: 2
+        },
+        mb: {
+          xs: 1,
+          md: 0
+        },
       }}>
         <Box
           component="img"
@@ -53,7 +68,15 @@ const RisingStarsCard = (props: RisingStarCardProps) => {
           color: "#FFF",
           opacity: 0.6,
           display: "flex",
-          alignItems: "center"
+          alignItems: "center",
+          justifyContent: {
+            xs: "center",
+            md: "unset"
+          },
+          marginLeft: {
+            xs: "-5px",
+            md: 0
+          }
         }}>
           {props.percent >= 0 ? <ArrowUpward sx={{fontSize: "16px"}} /> : <ArrowDownward sx={{fontSize: "16px"}} />}{props.percent}%
         </Typography>

@@ -15,13 +15,13 @@ type Story = StoryObj<typeof RisingStars>;
 
 const demoItem = {
   image: "/demo_nft.png",
-  collectionName: "collection 1",
+  collectionName: "Testcollection",
   percent: 50
 };
 
 export const Primary: Story = {
   args: {
-    entries: [demoItem, demoItem, demoItem,demoItem, demoItem, demoItem,demoItem, demoItem, demoItem,],
+    entries: [demoItem, demoItem, demoItem,demoItem, demoItem, demoItem, demoItem,demoItem, demoItem],
     activeTime: "7d",
   },
 };

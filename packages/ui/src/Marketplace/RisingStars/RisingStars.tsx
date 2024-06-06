@@ -1,4 +1,4 @@
-import { Box, Fade, Grid, Typography } from "@mui/material";
+import { Box, Fade, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
 import RisingStarsCard from "./RisingStarsCard";
 
@@ -22,7 +22,8 @@ const tabUnselectedStyles = {
   fontSize: "0.625rem",
   fontStyle: "normal",
   fontWeight: 700,
-  lineHeight: "1.25rem", // 200%
+  lineHeight: "1.25rem",
+  flex: 1,
 };
 
 const tabSelectedStyles = {
@@ -44,7 +45,7 @@ const tabSelectedStyles = {
   fontSize: "0.625rem",
   fontStyle: "normal",
   fontWeight: 700,
-  lineHeight: "1.25rem", // 200%
+  lineHeight: "1.25rem",
 };
 
 export interface RisingStarCardProps {
@@ -62,6 +63,29 @@ export interface RisingStarsProps {
 const RisingStars = (props: RisingStarsProps) => {
   const [ready, setReady] = React.useState<boolean>(false);
 
+  const theme = useTheme();
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
+
+  const [entryLength, setEntryLength] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (isMdUp) {
+        setEntryLength(9);
+      } else {
+        setEntryLength(8);
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isMdUp]);
+
   React.useEffect(() => {
     setReady(true);
   }, [props.entries]);
@@ -73,6 +97,10 @@ const RisingStars = (props: RisingStarsProps) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexDirection: {
+            xs: "column",
+            md: "row",
+          },
           mb: 2,
         }}
       >
@@ -86,11 +114,27 @@ const RisingStars = (props: RisingStarsProps) => {
             fontWeight: 700,
             lineHeight: "normal",
             flex: 1,
+            width: {
+              xs: "100%",
+              md: "unset",
+            },
           }}
         >
           Rising Stars
         </Typography>
-        <Box display="flex">
+        <Box
+          sx={{
+            display: "flex",
+            width: {
+              xs: "100%",
+              md: "unset",
+            },
+            mt: {
+              xs: 2,
+              md: 0,
+            },
+          }}
+        >
           <Box
             mr={0.5}
             sx={
@@ -137,19 +181,18 @@ const RisingStars = (props: RisingStarsProps) => {
         </Box>
       </Box>
       <Grid container spacing={2}>
-        {props.entries
-          .map((item: RisingStarCardProps, index: number) => (
-            <Fade
-              key={index}
-              in={ready}
-              {...(ready ? { timeout: index * 500 } : {})}
-              unmountOnExit
-            >
-              <Grid item xs={6} md={3} lg={4}>
-                <RisingStarsCard {...item} />
-              </Grid>
-            </Fade>
-          ))}
+        {props.entries.slice(0, entryLength).map((item: RisingStarCardProps, index: number) => (
+          <Fade
+            key={index}
+            in={ready}
+            {...(ready ? { timeout: index * 500 } : {})}
+            unmountOnExit
+          >
+            <Grid item xs={6} md={4}>
+              <RisingStarsCard {...item} />
+            </Grid>
+          </Fade>
+        ))}
       </Grid>
     </Box>
   );
