@@ -272,7 +272,7 @@ const PopularNfts = (props: FeaturedProps) => {
               {...(ready ? { timeout: index * 500 } : {})}
               unmountOnExit
             >
-              <Grid item xs={6} md={3} lg={12 / 5}>
+              <Grid item xs={6} md={12 / 5}>
                 <PopularNftsCard {...item} />
               </Grid>
             </Fade>
