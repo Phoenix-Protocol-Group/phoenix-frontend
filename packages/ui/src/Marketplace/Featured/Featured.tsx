@@ -20,12 +20,12 @@ export interface FeaturedCardProps {
 }
 
 export interface FeaturedProps {
-  items: FeaturedCardProps[];
+  entries: FeaturedCardProps[];
   forwardClick?: () => void;
   backwardClick?: () => void;
 }
 
-const Featured = ({ items, backwardClick, forwardClick }: FeaturedProps) => {
+const Featured = (props: FeaturedProps) => {
   const ArrowButtonStyles = {
     background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
     width: "38px",
@@ -69,7 +69,7 @@ const Featured = ({ items, backwardClick, forwardClick }: FeaturedProps) => {
 
   React.useEffect(() => {
     setReady(true);
-  }, [items]);
+  }, [props.entries]);
 
   return (
     <Box>
@@ -95,7 +95,7 @@ const Featured = ({ items, backwardClick, forwardClick }: FeaturedProps) => {
         >
           Featured
         </Typography>
-        {backwardClick && (
+        {props.backwardClick && (
           <Box mr={1}>
             <Box sx={ArrowButtonStyles}>
               <ArrowBackIcon
@@ -106,7 +106,7 @@ const Featured = ({ items, backwardClick, forwardClick }: FeaturedProps) => {
             </Box>
           </Box>
         )}
-        {forwardClick && (
+        {props.forwardClick && (
           <Box sx={ArrowButtonStyles}>
             <ArrowForward
               sx={{
@@ -117,7 +117,7 @@ const Featured = ({ items, backwardClick, forwardClick }: FeaturedProps) => {
         )}
       </Box>
       <Grid container spacing={1}>
-        {items
+        {props.entries
           .slice(0, entryLength)
           .map((item: FeaturedCardProps, index: number) => (
             <Fade
