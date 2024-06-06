@@ -41,7 +41,6 @@ const Featured = (props: FeaturedProps) => {
 
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
 
   const [entryLength, setEntryLength] = React.useState<number>(0);
 
@@ -61,7 +60,7 @@ const Featured = (props: FeaturedProps) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [isLgUp]);
+  }, [isMdUp]);
 
   React.useEffect(() => {
     setReady(true);

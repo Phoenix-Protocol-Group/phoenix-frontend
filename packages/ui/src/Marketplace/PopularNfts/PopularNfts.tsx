@@ -31,6 +31,7 @@ const tabUnselectedStyles = {
   fontStyle: "normal",
   fontWeight: 700,
   lineHeight: "1.25rem", // 200%
+  flex: 1
 };
 
 const tabSelectedStyles = {
@@ -89,20 +90,15 @@ const PopularNfts = (props: FeaturedProps) => {
 
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
 
   const [entryLength, setEntryLength] = React.useState<number>(0);
 
   React.useEffect(() => {
     const handleResize = () => {
       if (isMdUp) {
-        if (isLgUp) {
-          setEntryLength(5);
-        } else {
-          setEntryLength(4);
-        }
+        setEntryLength(5);
       } else {
-        setEntryLength(2);
+        setEntryLength(6);
       }
     };
 
@@ -113,7 +109,7 @@ const PopularNfts = (props: FeaturedProps) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [isLgUp]);
+  }, [isMdUp]);
 
   React.useEffect(() => {
     setReady(true);
@@ -124,9 +120,14 @@ const PopularNfts = (props: FeaturedProps) => {
       <Box
         sx={{
           display: "flex",
+          flexDirection: {
+            xs: "column",
+            md: "row",
+          },
           justifyContent: "space-between",
           alignItems: "center",
           mb: 2,
+          position: "relative",
         }}
       >
         <Typography
@@ -139,11 +140,25 @@ const PopularNfts = (props: FeaturedProps) => {
             fontWeight: 700,
             lineHeight: "normal",
             flex: 1,
+            width: {
+              xs: "100%",
+              md: "unset",
+            },
           }}
         >
-          Featured
+          Popular NFTs
         </Typography>
-        <Box display="flex">
+        <Box sx={{
+          display: "flex",
+          width: {
+            xs: "100%",
+            md: "unset"
+          },
+          mt: {
+            xs: 2,
+            md: 0
+          }
+        }}>
           <Box
             mr={0.5}
             sx={
@@ -205,7 +220,10 @@ const PopularNfts = (props: FeaturedProps) => {
               fontStyle: "normal",
               fontWeight: 700,
               lineHeight: "1.25rem",
-              mr: 2,
+              mr: {
+                xs: 0,
+                md: 2
+              }
             }}
             onClick={props.onViewAllClick}
           >
@@ -214,24 +232,32 @@ const PopularNfts = (props: FeaturedProps) => {
             </Box>
             <ArrowRightAlt sx={{ fontSize: "16px" }} />
           </Box>
-          {props.backwardClick && (
-            <Box mr={1}>
+          {props.backwardClick && props.forwardClick && (
+            <Box sx={{
+              display: "flex",
+              position: {
+                xs: "absolute",
+                md: "unset"
+              },
+              right: 0,
+              top: "4px",
+            }}>
+              <Box mr={1}>
+                <Box sx={ArrowButtonStyles}>
+                  <ArrowBack
+                    sx={{
+                      fontSize: "16px",
+                    }}
+                  />
+                </Box>
+              </Box>
               <Box sx={ArrowButtonStyles}>
-                <ArrowBack
+                <ArrowForward
                   sx={{
                     fontSize: "16px",
                   }}
                 />
               </Box>
-            </Box>
-          )}
-          {props.forwardClick && (
-            <Box sx={ArrowButtonStyles}>
-              <ArrowForward
-                sx={{
-                  fontSize: "16px",
-                }}
-              />
             </Box>
           )}
         </Box>
