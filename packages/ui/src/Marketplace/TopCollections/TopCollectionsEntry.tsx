@@ -8,6 +8,9 @@ const TopCollectionsEntry = (props: TopCollectionsEntryProps) => {
     borderRadius: "8px",
     background:
       "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+    "&:last-of-type": {
+      marginBottom: "0 !important"
+    }
   };
 
   const EntryTextStyle = {
