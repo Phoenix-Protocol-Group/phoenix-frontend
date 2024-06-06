@@ -1,8 +1,11 @@
-import {lobstr} from "./lobstr";
-import {Wallet} from "./types";
-import {xBull} from "./xbull";
-import {WalletConnect as WalletClient, WalletConnectAllowedMethods,} from "./wallet-connect";
-import {NETWORK_PASSPHRASE} from "../constants";
+import { lobstr } from "./lobstr";
+import { Wallet } from "./types";
+import { xBull } from "./xbull";
+import {
+  WalletConnect as WalletClient,
+  WalletConnectAllowedMethods,
+} from "./wallet-connect";
+import { NETWORK_PASSPHRASE } from "../constants";
 
 const initializeWalletConnect = async () => {
   const walletConnectInstance = new WalletClient({
@@ -11,7 +14,7 @@ const initializeWalletConnect = async () => {
     description: "Serving only the tastiest DeFi",
     url: "https://app.phoenix-hub.io",
     icons: [],
-    method: WalletConnectAllowedMethods.SIGN,
+    method: WalletConnectAllowedMethods.SIGN_AND_SUBMIT,
     network: NETWORK_PASSPHRASE,
   });
   console.log("Initialized Wallet Connect");

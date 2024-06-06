@@ -1,12 +1,13 @@
-import {Horizon} from "@stellar/stellar-sdk";
-import {AppStore, AppStorePersist} from "@phoenix-protocol/types";
-import {freighter} from "../wallet/freighter";
-import {allChains, networkToActiveChain} from "../wallet/chains";
-import {useAppStore, usePersistStore} from "../store";
-import {xbull} from "../wallet/xbull";
-import {lobstr} from "../wallet/lobstr";
-import {WalletConnect as WalletClient} from "@phoenix-protocol/utils";
-import {WalletConnectAllowedMethods} from "@phoenix-protocol/utils/build/wallets/wallet-connect";
+import { Horizon } from "@stellar/stellar-sdk";
+import { AppStore, AppStorePersist } from "@phoenix-protocol/types";
+import { freighter } from "../wallet/freighter";
+import { allChains, networkToActiveChain } from "../wallet/chains";
+import { useAppStore, usePersistStore } from "../store";
+import { xbull } from "../wallet/xbull";
+import { lobstr } from "../wallet/lobstr";
+import { WalletConnect as WalletClient } from "@phoenix-protocol/utils";
+import { WalletConnectAllowedMethods } from "@phoenix-protocol/utils/build/wallets/wallet-connect";
+import { NETWORK_PASSPHRASE } from "@phoenix-protocol/utils/build/constants";
 
 // Maintain a single WalletConnect instance
 let walletConnectInstance: WalletClient | null = null;
@@ -19,7 +20,7 @@ const initializeWalletConnect = async () => {
       description: "Serving only the tastiest DeFi",
       url: "https://app.phoenix-hub.io",
       icons: [],
-      method: WalletConnectAllowedMethods.SIGN,
+      method: WalletConnectAllowedMethods.SIGN_AND_SUBMIT,
       network: "stellar:pubnet",
     });
     console.log("Initialized Wallet Connect");
