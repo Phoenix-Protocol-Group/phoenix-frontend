@@ -48,13 +48,9 @@ const Featured = (props: FeaturedProps) => {
   React.useEffect(() => {
     const handleResize = () => {
       if (isMdUp) {
-        if (isLgUp) {
-          setEntryLength(5);
-        } else {
-          setEntryLength(4);
-        }
+        setEntryLength(5);
       } else {
-        setEntryLength(2);
+        setEntryLength(6);
       }
     };
 
@@ -116,7 +112,7 @@ const Featured = (props: FeaturedProps) => {
           </Box>
         )}
       </Box>
-      <Grid container spacing={1}>
+      <Grid container spacing={2}>
         {props.entries
           .slice(0, entryLength)
           .map((item: FeaturedCardProps, index: number) => (
@@ -126,7 +122,7 @@ const Featured = (props: FeaturedProps) => {
               {...(ready ? { timeout: index * 500 } : {})}
               unmountOnExit
             >
-              <Grid item xs={6} md={3} lg={12 / 5}>
+              <Grid item xs={6} md={12 / 5}>
                 <FeaturedCard {...item} />
               </Grid>
             </Fade>

@@ -23,13 +23,13 @@ const demoItem = {
 
 export const Primary: Story = {
   args: {
-    entries: [demoItem, demoItem, demoItem, demoItem, demoItem],
+    entries: [demoItem, demoItem, demoItem, demoItem, demoItem, demoItem],
   },
 };
 
 export const Slider: Story = {
   args: {
-    entries: [demoItem, demoItem, demoItem, demoItem, demoItem],
+    entries: [demoItem, demoItem, demoItem, demoItem, demoItem, demoItem],
     forwardClick: () => {},
     backwardClick: () => {}
   },
