@@ -1,9 +1,8 @@
-import { WalletConnectModal } from "@walletconnect/modal";
-import { SignClient } from "@walletconnect/sign-client";
-import { ISignClient } from "@walletconnect/types/dist/types/sign-client/client";
-import { SessionTypes } from "@walletconnect/types/dist/types/sign-client/session";
-import { Wallet } from "./types";
-import { NETWORK_PASSPHRASE } from "../constants";
+import {WalletConnectModal} from "@walletconnect/modal";
+import {SignClient} from "@walletconnect/sign-client";
+import {ISignClient} from "@walletconnect/types/dist/types/sign-client/client";
+import {SessionTypes} from "@walletconnect/types/dist/types/sign-client/session";
+import {Wallet} from "./types";
 
 const parseWalletConnectSession = (
   session: SessionTypes.Struct
@@ -122,7 +121,6 @@ export class WalletConnect implements Wallet {
           params: { xdr: tx },
         },
       })
-      .then((v: any) => v.signedXDR);
 
     return updatedXdr;
   }
