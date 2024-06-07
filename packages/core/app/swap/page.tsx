@@ -91,15 +91,6 @@ export default function SwapPage() {
       const result = await swapSigner.signTransaction(tx.built.toXDR());
       console.log(result)
 
-      if (result.getTransactionResponse?.status === "FAILED") {
-        setErrorModalOpen(true);
-
-        // @ts-ignore
-        setErrorDescription(tx?.resultXdr);
-
-        setTxBroadcasting(false);
-        return;
-      }
       setSuccessModalOpen(true);
     } catch (e: any) {
       setErrorModalOpen(true);
