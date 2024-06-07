@@ -16,6 +16,7 @@ import {
   fetchTokenPrices,
   findBestPath,
   resolveContractError,
+  WalletConnect,
 } from "@phoenix-protocol/utils";
 import {LoadingSwap, SwapError, SwapSuccess} from "@/components/Modal/Modal";
 import {Box} from "@mui/material";
@@ -68,7 +69,7 @@ export default function SwapPage() {
   const doSwap = async () => {
     setTxBroadcasting(true);
     try {
-      const swapSigner = appStore.walletConnectInstance;
+      const swapSigner: WalletConnect = appStore.walletConnectInstance;
 
       // Create contract instance
       const contract = new PhoenixMultihopContract.Client({
@@ -87,7 +88,7 @@ export default function SwapPage() {
         max_spread_bps: BigInt(maxSpread * 100),
       });
 
-      const result = await swapSigner.signTransaction(tx.resultXdr);
+      const result = await swapSigner.signTransaction(tx.built.toXDR());
       console.log(result)
 
       if (result.getTransactionResponse?.status === "FAILED") {
