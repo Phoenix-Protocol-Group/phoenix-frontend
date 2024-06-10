@@ -66,12 +66,11 @@ const NftCategories = (props: GettingStartedProps) => {
         </Box>
       </Box>
       <Grid container spacing={2}>
-        {props.entries
-          .map((item: GettingStartedCardProps, index: number) => (
-            <Grid item xs={12} md={4}>
-              <GettingStartedCard {...item} />
-            </Grid>
-          ))}
+        {props.entries.map((item: GettingStartedCardProps, index: number) => (
+          <Grid item xs={12} md={4}>
+            <GettingStartedCard {...item} />
+          </Grid>
+        ))}
       </Grid>
     </Box>
   );

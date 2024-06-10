@@ -6,7 +6,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { ArrowForward, ArrowBack, ArrowRightAlt } from "@mui/icons-material";
+import {ArrowForward, ArrowBack, ArrowRightAlt} from "@mui/icons-material";
 import React from "react";
 import PopularNftsCard from "./PopularNftsCard";
 
@@ -163,7 +163,7 @@ const PopularNfts = (props: FeaturedProps) => {
             mr={0.5}
             sx={
               props.activeTime === "6h"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                ? {...tabUnselectedStyles, ...tabSelectedStyles}
                 : tabUnselectedStyles
             }
             onClick={() => props.setActiveTime("6h")}
@@ -174,7 +174,7 @@ const PopularNfts = (props: FeaturedProps) => {
             mr={0.5}
             sx={
               props.activeTime === "1d"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                ? {...tabUnselectedStyles, ...tabSelectedStyles}
                 : tabUnselectedStyles
             }
             onClick={() => props.setActiveTime("1d")}
@@ -185,7 +185,7 @@ const PopularNfts = (props: FeaturedProps) => {
             mr={0.5}
             sx={
               props.activeTime === "7d"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                ? {...tabUnselectedStyles, ...tabSelectedStyles}
                 : tabUnselectedStyles
             }
             onClick={() => props.setActiveTime("7d")}
@@ -196,7 +196,7 @@ const PopularNfts = (props: FeaturedProps) => {
             mr={2}
             sx={
               props.activeTime === "30d"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                ? {...tabUnselectedStyles, ...tabSelectedStyles}
                 : tabUnselectedStyles
             }
             onClick={() => props.setActiveTime("30d")}
@@ -230,7 +230,7 @@ const PopularNfts = (props: FeaturedProps) => {
             <Box mr={0.5} whiteSpace="nowrap">
               View All
             </Box>
-            <ArrowRightAlt sx={{ fontSize: "16px" }} />
+            <ArrowRightAlt sx={{fontSize: "16px"}}/>
           </Box>
           {props.backwardClick && props.forwardClick && (
             <Box sx={{
@@ -269,7 +269,7 @@ const PopularNfts = (props: FeaturedProps) => {
             <Fade
               key={index}
               in={ready}
-              {...(ready ? { timeout: index * 500 } : {})}
+              {...(ready ? {timeout: index * 500} : {})}
               unmountOnExit
             >
               <Grid item xs={6} md={12 / 5}>
