@@ -17,6 +17,10 @@ const ImageUpload = (props: ImageUploadProps) => {
   const textStyle = {
     fontSize: "14px",
     lineHeight: "24px",
+    textAlign: {
+      xs: "center",
+      md: "unset",
+    },
   };
 
   const handleDragOver = (event: any) => {
@@ -33,9 +37,20 @@ const ImageUpload = (props: ImageUploadProps) => {
     setIsDragging(false);
 
     if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-      props.onFileDrop(event.dataTransfer.files);
+      props.onFileDrop(event.dataTransfer.files[0]);
       event.dataTransfer.clearData();
     }
+  };
+
+  const handleClick = () => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.onchange = (event: any) => {
+      if (event.target.files && event.target.files.length > 0) {
+        props.onFileDrop(event.target.files[0]);
+      }
+    };
+    fileInput.click();
   };
 
   return (
@@ -67,6 +82,7 @@ const ImageUpload = (props: ImageUploadProps) => {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onClick={handleClick}
         sx={{
           border: "1.5px solid #2C2C31",
           position: "relative",
@@ -75,6 +91,18 @@ const ImageUpload = (props: ImageUploadProps) => {
           display: "flex",
           boxShadow: "0px 6px 12px 0px #00000040 inset",
           overflow: "hidden",
+          cursor: "pointer",
+          flexDirection: {
+            xs: "column",
+            md: "row",
+          },
+          alignItems: {
+            xs: "center",
+            md: "unset",
+          },
+          "&:hover": {
+            border: "1.5px solid #E2621B",
+          },
           "&:after": {
             content: "' '",
             position: "absolute",
@@ -90,7 +118,14 @@ const ImageUpload = (props: ImageUploadProps) => {
       >
         <Box
           sx={{
-            mr: 3,
+            mr: {
+              xs: 0,
+              md: 3,
+            },
+            mb: {
+              xs: 2,
+              md: 0,
+            },
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -99,10 +134,12 @@ const ImageUpload = (props: ImageUploadProps) => {
             border: "1px solid #2C2C31",
             borderRadius: "16px",
             height: {
-              xs: "88px",
+              xs: "64px",
+              md: "88px",
             },
             width: {
-              xs: "88px",
+              xs: "64px",
+              md: "88px",
             },
           }}
         >
@@ -127,6 +164,10 @@ const ImageUpload = (props: ImageUploadProps) => {
               fontSize: "18px",
               fontWeight: 700,
               lineHeight: "21px",
+              textAlign: {
+                xs: "center",
+                md: "unset",
+              },
             }}
           >
             Drag and drop or click to upload
