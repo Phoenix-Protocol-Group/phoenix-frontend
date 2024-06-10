@@ -3,7 +3,7 @@ import PopularNfts from "./PopularNfts";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof PopularNfts> = {
-  title: "Marketplace/PopularNfts",
+  title: "Marketplace/Frontpage/PopularNfts",
   // @ts-ignore
   component: PopularNfts,
 };

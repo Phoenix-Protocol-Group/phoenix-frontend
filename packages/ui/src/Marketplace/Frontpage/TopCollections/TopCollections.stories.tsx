@@ -3,7 +3,7 @@ import TopCollections from "./TopCollections";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof TopCollections> = {
-  title: "Marketplace/TopCollections",
+  title: "Marketplace/Frontpage/TopCollections",
   // @ts-ignore
   component: TopCollections,
 };

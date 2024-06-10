@@ -3,7 +3,7 @@ import Featured from "./Featured";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof Featured> = {
-  title: "Marketplace/Featured",
+  title: "Marketplace/Frontpage/Featured",
   // @ts-ignore
   component: Featured,
 };

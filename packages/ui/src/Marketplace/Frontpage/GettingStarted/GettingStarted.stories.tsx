@@ -3,7 +3,7 @@ import GettingStarted from "./GettingStarted";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof GettingStarted> = {
-  title: "Marketplace/GettingStarted",
+  title: "Marketplace/Frontpage/GettingStarted",
   // @ts-ignore
   component: GettingStarted,
 };

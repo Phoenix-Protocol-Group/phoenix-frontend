@@ -3,7 +3,7 @@ import RisingStars from "./RisingStars";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof RisingStars> = {
-  title: "Marketplace/RisingStars",
+  title: "Marketplace/Frontpage/RisingStars",
   // @ts-ignore
   component: RisingStars,
 };

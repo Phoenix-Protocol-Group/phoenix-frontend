@@ -3,7 +3,7 @@ import NftCategories from "./NftCategories";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof NftCategories> = {
-  title: "Marketplace/NftCategories",
+  title: "Marketplace/Frontpage/NftCategories",
   // @ts-ignore
   component: NftCategories,
 };
