@@ -1,9 +1,11 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 export interface ImageUploadProps {
   title: string;
+  helpText?: string;
   onFileDrop: (file: File) => void;
   description1: string;
   description2?: string;
@@ -46,7 +48,20 @@ const ImageUpload = (props: ImageUploadProps) => {
           color: "#BFBFBF",
         }}
       >
-        {props.title}
+        {props.title}{" "}
+        {props.helpText && (
+          <Tooltip title={props.helpText}>
+            <HelpOutlineIcon
+              sx={{
+                ml: 2,
+                fontSize: "16px",
+                position: "relative",
+                top: 3,
+                "&:hover": { color: "#FFF" },
+              }}
+            />
+          </Tooltip>
+        )}
       </Typography>
       <Box
         onDragOver={handleDragOver}

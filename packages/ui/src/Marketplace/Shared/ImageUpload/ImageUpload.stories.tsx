@@ -17,6 +17,7 @@ type Story = StoryObj<typeof ImageUpload>;
 export const Primary: Story = {
   args: {
     title: "LOGO IMAGE",
+    helpText: "Lorem ipsum dolor sit amet",
     onFileDrop: (file: File) => {
       console.log(file);
     },
