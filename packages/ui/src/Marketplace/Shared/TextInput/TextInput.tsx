@@ -37,10 +37,8 @@ const TextInput = (props: TextInputProps) => {
         )}
       </Typography>
       <TextField
-        id="search"
-        type="search"
         value={props.value}
-        placeholder="Search"
+        placeholder={props.placeholder}
         sx={{
           color: "white",
           width: "100%",
