@@ -1,0 +1,36 @@
+import { Box, Typography } from "@mui/material";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
+
+export interface BackButtonProps {
+  onClick: () => void;
+}
+
+const BackButton = (props: BackButtonProps) => {
+  return (
+    <Box
+      onClick={props.onClick}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        cursor: "pointer",
+        "&:hover .backButton-label": {
+          textDecoration: "underline",
+        },
+      }}
+    >
+      <KeyboardBackspaceIcon sx={{ fontSize: "24px", mr: 1 }} />
+      <Typography
+        className="backButton-label"
+        sx={{
+          fontSize: "16px",
+          fontWeight: 700,
+          lineHeight: "24px",
+        }}
+      >
+        Back
+      </Typography>
+    </Box>
+  );
+};
+
+export default BackButton;
