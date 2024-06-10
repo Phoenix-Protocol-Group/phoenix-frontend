@@ -1,4 +1,4 @@
-import { TextField, Tooltip, Typography } from "@mui/material";
+import { Tooltip, TextField, Typography } from "@mui/material";
 import React from "react";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
@@ -39,6 +39,8 @@ const TextInput = (props: TextInputProps) => {
       <TextField
         value={props.value}
         placeholder={props.placeholder}
+        rows={5}
+        multiline={true}
         sx={{
           color: "white",
           width: "100%",
@@ -47,7 +49,7 @@ const TextInput = (props: TextInputProps) => {
             color: "white",
             opacity: 0.4,
           },
-          "& .MuiInputBase-input": {
+          "& .MuiInputBase-multiline": {
             padding: "14px 8px 14px 16px !important",
           },
         }}

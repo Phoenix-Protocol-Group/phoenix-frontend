@@ -53,7 +53,7 @@ const ImageUpload = (props: ImageUploadProps) => {
           <Tooltip title={props.helpText}>
             <HelpOutlineIcon
               sx={{
-                ml: 2,
+                ml: 1,
                 fontSize: "16px",
                 position: "relative",
                 top: 3,
