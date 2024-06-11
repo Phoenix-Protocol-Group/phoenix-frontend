@@ -101,7 +101,7 @@ const ImageUpload = (props: ImageUploadProps) => {
             md: "unset",
           },
           "&:hover": {
-            border: "1.5px solid #E2621B",
+            border: "1px solid rgba(226, 98, 27, 0.6)",
           },
           "&:after": {
             content: "' '",

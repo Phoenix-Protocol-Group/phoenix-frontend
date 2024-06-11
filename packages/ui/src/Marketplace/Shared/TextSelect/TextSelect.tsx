@@ -61,7 +61,9 @@ const TextSelect = (props: TextSelectProps) => {
           onChange={(e) => props.onChange(e.target.value)}
           displayEmpty
           inputProps={{ "aria-label": "Without label" }}
-          sx={{ borderRadius: "16px", opacity: 0.4, fontSize: "14px" }}
+          sx={{ borderRadius: "16px", opacity: 0.6, fontSize: "14px", "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#E2621B !important"
+          } }}
         >
           {props.items.map((item: TextSelectItemProps, index: number) => (
             <MenuItem key={index} value={item.value}>
