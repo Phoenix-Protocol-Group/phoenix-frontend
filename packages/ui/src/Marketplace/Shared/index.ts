@@ -4,6 +4,7 @@ import ImageUpload from "./ImageUpload/ImageUpload";
 import TextInput from "./TextInput/TextInput";
 import TextArea from "./TextArea/TextArea";
 import TextSelect from "./TextSelect/TextSelect";
+import Preview from "./Preview/Preview";
 
 export {
   BackButton,
@@ -12,4 +13,5 @@ export {
   TextInput,
   TextArea,
   TextSelect,
+  Preview,
 };
