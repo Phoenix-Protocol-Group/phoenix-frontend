@@ -1,6 +1,6 @@
 import { Box, Grid, Typography } from "@mui/material";
 
-export interface PreviewProps {
+export interface NftPreviewProps {
   image: string;
   collectionName: string;
   nftName: string;
@@ -8,7 +8,7 @@ export interface PreviewProps {
   ownedBy: string;
 }
 
-const Preview = (props: PreviewProps) => {
+const NftPreview = (props: NftPreviewProps) => {
   return (
     <Box
       sx={{
@@ -136,4 +136,4 @@ const Preview = (props: PreviewProps) => {
   );
 };
 
-export default Preview;
+export default NftPreview;

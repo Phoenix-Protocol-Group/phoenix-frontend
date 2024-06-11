@@ -4,7 +4,8 @@ import ImageUpload from "./ImageUpload/ImageUpload";
 import TextInput from "./TextInput/TextInput";
 import TextArea from "./TextArea/TextArea";
 import TextSelect from "./TextSelect/TextSelect";
-import Preview from "./Preview/Preview";
+import NftPreview from "./NftPreview/NftPreview";
+import CollectionPreview from "./CollectionPreview/CollectionPreview";
 
 export {
   BackButton,
@@ -13,5 +14,6 @@ export {
   TextInput,
   TextArea,
   TextSelect,
-  Preview,
+  NftPreview,
+  CollectionPreview,
 };
