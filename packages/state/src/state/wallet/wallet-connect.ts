@@ -1,7 +1,7 @@
-import { Connector, NetworkDetails } from "@phoenix-protocol/types";
-import { WalletConnect as WalletClient } from "@phoenix-protocol/utils";
-import { WalletConnectAllowedMethods } from "@phoenix-protocol/utils/build/wallets/wallet-connect";
-import { NETWORK_PASSPHRASE } from "@phoenix-protocol/utils/build/constants";
+import {Connector, NetworkDetails} from "@phoenix-protocol/types";
+import {WalletConnect as WalletClient} from "@phoenix-protocol/utils";
+import {WalletConnectAllowedMethods} from "@phoenix-protocol/utils/build/wallets/wallet-connect";
+import {NETWORK_PASSPHRASE} from "@phoenix-protocol/utils/build/constants";
 
 export function WalletConnect(): Connector {
   return {
@@ -32,7 +32,7 @@ export function WalletConnect(): Connector {
         name: "Phoenix DeFi Hub",
         description: "Serving only the tastiest DeFi",
         url: "https://app.phoenix-hub.io",
-        icons: [],
+        icons: ["https://app.phoenix-hub.io/logoIcon.png"],
         method: WalletConnectAllowedMethods.SIGN_AND_SUBMIT,
         network: "stellar:pubnet",
       });
@@ -52,7 +52,7 @@ export function WalletConnect(): Connector {
         name: "Phoenix DeFi Hub",
         description: "Serving only the tastiest DeFi",
         url: "https://app.phoenix-hub.io",
-        icons: [],
+        icons: ["https://app.phoenix-hub.io/logoIcon.png"],
         method: WalletConnectAllowedMethods.SIGN_AND_SUBMIT,
         network: NETWORK_PASSPHRASE,
       });
