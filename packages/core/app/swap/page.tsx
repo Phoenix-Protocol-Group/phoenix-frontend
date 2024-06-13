@@ -70,6 +70,7 @@ export default function SwapPage() {
     setTxBroadcasting(true);
     try {
       const swapSigner: WalletConnect = appStore.walletConnectInstance;
+      console.log(swapSigner)
 
       // Create contract instance
       const contract = new PhoenixMultihopContract.Client({
@@ -89,7 +90,7 @@ export default function SwapPage() {
       });
 
       const result = await swapSigner.signTransaction(tx.built.toXDR());
-      console.log(result)
+      console.log(tx.result)
 
       setSuccessModalOpen(true);
     } catch (e: any) {

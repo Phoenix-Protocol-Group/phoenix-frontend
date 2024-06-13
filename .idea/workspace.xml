@@ -4,7 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4e4788e-0992-4eba-bad6-62c4e7bddfcf" name="Changes" comment="Connect wallet" />
+    <list default="true" id="d4e4788e-0992-4eba-bad6-62c4e7bddfcf" name="Changes" comment="Attempt to fix android signing">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.yarn/install-state.gz" beforeDir="false" afterPath="$PROJECT_DIR$/.yarn/install-state.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/core/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/packages/core/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/core/app/swap/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/core/app/swap/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/core/components/TopBar/TopBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/core/components/TopBar/TopBar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/core/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/core/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/state/src/state/persist/createConnectWalletActions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/persist/createConnectWalletActions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/state/src/state/wallet/freighter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/wallet/freighter.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/state/src/state/wallet/lobstr.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/wallet/lobstr.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/state/src/state/wallet/wallet-connect.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/wallet/wallet-connect.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/state/src/state/wallet/xbull.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/wallet/xbull.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/types/src/state/wallet.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/types/src/state/wallet.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -44,27 +58,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "add-walletconnect",
-    "js.linters.configure.manually.selectedeslint": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.standard": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.standard": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "yarn",
-    "npm.core > install pino-pretty.executor": "Run",
-    "npm.phoenix-frontend > install @walletconnect/modal.executor": "Run",
-    "prettierjs.PrettierConfiguration.Package": "/Users/milan/workspace/phoenix/phoenix-frontend/node_modules/prettier",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "/Users/milan/workspace/phoenix/phoenix-frontend/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;add-walletconnect&quot;,
+    &quot;js.linters.configure.manually.selectedeslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
+    &quot;npm.core &gt; install pino-pretty.executor&quot;: &quot;Run&quot;,
+    &quot;npm.phoenix-frontend &gt; install @walletconnect/modal.executor&quot;: &quot;Run&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/Users/milan/workspace/phoenix/phoenix-frontend/node_modules/prettier&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/milan/workspace/phoenix/phoenix-frontend/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ReactDesignerToolWindowState">
     <option name="myId2Visible">
       <map>
@@ -111,6 +125,8 @@
       <workItem from="1717585918726" duration="368000" />
       <workItem from="1717588378791" duration="610000" />
       <workItem from="1717673612909" duration="8576000" />
+      <workItem from="1718209855935" duration="77000" />
+      <workItem from="1718268552822" duration="7808000" />
     </task>
     <task id="LOCAL-00001" summary="Upgrade to js sdk 12 rc3">
       <option name="closed" value="true" />
@@ -328,7 +344,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717680634690</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Attempt to fix android signing">
+      <option name="closed" value="true" />
+      <created>1718194314471</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1718194314471</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -373,7 +397,8 @@
     <MESSAGE value="Add PHO Token price chart" />
     <MESSAGE value="Add more PHO Token datasets from the past" />
     <MESSAGE value="Connect wallet" />
-    <option name="LAST_COMMIT_MESSAGE" value="Connect wallet" />
+    <MESSAGE value="Attempt to fix android signing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Attempt to fix android signing" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />

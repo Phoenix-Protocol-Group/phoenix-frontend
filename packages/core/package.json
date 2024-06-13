@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:experimental": "next dev --experimental-https",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -18,7 +19,7 @@
     "eslint": "8.45.0",
     "eslint-config-next": "13.4.10",
     "moment-timezone": "^0.5.45",
-    "next": "13.4.10",
+    "next": "13.5.1",
     "pino-pretty": "^11.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

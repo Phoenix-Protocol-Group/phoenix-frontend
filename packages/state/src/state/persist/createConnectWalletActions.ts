@@ -5,23 +5,14 @@ import {allChains, networkToActiveChain} from "../wallet/chains";
 import {useAppStore, usePersistStore} from "../store";
 import {xbull} from "../wallet/xbull";
 import {lobstr} from "../wallet/lobstr";
-import {WalletConnect as WalletClient} from "@phoenix-protocol/utils";
-import {WalletConnectAllowedMethods} from "@phoenix-protocol/utils/build/wallets/wallet-connect";
+import {WalletConnect} from "../wallet/wallet-connect";
 
 // Maintain a single WalletConnect instance
-let walletConnectInstance: WalletClient | null = null;
+let walletConnectInstance: WalletConnect | null = null;
 
 const initializeWalletConnect = async () => {
   if (!walletConnectInstance) {
-    walletConnectInstance = new WalletClient({
-      projectId: "1cca500fbafdda38a70f8bf3bcb91b15",
-      name: "Phoenix DeFi Hub",
-      description: "Serving only the tastiest DeFi",
-      url: "https://app.phoenix-hub.io",
-      icons: ["https://app.phoenix-hub.io/logoIcon.png"],
-      method: WalletConnectAllowedMethods.SIGN_AND_SUBMIT,
-      network: "stellar:pubnet",
-    });
+    walletConnectInstance = new WalletConnect();
     console.log("Initialized Wallet Connect");
   }
 

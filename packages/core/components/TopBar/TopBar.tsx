@@ -1,15 +1,8 @@
 "use client";
-import { NoSsr } from "@mui/material";
-import {
-  freighter,
-  lobstr,
-  useAppStore,
-  usePersistStore,
-  WalletConnect,
-  xbull,
-} from "@phoenix-protocol/state";
-import { AppBar, ConnectWallet } from "@phoenix-protocol/ui";
-import React, { useEffect } from "react";
+import {NoSsr} from "@mui/material";
+import {freighter, lobstr, useAppStore, usePersistStore, WalletConnect, xbull,} from "@phoenix-protocol/state";
+import {AppBar, ConnectWallet} from "@phoenix-protocol/ui";
+import React, {useEffect} from "react";
 
 const TopBar = ({
   navOpen,
@@ -75,7 +68,7 @@ const TopBar = ({
       <ConnectWallet
         open={store.walletModalOpen}
         // @ts-ignore
-        connectors={[freighter(), xbull(), lobstr(), WalletConnect()]}
+        connectors={[freighter(), xbull(), lobstr(), new WalletConnect(true)]}
         setOpen={() => store.setWalletModalOpen(!store.walletModalOpen)}
         connect={connect}
       />
