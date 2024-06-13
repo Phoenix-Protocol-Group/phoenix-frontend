@@ -38,7 +38,8 @@ export class WalletConnect implements Connector {
   }
 
   async isConnected(): Promise<boolean> {
-    return !!(await this.getPublicKey());
+    console.log(this.client)
+    return !!this.client;
   }
 
   async getNetworkDetails(): Promise<NetworkDetails> {

@@ -16,9 +16,17 @@ const initializeWalletConnect = async () => {
     console.log("Initialized Wallet Connect");
   }
 
-  while (!(await walletConnectInstance.isConnected())) {
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  let publicKey: string | null = null;
+
+  while (!publicKey) {
+    try {
+      publicKey = await walletConnectInstance.getPublicKey();
+    } catch (error) {
+      console.log("Waiting for wallet to connect...");
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
   }
+
   console.log("Wallet connected", walletConnectInstance);
 
   // Save the walletConnectInstance in the regular app state

@@ -6,18 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="d4e4788e-0992-4eba-bad6-62c4e7bddfcf" name="Changes" comment="Attempt to fix android signing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.yarn/install-state.gz" beforeDir="false" afterPath="$PROJECT_DIR$/.yarn/install-state.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/core/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/packages/core/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/core/app/swap/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/core/app/swap/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/core/components/TopBar/TopBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/core/components/TopBar/TopBar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/core/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/core/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/state/src/state/persist/createConnectWalletActions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/persist/createConnectWalletActions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/state/src/state/wallet/freighter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/wallet/freighter.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/state/src/state/wallet/lobstr.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/wallet/lobstr.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/state/src/state/wallet/wallet-connect.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/wallet/wallet-connect.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/state/src/state/wallet/xbull.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/wallet/xbull.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/types/src/state/wallet.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/types/src/state/wallet.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +116,7 @@
       <workItem from="1717588378791" duration="610000" />
       <workItem from="1717673612909" duration="8576000" />
       <workItem from="1718209855935" duration="77000" />
-      <workItem from="1718268552822" duration="7808000" />
+      <workItem from="1718268552822" duration="9516000" />
     </task>
     <task id="LOCAL-00001" summary="Upgrade to js sdk 12 rc3">
       <option name="closed" value="true" />
@@ -352,7 +342,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718194314471</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Attempt to fix android signing">
+      <option name="closed" value="true" />
+      <created>1718280730223</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1718280730223</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
