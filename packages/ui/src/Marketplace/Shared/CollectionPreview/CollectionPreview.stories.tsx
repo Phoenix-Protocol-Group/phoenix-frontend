@@ -18,9 +18,8 @@ export const Primary: Story = {
   args: {
     image: "/nftPreview.png",
     collectionName: "Collection Name",
-    nftName: "NFT Name",
-    price: "0.00",
-    ownedBy: "You"
+    floorPrice: "0.00",
+    volume: "10000"
   },
   parameters: {
     layout: "centered"
