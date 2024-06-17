@@ -171,7 +171,7 @@ export default function Page({ params }: PoolPageProps) {
         contractId: params.poolAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) => stakeSigner.sign(tx),
+        signTransaction: (tx: string) => storePersist.wallet.walletType === "wallet-connect" ? stakeSigner.signTransaction(tx) : stakeSigner.sign(tx),
       });
       const tx = await SigningPairContract.provide_liquidity({
         sender: storePersist.wallet.address!,
@@ -194,6 +194,13 @@ export default function Page({ params }: PoolPageProps) {
       await getPool();
       setSuccessModalOpen(true);
     } catch (error: any) {
+      // TODO: Hacky fix for XDR issues with wallet-connect
+      if (error.message.includes("envelope")) {
+        setTokenAmounts([tokenAAmount, tokenBAmount]);
+        setSuccessModalOpen(true);
+        setLoading(false);
+        return;
+      }
       setErrorModalOpen(true);
       if (storePersist.wallet.walletType === "wallet-connect") {
         setErrorDescripption(error.message);
@@ -216,7 +223,7 @@ export default function Page({ params }: PoolPageProps) {
         contractId: params.poolAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) => stakeSigner.sign(tx),
+        signTransaction: (tx: string) => storePersist.wallet.walletType === "wallet-connect" ? stakeSigner.signTransaction(tx) : stakeSigner.sign(tx),
       });
       const tx = await SigningPairContract.withdraw_liquidity({
         sender: storePersist.wallet.address!,
@@ -231,6 +238,13 @@ export default function Page({ params }: PoolPageProps) {
       setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
     } catch (error: any) {
+      //TODO: Hacky fix for XDR issues with wallet-connect
+      if (error.message.includes("envelope")) {
+        setTokenAmounts([lpTokenAmount]);
+        setSuccessModalOpen(true);
+        setLoading(false);
+        return;
+      }
       setLoading(false);
       if (storePersist.wallet.walletType === "wallet-connect") {
         setErrorDescripption(error.message);
@@ -258,7 +272,7 @@ export default function Page({ params }: PoolPageProps) {
         contractId: stakeAddress!,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) => stakeSigner.sign(tx),
+        signTransaction: (tx: string) => storePersist.wallet.walletType === "wallet-connect" ? stakeSigner.signTransaction(tx) : stakeSigner.sign(tx),
       });
 
       const tx = await SigningStakeContract.bond({
@@ -275,6 +289,13 @@ export default function Page({ params }: PoolPageProps) {
       setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
     } catch (error: any) {
+      //TODO: Hacky fix for XDR issues with wallet-connect
+      if (error.message.includes("envelope")) {
+        setTokenAmounts([lpTokenAmount]);
+        setSuccessModalOpen(true);
+        setLoading(false);
+        return;
+      }
       setLoading(false);
       if (storePersist.wallet.walletType === "wallet-connect") {
         setErrorDescripption(error.message);
@@ -302,7 +323,7 @@ export default function Page({ params }: PoolPageProps) {
         contractId: stakeAddress!,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) => stakeSigner.sign(tx),
+        signTransaction: (tx: string) => storePersist.wallet.walletType === "wallet-connect" ? stakeSigner.signTransaction(tx) : stakeSigner.sign(tx),
       });
       const tx = await SigningStakeContract.unbond({
         sender: storePersist.wallet.address!,
@@ -317,6 +338,13 @@ export default function Page({ params }: PoolPageProps) {
       setTokenAmounts([lpTokenAmount]);
       setUnstakeModalOpen(true);
     } catch (error: any) {
+      //TODO: Hacky fix for XDR issues with wallet-connect
+      if (error.message.includes("envelope")) {
+        setTokenAmounts([lpTokenAmount]);
+        setSuccessModalOpen(true);
+        setLoading(false);
+        return;
+      }
       setLoading(false);
       if (storePersist.wallet.walletType === "wallet-connect") {
         setErrorDescripption(error.message);

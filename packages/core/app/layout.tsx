@@ -1,17 +1,17 @@
 "use client";
 
-import React, { ReactNode, useEffect, useState } from "react";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import React, {ReactNode, useEffect, useState} from "react";
+import {Box, useMediaQuery, useTheme} from "@mui/material";
 import Providers from "../providers";
 import TopBar from "@/components/TopBar/TopBar";
 import SideNav from "@/components/SideNav/SideNav";
-import { usePathname, useRouter } from "next/navigation";
-import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
-import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
+import {usePathname, useRouter} from "next/navigation";
+import Joyride, {ACTIONS, EVENTS, STATUS} from "react-joyride";
+import {useAppStore, usePersistStore} from "@phoenix-protocol/state";
 import JoyRideTooltip from "@/components/JoyRideTooltip";
-import { joyride } from "@phoenix-protocol/utils";
-import { DisclaimerModal, TourModal } from "@phoenix-protocol/ui";
-import { Analytics } from "@vercel/analytics/react";
+import {joyride} from "@phoenix-protocol/utils";
+import {DisclaimerModal, TourModal} from "@phoenix-protocol/ui";
+import {Analytics} from "@vercel/analytics/react";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   // Use theme for responsive design
@@ -100,6 +100,20 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     setNavOpen(largerThenMd);
   }, [largerThenMd]);
+
+
+  // Use effect hook to prune the persist store on page load, when it is wallet-connect
+  // @todo: This should be moved to a more appropriate place and we need to keep sessions on reload on a long term
+  useEffect(() => {
+    const appStorageValue = localStorage?.getItem("app-storage");
+    if (appStorageValue !== null) {
+      const parsedValue = JSON.parse(appStorageValue);
+      const walletType = parsedValue?.state?.wallet?.walletType;
+      if (walletType === "wallet-connect") {
+        persistStore.disconnectWallet();
+      }
+    }
+  }, []);
 
   // Use effect hook to delay the joyride until the page has loaded and avoid hydration issues
   // Also we check the local storage to see if the user has already completed the tour

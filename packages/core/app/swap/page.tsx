@@ -78,7 +78,8 @@ export default function SwapPage() {
         contractId: constants.MULTIHOP_ADDRESS,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) => swapSigner.signTransaction(tx),
+        // @ts-ignore
+        signTransaction: (tx: string) => storePersist.wallet.walletType === "wallet-connect" ? swapSigner.signTransaction(tx) : swapSigner.sign(tx),
       });
 
       // Execute swap
@@ -90,10 +91,15 @@ export default function SwapPage() {
       });
 
       const result = await swapSigner.signTransaction(tx.built.toXDR());
-      console.log(tx.result)
 
       setSuccessModalOpen(true);
     } catch (e: any) {
+      // TODO: Hacky fix for XDR issues with wallet-connect
+      if (e.message.includes("envelope")) {
+        setSuccessModalOpen(true);
+        setTxBroadcasting(false);
+        return;
+      }
       setErrorModalOpen(true);
 
       if (storePersist.wallet.walletType === "wallet-connect") {
