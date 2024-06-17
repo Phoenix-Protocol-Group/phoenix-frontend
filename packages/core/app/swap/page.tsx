@@ -16,6 +16,7 @@ import {
   fetchTokenPrices,
   findBestPath,
   resolveContractError,
+  Signer,
   WalletConnect,
 } from "@phoenix-protocol/utils";
 import {LoadingSwap, SwapError, SwapSuccess} from "@/components/Modal/Modal";
@@ -69,8 +70,7 @@ export default function SwapPage() {
   const doSwap = async () => {
     setTxBroadcasting(true);
     try {
-      const swapSigner: WalletConnect = appStore.walletConnectInstance;
-      console.log(swapSigner)
+      const swapSigner: WalletConnect = storePersist.wallet.walletType === "wallet-connect" ? appStore.walletConnectInstance : new Signer();
 
       // Create contract instance
       const contract = new PhoenixMultihopContract.Client({
@@ -96,17 +96,20 @@ export default function SwapPage() {
     } catch (e: any) {
       setErrorModalOpen(true);
 
-      console.error(e);
+      if (storePersist.wallet.walletType === "wallet-connect") {
+        setErrorDescription(e.message);
+      } else {
 
-      // @ts-ignore
-      setErrorDescription(
-        typeof e === "string"
-          ? e
-          : e.message.includes("request denied")
-          ? e.message
-          : resolveContractError(e.message)
-      );
-      setTxBroadcasting(false);
+        // @ts-ignore
+        setErrorDescription(
+            typeof e === "string"
+                ? e
+                : e.message.includes("request denied")
+                    ? e.message
+                    : resolveContractError(e.message)
+        );
+        setTxBroadcasting(false);
+      }
     }
     setTxBroadcasting(false);
   };

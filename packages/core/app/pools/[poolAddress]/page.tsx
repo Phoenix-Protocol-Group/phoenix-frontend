@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import * as refuse from "react-usestateref";
-import { Box, GlobalStyles, Grid, Skeleton, Typography } from "@mui/material";
+import {Box, GlobalStyles, Grid, Skeleton, Typography} from "@mui/material";
 import {
   LiquidityMining,
   PoolLiquidity,
@@ -10,14 +10,8 @@ import {
   Skeleton as PhoenixSkeleton,
   StakingList,
 } from "@phoenix-protocol/ui";
-import { Token } from "@phoenix-protocol/types";
-import {
-  Loading,
-  PoolError,
-  PoolSuccess,
-  StakeSuccess,
-  UnstakeSuccess,
-} from "../../../components/Modal/Modal";
+import {Token} from "@phoenix-protocol/types";
+import {Loading, PoolError, PoolSuccess, StakeSuccess, UnstakeSuccess,} from "../../../components/Modal/Modal";
 
 import {
   constants,
@@ -28,14 +22,10 @@ import {
   time,
 } from "@phoenix-protocol/utils";
 
-import {
-  fetchPho,
-  PhoenixPairContract,
-  PhoenixStakeContract,
-} from "@phoenix-protocol/contracts";
-import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
+import {fetchPho, PhoenixPairContract, PhoenixStakeContract,} from "@phoenix-protocol/contracts";
+import {useAppStore, usePersistStore} from "@phoenix-protocol/state";
 import Link from "next/link";
-import { Helmet } from "react-helmet";
+import {Helmet} from "react-helmet";
 
 interface Entry {
   icon: string;
@@ -174,7 +164,8 @@ export default function Page({ params }: PoolPageProps) {
   ) => {
     try {
       setLoading(true);
-      const stakeSigner = new Signer();
+      const stakeSigner = storePersist.wallet.walletType === "wallet-connect" ? store.walletConnectInstance : new Signer();
+
       const SigningPairContract = new PhoenixPairContract.Client({
         publicKey: storePersist.wallet.address!,
         contractId: params.poolAddress,
@@ -204,8 +195,11 @@ export default function Page({ params }: PoolPageProps) {
       setSuccessModalOpen(true);
     } catch (error: any) {
       setErrorModalOpen(true);
-
-      setErrorDescripption(resolveContractError(JSON.stringify(error.message)));
+      if (storePersist.wallet.walletType === "wallet-connect") {
+        setErrorDescripption(error.message);
+      } else {
+        setErrorDescripption(resolveContractError(JSON.stringify(error.message)));
+      }
       setLoading(false);
       console.error(error);
     }
@@ -215,7 +209,8 @@ export default function Page({ params }: PoolPageProps) {
   const removeLiquidity = async (lpTokenAmount: number) => {
     try {
       setLoading(true);
-      const stakeSigner = new Signer();
+      const stakeSigner = storePersist.wallet.walletType === "wallet-connect" ? store.walletConnectInstance : new Signer();
+
       const SigningPairContract = new PhoenixPairContract.Client({
         publicKey: storePersist.wallet.address!,
         contractId: params.poolAddress,
@@ -237,7 +232,11 @@ export default function Page({ params }: PoolPageProps) {
       setStakeModalOpen(true);
     } catch (error: any) {
       setLoading(false);
-      setErrorDescripption(error);
+      if (storePersist.wallet.walletType === "wallet-connect") {
+        setErrorDescripption(error.message);
+      } else {
+        setErrorDescripption(JSON.stringify(error));
+      }
       setErrorModalOpen(true);
     }
   };
@@ -247,7 +246,7 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      const stakeSigner = new Signer();
+      const stakeSigner = storePersist.wallet.walletType === "wallet-connect" ? store.walletConnectInstance : new Signer();
 
       let stakeAddress: string | undefined = stakeContractAddress;
       if (stakeContractAddress === "") {
@@ -277,7 +276,11 @@ export default function Page({ params }: PoolPageProps) {
       setStakeModalOpen(true);
     } catch (error: any) {
       setLoading(false);
-      setErrorDescripption(JSON.stringify(error));
+      if (storePersist.wallet.walletType === "wallet-connect") {
+        setErrorDescripption(error.message);
+      } else {
+        setErrorDescripption(JSON.stringify(error));
+      }
       setErrorModalOpen(true);
     }
   };
@@ -287,7 +290,7 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      const stakeSigner = new Signer();
+      const stakeSigner = storePersist.wallet.walletType === "wallet-connect" ? store.walletConnectInstance : new Signer();
 
       let stakeAddress: string | undefined = stakeContractAddress;
       if (stakeContractAddress === "") {
@@ -315,7 +318,11 @@ export default function Page({ params }: PoolPageProps) {
       setUnstakeModalOpen(true);
     } catch (error: any) {
       setLoading(false);
-      setErrorDescripption(JSON.stringify(error.message));
+      if (storePersist.wallet.walletType === "wallet-connect") {
+        setErrorDescripption(error.message);
+      } else {
+        setErrorDescripption(JSON.stringify(error.message));
+      }
       setErrorModalOpen(true);
     }
   };
