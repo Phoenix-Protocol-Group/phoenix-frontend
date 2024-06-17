@@ -193,12 +193,20 @@ export default function Page({ params }: PoolPageProps) {
       // Refresh pool data
       await getPool();
       setSuccessModalOpen(true);
+      // Wait 7 Seconds for the next block and fetch new balances
+      setTimeout(() => {
+        getPool();
+      }, 7000);
     } catch (error: any) {
       // TODO: Hacky fix for XDR issues with wallet-connect
       if (error.message.includes("envelope")) {
         setTokenAmounts([tokenAAmount, tokenBAmount]);
         setSuccessModalOpen(true);
         setLoading(false);
+        // Wait 7 Seconds for the next block and fetch new balances
+        setTimeout(() => {
+          getPool();
+        }, 7000);
         return;
       }
       setErrorModalOpen(true);
@@ -237,12 +245,20 @@ export default function Page({ params }: PoolPageProps) {
       setLoading(false);
       setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
+      // Wait 7 Seconds for the next block and fetch new balances
+      setTimeout(() => {
+        getPool();
+      }, 7000);
     } catch (error: any) {
       //TODO: Hacky fix for XDR issues with wallet-connect
       if (error.message.includes("envelope")) {
         setTokenAmounts([lpTokenAmount]);
         setSuccessModalOpen(true);
         setLoading(false);
+        // Wait 7 Seconds for the next block and fetch new balances
+        setTimeout(() => {
+          getPool();
+        }, 7000);
         return;
       }
       setLoading(false);
@@ -288,12 +304,20 @@ export default function Page({ params }: PoolPageProps) {
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
+      // Wait 7 Seconds for the next block and fetch new balances
+      setTimeout(() => {
+        getPool();
+      }, 7000);
     } catch (error: any) {
       //TODO: Hacky fix for XDR issues with wallet-connect
       if (error.message.includes("envelope")) {
         setTokenAmounts([lpTokenAmount]);
         setSuccessModalOpen(true);
         setLoading(false);
+        // Wait 7 Seconds for the next block and fetch new balances
+        setTimeout(() => {
+          getPool();
+        }, 7000);
         return;
       }
       setLoading(false);
@@ -337,12 +361,20 @@ export default function Page({ params }: PoolPageProps) {
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
       setUnstakeModalOpen(true);
+      // Wait 7 Seconds for the next block and fetch new balances
+      setTimeout(() => {
+        getPool();
+      }, 7000);
     } catch (error: any) {
       //TODO: Hacky fix for XDR issues with wallet-connect
       if (error.message.includes("envelope")) {
         setTokenAmounts([lpTokenAmount]);
         setSuccessModalOpen(true);
         setLoading(false);
+        // Wait 7 Seconds for the next block and fetch new balances
+        setTimeout(() => {
+          getPool();
+        }, 7000);
         return;
       }
       setLoading(false);

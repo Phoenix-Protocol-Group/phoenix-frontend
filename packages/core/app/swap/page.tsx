@@ -93,6 +93,12 @@ export default function SwapPage() {
       const result = await swapSigner.signTransaction(tx.built.toXDR());
 
       setSuccessModalOpen(true);
+
+      // Wait 7 seconds for the next block and fetch token balances
+      setTimeout(async () => {
+        await appStore.fetchTokenInfo(fromToken?.name!);
+        await appStore.fetchTokenInfo(toToken?.name!);
+      }, 7000);
     } catch (e: any) {
       // TODO: Hacky fix for XDR issues with wallet-connect
       if (e.message.includes("envelope")) {
