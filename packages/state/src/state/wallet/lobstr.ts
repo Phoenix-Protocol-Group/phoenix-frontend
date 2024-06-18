@@ -1,5 +1,9 @@
-import {getPublicKey, isConnected, signTransaction,} from "@lobstrco/signer-extension-api";
-import {Connector, NetworkDetails} from "@phoenix-protocol/types";
+import {
+  getPublicKey,
+  isConnected,
+  signTransaction,
+} from "@lobstrco/signer-extension-api";
+import { Connector, NetworkDetails } from "@phoenix-protocol/types";
 
 export function lobstr(): Connector {
   return {
@@ -7,7 +11,7 @@ export function lobstr(): Connector {
       return await isConnected();
     },
     id: "lobstr",
-    name: "Lobstr",
+    name: "LOBSTR",
     iconUrl:
       "https://raw.githubusercontent.com/Lobstrco/lobstr-browser-extension/main/extension/public/static/images/icon128.png",
     iconBackground: "#fff",
@@ -46,7 +50,7 @@ export function lobstr(): Connector {
       }
     ): Promise<string> {
       return signTransaction(xdr);
-    }
+    },
   };
 }
 
