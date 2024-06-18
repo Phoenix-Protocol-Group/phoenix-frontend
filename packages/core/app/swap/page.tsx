@@ -1,14 +1,22 @@
 "use client";
 
 // React-related imports
-import React, {useEffect, useState} from "react";
-import {useDebounce} from "use-debounce";
+import React, { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
 
 // Component and utility imports
-import {AssetSelector, Skeleton, SlippageSettings, SwapContainer,} from "@phoenix-protocol/ui";
-import {Token} from "@phoenix-protocol/types";
-import {PhoenixFactoryContract, PhoenixMultihopContract,} from "@phoenix-protocol/contracts";
-import {useAppStore, usePersistStore} from "@phoenix-protocol/state";
+import {
+  AssetSelector,
+  Skeleton,
+  SlippageSettings,
+  SwapContainer,
+} from "@phoenix-protocol/ui";
+import { Token } from "@phoenix-protocol/types";
+import {
+  PhoenixFactoryContract,
+  PhoenixMultihopContract,
+} from "@phoenix-protocol/contracts";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
   checkTrustline,
   constants,
@@ -19,9 +27,10 @@ import {
   Signer,
   WalletConnect,
 } from "@phoenix-protocol/utils";
-import {LoadingSwap, SwapError, SwapSuccess} from "@/components/Modal/Modal";
-import {Box} from "@mui/material";
-import {Helmet} from "react-helmet";
+import { LoadingSwap, SwapError, SwapSuccess } from "@/components/Modal/Modal";
+import { Box } from "@mui/material";
+import { Helmet } from "react-helmet";
+import { handleXDRIssues } from "@/lib/txErrors";
 
 export default function SwapPage() {
   // State variables declaration and initialization
@@ -70,7 +79,10 @@ export default function SwapPage() {
   const doSwap = async () => {
     setTxBroadcasting(true);
     try {
-      const swapSigner: WalletConnect = storePersist.wallet.walletType === "wallet-connect" ? appStore.walletConnectInstance : new Signer();
+      const swapSigner: WalletConnect =
+        storePersist.wallet.walletType === "wallet-connect"
+          ? appStore.walletConnectInstance
+          : new Signer();
 
       // Create contract instance
       const contract = new PhoenixMultihopContract.Client({
@@ -79,7 +91,11 @@ export default function SwapPage() {
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
         // @ts-ignore
-        signTransaction: (tx: string) => storePersist.wallet.walletType === "wallet-connect" ? swapSigner.signTransaction(tx) : swapSigner.sign(tx),
+        signTransaction: (tx: string) =>
+          storePersist.wallet.walletType === "wallet-connect"
+            ? swapSigner.signTransaction(tx)
+            : // @ts-ignore
+              swapSigner.sign(tx),
       });
 
       // Execute swap
@@ -100,28 +116,15 @@ export default function SwapPage() {
         await appStore.fetchTokenInfo(toToken?.name!);
       }, 7000);
     } catch (e: any) {
-      // TODO: Hacky fix for XDR issues with wallet-connect
-      if (e.message.includes("envelope")) {
-        setSuccessModalOpen(true);
-        setTxBroadcasting(false);
-        return;
-      }
-      setErrorModalOpen(true);
-
-      if (storePersist.wallet.walletType === "wallet-connect") {
-        setErrorDescription(e.message);
-      } else {
-
-        // @ts-ignore
-        setErrorDescription(
-            typeof e === "string"
-                ? e
-                : e.message.includes("request denied")
-                    ? e.message
-                    : resolveContractError(e.message)
-        );
-        setTxBroadcasting(false);
-      }
+      handleXDRIssues(
+        e,
+        setSuccessModalOpen,
+        setTxBroadcasting,
+        setErrorModalOpen,
+        storePersist,
+        setErrorDescription,
+        resolveContractError
+      );
     }
     setTxBroadcasting(false);
   };
