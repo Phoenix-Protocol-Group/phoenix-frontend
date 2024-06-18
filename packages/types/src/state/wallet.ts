@@ -1,4 +1,4 @@
-import { Horizon } from "@stellar/stellar-sdk";
+import {Horizon} from "@stellar/stellar-sdk";
 
 export type StateToken = {
   id: string;
@@ -12,7 +12,7 @@ export type Wallet = {
   address: string | undefined;
   activeChain: WalletChain | undefined;
   server: Horizon.Server | undefined;
-  walletType: "freighter" | "xbull" | "lobstr" | undefined;
+  walletType: "freighter" | "xbull" | "lobstr" | "wallet-connect" | undefined;
 };
 
 export interface WalletActions {
@@ -23,6 +23,7 @@ export interface WalletActions {
     isStakingToken?: boolean
   ) => Promise<StateToken | undefined>;
   getAllTokens: () => Promise<any[]>;
+  walletConnectInstance?: any;
 }
 
 export interface WalletChain {
@@ -35,39 +36,39 @@ export interface WalletChain {
   unsupported?: boolean;
 }
 
-export type Connector = {
-  id: string;
-  name: string;
-  shortName?: string;
-  iconUrl: string;
-  iconBackground: string;
-  installed?: boolean;
-  downloadUrls?: {
-    android?: string;
-    ios?: string;
-    browserExtension?: string;
-    qrCode?: string;
-  };
-  isConnected: () => boolean | Promise<boolean>;
-  getNetworkDetails: () => Promise<NetworkDetails>;
-  getPublicKey: () => Promise<string>;
-  signTransaction: (
-    xdr: string,
-    opts?: {
-      network?: string;
-      networkPassphrase?: string;
-      accountToSign?: string;
-    }
-  ) => Promise<string>;
-};
-
-export type InstructionStepName = "install" | "create" | "scan";
-
 export interface NetworkDetails {
   network: string;
   networkUrl: string;
   networkPassphrase: string;
 }
+
+export interface Connector {
+  id: string;
+  name: string;
+  iconUrl: string;
+  iconBackground: string;
+  installed: boolean;
+  downloadUrls: {
+    browserExtension: string;
+  };
+  client?: any;
+
+  isConnected(): Promise<boolean>;
+
+  getNetworkDetails(): Promise<NetworkDetails>;
+
+  getPublicKey(): Promise<string>;
+
+  signTransaction(
+      xdr: string,
+      opts?: {
+        network?: string;
+        networkPassphrase?: string;
+        accountToSign?: string;
+      }
+  ): Promise<string>;
+}
+
 
 // Sourced from https://github.com/tmm/wagmi/blob/main/packages/core/src/constants/chains.ts
 // This is just so we can clearly see which of wagmi's first-class chains we provide metadata for

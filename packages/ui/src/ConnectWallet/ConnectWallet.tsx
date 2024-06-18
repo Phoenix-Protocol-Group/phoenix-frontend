@@ -1,10 +1,10 @@
 import React from "react";
 import {
+  Connector,
   ConnectWalletProps,
   OptionComponentProps,
-  Connector,
 } from "@phoenix-protocol/types";
-import { Box, Typography, Modal, Button } from "@mui/material";
+import { Box, Modal, Typography } from "@mui/material";
 import { Button as PhoenixButton } from "../Button/Button";
 import Colors from "../Theme/colors";
 
@@ -67,6 +67,10 @@ const ConnectWallet = ({
 
   const doConnect = async (connector: Connector) => {
     setLoading(true);
+    if (connector.id === "wallet-connect") {
+      setLoading(false);
+      setOpen(false);
+    }
     await connect(connector);
     setLoading(false);
     setOpen(false);

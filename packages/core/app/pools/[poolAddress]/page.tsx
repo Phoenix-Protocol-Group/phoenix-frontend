@@ -36,6 +36,7 @@ import {
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import Link from "next/link";
 import { Helmet } from "react-helmet";
+import { handleXDRIssues } from "@/lib/txErrors";
 
 interface Entry {
   icon: string;
@@ -174,13 +175,20 @@ export default function Page({ params }: PoolPageProps) {
   ) => {
     try {
       setLoading(true);
-      const stakeSigner = new Signer();
+      const stakeSigner =
+        storePersist.wallet.walletType === "wallet-connect"
+          ? store.walletConnectInstance
+          : new Signer();
+
       const SigningPairContract = new PhoenixPairContract.Client({
         publicKey: storePersist.wallet.address!,
         contractId: params.poolAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) => stakeSigner.sign(tx),
+        signTransaction: (tx: string) =>
+          storePersist.wallet.walletType === "wallet-connect"
+            ? stakeSigner.signTransaction(tx)
+            : stakeSigner.sign(tx),
       });
       const tx = await SigningPairContract.provide_liquidity({
         sender: storePersist.wallet.address!,
@@ -202,12 +210,24 @@ export default function Page({ params }: PoolPageProps) {
       // Refresh pool data
       await getPool();
       setSuccessModalOpen(true);
+      // Wait 7 Seconds for the next block and fetch new balances
+      setTimeout(() => {
+        getPool();
+      }, 7000);
     } catch (error: any) {
-      setErrorModalOpen(true);
-
-      setErrorDescripption(resolveContractError(JSON.stringify(error.message)));
-      setLoading(false);
-      console.error(error);
+      handleXDRIssues(
+        error,
+        setSuccessModalOpen,
+        setLoading,
+        setErrorModalOpen,
+        storePersist,
+        setErrorDescripption,
+        resolveContractError,
+        setTokenAmounts,
+        tokenAAmount,
+        tokenBAmount,
+        getPool
+      );
     }
   };
 
@@ -215,13 +235,20 @@ export default function Page({ params }: PoolPageProps) {
   const removeLiquidity = async (lpTokenAmount: number) => {
     try {
       setLoading(true);
-      const stakeSigner = new Signer();
+      const stakeSigner =
+        storePersist.wallet.walletType === "wallet-connect"
+          ? store.walletConnectInstance
+          : new Signer();
+
       const SigningPairContract = new PhoenixPairContract.Client({
         publicKey: storePersist.wallet.address!,
         contractId: params.poolAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) => stakeSigner.sign(tx),
+        signTransaction: (tx: string) =>
+          storePersist.wallet.walletType === "wallet-connect"
+            ? stakeSigner.signTransaction(tx)
+            : stakeSigner.sign(tx),
       });
       const tx = await SigningPairContract.withdraw_liquidity({
         sender: storePersist.wallet.address!,
@@ -235,10 +262,24 @@ export default function Page({ params }: PoolPageProps) {
       setLoading(false);
       setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
+      // Wait 7 Seconds for the next block and fetch new balances
+      setTimeout(() => {
+        getPool();
+      }, 7000);
     } catch (error: any) {
-      setLoading(false);
-      setErrorDescripption(error);
-      setErrorModalOpen(true);
+      handleXDRIssues(
+        error,
+        setSuccessModalOpen,
+        setLoading,
+        setErrorModalOpen,
+        storePersist,
+        setErrorDescripption,
+        resolveContractError,
+        setTokenAmounts,
+        lpTokenAmount,
+        undefined,
+        getPool
+      );
     }
   };
 
@@ -247,7 +288,10 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      const stakeSigner = new Signer();
+      const stakeSigner =
+        storePersist.wallet.walletType === "wallet-connect"
+          ? store.walletConnectInstance
+          : new Signer();
 
       let stakeAddress: string | undefined = stakeContractAddress;
       if (stakeContractAddress === "") {
@@ -259,7 +303,10 @@ export default function Page({ params }: PoolPageProps) {
         contractId: stakeAddress!,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) => stakeSigner.sign(tx),
+        signTransaction: (tx: string) =>
+          storePersist.wallet.walletType === "wallet-connect"
+            ? stakeSigner.signTransaction(tx)
+            : stakeSigner.sign(tx),
       });
 
       const tx = await SigningStakeContract.bond({
@@ -275,10 +322,24 @@ export default function Page({ params }: PoolPageProps) {
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
+      // Wait 7 Seconds for the next block and fetch new balances
+      setTimeout(() => {
+        getPool();
+      }, 7000);
     } catch (error: any) {
-      setLoading(false);
-      setErrorDescripption(JSON.stringify(error));
-      setErrorModalOpen(true);
+      handleXDRIssues(
+        error,
+        setSuccessModalOpen,
+        setLoading,
+        setErrorModalOpen,
+        storePersist,
+        setErrorDescripption,
+        resolveContractError,
+        setTokenAmounts,
+        lpTokenAmount,
+        undefined,
+        getPool
+      );
     }
   };
 
@@ -287,7 +348,10 @@ export default function Page({ params }: PoolPageProps) {
     try {
       setLoading(true);
 
-      const stakeSigner = new Signer();
+      const stakeSigner =
+        storePersist.wallet.walletType === "wallet-connect"
+          ? store.walletConnectInstance
+          : new Signer();
 
       let stakeAddress: string | undefined = stakeContractAddress;
       if (stakeContractAddress === "") {
@@ -299,7 +363,10 @@ export default function Page({ params }: PoolPageProps) {
         contractId: stakeAddress!,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) => stakeSigner.sign(tx),
+        signTransaction: (tx: string) =>
+          storePersist.wallet.walletType === "wallet-connect"
+            ? stakeSigner.signTransaction(tx)
+            : stakeSigner.sign(tx),
       });
       const tx = await SigningStakeContract.unbond({
         sender: storePersist.wallet.address!,
@@ -313,10 +380,24 @@ export default function Page({ params }: PoolPageProps) {
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
       setUnstakeModalOpen(true);
+      // Wait 7 Seconds for the next block and fetch new balances
+      setTimeout(() => {
+        getPool();
+      }, 7000);
     } catch (error: any) {
-      setLoading(false);
-      setErrorDescripption(JSON.stringify(error.message));
-      setErrorModalOpen(true);
+      handleXDRIssues(
+        error,
+        setSuccessModalOpen,
+        setLoading,
+        setErrorModalOpen,
+        storePersist,
+        setErrorDescripption,
+        resolveContractError,
+        setTokenAmounts,
+        lpTokenAmount,
+        undefined,
+        getPool
+      );
     }
   };
 
