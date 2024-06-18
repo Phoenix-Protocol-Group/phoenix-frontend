@@ -106,10 +106,7 @@ export default function SwapPage() {
         max_spread_bps: BigInt(maxSpread * 100),
       });
 
-      const result = await (storePersist.wallet.walletType === "wallet-connect"
-        ? swapSigner.signTransaction(tx)
-        : // @ts-ignore
-          swapSigner.sign(tx));
+      await tx?.signAndSend();
 
       setSuccessModalOpen(true);
 
