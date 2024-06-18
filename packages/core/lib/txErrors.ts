@@ -13,7 +13,11 @@ export function handleXDRIssues(
   tokenBAmount?: number,
   refresh?: () => void
 ): void {
-  if (error.message.includes("envelope")) {
+  // Hacky iOS fix
+  if (
+    error.message.includes("envelope") ||
+    error.message.includes("e.switch")
+  ) {
     if (
       tokenAAmount !== undefined &&
       tokenBAmount !== undefined &&
