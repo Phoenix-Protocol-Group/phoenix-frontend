@@ -52,8 +52,8 @@ const CreateCollection = () => {
     <Box>
       <BackButton onClick={() => {}} />
       <Grid container columnSpacing={6} rowSpacing={4} pt={3}>
-        <Grid item xs={12} md={9}>
-          <Grid container rowSpacing={5}>
+        <Grid item xs={12} lg={8}>
+          <Grid container rowSpacing={4}>
             <Grid item xs={12}>
               <Typography variant="h2" sx={h2Style}>
                 First, you’ll need to deploy a contract
@@ -81,7 +81,7 @@ const CreateCollection = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Grid container spacing={3}>
-                    <Grid item xs={7} sm={8} md={10}>
+                    <Grid item xs={7} sm={9} md={10}>
                       <TextInput
                         label="CONTRACT NAME"
                         helpText="help"
@@ -90,7 +90,7 @@ const CreateCollection = () => {
                         onChange={setCollectionName}
                       />
                     </Grid>
-                    <Grid item xs={5} sm={8} md={2}>
+                    <Grid item xs={5} sm={3} md={2}>
                       <TextInput
                         label="TOKEN SYMBOL"
                         helpText="help"
@@ -126,7 +126,7 @@ const CreateCollection = () => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} lg={4}>
           <CollectionPreview
             image="/nftPreview.png"
             collectionName="Collection Name"

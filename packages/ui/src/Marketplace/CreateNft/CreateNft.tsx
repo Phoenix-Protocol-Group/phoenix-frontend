@@ -53,14 +53,15 @@ const CreateNft = () => {
     <Box>
       <BackButton onClick={() => {}} />
       <Grid container columnSpacing={6} rowSpacing={4} pt={3}>
-        <Grid item xs={12} md={9}>
+        <Grid item xs={12} lg={8}>
           <Grid container rowSpacing={5}>
             <Grid item xs={12}>
               <Typography variant="h2" sx={h2Style}>
                 Create an NFT
               </Typography>
               <Typography sx={h2Subtext}>
-                Once your item is minted you will not be able to change any of its information.
+                Once your item is minted you will not be able to change any of
+                its information.
               </Typography>
             </Grid>
 
@@ -72,7 +73,7 @@ const CreateNft = () => {
 
                 <Grid item xs={12}>
                   <Grid container spacing={3}>
-                    <Grid item xs={12} sm={8} md={9}>
+                    <Grid item xs={12} sm>
                       <TextSelect
                         label="CATEGORY"
                         helpText="help"
@@ -82,7 +83,21 @@ const CreateNft = () => {
                         items={categoryItems}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={8} md={3}>
+                    <Grid
+                      item
+                      xs={12}
+                      sm="auto"
+                      sx={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        "& > div": {
+                          width: {
+                            xs: "100% !important",
+                            sm: "auto !important",
+                          },
+                        },
+                      }}
+                    >
                       <Button
                         label="Create Collection"
                         onClick={() => {}}
@@ -90,8 +105,8 @@ const CreateNft = () => {
                           padding: "14px 40px",
                           marginTop: {
                             xs: "-8px",
-                            md: "32px"
-                          }
+                            md: "32px",
+                          },
                         }}
                       />
                     </Grid>
@@ -110,7 +125,7 @@ const CreateNft = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Grid container spacing={3}>
-                    <Grid item xs={7} sm={8} md={10}>
+                    <Grid item xs={7} sm={9} md={10}>
                       <TextInput
                         label="NAME"
                         helpText="help"
@@ -119,7 +134,7 @@ const CreateNft = () => {
                         onChange={setNftName}
                       />
                     </Grid>
-                    <Grid item xs={5} sm={8} md={2}>
+                    <Grid item xs={5} sm={3} md={2}>
                       <TextInput
                         label="SUPPLY"
                         helpText="help"
@@ -154,7 +169,7 @@ const CreateNft = () => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} lg={4}>
           <NftPreview
             image="/nftPreview.png"
             collectionName="Collection Name"
