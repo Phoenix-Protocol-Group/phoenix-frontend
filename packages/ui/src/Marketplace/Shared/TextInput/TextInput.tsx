@@ -3,7 +3,7 @@ import React from "react";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 export interface TextInputProps {
-  label: string;
+  label?: string;
   helpText?: string;
   placeholder: string;
   value: string;
@@ -13,29 +13,32 @@ export interface TextInputProps {
 const TextInput = (props: TextInputProps) => {
   return (
     <>
-      <Typography
-        sx={{
-          fontSize: "12px",
-          lineHeight: "17px",
-          mb: 1.5,
-          color: "#BFBFBF",
-        }}
-      >
-        {props.label}{" "}
-        {props.helpText && (
-          <Tooltip title={props.helpText}>
-            <HelpOutlineIcon
-              sx={{
-                ml: 1,
-                fontSize: "16px",
-                position: "relative",
-                top: 3,
-                "&:hover": { color: "#FFF" },
-              }}
-            />
-          </Tooltip>
-        )}
-      </Typography>
+      {props.label && (
+        <Typography
+          sx={{
+            fontSize: "12px",
+            lineHeight: "17px",
+            mb: 1.5,
+            color: "#BFBFBF",
+          }}
+        >
+          {props.label}{" "}
+          {props.helpText && (
+            <Tooltip title={props.helpText}>
+              <HelpOutlineIcon
+                sx={{
+                  ml: 1,
+                  fontSize: "16px",
+                  position: "relative",
+                  top: 3,
+                  "&:hover": { color: "#FFF" },
+                }}
+              />
+            </Tooltip>
+          )}
+        </Typography>
+      )}
+
       <TextField
         value={props.value}
         placeholder={props.placeholder}
