@@ -3,16 +3,18 @@ import React from "react";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 export interface TextInputProps {
-  label: string;
+  label?: string;
   helpText?: string;
   placeholder: string;
+  name?: string; //optional for grouped input onChange Events
   value: string;
-  onChange: (val: string) => void;
+  onChange: (val: string, name?: string) => void;
 }
 
 const TextInput = (props: TextInputProps) => {
   return (
     <>
+    {props.label && (
       <Typography
         sx={{
           fontSize: "12px",
@@ -36,10 +38,12 @@ const TextInput = (props: TextInputProps) => {
           </Tooltip>
         )}
       </Typography>
+      )}
       <TextField
         value={props.value}
+        name={props.name}
         placeholder={props.placeholder}
-        rows={5}
+        rows={3}
         multiline={true}
         sx={{
           color: "white",
@@ -53,7 +57,7 @@ const TextInput = (props: TextInputProps) => {
             padding: "14px 8px 14px 16px !important",
           },
         }}
-        onChange={(e) => props.onChange(e.target.value)}
+        onChange={(e) => props.onChange(e.target.value, e.target.name)}
         InputLabelProps={{
           sx: {
             color: "white!important",
