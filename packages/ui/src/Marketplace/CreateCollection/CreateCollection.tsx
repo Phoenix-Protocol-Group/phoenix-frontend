@@ -113,6 +113,7 @@ const CreateCollection = () => {
                 <Grid item xs={12}>
                   <TextSelect
                     label="CATEGORY"
+                    placeholder="My Collection Name"
                     value={category}
                     items={categoryItems}
                     onChange={setCategory}

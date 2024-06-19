@@ -76,6 +76,7 @@ const CreateNft = () => {
                       <TextSelect
                         label="CATEGORY"
                         helpText="help"
+                        placeholder="My Collection Name"
                         value={category}
                         onChange={setCategory}
                         items={categoryItems}
@@ -86,7 +87,7 @@ const CreateNft = () => {
                         label="Create Collection"
                         onClick={() => {}}
                         sx={{
-                          padding: "14px 8px",
+                          padding: "14px 40px",
                           marginTop: {
                             xs: "-8px",
                             md: "32px"

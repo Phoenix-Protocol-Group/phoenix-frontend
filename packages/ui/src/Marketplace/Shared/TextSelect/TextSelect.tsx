@@ -16,6 +16,7 @@ export interface TextSelectItemProps {
 export interface TextSelectProps {
   label: string;
   helpText?: string;
+  placeholder: string;
   value: string;
   onChange: (value: string) => void;
   items: TextSelectItemProps[];
@@ -59,6 +60,13 @@ const TextSelect = (props: TextSelectProps) => {
         <Select
           value={props.value}
           onChange={(e) => props.onChange(e.target.value)}
+          renderValue={(selected: string) => {
+            if (!selected) {
+              return props.placeholder;
+            }
+
+            return props.items.find(item => item.value === selected).label;
+          }}
           displayEmpty
           inputProps={{ "aria-label": "Without label" }}
           sx={{ borderRadius: "16px", opacity: 0.6, fontSize: "14px", "&:hover .MuiOutlinedInput-notchedOutline": {
