@@ -33,5 +33,6 @@ export const Primary: Story = {
     activeCurrency: "crypto",
     activeTime: "1d",
     entries: [demoItem, demoItem, demoItem, demoItem, demoItem],
+    onEntryClick: (id: string) => {alert(id)}
   },
 };

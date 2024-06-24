@@ -23,8 +23,7 @@ const tabUnselectedStyles = {
   cursor: "pointer",
   background:
     "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
-  color: "#FFF",
-  opacity: 0.6,
+  color: "rgba(255, 255, 255, 0.6)",
   textAlign: "center",
   fontFeatureSettings: "'clig' off, 'liga' off",
   fontFamily: "Ubuntu",
@@ -41,12 +40,10 @@ const tabSelectedStyles = {
   justifyContent: "center",
   alignItems: "center",
   gap: "0.625rem",
-  flex: "1 0 0",
   borderRadius: "1rem",
   border: "1px solid var(--Primary-P3, #E2571C)",
   background: "rgba(226, 73, 26, 0.10)",
   color: "#FFF",
-  opacity: 1,
   textAlign: "center",
   fontFeatureSettings: "'clig' off, 'liga' off",
   fontFamily: "Ubuntu",
@@ -85,6 +82,7 @@ const headerRightAligned = {
 
 export interface TopCollectionsEntryProps {
   _key?: number; //only used for loop key
+  _onClick?: (id: string) => void; //used to trigger onEntryClick
   id: string;
   previewImage: string;
   collectionName: string;
@@ -100,6 +98,7 @@ export interface TopCollectionsEntryProps {
 
 export interface TopCollectionsProps {
   entries: TopCollectionsEntryProps[];
+  onEntryClick: (id: string) => void;
   activeSort: {
     column:
       | "collection"
@@ -136,7 +135,12 @@ const TopCollections = (props: TopCollectionsProps) => {
         sx={{
           display: "flex",
           mb: 3,
+          gap: 2,
           justifyContent: "space-between",
+          flexDirection: {
+            xs: "column",
+            sm: "row"
+          }
         }}
       >
         <Typography
@@ -318,7 +322,7 @@ const TopCollections = (props: TopCollectionsProps) => {
       <Box sx={{ minWidth: "700px" }}>
         {props.entries.length ? (
           props.entries.map((entry, index) => (
-            <TopCollectionsEntry _key={index} {...entry}/>
+            <TopCollectionsEntry _key={index} _onClick={props.onEntryClick} {...entry}/>
           ))
         ) : (
           <Box>

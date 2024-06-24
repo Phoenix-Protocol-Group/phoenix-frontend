@@ -6,11 +6,15 @@ const TopCollectionsEntry = (props: TopCollectionsEntryProps) => {
   const BoxStyle = {
     p: 2,
     borderRadius: "8px",
+    cursor: "pointer",
     background:
       "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
     "&:last-of-type": {
       marginBottom: "0 !important"
-    }
+    },
+    "&:hover": {
+      outline: "1px solid #E2621B",
+    },
   };
 
   const EntryTextStyle = {
@@ -26,7 +30,7 @@ const TopCollectionsEntry = (props: TopCollectionsEntryProps) => {
   }
 
   return (
-    <Box key={props._key} sx={{ ...BoxStyle, mb: 2 }}>
+    <Box key={props._key} sx={{ ...BoxStyle, mb: 2 }} onClick={() => props._onClick(props.id)}>
       <Grid container alignItems="center">
         <Grid item xs={3} sx={{
           display: "flex",
