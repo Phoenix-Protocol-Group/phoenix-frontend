@@ -4,10 +4,11 @@ import { CollectionsOverviewEntryProps } from "./CollectionsOverview";
 
 const TopCollectionsEntry = (props: CollectionsOverviewEntryProps) => {
   const BoxStyle = {
-    p: 2,
+    padding: "11px 16px",
     mb: 2,
     borderRadius: "8px",
     cursor: "pointer",
+    border: "1px solid #2C2C31",
     background:
       "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
     "&:last-of-type": {

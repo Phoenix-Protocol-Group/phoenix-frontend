@@ -5,8 +5,9 @@ import TopCollectionsHeader from "./TopCollectionsHeader";
 import TopCollectionsEntry from "./TopCollectionsEntry";
 
 const BoxStyle = {
-  p: 2,
+  padding: "15px",
   borderRadius: "8px",
+  border: "1px solid #2C2C31",
   background:
     "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
 };

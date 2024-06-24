@@ -16,8 +16,9 @@ import CollectionsOverviewHeader from "./CollectionsOverviewHeader";
 import CollectionsOverviewEntry from "./CollectionsOverviewEntry";
 
 const BoxStyle = {
-  p: 2,
+  padding: "15px",
   borderRadius: "8px",
+  border: "1px solid #2C2C31",
   background:
     "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
 };
@@ -206,7 +207,7 @@ const CollectionsOverview = (props: CollectionsOverviewProps) => {
                   background:
                     "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
                   "& fieldset": {
-                    border: "transparent !important",
+                    border: "1px solid #2C2C31 !important",
                   },
                   "& input": {
                     padding: 0,
