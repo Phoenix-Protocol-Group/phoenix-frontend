@@ -1,22 +1,21 @@
 import Colors from "../Theme/colors";
-import React from "react";
-import { styled, Theme, CSSObject } from "@mui/material/styles";
+import React, { useEffect } from "react";
+import { CSSObject, styled, Theme } from "@mui/material/styles";
 import {
   Box,
   Drawer as MuiDrawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
   useMediaQuery,
   useTheme,
-  Typography,
-  Link,
 } from "@mui/material";
-import List from "@mui/material/List";
-import IconButton from "@mui/material/IconButton";
-import ListSubheader from "@mui/material/ListSubheader";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import { DrawerProps } from "@phoenix-protocol/types";
+import { motion, MotionProps } from "framer-motion"; // Import MotionProps
 
 const drawerWidth = 240;
 
@@ -53,14 +52,18 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
   justifyContent: "flex-start",
 }));
 
-const Drawer = styled(MuiDrawer, {
+// Define props interface for DrawerMotion
+interface DrawerMotionProps extends MotionProps {
+  open?: boolean;
+}
+
+const DrawerMotion = styled(motion.div, {
   shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
+})<DrawerMotionProps>(({ theme, open }) => ({
   width: drawerWidth,
   flexShrink: 0,
   whiteSpace: "nowrap",
@@ -81,12 +84,11 @@ const SidebarNavigation = ({
   setOpen,
   onNavClick,
   bottomItems,
-  ...props
 }: DrawerProps) => {
   const theme = useTheme();
   const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!largerThenMd && open) {
       document.body.style.overflow = "hidden";
     } else {
@@ -99,100 +101,106 @@ const SidebarNavigation = ({
   };
 
   return (
-    <Drawer
-      PaperProps={{
-        sx: {
-          background: Colors.backgroundSidenav,
-          boxShadow: "-1px 0px 0px 0px rgba(228, 228, 228, 0.10) inset",
-          maxWidth: "100vw",
-        },
-      }}
-      variant="permanent"
-      open={open}
-      {...props}
+    <DrawerMotion
+      initial={{ width: 0 }}
+      animate={{ width: open ? drawerWidth : 0 }}
+      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      open={open} // Pass open prop to DrawerMotion
     >
-      {largerThenMd && (
-        <DrawerHeader
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: open ? "30px" : "18px",
-          }}
-        >
-          <Box
-            component="img"
-            alt="Phoenix Logo"
-            sx={open ? { maxWidth: "128px" } : { mx: "-8px" }}
-            src={open ? "/logo.png" : "/logo_icon.svg"}
-          />
-          {open && (
-            <IconButton
-              onClick={toggleDrawer}
-              sx={{
-                borderRadius: "8px",
-                background:
-                  "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
-                transform: open ? "none" : "rotate(180deg)",
-                marginTop: open ? 0 : "12px",
-                marginLeft: "8px",
-                padding: "10px",
-              }}
-            >
-              <img src="/arrow.svg" />
-            </IconButton>
-          )}
-        </DrawerHeader>
-      )}
-      <List>
-        <ListSubheader
-          sx={{
-            paddingLeft: "40px",
-            background: "unset",
-            fontSize: "14px",
-            lineHeight: "16px",
-            marginBottom: "20px",
-            display: open ? "block" : "none",
-          }}
-        >
-          Menu
-        </ListSubheader>
-        <ItemList
-          items={items}
-          setOpen={setOpen}
-          largerThenMd={largerThenMd}
-          onNavClick={onNavClick}
-          open={open}
-        />
-        {!open && (
-          <ListItem>
-            <IconButton
-              onClick={toggleDrawer}
-              sx={{
-                borderRadius: "8px",
-                background:
-                  "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
-                transform: open ? "none" : "rotate(180deg)",
-                marginTop: open ? 0 : "12px",
-                padding: "10px",
-              }}
-            >
-              <img src="/arrow.svg" />
-            </IconButton>
-          </ListItem>
+      <MuiDrawer
+        PaperProps={{
+          sx: {
+            background: Colors.backgroundSidenav,
+            boxShadow: "-1px 0px 0px 0px rgba(228, 228, 228, 0.10) inset",
+            maxWidth: "100vw",
+          },
+        }}
+        variant="permanent"
+        open={open} // Pass open prop to MuiDrawer
+      >
+        {largerThenMd && (
+          <DrawerHeader
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              padding: open ? "30px" : "18px",
+            }}
+          >
+            <Box
+              component="img"
+              alt="Phoenix Logo"
+              sx={open ? { maxWidth: "128px" } : { mx: "-8px" }}
+              src={open ? "/logo.png" : "/logo_icon.svg"}
+            />
+            {open && (
+              <IconButton
+                onClick={toggleDrawer}
+                sx={{
+                  borderRadius: "8px",
+                  background:
+                    "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
+                  transform: open ? "none" : "rotate(180deg)",
+                  marginTop: open ? 0 : "12px",
+                  marginLeft: "8px",
+                  padding: "10px",
+                }}
+              >
+                <img alt="arrow" src="/arrow.svg" />
+              </IconButton>
+            )}
+          </DrawerHeader>
         )}
-      </List>
-      {bottomItems && (
-        <List sx={{ position: "absolute", bottom: "2rem", width: "100%" }}>
+        <List>
+          <ListSubheader
+            sx={{
+              paddingLeft: "40px",
+              background: "unset",
+              fontSize: "14px",
+              lineHeight: "16px",
+              marginBottom: "20px",
+              display: open ? "block" : "none",
+            }}
+          >
+            Menu
+          </ListSubheader>
           <ItemList
-            items={bottomItems}
+            items={items}
             setOpen={setOpen}
             largerThenMd={largerThenMd}
             onNavClick={onNavClick}
             open={open}
           />
+          {!open && (
+            <ListItem>
+              <IconButton
+                onClick={toggleDrawer}
+                sx={{
+                  borderRadius: "8px",
+                  background:
+                    "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
+                  transform: open ? "none" : "rotate(180deg)",
+                  marginTop: open ? 0 : "12px",
+                  padding: "10px",
+                }}
+              >
+                <img alt="arrow" src="/arrow.svg" />
+              </IconButton>
+            </ListItem>
+          )}
         </List>
-      )}
-    </Drawer>
+        {bottomItems && (
+          <List sx={{ position: "absolute", bottom: "2rem", width: "100%" }}>
+            <ItemList
+              items={bottomItems}
+              setOpen={setOpen}
+              largerThenMd={largerThenMd}
+              onNavClick={onNavClick}
+              open={open}
+            />
+          </List>
+        )}
+      </MuiDrawer>
+    </DrawerMotion>
   );
 };
 
@@ -211,7 +219,7 @@ const ItemList = ({
 }) => {
   return (
     <>
-      {items.map((item, index) => (
+      {items.map((item) => (
         <ListItem
           key={item.label}
           disablePadding
@@ -257,7 +265,7 @@ const ItemList = ({
               }}
               sx={{
                 padding: "16px 24px 16px 20px",
-                opacity: item.active ? 1 : 0.6000000238418579,
+                opacity: item.active ? 1 : 0.6,
               }}
               primary={item.label}
             />
