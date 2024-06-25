@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Grid, IconButton, Input, Typography } from "@mui/material";
-import AssetItem from "./AssetItem";
+import { motion } from "framer-motion";
 import { KeyboardArrowLeft } from "@mui/icons-material";
 import { AssetSelectorProps } from "@phoenix-protocol/types";
+import AssetItem from "./AssetItem";
 
 const containerStyle = {
   borderRadius: "16px",
@@ -46,127 +47,141 @@ const AssetSelector = ({
   onTokenClick,
   hideQuickSelect,
 }: AssetSelectorProps) => {
-  const [searchValue, setSearchValue] = React.useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   const getFilteredTokens = () => {
     return tokensAll.filter((token) =>
-      token.name.toLowerCase().includes(searchValue)
+      token.name.toLowerCase().includes(searchValue.toLowerCase())
     );
   };
 
   return (
-    <Box
-      sx={{
-        maxWidth: "600px",
-        width: "100%",
-      }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
     >
       <Box
         sx={{
-          display: "flex",
-          marginBottom: "16px",
+          maxWidth: "600px",
+          width: "100%",
         }}
       >
-        <IconButton
-          onClick={onClose}
-          sx={{
-            maxWidth: "32px",
-            maxHeight: "32px",
-            margin: "8px 16px 0 0",
-            borderRadius: "8px",
-            background:
-              "linear-gradient(180deg, #292B2C 0%, #222426 100%),linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
-          }}
-        >
-          <KeyboardArrowLeft />
-        </IconButton>
-        <Typography
-          sx={{
-            color: "white",
-            fontSize: "32px",
-            fontWeight: "700",
-          }}
-        >
-          Select Token
-        </Typography>
-      </Box>
-      <Input
-        placeholder="Search by name or address"
-        onChange={(e: any) => setSearchValue(e.target.value)}
-        sx={{
-          width: "100%",
-          borderRadius: "16px",
-          border: "1px solid #2D303A",
-          background: "#1D1F21",
-          padding: "8px 16px",
-          lineHeight: "18px",
-          fontSize: "13px",
-          marginBottom: "16px",
-          "&:before": {
-            content: "none",
-          },
-          "&:after": {
-            content: "none",
-          },
-        }}
-        startAdornment={
-          <img style={{ marginRight: "8px" }} src="/MagnifyingGlass.svg" />
-        }
-      />
-      {!hideQuickSelect && (
-        <Box sx={containerStyle}>
-          <Typography sx={headerStyle}>Quick select</Typography>
-          <Grid container spacing={1}>
-            {tokens.map((token, index) => (
-              <Grid key={index} item xs={4} md={2}>
-                <AssetItem token={token} onClick={onTokenClick} />
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      )}
-      <Box sx={containerStyle}>
-        <Typography sx={headerStyle}>All tokens</Typography>
         <Box
           sx={{
-            maxHeight: "30vh",
-            overflow: "auto",
-            ...scrollbarStyles,
-            paddingRight: "8px",
+            display: "flex",
+            marginBottom: "16px",
           }}
         >
-          {getFilteredTokens().map((token, index) => (
-            <AssetItem token={token} onClick={onTokenClick} />
-          ))}
-          <Box
+          <IconButton
+            onClick={onClose}
             sx={{
-              display: getFilteredTokens().length ? "none" : "flex",
-              flexDirection: "column",
-              alignItems: "center",
+              maxWidth: "32px",
+              maxHeight: "32px",
+              margin: "8px 16px 0 0",
+              borderRadius: "8px",
+              background:
+                "linear-gradient(180deg, #292B2C 0%, #222426 100%),linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
             }}
           >
-            <Box
-              component={"img"}
-              src="/search-not-found.svg"
-              sx={{
-                maxWidth: "160px",
-              }}
+            <KeyboardArrowLeft />
+          </IconButton>
+          <Typography
+            sx={{
+              color: "white",
+              fontSize: "32px",
+              fontWeight: "700",
+            }}
+          >
+            Select Token
+          </Typography>
+        </Box>
+        <Input
+          placeholder="Search by name or address"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchValue(e.target.value)
+          }
+          sx={{
+            width: "100%",
+            borderRadius: "16px",
+            border: "1px solid #2D303A",
+            background: "#1D1F21",
+            padding: "8px 16px",
+            lineHeight: "18px",
+            fontSize: "13px",
+            marginBottom: "16px",
+            "&:before": {
+              content: "none",
+            },
+            "&:after": {
+              content: "none",
+            },
+          }}
+          startAdornment={
+            <img
+              style={{ marginRight: "8px" }}
+              src="/MagnifyingGlass.svg"
+              alt="Search"
             />
-            <Typography
+          }
+        />
+        {!hideQuickSelect && (
+          <Box sx={containerStyle}>
+            <Typography sx={headerStyle}>Quick select</Typography>
+            <Grid container spacing={1}>
+              {tokens.map((token, index) => (
+                <Grid key={index} item xs={4} md={2}>
+                  <AssetItem token={token} onClick={onTokenClick} />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
+        <Box sx={containerStyle}>
+          <Typography sx={headerStyle}>All tokens</Typography>
+          <Box
+            sx={{
+              maxHeight: "30vh",
+              overflow: "auto",
+              ...scrollbarStyles,
+              paddingRight: "8px",
+            }}
+          >
+            {getFilteredTokens().map((token, index) => (
+              <AssetItem key={index} token={token} onClick={onTokenClick} />
+            ))}
+            <Box
               sx={{
-                lineHeight: "18px",
-                fontSize: "14px",
-                fontWeight: "400",
-                color:
-                  "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
+                display: getFilteredTokens().length ? "none" : "flex",
+                flexDirection: "column",
+                alignItems: "center",
               }}
             >
-              We didn’t find any assets for {searchValue}
-            </Typography>
+              <Box
+                component="img"
+                src="/search-not-found.svg"
+                alt="No assets found"
+                sx={{
+                  maxWidth: "160px",
+                }}
+              />
+              <Typography
+                sx={{
+                  lineHeight: "18px",
+                  fontSize: "14px",
+                  fontWeight: "400",
+                  color:
+                    "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
+                }}
+              >
+                We didn’t find any assets for {searchValue}
+              </Typography>
+            </Box>
           </Box>
         </Box>
       </Box>
-    </Box>
+    </motion.div>
   );
 };
 
