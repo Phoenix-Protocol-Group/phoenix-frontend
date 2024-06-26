@@ -112,7 +112,7 @@ const tabSelectedStyles = {
 };
 
 const NftListing = (props: NftListingProps) => {
-  const [showFilter, setShowFilter] = React.useState(false);;
+  const [showFilter, setShowFilter] = React.useState(false);
 
   return (
     <Box>
@@ -127,22 +127,26 @@ const NftListing = (props: NftListingProps) => {
         }}
       >
         <Grid item xs={12}>
-          <Grid container gap={2.5}>
-            <Grid
-              item
-              xs="auto"
-              display={{
-                xs: "none",
-                sm: "block",
-              }}
-            >
+          <Grid
+            container
+            gap={{
+              xs: 1.5,
+              sm: 2.5,
+            }}
+          >
+            <Grid item xs="auto">
               <MuiButton
                 onClick={() => setShowFilter(!showFilter)}
                 sx={{
                   ...outlinedIconButtonStyle,
+                  display: {
+                    xs: "none",
+                    sm: "block",
+                  },
                   background:
                     "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%) !important",
                   border: "1px solid #2C2C31",
+                  color: "rgba(255, 255, 255, 0.6)",
                 }}
               >
                 <Tune sx={{ fontSize: "16px" }} />
@@ -234,42 +238,74 @@ const NftListing = (props: NftListingProps) => {
                 ))}
               </Select>
             </Grid>
-            <Grid item xs="auto" display="flex">
-              <Box
-                mr={0.5}
-                sx={
-                  props.activeCurrency === "crypto"
-                    ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-                    : tabUnselectedStyles
-                }
-                onClick={() => props.setActiveCurrency("crypto")}
-              >
-                Crypto
+            <Grid
+              item
+              xs={12}
+              sm="auto"
+              sx={{
+                display: "flex",
+                justifyContent: {
+                  xs: "space-between",
+                  sm: "flex-start",
+                },
+              }}
+            >
+              <Box display="flex">
+                <Box
+                  mr={0.5}
+                  sx={
+                    props.activeCurrency === "crypto"
+                      ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                      : tabUnselectedStyles
+                  }
+                  onClick={() => props.setActiveCurrency("crypto")}
+                >
+                  Crypto
+                </Box>
+                <Box
+                  mr={1}
+                  sx={
+                    props.activeCurrency === "usd"
+                      ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                      : tabUnselectedStyles
+                  }
+                  onClick={() => props.setActiveCurrency("usd")}
+                >
+                  USD
+                </Box>
               </Box>
-              <Box
-                sx={
-                  props.activeCurrency === "usd"
-                    ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-                    : tabUnselectedStyles
-                }
-                onClick={() => props.setActiveCurrency("usd")}
+              <MuiButton
+                onClick={() => setShowFilter(!showFilter)}
+                sx={{
+                  ...outlinedIconButtonStyle,
+                  display: {
+                    xs: "flex",
+                    sm: "none",
+                  },
+                  background:
+                    "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%) !important",
+                  border: "1px solid #2C2C31",
+                  color: "rgba(255, 255, 255, 0.6)",
+                }}
               >
-                USD
-              </Box>
+                <Tune sx={{ fontSize: "16px" }} />
+                Filters
+                <ExpandMore sx={{ fontSize: "16px" }} />
+              </MuiButton>
             </Grid>
           </Grid>
         </Grid>
         <Grid item xs={12} display="flex">
           <Box
             sx={{
-              width: "256px",
+              width: { xs: "100%", sm: "256px" },
               display: showFilter ? "block" : "none",
               overflow: "hidden",
               background:
                 "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
               border: "1px solid #2C2C31",
               borderRadius: "16px",
-              mr: 2,
+              mr: { xs: 0, sm: 2 },
               p: 2,
             }}
           >
@@ -287,7 +323,7 @@ const NftListing = (props: NftListingProps) => {
                 </Typography>
                 <Box display="flex" alignItems="center" gap={1} mb={1.5}>
                   <TextInput
-                    placeholder="Min" 
+                    placeholder="Min"
                     value={props.minPrice}
                     onChange={props.setMinPrice}
                   />
@@ -300,7 +336,7 @@ const NftListing = (props: NftListingProps) => {
                     to
                   </Typography>
                   <TextInput
-                    placeholder="Max" 
+                    placeholder="Max"
                     value={props.maxPrice}
                     onChange={props.setMaxPrice}
                   />
@@ -336,11 +372,11 @@ const NftListing = (props: NftListingProps) => {
                     sx={{
                       marginLeft: "3px",
                       "& .MuiRadio-root": {
-                        padding: "6px"
+                        padding: "6px",
                       },
                       "& .MuiFormControlLabel-label": {
                         fontSize: "14px",
-                        lineHeight: "20px"
+                        lineHeight: "20px",
                       },
                       "& .MuiSvgIcon-root": {
                         height: 20,
@@ -386,11 +422,11 @@ const NftListing = (props: NftListingProps) => {
                     sx={{
                       marginLeft: "3px",
                       "& .MuiRadio-root": {
-                        padding: "6px"
+                        padding: "6px",
                       },
                       "& .MuiFormControlLabel-label": {
                         fontSize: "14px",
-                        lineHeight: "20px"
+                        lineHeight: "20px",
                       },
                       "& .MuiSvgIcon-root": {
                         height: 20,
@@ -418,10 +454,22 @@ const NftListing = (props: NftListingProps) => {
               </Grid>
             </Grid>
           </Box>
-          <Grid container spacing={1.5}>
+          <Grid
+            container
+            spacing={1.5}
+            sx={{
+              display: {
+                xs: showFilter ? "none" : "flex",
+                sm: "flex",
+              },
+            }}
+          >
             {props.nftEntries.map((entry: any, index: number) => (
               <Grid item xs={6} sm={4} md={3} lg={12 / 5} key={index}>
-                <NftListingEntry _listForSaleClick={props.listForSaleClick} {...entry} />
+                <NftListingEntry
+                  _listForSaleClick={props.listForSaleClick}
+                  {...entry}
+                />
               </Grid>
             ))}
           </Grid>
