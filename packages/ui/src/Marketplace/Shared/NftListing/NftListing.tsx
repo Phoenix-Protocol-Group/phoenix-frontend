@@ -1,17 +1,28 @@
 import React from "react";
 import {
   Box,
-  Button,
   Grid,
+  Button as MuiButton,
   InputAdornment,
   MenuItem,
   Select,
   TextField,
+  Typography,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormControl,
 } from "@mui/material";
+import { Button } from "../../../Button/Button";
 import { ExpandMore, Search, Tune } from "@mui/icons-material";
 import NftListingEntry from "./NftListingEntry";
+import TextInput from "../TextInput/TextInput";
+
+type AuctionStatus = "ALL" | "NOW" | "AUCTION";
+type AuctionType = "ALL" | "MULTIPLE" | "SINGLE";
 
 export interface NftListingProps {
+  nftEntries: NftListingEntryProps[];
   searchTerm: string;
   setSearchTerm: (searchTerm: string) => void;
   order: string;
@@ -22,7 +33,15 @@ export interface NftListingProps {
   setOrder: (order: string) => void;
   activeCurrency: "crypto" | "usd";
   setActiveCurrency: (view: "crypto" | "usd") => void;
-  nftEntries: NftListingEntryProps[];
+  //filter properties
+  minPrice: string;
+  setMinPrice: (minPrice: string) => void;
+  maxPrice: string;
+  setMaxPrice: (maxPrice: string) => void;
+  status: AuctionStatus;
+  setStatus: (status: AuctionStatus) => void;
+  type: AuctionType;
+  setType: (status: AuctionType) => void;
 }
 
 export interface NftListingEntryProps {
@@ -90,6 +109,8 @@ const tabSelectedStyles = {
 };
 
 const NftListing = (props: NftListingProps) => {
+  const [showFilter, setShowFilter] = React.useState(false);;
+
   return (
     <Box>
       <Grid
@@ -104,11 +125,16 @@ const NftListing = (props: NftListingProps) => {
       >
         <Grid item xs={12}>
           <Grid container gap={2.5}>
-            <Grid item xs="auto" display={{
-              xs: "none",
-              sm: "block"
-            }}>
-              <Button
+            <Grid
+              item
+              xs="auto"
+              display={{
+                xs: "none",
+                sm: "block",
+              }}
+            >
+              <MuiButton
+                onClick={() => setShowFilter(!showFilter)}
                 sx={{
                   ...outlinedIconButtonStyle,
                   background:
@@ -119,7 +145,7 @@ const NftListing = (props: NftListingProps) => {
                 <Tune sx={{ fontSize: "16px" }} />
                 Filters
                 <ExpandMore sx={{ fontSize: "16px" }} />
-              </Button>
+              </MuiButton>
             </Grid>
             <Grid item xs={12} sm>
               <TextField
@@ -230,7 +256,165 @@ const NftListing = (props: NftListingProps) => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} display="flex">
+          <Box
+            sx={{
+              width: "256px",
+              display: showFilter ? "block" : "none",
+              overflow: "hidden",
+              background:
+                "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
+              border: "1px solid #2C2C31",
+              borderRadius: "16px",
+              mr: 2,
+              p: 2,
+            }}
+          >
+            <Grid container rowSpacing={3}>
+              <Grid item xs={12}>
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    lineHeight: "24px",
+                    fontWeight: 700,
+                    mb: 1.5,
+                  }}
+                >
+                  Price
+                </Typography>
+                <Box display="flex" alignItems="center" gap={1} mb={1.5}>
+                  <TextInput
+                    placeholder="Min" 
+                    value={props.minPrice}
+                    onChange={props.setMinPrice}
+                  />
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      color: "rgba(255, 255, 255, 0.6)",
+                    }}
+                  >
+                    to
+                  </Typography>
+                  <TextInput
+                    placeholder="Max" 
+                    value={props.maxPrice}
+                    onChange={props.setMaxPrice}
+                  />
+                </Box>
+                <Button
+                  label="Apply"
+                  sx={{
+                    fontSize: "14px",
+                    lineHeight: "16px",
+                    fontWeight: 700,
+                    padding: "12px 40px 12px 40px",
+                    width: "100%",
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    lineHeight: "24px",
+                    fontWeight: 700,
+                    mb: 1.5,
+                  }}
+                >
+                  Status
+                </Typography>
+                <FormControl>
+                  <RadioGroup
+                    value={props.status}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      props.setStatus(e.target.value as AuctionStatus);
+                    }}
+                    sx={{
+                      marginLeft: "3px",
+                      "& .MuiRadio-root": {
+                        padding: "6px"
+                      },
+                      "& .MuiFormControlLabel-label": {
+                        fontSize: "14px",
+                        lineHeight: "20px"
+                      },
+                      "& .MuiSvgIcon-root": {
+                        height: 20,
+                        width: 20,
+                      },
+                    }}
+                  >
+                    <FormControlLabel
+                      value="ALL"
+                      control={<Radio />}
+                      label="All"
+                    />
+                    <FormControlLabel
+                      value="NOW"
+                      control={<Radio />}
+                      label="Buy now"
+                    />
+                    <FormControlLabel
+                      value="AUCTION"
+                      control={<Radio />}
+                      label="Live auction"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    lineHeight: "24px",
+                    fontWeight: 700,
+                    mb: 1.5,
+                  }}
+                >
+                  Status
+                </Typography>
+                <FormControl>
+                  <RadioGroup
+                    value={props.type}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      props.setType(e.target.value as AuctionType);
+                    }}
+                    sx={{
+                      marginLeft: "3px",
+                      "& .MuiRadio-root": {
+                        padding: "6px"
+                      },
+                      "& .MuiFormControlLabel-label": {
+                        fontSize: "14px",
+                        lineHeight: "20px"
+                      },
+                      "& .MuiSvgIcon-root": {
+                        height: 20,
+                        width: 20,
+                      },
+                    }}
+                  >
+                    <FormControlLabel
+                      value="ALL"
+                      control={<Radio />}
+                      label="All"
+                    />
+                    <FormControlLabel
+                      value="NOW"
+                      control={<Radio />}
+                      label="Buy now"
+                    />
+                    <FormControlLabel
+                      value="AUCTION"
+                      control={<Radio />}
+                      label="Live auction"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Box>
           <Grid container spacing={1.5}>
             {props.nftEntries.map((entry: any, index: number) => (
               <Grid item xs={6} sm={4} md={3} lg={12 / 5} key={index}>

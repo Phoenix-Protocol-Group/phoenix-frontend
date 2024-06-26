@@ -35,7 +35,16 @@ export const Primary: Story = {
       value: "desc"
     }],
     activeCurrency: "crypto",
-    nftEntries: [demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry]
+    setActiveCurrency: (currency: any) => {alert(currency)},
+    nftEntries: [demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry],
+    minPrice: "0",
+    setMinPrice: (minPrice: string) => {},
+    maxPrice: "0",
+    setMaxPrice: (maxPrice: string) => {},
+    status: "ALL",
+    setStatus: (status: any) => {alert(status)},
+    type: "ALL",
+    setType: (type: any) => {alert(type)},
   },
 };
 

@@ -7,6 +7,7 @@ import TextSelect from "./TextSelect/TextSelect";
 import NftPreview from "./NftPreview/NftPreview";
 import CollectionPreview from "./CollectionPreview/CollectionPreview";
 import Divider from "./Divider/Divider";
+import NftListing from './NftListing/NftListing';
 
 export {
   BackButton,
@@ -16,6 +17,7 @@ export {
   TextArea,
   TextSelect,
   NftPreview,
+  NftListing,
   CollectionPreview,
   Divider,
 };
