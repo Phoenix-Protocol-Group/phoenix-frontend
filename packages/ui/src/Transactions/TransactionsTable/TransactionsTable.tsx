@@ -12,7 +12,7 @@ const customSpacing = {
   md: "16px",
 };
 
-const useStyles = () => ({
+const classes = {
   root: {
     marginTop: customSpacing.md,
     padding: `${customSpacing.md} ${customSpacing.md}`,
@@ -32,7 +32,7 @@ const useStyles = () => ({
     borderRadius: "1rem",
     cursor: "pointer",
     background:
-      "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
     color: "#FFF",
     opacity: 0.6,
     textAlign: "center",
@@ -63,7 +63,7 @@ const useStyles = () => ({
     fontWeight: 700,
     lineHeight: "1.25rem", // 200%
   },
-});
+};
 
 const TransactionsTable: React.FC<TransactionsTableProps> = ({
   activeView,
@@ -75,7 +75,6 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   activeSort,
   entries,
 }: TransactionsTableProps) => {
-  const classes = useStyles();
   const [renderedEntries, setRenderedEntries] = React.useState<number>(0);
 
   // Render entries one by one with a delay
@@ -99,7 +98,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
       transition={{ duration: 0.4 }}
     >
       {/* @ts-ignore */}
-      <Box className={classes.root}>
+      <Box sx={classes.root}>
         <Box
           style={{
             display: "flex",
@@ -116,9 +115,11 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
             }}
           >
             <motion.div
-              className={`${classes.tabUnselected} ${
-                activeView === "all" ? classes.tabSelected : ""
-              }`}
+              // @ts-ignore
+              style={{
+                ...classes.tabUnselected,
+                ...(activeView === "all" ? classes.tabSelected : ""),
+              }}
               onClick={() => setActiveView("all")}
               whileHover={{ scale: 1.05 }}
             >
@@ -132,9 +133,11 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
               }
             >
               <motion.div
-                className={`${classes.tabUnselected} ${
-                  activeView === "personal" ? classes.tabSelected : ""
-                }`}
+                // @ts-ignore
+                style={{
+                  ...classes.tabUnselected,
+                  ...(activeView === "personal" ? classes.tabSelected : ""),
+                }}
                 onClick={() => (loggedIn ? setActiveView("personal") : null)}
                 whileHover={{ scale: 1.05 }}
               >
