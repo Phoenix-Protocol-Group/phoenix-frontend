@@ -223,10 +223,7 @@ const CollectionsOverview = (props: CollectionsOverviewProps) => {
                 onChange={(e) => props.setCategory(e.target.value)}
                 sx={{
                   boxShadow: "none",
-                  ".MuiOutlinedInput-notchedOutline": { border: 0 },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'transparent !important',
-                  },
+                  ".MuiOutlinedInput-notchedOutline": {border: "1px solid #2C2C31 !important", },
                   background:
                     "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
                   borderRadius: "8px",
