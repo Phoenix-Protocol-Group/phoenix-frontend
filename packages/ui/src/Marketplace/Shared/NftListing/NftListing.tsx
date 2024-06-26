@@ -22,6 +22,7 @@ type AuctionStatus = "ALL" | "NOW" | "AUCTION";
 type AuctionType = "ALL" | "MULTIPLE" | "SINGLE";
 
 export interface NftListingProps {
+  listForSaleClick?: (id: string) => void;
   nftEntries: NftListingEntryProps[];
   searchTerm: string;
   setSearchTerm: (searchTerm: string) => void;
@@ -51,6 +52,8 @@ export interface NftListingEntryProps {
   nftName: string;
   price: string;
   ownedBy: string;
+  listForSale?: boolean;
+  _listForSaleClick?: (id: string) => void; //use listForSaleClick in NftListingProps
 }
 
 const outlinedIconButtonStyle = {
@@ -418,7 +421,7 @@ const NftListing = (props: NftListingProps) => {
           <Grid container spacing={1.5}>
             {props.nftEntries.map((entry: any, index: number) => (
               <Grid item xs={6} sm={4} md={3} lg={12 / 5} key={index}>
-                <NftListingEntry {...entry} />
+                <NftListingEntry _listForSaleClick={props.listForSaleClick} {...entry} />
               </Grid>
             ))}
           </Grid>

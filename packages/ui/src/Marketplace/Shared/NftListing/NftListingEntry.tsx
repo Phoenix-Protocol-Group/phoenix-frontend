@@ -1,5 +1,6 @@
 import { Box, Grid, Typography } from "@mui/material";
 import { NftListingEntryProps } from "./NftListing";
+import { Button } from "../../../Button/Button";
 
 const NftListingEntry = (props: NftListingEntryProps) => {
   return (
@@ -14,14 +15,16 @@ const NftListingEntry = (props: NftListingEntryProps) => {
         alt="Preview Image"
         src={props.image}
       />
-      <Typography sx={{
-        position: "absolute",
-        top: "16px",
-        right: "16px",
-        fontWeight: 700,
-        size: "14px",
-        lineHeight: "16px"
-      }}>
+      <Typography
+        sx={{
+          position: "absolute",
+          top: "16px",
+          right: "16px",
+          fontWeight: 700,
+          size: "14px",
+          lineHeight: "16px",
+        }}
+      >
         #{props.id}
       </Typography>
       <Box
@@ -59,61 +62,75 @@ const NftListingEntry = (props: NftListingEntryProps) => {
           {props.nftName}
         </Typography>
         <Grid container>
-          <Grid item xs={6}>
-            <Typography
-              sx={{
-                fontSize: "11px",
-                lineHeight: "16px",
-                fontWeight: 500,
-                color: "#BDBEBE",
-              }}
-            >
-              Price
-            </Typography>
-            <Box display="flex" alignItems="center">
-              <Box
-                component="img"
+          {props.listForSale ? (
+            <Grid item xs={12}>
+              <Button 
                 sx={{
-                  width: "16px",
-                  mr: 0.5,
+                  padding: "12px 40px 12px 40px"
                 }}
-                alt="pho icon"
-                src="/cryptoIcons/pho.svg"
+                label="List For Sale"
+                onClick={() => props._listForSaleClick(props.id)}
               />
-              <Typography
-                sx={{
-                  fontSize: "14px",
-                  lineHeight: "24px",
-                  color: "#FFF",
-                }}
-              >
-                {props.price}
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography
-              sx={{
-                fontSize: "11px",
-                lineHeight: "16px",
-                fontWeight: 500,
-                color: "#BDBEBE",
-                textAlign: "right",
-              }}
-            >
-              Owned by
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "14px",
-                lineHeight: "24px",
-                color: "#FFF",
-                textAlign: "right",
-              }}
-            >
-              {props.ownedBy}
-            </Typography>
-          </Grid>
+            </Grid>
+          ) : (
+            <>
+              <Grid item xs={6}>
+                <Typography
+                  sx={{
+                    fontSize: "11px",
+                    lineHeight: "16px",
+                    fontWeight: 500,
+                    color: "#BDBEBE",
+                  }}
+                >
+                  Price
+                </Typography>
+                <Box display="flex" alignItems="center">
+                  <Box
+                    component="img"
+                    sx={{
+                      width: "16px",
+                      mr: 0.5,
+                    }}
+                    alt="pho icon"
+                    src="/cryptoIcons/pho.svg"
+                  />
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      lineHeight: "24px",
+                      color: "#FFF",
+                    }}
+                  >
+                    {props.price}
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography
+                  sx={{
+                    fontSize: "11px",
+                    lineHeight: "16px",
+                    fontWeight: 500,
+                    color: "#BDBEBE",
+                    textAlign: "right",
+                  }}
+                >
+                  Owned by
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    lineHeight: "24px",
+                    color: "#FFF",
+                    textAlign: "right",
+                  }}
+                >
+                  {props.ownedBy}
+                </Typography>
+              </Grid>
+            </>
+          )}
         </Grid>
       </Box>
     </Box>

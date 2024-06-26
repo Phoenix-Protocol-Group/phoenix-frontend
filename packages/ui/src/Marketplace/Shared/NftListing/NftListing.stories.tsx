@@ -19,32 +19,108 @@ const demoEntry = {
   collectionName: "Collection Name",
   nftName: "NFT Name",
   price: "0.00",
-  ownedBy: "You"
-}
+  ownedBy: "You",
+};
 
 export const Primary: Story = {
   args: {
     searchTerm: "",
     setSearchTerm: (searchTerm) => {},
     order: "asc",
-    orderItems: [{
-      label: "Lowest Listing Price",
-      value: "asc"
-    }, {
-      label: "Highest Listing Price",
-      value: "desc"
-    }],
+    orderItems: [
+      {
+        label: "Lowest Listing Price",
+        value: "asc",
+      },
+      {
+        label: "Highest Listing Price",
+        value: "desc",
+      },
+    ],
     activeCurrency: "crypto",
-    setActiveCurrency: (currency: any) => {alert(currency)},
-    nftEntries: [demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry, demoEntry],
+    setActiveCurrency: (currency: any) => {
+      alert(currency);
+    },
+    nftEntries: [
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+    ],
     minPrice: "0",
     setMinPrice: (minPrice: string) => {},
     maxPrice: "0",
     setMaxPrice: (maxPrice: string) => {},
     status: "ALL",
-    setStatus: (status: any) => {alert(status)},
+    setStatus: (status: any) => {
+      alert(status);
+    },
     type: "ALL",
-    setType: (type: any) => {alert(type)},
+    setType: (type: any) => {
+      alert(type);
+    },
   },
 };
 
+export const ListForSale: Story = {
+  args: {
+    listForSaleClick: (id: string) => {
+      alert(id);
+    },
+    searchTerm: "",
+    setSearchTerm: (searchTerm) => {},
+    order: "asc",
+    orderItems: [
+      {
+        label: "Lowest Listing Price",
+        value: "asc",
+      },
+      {
+        label: "Highest Listing Price",
+        value: "desc",
+      },
+    ],
+    activeCurrency: "crypto",
+    setActiveCurrency: (currency: any) => {
+      alert(currency);
+    },
+    nftEntries: [
+      {
+        listForSale: true,
+        id: "2137",
+        image: "/nftPreview.png",
+        collectionName: "Collection Name",
+        nftName: "NFT Name",
+        price: "0.00",
+        ownedBy: "You",
+      },
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+      demoEntry,
+    ],
+    minPrice: "0",
+    setMinPrice: (minPrice: string) => {},
+    maxPrice: "0",
+    setMaxPrice: (maxPrice: string) => {},
+    status: "ALL",
+    setStatus: (status: any) => {
+      alert(status);
+    },
+    type: "ALL",
+    setType: (type: any) => {
+      alert(type);
+    },
+  },
+};
