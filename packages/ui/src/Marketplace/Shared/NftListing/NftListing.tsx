@@ -14,7 +14,7 @@ import {
   FormControl,
 } from "@mui/material";
 import { Button } from "../../../Button/Button";
-import { ExpandMore, Search, Tune } from "@mui/icons-material";
+import { ExpandMore, ExpandLess, Search, Tune } from "@mui/icons-material";
 import NftListingEntry from "./NftListingEntry";
 import TextInput from "../TextInput/TextInput";
 
@@ -60,7 +60,7 @@ const outlinedIconButtonStyle = {
   border: "1px solid #2C2C31",
   background: "transparent !important",
   color: "white",
-  padding: "8px 16px !important",
+  padding: "8px 12px 8px 16px !important",
   borderRadius: "8px",
   fontSize: "14px",
   lineHeight: "20px",
@@ -141,7 +141,7 @@ const NftListing = (props: NftListingProps) => {
                   ...outlinedIconButtonStyle,
                   display: {
                     xs: "none",
-                    sm: "block",
+                    sm: "flex",
                   },
                   background:
                     "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%) !important",
@@ -151,7 +151,7 @@ const NftListing = (props: NftListingProps) => {
               >
                 <Tune sx={{ fontSize: "16px" }} />
                 Filters
-                <ExpandMore sx={{ fontSize: "16px" }} />
+                {showFilter ? <ExpandLess sx={{ fontSize: "16px" }} /> : <ExpandMore sx={{ fontSize: "16px" }} />}
               </MuiButton>
             </Grid>
             <Grid item xs={12} sm>
@@ -211,6 +211,7 @@ const NftListing = (props: NftListingProps) => {
               <Select
                 value={props.order}
                 onChange={(e) => props.setOrder(e.target.value)}
+                IconComponent={() => <ExpandMore sx={{fontSize: "16px", marginRight: "12px", color: "rgba(255, 255, 255, 0.6)"}}/>}
                 sx={{
                   boxShadow: "none",
                   width: {
@@ -290,7 +291,7 @@ const NftListing = (props: NftListingProps) => {
               >
                 <Tune sx={{ fontSize: "16px" }} />
                 Filters
-                <ExpandMore sx={{ fontSize: "16px" }} />
+                {showFilter ? <ExpandLess sx={{ fontSize: "16px" }} /> : <ExpandMore sx={{ fontSize: "16px" }} />}
               </MuiButton>
             </Grid>
           </Grid>
