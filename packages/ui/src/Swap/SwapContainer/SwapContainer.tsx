@@ -1,21 +1,19 @@
+import React, { useState } from "react";
 import {
-  Box,
-  Divider,
-  IconButton,
-  Typography,
   Accordion,
-  AccordionSummary,
   AccordionDetails,
+  AccordionSummary,
+  Alert,
+  Box,
+  IconButton,
   List,
   ListItem,
-  Alert,
+  Typography,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { motion } from "framer-motion";
+import { ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
 import { TokenBox } from "../TokenBox/TokenBox";
-import { Button } from "@mui/material";
-import React from "react";
-
-import { Button as CustomButton } from "../../Button/Button";
+import { Button } from "../../Button/Button";
 import { SwapContainerProps } from "@phoenix-protocol/types";
 
 const listItemContainer = {
@@ -39,9 +37,19 @@ const listItemContentStyle = {
 };
 
 const SwapAssetsButton = ({ onClick }: { onClick: () => void }) => {
+  const [isSpinning, setIsSpinning] = useState(false);
+
+  const handleClick = () => {
+    if (!isSpinning) {
+      onClick();
+      setIsSpinning(true);
+      setTimeout(() => setIsSpinning(false), 1000); // Reset spinning animation after 1 second
+    }
+  };
+
   return (
     <Button
-      onClick={onClick}
+      onClick={handleClick}
       className="swap-assets-button"
       sx={{
         padding: "4px",
@@ -53,9 +61,22 @@ const SwapAssetsButton = ({ onClick }: { onClick: () => void }) => {
           "linear-gradient(137deg, #E2491A 0%, #E21B1B 17.08%, #E2491A 42.71%, #E2AA1B 100%), #E2491A",
         transform: "translate(-50%, -50%)",
         left: "50%",
+        transition: "transform 0.3s ease-in-out", // Add smooth transition for transform
+        "&:hover": {
+          transform: "translate(-50%, -50%) scale(1.1)", // Scale up on hover
+        },
       }}
     >
-      <img src="/ArrowsDownUp.svg" />
+      <motion.img
+        src="/ArrowsDownUp.svg"
+        alt="Swap"
+        animate={{ rotate: isSpinning ? 360 : 0 }} // Spin animation
+        transition={{
+          duration: 1,
+          ease: "linear",
+          repeat: isSpinning ? Infinity : 0,
+        }}
+      />
     </Button>
   );
 };
@@ -83,31 +104,36 @@ const SwapContainer = ({
   trustlineButtonDisabled = false,
   trustlineAssetName,
 }: SwapContainerProps) => {
-  const [expanded, setExpanded] = React.useState(true);
+  const [expanded, setExpanded] = useState(true);
 
   return (
-    <Box
-      sx={{
-        maxWidth: "600px",
-        width: "100%",
-      }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
     >
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "16px",
+          maxWidth: "600px",
+          width: "100%",
         }}
       >
-        <Typography
+        <Box
           sx={{
-            fontSize: "32px",
-            fontWeight: "700",
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "16px",
           }}
         >
-          Swap tokens instantly
-        </Typography>
-        <Box>
+          <Typography
+            sx={{
+              fontSize: "32px",
+              fontWeight: "700",
+            }}
+          >
+            Swap tokens instantly
+          </Typography>
           <IconButton
             onClick={onOptionsClick}
             className="slippage-button"
@@ -117,142 +143,139 @@ const SwapContainer = ({
               marginTop: "8px",
             }}
           >
-            <Box component={"img"} src="/GearSix.svg" />
+            <img src="/GearSix.svg" alt="Options" />
           </IconButton>
         </Box>
-      </Box>
-      <div className="token-box">
-        <TokenBox
-          value={fromTokenValue}
-          token={fromToken}
-          onAssetClick={() => onTokenSelectorClick(true)}
-          onChange={(value) => onInputChange(true, value)}
-        />
-        <Box
-          sx={{
-            height: "8px",
-            width: "100%",
-            position: "relative",
-          }}
-        >
-          <SwapAssetsButton onClick={onSwapTokensClick} />
-        </Box>
+        <div className="token-box">
+          <TokenBox
+            value={fromTokenValue}
+            token={fromToken}
+            onAssetClick={() => onTokenSelectorClick(true)}
+            onChange={(value) => onInputChange(true, value)}
+          />
+          <Box
+            sx={{
+              height: "8px", // Set fixed height for the square container
+              width: "36px", // Set fixed width for the square container
+              position: "relative",
+              margin: "0 auto", // Center the box horizontally
+            }}
+          >
+            <SwapAssetsButton onClick={onSwapTokensClick} />
+          </Box>
 
-        <TokenBox
-          value={toTokenValue}
-          token={toToken}
-          onAssetClick={() => onTokenSelectorClick(false)}
-          onChange={(value) => onInputChange(false, value)}
-          disabled={true}
-          loadingValues={loadingSimulate}
-        />
-      </div>
-      {trustlineButtonActive ? (
-        <>
-          <CustomButton
-            onClick={onTrustlineButtonClick}
-            disabled={trustlineButtonDisabled}
+          <TokenBox
+            value={toTokenValue}
+            token={toToken}
+            onAssetClick={() => onTokenSelectorClick(false)}
+            onChange={(value) => onInputChange(false, value)}
+            disabled={true}
+            loadingValues={loadingSimulate}
+          />
+        </div>
+        {trustlineButtonActive ? (
+          <>
+            <Button
+              onClick={onTrustlineButtonClick}
+              disabled={trustlineButtonDisabled}
+              type="primary"
+              label={
+                trustlineButtonDisabled
+                  ? `You need more than 0.5 XLM on your wallet`
+                  : `Add ${trustlineAssetName} trustline`
+              }
+              sx={{
+                marginTop: "16px",
+                width: "100%",
+              }}
+            />
+            <Alert severity="info" sx={{ mt: 2 }}>
+              To hold other tokens than XLM, you need to add a trustline first.
+              Trustlines are permissions to hold tokens on the Stellar network.
+              Setting the trustline reserves 0.5 XLM from your account.
+            </Alert>
+          </>
+        ) : (
+          <Button
+            onClick={onSwapButtonClick}
+            disabled={swapButtonDisabled}
             type="primary"
-            label={
-              trustlineButtonDisabled
-                ? `You need more then 0.5 XLM on your wallet`
-                : `Add ${trustlineAssetName} trustline`
-            }
+            label="Swap"
             sx={{
               marginTop: "16px",
               width: "100%",
             }}
           />
-          <Alert severity="info" sx={{ mt: 2 }}>
-            To hold other tokens then XLM, you got to add a trustline first.
-            Trustlines are like permissions to hold tokens on the Stellar
-            network. Setting the trustline reserves 0.5 XLM from your account.
-          </Alert>
-        </>
-      ) : (
-        <CustomButton
-          onClick={onSwapButtonClick}
-          disabled={swapButtonDisabled}
-          type="primary"
-          label="Swap"
+        )}
+        <Box
           sx={{
-            marginTop: "16px",
-            width: "100%",
-          }}
-        />
-      )}
-      <Box
-        sx={{
-          marginTop: "24px",
-          borderRadius: "16px",
-        }}
-      >
-        <Accordion
-          onChange={(e, isExpanded) => setExpanded(isExpanded)}
-          disableGutters
-          expanded={expanded}
-          sx={{
-            background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
+            marginTop: "24px",
+            borderRadius: "16px",
           }}
         >
-          <AccordionSummary
-            expandIcon={
-              <ExpandMoreIcon
-                sx={{
-                  maxWidth: "20px",
-                }}
-              />
-            }
-          >
-            <Typography
-              sx={{
-                fontWeight: "700",
-              }}
-            >
-              Swap details
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails
+          <Accordion
+            onChange={(e, isExpanded) => setExpanded(isExpanded)}
+            disableGutters
+            expanded={expanded}
             sx={{
-              borderTop: "1px solid rgba(255, 255, 255, 0.10)",
-              margin: 0,
-              padding: 0,
-              paddingBottom: "8px",
+              background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
             }}
           >
-            <List
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon sx={{ maxWidth: "20px" }} />}
+            >
+              <Typography
+                sx={{
+                  fontWeight: "700",
+                }}
+              >
+                Swap details
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails
               sx={{
-                padding: 0,
+                borderTop: "1px solid rgba(255, 255, 255, 0.10)",
                 margin: 0,
+                padding: 0,
+                paddingBottom: "8px",
               }}
             >
-              <ListItem sx={listItemContainer}>
-                <Typography sx={listItemNameStyle}>Exchange rate</Typography>
-                <Typography sx={listItemContentStyle}>
-                  {exchangeRate}
-                </Typography>
-              </ListItem>
-              <ListItem sx={listItemContainer}>
-                <Typography sx={listItemNameStyle}>Protocol fee</Typography>
-                <Typography sx={listItemContentStyle}>{networkFee}</Typography>
-              </ListItem>
-              <ListItem sx={listItemContainer}>
-                <Typography sx={listItemNameStyle}>Route</Typography>
-                <Typography sx={listItemContentStyle}>{route}</Typography>
-              </ListItem>
-              <ListItem sx={listItemContainer}>
-                <Typography sx={listItemNameStyle}>
-                  Slippage tolerance
-                </Typography>
-                <Typography sx={listItemContentStyle}>
-                  {slippageTolerance}
-                </Typography>
-              </ListItem>
-            </List>
-          </AccordionDetails>
-        </Accordion>
+              <List
+                sx={{
+                  padding: 0,
+                  margin: 0,
+                }}
+              >
+                <ListItem sx={listItemContainer}>
+                  <Typography sx={listItemNameStyle}>Exchange rate</Typography>
+                  <Typography sx={listItemContentStyle}>
+                    {exchangeRate}
+                  </Typography>
+                </ListItem>
+                <ListItem sx={listItemContainer}>
+                  <Typography sx={listItemNameStyle}>Protocol fee</Typography>
+                  <Typography sx={listItemContentStyle}>
+                    {networkFee}
+                  </Typography>
+                </ListItem>
+                <ListItem sx={listItemContainer}>
+                  <Typography sx={listItemNameStyle}>Route</Typography>
+                  <Typography sx={listItemContentStyle}>{route}</Typography>
+                </ListItem>
+                <ListItem sx={listItemContainer}>
+                  <Typography sx={listItemNameStyle}>
+                    Slippage tolerance
+                  </Typography>
+                  <Typography sx={listItemContentStyle}>
+                    {slippageTolerance}
+                  </Typography>
+                </ListItem>
+              </List>
+            </AccordionDetails>
+          </Accordion>
+        </Box>
       </Box>
-    </Box>
+    </motion.div>
   );
 };
 
