@@ -1,14 +1,17 @@
 import {
-  isConnected,
   getPublicKey,
+  isConnected,
   signTransaction,
 } from "@lobstrco/signer-extension-api";
-import { NetworkDetails, Connector } from "@phoenix-protocol/types";
+import { Connector, NetworkDetails } from "@phoenix-protocol/types";
 
 export function lobstr(): Connector {
   return {
+    async isConnected(): Promise<boolean> {
+      return await isConnected();
+    },
     id: "lobstr",
-    name: "Lobstr",
+    name: "LOBSTR",
     iconUrl:
       "https://raw.githubusercontent.com/Lobstrco/lobstr-browser-extension/main/extension/public/static/images/icon128.png",
     iconBackground: "#fff",
@@ -16,9 +19,6 @@ export function lobstr(): Connector {
     downloadUrls: {
       browserExtension:
         "https://chrome.google.com/webstore/detail/freighter/bcacfldlkkdogcmkkibnjlakofdplcbk?hl=en",
-    },
-    async isConnected(): Promise<boolean> {
-      return isConnected();
     },
     async getNetworkDetails(): Promise<NetworkDetails> {
       // TODO

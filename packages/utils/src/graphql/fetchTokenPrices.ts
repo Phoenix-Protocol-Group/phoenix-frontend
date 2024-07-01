@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { createApolloClient } from "./apolloClient";
+import { priceExport } from "./exportedPrices";
 
 export async function fetchTokenPrices(symbol?: string, tokenId?: string) {
   const client = createApolloClient();
@@ -36,10 +37,11 @@ export async function fetchTokenPrices(symbol?: string, tokenId?: string) {
 }
 
 export async function fetchHistoricalPrices(
-  timestampLimit: number,
+  timestampLimit?: number,
   symbol?: string,
   tokenId?: string,
-  maxEntries?: number
+  maxEntries?: number,
+  notParse?: boolean
 ) {
   const client = createApolloClient();
 
@@ -75,6 +77,17 @@ export async function fetchHistoricalPrices(
       },
     });
 
+    if (notParse) {
+      if (symbol === "PHO") {
+        const res = [...priceExport, ...data.historicalPrices];
+        return res.sort(
+          (a: any, b: any) =>
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
+      }
+      return data.historicalPrices;
+    }
+
     const parsedPrices = data.historicalPrices.map((item: any) => [
       new Date(item.timestamp).getTime(),
       item.usdValue,
@@ -87,7 +100,10 @@ export async function fetchHistoricalPrices(
   }
 }
 
-export async function fetchTokenPrices2(symbol?: string, tokenId?: string): Promise<number> {
+export async function fetchTokenPrices2(
+  symbol?: string,
+  tokenId?: string
+): Promise<number> {
   const client = createApolloClient();
 
   const timestampLimit = 1440; //24 hours

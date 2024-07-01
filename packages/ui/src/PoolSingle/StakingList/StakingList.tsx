@@ -119,7 +119,7 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
           </Grid>
           <Grid item xs={1}>
             <Typography sx={{ ...typoStyle, fontWeight: 400 }}>
-              Actions
+              Unbond
             </Typography>
           </Grid>
         </Grid>

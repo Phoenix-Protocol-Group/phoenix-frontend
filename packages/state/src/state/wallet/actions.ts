@@ -45,7 +45,7 @@ export const createWalletActions = (setState: SetStateType, getState: GetStateTy
                 .reduce((acc: string[], curr: string[]) => [...acc, ...curr], [])
                 // Remove duplicates
                 .filter((address, index, self) => self.indexOf(address) === index);
-            console.log("Hier!");
+
             const allAssets = _allAssets ? _allAssets.map(async (asset) => {
                 await getState().fetchTokenInfo(asset);
             }) : [];

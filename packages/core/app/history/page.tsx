@@ -1,16 +1,18 @@
 "use client";
-import { Box, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { ActiveFilters } from "@phoenix-protocol/types";
 import {
   Button,
+  FinancialChart,
+  Skeleton,
   TransactionsCards,
   TransactionsTable,
-  Skeleton,
   VolumeChart,
 } from "@phoenix-protocol/ui";
 import {
   fetchDataByTimeEpoch,
+  fetchHistoricalPrices,
   fetchHistoryMetaData,
   fetchSwapHistory,
 } from "@phoenix-protocol/utils";
@@ -42,6 +44,9 @@ export default function Page() {
   // Set History
   const [history, setHistory] = useState<any>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
+
+  // Historical Prices
+  const [historicalPrices, setHistoricalPrices] = useState<any[]>([]);
 
   // Set Search Term
   const [searchTerm, setSearchTerm] = useState("");
@@ -84,6 +89,18 @@ export default function Page() {
     const { activeAccountsLast24h, totalAccounts, totalTrades } =
       await fetchHistoryMetaData();
     setMeta({ activeAccountsLast24h, totalAccounts, totalTrades });
+  };
+
+  // Load price data
+  const loadPriceData = async () => {
+    const result = await fetchHistoricalPrices(
+      undefined,
+      "PHO",
+      undefined,
+      undefined,
+      true
+    );
+    setHistoricalPrices(result);
   };
 
   // Load Volume Data
@@ -269,6 +286,7 @@ export default function Page() {
   useEffect(() => {
     loadMetaData();
     loadVolumeData("daily");
+    loadPriceData();
   }, []);
 
   const asset = {
@@ -300,12 +318,21 @@ export default function Page() {
       >
         Transaction History
       </Typography>
-      <VolumeChart
-        data={data}
-        setSelectedTab={(e) => setSelectedTimeEpoch(e)}
-        selectedTab={selectedTimeEpoch}
-        totalVolume={totalVolume}
-      />
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+          <VolumeChart
+            data={data}
+            setSelectedTab={(e) => setSelectedTimeEpoch(e)}
+            selectedTab={selectedTimeEpoch}
+            totalVolume={totalVolume}
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          {historicalPrices.length > 0 && (
+            <FinancialChart historicalPrices={historicalPrices} />
+          )}
+        </Grid>
+      </Grid>
       <TransactionsCards
         activeTraders={meta.activeAccountsLast24h.toString()}
         totalTraders={meta.totalAccounts.toString()}

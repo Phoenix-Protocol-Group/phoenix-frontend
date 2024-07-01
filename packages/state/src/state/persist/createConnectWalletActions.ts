@@ -1,15 +1,42 @@
-import { Horizon } from "@stellar/stellar-sdk";
-import {
-  AppStore,
-  SetStateType,
-  GetStateType,
-  AppStorePersist,
-} from "@phoenix-protocol/types";
-import { freighter } from "../wallet/freighter";
-import { allChains, networkToActiveChain } from "../wallet/chains";
-import { usePersistStore } from "../store";
-import { xbull } from "../wallet/xbull";
-import { lobstr } from "../wallet/lobstr";
+import {Horizon} from "@stellar/stellar-sdk";
+import {AppStore, AppStorePersist} from "@phoenix-protocol/types";
+import {freighter} from "../wallet/freighter";
+import {allChains, networkToActiveChain} from "../wallet/chains";
+import {useAppStore, usePersistStore} from "../store";
+import {xbull} from "../wallet/xbull";
+import {lobstr} from "../wallet/lobstr";
+import {WalletConnect} from "../wallet/wallet-connect";
+
+// Maintain a single WalletConnect instance
+let walletConnectInstance: WalletConnect | null = null;
+
+const initializeWalletConnect = async () => {
+  if (!walletConnectInstance) {
+    walletConnectInstance = new WalletConnect();
+    console.log("Initialized Wallet Connect");
+  }
+
+  let publicKey: string | null = null;
+
+  while (!publicKey) {
+    try {
+      publicKey = await walletConnectInstance.getPublicKey();
+    } catch (error) {
+      console.log("Waiting for wallet to connect...");
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }
+
+  console.log("Wallet connected", walletConnectInstance);
+
+  // Save the walletConnectInstance in the regular app state
+  useAppStore.setState((state: AppStore) => ({
+    ...state,
+    walletConnectInstance,
+  }));
+
+  return walletConnectInstance;
+};
 
 export const createConnectWalletActions = () => {
   return {
@@ -53,7 +80,6 @@ export const createConnectWalletActions = () => {
       // Get the user's address from the wallet.
       let address = "";
 
-      console.log("Wallet: ", wallet);
       switch (wallet) {
         case "freighter":
           address = await freighter().getPublicKey();
@@ -62,8 +88,11 @@ export const createConnectWalletActions = () => {
           address = await xbull().getPublicKey();
           break;
         case "lobstr":
-          console.log("Connect lobstr");
           address = await lobstr().getPublicKey();
+          break;
+        case "wallet-connect":
+          const Client = await initializeWalletConnect();
+          address = await Client.getPublicKey();
           break;
         default:
           throw new Error("Wallet not supported");

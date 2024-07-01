@@ -1,37 +1,38 @@
-import {
-  Box,
-  Grid,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import FilterMenu from "./FilterMenu";
-import {
-  TransactionsTableProps,
-} from "@phoenix-protocol/types";
 import React from "react";
+import { Box, Grid, Tooltip, Typography } from "@mui/material";
+import { motion } from "framer-motion"; // Import Framer Motion
+import FilterMenu from "./FilterMenu";
+import { TransactionsTableProps } from "@phoenix-protocol/types";
 import TransactionEntry from "./TransactionEntry";
 import TransactionHeader from "./TransactionsHeader";
 
-const BoxStyle = {
-  p: 2,
-  borderRadius: "8px",
-  background:
-    "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+const customSpacing = {
+  xs: "8px",
+  sm: "12px",
+  md: "16px",
 };
 
-const TransactionsTable = (props: TransactionsTableProps) => {
-  const tabUnselectedStyles = {
+const classes = {
+  root: {
+    marginTop: customSpacing.md,
+    padding: `${customSpacing.md} ${customSpacing.md}`,
+    borderRadius: "8px",
+    background:
+      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+    overflowX: "auto",
+  },
+  tabUnselected: {
     display: "flex",
     width: "2.75rem",
     height: "2.3125rem",
-    padding: "1.125rem 1.5rem",
+    padding: `${customSpacing.md} ${customSpacing.sm}`,
     justifyContent: "center",
     alignItems: "center",
     gap: "0.625rem",
     borderRadius: "1rem",
     cursor: "pointer",
     background:
-      "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
     color: "#FFF",
     opacity: 0.6,
     textAlign: "center",
@@ -41,12 +42,11 @@ const TransactionsTable = (props: TransactionsTableProps) => {
     fontStyle: "normal",
     fontWeight: 700,
     lineHeight: "1.25rem", // 200%
-  };
-
-  const tabSelectedStyles = {
+  },
+  tabSelected: {
     display: "flex",
     height: "2.25rem",
-    padding: "1.125rem 1.5rem",
+    padding: `${customSpacing.md} ${customSpacing.sm}`,
     justifyContent: "center",
     alignItems: "center",
     gap: "0.625rem",
@@ -62,190 +62,205 @@ const TransactionsTable = (props: TransactionsTableProps) => {
     fontStyle: "normal",
     fontWeight: 700,
     lineHeight: "1.25rem", // 200%
-  };
+  },
+};
 
+const TransactionsTable: React.FC<TransactionsTableProps> = ({
+  activeView,
+  setActiveView,
+  loggedIn,
+  activeFilters,
+  applyFilters,
+  handleSort,
+  activeSort,
+  entries,
+}: TransactionsTableProps) => {
+  const [renderedEntries, setRenderedEntries] = React.useState<number>(0);
+
+  // Render entries one by one with a delay
   React.useEffect(() => {
-    console.log(props.activeView);
-  }, [props.activeView]);
+    if (entries.length > 0) {
+      const interval = setInterval(() => {
+        setRenderedEntries((prevCount) =>
+          prevCount < entries.length ? prevCount + 1 : prevCount
+        );
+      }, 200); // Adjust the delay between each entry here (in milliseconds)
 
-  const scrollbarStyles = {
-    /* Firefox */
-    scrollbarWidth: "thin",
-    scrollbarColor: "#E2491A #1B1B1B",
-
-    /* Chrome, Edge, and Safari */
-    "&::-webkit-scrollbar": {
-      width: "4px",
-    },
-
-    "&::-webkit-scrollbar-track": {
-      background:
-        "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);",
-    },
-
-    "&::-webkit-scrollbar-thumb": {
-      backgroundColor: "#E2491A",
-      borderRadius: "8px",
-    },
-  };
+      return () => clearInterval(interval);
+    }
+  }, [entries]);
 
   return (
-    <Box
-      sx={{
-        mt: 2,
-        p: 3,
-        borderRadius: 3,
-        background:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        overflowX: "auto",
-        ...scrollbarStyles,
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.4 }}
     >
-      <Box
-        sx={{
-          display: "flex",
-          mb: 2,
-          minWidth: { xs: "80vw", md: "700px" },
-          justifyContent: "space-between",
-        }}
-      >
-        <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
+      {/* @ts-ignore */}
+      <Box sx={classes.root}>
+        <Box
+          style={{
+            display: "flex",
+            marginBottom: customSpacing.md,
+            minWidth: "700px",
+            justifyContent: "space-between",
+          }}
+        >
           <Box
-            sx={
-              props.activeView === "all"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-                : tabUnselectedStyles
-            }
-            onClick={() => props.setActiveView("all")}
+            style={{
+              display: "flex",
+              gap: customSpacing.sm,
+              justifyContent: "space-between",
+            }}
           >
-            All
-          </Box>
-          <Tooltip
-            title={
-              props.loggedIn
-                ? undefined
-                : "Connect wallet to see personal transactions"
-            }
-          >
-            <Box
-              sx={
-                props.activeView === "personal"
-                  ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-                  : tabUnselectedStyles
-              }
-              onClick={() =>
-                props.loggedIn ? props.setActiveView("personal") : null
-              }
-            >
-              Personal
-            </Box>
-          </Tooltip>
-        </Box>
-        <FilterMenu
-          activeFilters={props.activeFilters}
-          applyFilters={props.applyFilters}
-        />
-      </Box>
-      <Box sx={{ ...BoxStyle, mb: 2, minWidth: "700px" }}>
-        <Grid container>
-          <Grid item xs={2}>
-            <TransactionHeader
-              handleSort={props.handleSort}
-              label="Trade type"
-              active={
-                props.activeSort.column === "tradeType"
-                  ? props.activeSort.direction
-                  : false
-              }
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <TransactionHeader
-              handleSort={props.handleSort}
-              label="Asset"
-              active={
-                props.activeSort.column === "asset"
-                  ? props.activeSort.direction
-                  : false
-              }
-            />
-          </Grid>
-          <Grid item xs={2}>
-            <TransactionHeader
-              handleSort={props.handleSort}
-              label="Trade Size"
-              active={
-                props.activeSort.column === "tradeSize"
-                  ? props.activeSort.direction
-                  : false
-              }
-            />
-          </Grid>
-          <Grid item xs={2}>
-            <TransactionHeader
-              handleSort={props.handleSort}
-              label="Trade Value"
-              active={
-                props.activeSort.column === "tradeValue"
-                  ? props.activeSort.direction
-                  : false
-              }
-            />
-          </Grid>
-          <Grid item xs={2}>
-            <TransactionHeader
-              handleSort={props.handleSort}
-              label="Date"
-              active={
-                props.activeSort.column === "date"
-                  ? props.activeSort.direction
-                  : false
-              }
-            />
-          </Grid>
-          <Grid item xs={1}>
-            <TransactionHeader
-              handleSort={props.handleSort}
-              label="Unbond"
-              active={
-                props.activeSort.column === "actions"
-                  ? props.activeSort.direction
-                  : false
-              }
-            />
-          </Grid>
-        </Grid>
-      </Box>
-      <Box sx={{ minWidth: "700px" }}>
-        {props.entries.length ? (
-          props.entries.map((entry, index) => (
-            <TransactionEntry
-              type={entry.type}
-              assets={entry.assets}
-              tradeSize={entry.tradeSize}
-              tradeValue={entry.tradeValue}
-              date={entry.date}
-              txHash={entry.txHash}
-            />
-          ))
-        ) : (
-          <Box>
-            <Typography
-              sx={{
-                color: "#FFF",
-                fontSize: "14px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                pt: 1
+            <motion.div
+              // @ts-ignore
+              style={{
+                ...classes.tabUnselected,
+                ...(activeView === "all" ? classes.tabSelected : ""),
               }}
+              onClick={() => setActiveView("all")}
+              whileHover={{ scale: 1.05 }}
             >
-              {props.activeView === "personal" ? "It looks like you haven't made any transactions yet." : "No transactions found."}
-            </Typography>
+              All
+            </motion.div>
+            <Tooltip
+              title={
+                loggedIn
+                  ? undefined
+                  : "Connect wallet to see personal transactions"
+              }
+            >
+              <motion.div
+                // @ts-ignore
+                style={{
+                  ...classes.tabUnselected,
+                  ...(activeView === "personal" ? classes.tabSelected : ""),
+                }}
+                onClick={() => (loggedIn ? setActiveView("personal") : null)}
+                whileHover={{ scale: 1.05 }}
+              >
+                Personal
+              </motion.div>
+            </Tooltip>
           </Box>
-        )}
+          <FilterMenu
+            activeFilters={activeFilters}
+            applyFilters={applyFilters}
+          />
+        </Box>
+        <Box
+          style={{
+            padding: `${customSpacing.md} ${customSpacing.md}`,
+            borderRadius: "8px",
+            background:
+              "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          }}
+        >
+          <Grid container>
+            <Grid item xs={2}>
+              <TransactionHeader
+                handleSort={handleSort}
+                label="Trade type"
+                active={
+                  activeSort.column === "tradeType"
+                    ? activeSort.direction
+                    : false
+                }
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <TransactionHeader
+                handleSort={handleSort}
+                label="Asset"
+                active={
+                  activeSort.column === "asset" ? activeSort.direction : false
+                }
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <TransactionHeader
+                handleSort={handleSort}
+                label="Trade Size"
+                active={
+                  activeSort.column === "tradeSize"
+                    ? activeSort.direction
+                    : false
+                }
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <TransactionHeader
+                handleSort={handleSort}
+                label="Trade Value"
+                active={
+                  activeSort.column === "tradeValue"
+                    ? activeSort.direction
+                    : false
+                }
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <TransactionHeader
+                handleSort={handleSort}
+                label="Date"
+                active={
+                  activeSort.column === "date" ? activeSort.direction : false
+                }
+              />
+            </Grid>
+            <Grid item xs={1}>
+              <TransactionHeader
+                handleSort={handleSort}
+                label="Explore"
+                active={
+                  activeSort.column === "actions" ? activeSort.direction : false
+                }
+              />
+            </Grid>
+          </Grid>
+        </Box>
+        <Box style={{ minWidth: "700px" }}>
+          {entries.map((entry, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }} // Delay each entry animation
+            >
+              <TransactionEntry
+                type={entry.type}
+                assets={entry.assets}
+                tradeSize={entry.tradeSize}
+                tradeValue={entry.tradeValue}
+                date={entry.date}
+                txHash={entry.txHash}
+              />
+            </motion.div>
+          ))}
+          {entries.length === 0 && (
+            <Box>
+              <Typography
+                style={{
+                  color: "#FFF",
+                  fontSize: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingTop: "8px",
+                }}
+              >
+                {activeView === "personal"
+                  ? "It looks like you haven't made any transactions yet."
+                  : "No transactions found."}
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </motion.div>
   );
 };
 

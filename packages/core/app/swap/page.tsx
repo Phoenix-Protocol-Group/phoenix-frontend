@@ -25,10 +25,12 @@ import {
   findBestPath,
   resolveContractError,
   Signer,
+  WalletConnect,
 } from "@phoenix-protocol/utils";
 import { LoadingSwap, SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
 import { Helmet } from "react-helmet";
+import { handleXDRIssues } from "@/lib/txErrors";
 
 export default function SwapPage() {
   // State variables declaration and initialization
@@ -77,7 +79,10 @@ export default function SwapPage() {
   const doSwap = async () => {
     setTxBroadcasting(true);
     try {
-      const swapSigner = new Signer();
+      const swapSigner: WalletConnect =
+        storePersist.wallet.walletType === "wallet-connect"
+          ? appStore.walletConnectInstance
+          : new Signer();
 
       // Create contract instance
       const contract = new PhoenixMultihopContract.Client({
@@ -85,7 +90,12 @@ export default function SwapPage() {
         contractId: constants.MULTIHOP_ADDRESS,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) => swapSigner.sign(tx),
+        // @ts-ignore
+        signTransaction: (tx: string) =>
+          storePersist.wallet.walletType === "wallet-connect"
+            ? swapSigner.signTransaction(tx)
+            : // @ts-ignore
+              swapSigner.sign(tx),
       });
 
       // Execute swap
@@ -96,30 +106,25 @@ export default function SwapPage() {
         max_spread_bps: BigInt(maxSpread * 100),
       });
 
-      const result = await tx.signAndSend();
+      await tx?.signAndSend();
 
-      if (result.getTransactionResponse?.status === "FAILED") {
-        setErrorModalOpen(true);
-
-        // @ts-ignore
-        setErrorDescription(tx?.resultXdr);
-
-        setTxBroadcasting(false);
-        return;
-      }
       setSuccessModalOpen(true);
-    } catch (e: any) {
-      setErrorModalOpen(true);
 
-      // @ts-ignore
-      setErrorDescription(
-        typeof e === "string"
-          ? e
-          : e.message.includes("request denied")
-          ? e.message
-          : resolveContractError(e.message)
+      // Wait 7 seconds for the next block and fetch token balances
+      setTimeout(async () => {
+        await appStore.fetchTokenInfo(fromToken?.name!);
+        await appStore.fetchTokenInfo(toToken?.name!);
+      }, 7000);
+    } catch (e: any) {
+      handleXDRIssues(
+        e,
+        setSuccessModalOpen,
+        setTxBroadcasting,
+        setErrorModalOpen,
+        storePersist,
+        setErrorDescription,
+        resolveContractError
       );
-      setTxBroadcasting(false);
     }
     setTxBroadcasting(false);
   };

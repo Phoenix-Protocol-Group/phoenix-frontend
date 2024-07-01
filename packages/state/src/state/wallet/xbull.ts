@@ -1,6 +1,6 @@
 import freighterApi from "@stellar/freighter-api";
-import { NetworkDetails, Connector } from "@phoenix-protocol/types";
-import { xBullWalletConnect } from "xBull-Wallet-Connect";
+import {Connector, NetworkDetails} from "@phoenix-protocol/types";
+import {xBullWalletConnect} from "xBull-Wallet-Connect";
 
 export function xbull(): Connector {
   return {
@@ -13,7 +13,7 @@ export function xbull(): Connector {
       browserExtension:
         "https://chrome.google.com/webstore/detail/freighter/bcacfldlkkdogcmkkibnjlakofdplcbk?hl=en",
     },
-    isConnected(): boolean {
+    async isConnected(): Promise<boolean> {
       const bridge: xBullWalletConnect = new xBullWalletConnect();
       return bridge.publicKey !== undefined;
     },

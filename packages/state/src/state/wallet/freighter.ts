@@ -1,5 +1,5 @@
 import freighterApi from "@stellar/freighter-api";
-import { NetworkDetails, Connector } from "@phoenix-protocol/types";
+import {Connector, NetworkDetails} from "@phoenix-protocol/types";
 
 export function freighter(): Connector {
   return {
@@ -12,7 +12,7 @@ export function freighter(): Connector {
       browserExtension:
         "https://chrome.google.com/webstore/detail/freighter/bcacfldlkkdogcmkkibnjlakofdplcbk?hl=en",
     },
-    isConnected(): boolean {
+    async isConnected(): Promise<boolean> {
       return !!freighterApi?.isConnected();
     },
     async getNetworkDetails(): Promise<NetworkDetails> {
