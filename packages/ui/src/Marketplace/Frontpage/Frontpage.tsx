@@ -1,10 +1,11 @@
 import { Box, Grid } from "@mui/material";
-import Featured, { FeaturedProps } from "./Featured/Featured";
-import TopCollections, { TopCollectionsProps } from "./TopCollections/TopCollections";
-import PopularNfts, { PopularNftsProps } from "./PopularNfts/PopularNfts";
-import RisingStars, { RisingStarsProps } from "./RisingStars/RisingStars";
-import NftCategories, { NftCategoriesProps } from "./NftCategories/NftCategories";
-import GettingStarted, { GettingStartedProps } from "./GettingStarted/GettingStarted";
+import Featured from "./Featured/Featured";
+import TopCollections from "./TopCollections/TopCollections";
+import PopularNfts from "./PopularNfts/PopularNfts";
+import RisingStars from "./RisingStars/RisingStars";
+import NftCategories from "./NftCategories/NftCategories";
+import GettingStarted from "./GettingStarted/GettingStarted";
+import { FeaturedProps, GettingStartedProps, NftCategoriesProps, PopularNftsProps, RisingStarsProps, TopCollectionsProps } from "@phoenix-protocol/types";
 
 export interface FeaturedCardProps {
   image: string;
