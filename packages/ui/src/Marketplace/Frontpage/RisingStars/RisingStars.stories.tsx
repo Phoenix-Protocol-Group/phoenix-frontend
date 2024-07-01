@@ -14,6 +14,7 @@ export default meta;
 type Story = StoryObj<typeof RisingStars>;
 
 const demoItem = {
+  id: "1234",
   image: "/demo_nft.png",
   collectionName: "Testcollection",
   percent: 50

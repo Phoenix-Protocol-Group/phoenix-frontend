@@ -14,6 +14,7 @@ export default meta;
 type Story = StoryObj<typeof PopularNfts>;
 
 const demoItem = {
+  id: "1234",
   image: "/banklocker.png",
   collectionName: "collection",
   nftName: "NFT Name",

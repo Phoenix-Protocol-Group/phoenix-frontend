@@ -31,7 +31,7 @@ export const Primary: Story = {
 export const Slider: Story = {
   args: {
     entries: [demoItem, demoItem, demoItem, demoItem, demoItem, demoItem],
-    onClick: (id: string) => {},
+    onEntryClick: (id: string) => {},
     forwardClick: () => {},
     backwardClick: () => {}
   },
