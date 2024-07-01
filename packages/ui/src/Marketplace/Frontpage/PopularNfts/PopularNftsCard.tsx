@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
-import { PopularNftCardProps } from "./PopularNfts";
+import { PopularNftCardProps } from "@phoenix-protocol/types";
 
 const PopularNftsCard = (props: PopularNftCardProps) => {
   return (

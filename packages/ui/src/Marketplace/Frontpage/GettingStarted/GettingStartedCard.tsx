@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { GettingStartedCardProps } from './GettingStarted';
+import { GettingStartedCardProps } from '@phoenix-protocol/types';
 
 const GettingStartedCard = (props: GettingStartedCardProps) => {
   return (

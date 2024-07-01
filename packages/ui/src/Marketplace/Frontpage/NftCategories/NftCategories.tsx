@@ -2,19 +2,7 @@ import { ArrowRightAlt } from "@mui/icons-material";
 import { Box, Fade, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
 import NftCategoriesCard from "./NftCategoriesCard";
-
-export interface NftCategoriesCardProps {
-  id: string;
-  _onClick?: (id: string) => void;
-  image: string;
-  name: string;
-}
-
-export interface NftCategoriesProps {
-  entries: NftCategoriesCardProps[];
-  onEntryClick: (id: string) => void;
-  onViewAllClick: () => void;
-}
+import { NftCategoriesCardProps, NftCategoriesProps } from "@phoenix-protocol/types";
 
 const NftCategories = (props: NftCategoriesProps) => {
   const [ready, setReady] = React.useState<boolean>(false);

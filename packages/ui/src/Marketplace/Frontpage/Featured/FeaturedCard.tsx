@@ -1,5 +1,5 @@
 import { Box, Grid, Typography } from "@mui/material";
-import { FeaturedCardProps } from "./Featured";
+import { FeaturedCardProps } from "@phoenix-protocol/types";
 
 const FeaturedCard = ({
   id,

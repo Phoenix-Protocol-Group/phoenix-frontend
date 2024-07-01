@@ -3,6 +3,7 @@ import { Box, Grid, Typography } from "@mui/material";
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import TopCollectionsHeader from "./TopCollectionsHeader";
 import TopCollectionsEntry from "./TopCollectionsEntry";
+import { TopCollectionsProps } from "@phoenix-protocol/types";
 
 const BoxStyle = {
   padding: "15px",
@@ -79,44 +80,6 @@ const headerRightAligned = {
   display: "flex",
   justifyContent: "flex-end",
   pr: 0.5
-}
-
-export interface TopCollectionsEntryProps {
-  _key?: number; //only used for loop key
-  _onClick?: (id: string) => void; //used to trigger onEntryClick
-  id: string;
-  previewImage: string;
-  collectionName: string;
-  floorPrice: string;
-  bestOffer: string;
-  volume: string;
-  volumePercent?: string;
-  owners: string;
-  ownersPercent?: string;
-  forSalePercent: string;
-  forSaleNumbers: string;
-}
-
-export interface TopCollectionsProps {
-  entries: TopCollectionsEntryProps[];
-  onEntryClick: (id: string) => void;
-  activeSort: {
-    column:
-      | "collection"
-      | "floorPrice"
-      | "bestOffer"
-      | "volume"
-      | "owners"
-      | "forSale"
-      | undefined;
-    direction: "asc" | "desc";
-  };
-  handleSort: (column: string) => void;
-  activeCurrency: "crypto" | "usd";
-  setActiveCurrency: (view: "crypto" | "usd") => void;
-  activeTime: "6h" | "1d" | "7d" | "30d";
-  setActiveTime: (time: "6h" | "1d" | "7d" | "30d") => void;
-  onViewAllClick: () => void;
 }
 
 const TopCollections = (props: TopCollectionsProps) => {

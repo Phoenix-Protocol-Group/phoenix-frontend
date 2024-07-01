@@ -9,6 +9,7 @@ import {
 import {ArrowForward, ArrowBack, ArrowRightAlt} from "@mui/icons-material";
 import React from "react";
 import PopularNftsCard from "./PopularNftsCard";
+import { PopularNftCardProps, PopularNftsProps } from "@phoenix-protocol/types";
 
 const tabUnselectedStyles = {
   display: "flex",
@@ -66,27 +67,6 @@ const ArrowButtonStyles = {
   alignItems: "center",
   cursor: "pointer",
 };
-
-export interface PopularNftCardProps {
-  id: string;
-  _onClick?: (id: string) => void;
-  image: string;
-  collectionName: string;
-  nftName: string;
-  price: string;
-  volume: string;
-  icon: string;
-}
-
-export interface PopularNftsProps {
-  entries: PopularNftCardProps[];
-  onEntryClick: (id: string) => void;
-  forwardClick?: () => void;
-  backwardClick?: () => void;
-  activeTime: "6h" | "1d" | "7d" | "30d";
-  setActiveTime: (time: "6h" | "1d" | "7d" | "30d") => void;
-  onViewAllClick: () => void;
-}
 
 const PopularNfts = (props: PopularNftsProps) => {
   const [ready, setReady] = React.useState<boolean>(false);

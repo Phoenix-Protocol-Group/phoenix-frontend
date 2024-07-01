@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
-import { TopCollectionsEntryProps } from "./TopCollections";
+import { TopCollectionsEntryProps } from "@phoenix-protocol/types";
 
 const TopCollectionsEntry = (props: TopCollectionsEntryProps) => {
   const BoxStyle = {

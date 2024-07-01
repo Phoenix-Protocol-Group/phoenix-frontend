@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { NftCategoriesCardProps } from "./NftCategories";
+import { NftCategoriesCardProps } from "@phoenix-protocol/types";
 
 const NftCategoriesCard = (props: NftCategoriesCardProps) => {
   return (

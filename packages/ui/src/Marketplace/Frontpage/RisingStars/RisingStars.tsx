@@ -1,6 +1,7 @@
 import { Box, Fade, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
 import RisingStarsCard from "./RisingStarsCard";
+import { RisingStarCardProps, RisingStarsProps } from "@phoenix-protocol/types";
 
 const tabUnselectedStyles = {
   display: "flex",
@@ -47,21 +48,6 @@ const tabSelectedStyles = {
   fontWeight: 700,
   lineHeight: "1.25rem",
 };
-
-export interface RisingStarCardProps {
-  id: string;
-  _onClick?: (id: string) => void;
-  image: string;
-  collectionName: string;
-  percent: number;
-}
-
-export interface RisingStarsProps {
-  entries: RisingStarCardProps[];
-  onEntryClick: (id: string) => void;
-  activeTime: "6h" | "1d" | "7d" | "30d";
-  setActiveTime: (time: "6h" | "1d" | "7d" | "30d") => void;
-}
 
 const RisingStars = (props: RisingStarsProps) => {
   const [ready, setReady] = React.useState<boolean>(false);

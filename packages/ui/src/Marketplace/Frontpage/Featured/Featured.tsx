@@ -10,23 +10,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ArrowForward } from "@mui/icons-material";
 import React from "react";
 import FeaturedCard from "./FeaturedCard";
-
-export interface FeaturedCardProps {
-  id: string;
-  _onClick?: (id: string) => void;
-  image: string;
-  name: string;
-  price: string;
-  volume: string;
-  icon: string;
-}
-
-export interface FeaturedProps {
-  entries: FeaturedCardProps[];
-  onEntryClick: (id: string) => void;
-  forwardClick?: () => void;
-  backwardClick?: () => void;
-}
+import { FeaturedCardProps, FeaturedProps } from "@phoenix-protocol/types";
 
 const Featured = (props: FeaturedProps) => {
   const ArrowButtonStyles = {

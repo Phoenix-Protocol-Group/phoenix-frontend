@@ -2,17 +2,7 @@ import { ArrowRightAlt } from "@mui/icons-material";
 import { Box, Grid, Typography } from "@mui/material";
 import React from "react";
 import GettingStartedCard from "./GettingStartedCard";
-
-export interface GettingStartedCardProps {
-  image: string;
-  name: string;
-  description: string;
-}
-
-export interface GettingStartedProps {
-  entries: GettingStartedCardProps[];
-  onViewAllClick: () => void;
-}
+import { GettingStartedCardProps, GettingStartedProps } from "@phoenix-protocol/types";
 
 const GettingStarted = (props: GettingStartedProps) => {
   return (

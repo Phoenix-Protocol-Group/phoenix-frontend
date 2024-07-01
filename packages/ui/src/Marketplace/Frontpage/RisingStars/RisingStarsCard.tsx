@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
-import { RisingStarCardProps } from "./RisingStars";
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
+import { RisingStarCardProps } from "@phoenix-protocol/types";
 
 const RisingStarsCard = (props: RisingStarCardProps) => {
   return (
