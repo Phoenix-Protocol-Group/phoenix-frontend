@@ -21,3 +21,4 @@ export * from "./AnchorServices";
 export * from "./TransactionsCards";
 export * from "./TransactionsTable";
 export * from "./AssetInfoModal";
+export * from "./MarketplaceFrontpage";

@@ -57,6 +57,19 @@ const SideNav = ({
       href: "/pools",
     },
     {
+      label: "Marketplace",
+      icon: (
+        <Image
+          alt="Marketplace Icon"
+          width={24}
+          height={24}
+          src={pathname == "/marketplace" ? "/marketplaceIconActive.svg" : "/marketplaceIcon.svg"}
+        />
+      ),
+      active: pathname == "/marketplace",
+      href: "/marketplace",
+    },
+    {
       label: "Trade History",
       icon: (
         <Image
