@@ -4,13 +4,14 @@ import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Helmet } from "react-helmet";
 import "./style.css";
 import {
+  AnchorServices,
+  AssetInfoModal,
+  Button,
   CryptoCTA,
   DashboardPriceCharts,
   DashboardStats,
-  WalletBalanceTable,
-  AnchorServices,
   Skeleton,
-  AssetInfoModal,
+  WalletBalanceTable,
 } from "@phoenix-protocol/ui";
 
 import { fetchPho, SorobanTokenContract } from "@phoenix-protocol/contracts";
@@ -29,6 +30,7 @@ import {
   fetchTokenPrices2,
   formatCurrency,
 } from "@phoenix-protocol/utils";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const theme = useTheme();
@@ -220,6 +222,8 @@ export default function Page() {
     },
   };
 
+  const router = useRouter();
+
   return (
     <Box sx={{ marginTop: { md: 0, xs: 12 } }}>
       <Helmet>
@@ -246,9 +250,62 @@ export default function Page() {
         spacing={largerThenMd ? 3 : 1}
       >
         <Grid item xs={12}>
-          <Typography sx={{ fontSize: "2rem", fontWeight: "700" }}>
-            Hello 👋
-          </Typography>
+          <Box sx={{ position: "relative" }}>
+            <Box
+              sx={{
+                backgroundImage: "url('/banner.png')",
+                padding: 8,
+                borderRadius: "16px",
+                opacity: 0.7,
+                backdropFilter: "blur(42px)",
+                backgroundPosition: "center",
+                backgroundSize: "cover",
+                position: "relative",
+              }}
+            />
+            <Box
+              sx={{
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                top: 0,
+                padding: { md: "2rem", lg: "2rem 8rem", xs: 1 },
+                margin: "auto",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Box>
+                <Typography
+                  variant="h1"
+                  sx={{
+                    color: "#fff",
+                    fontWeight: 700,
+                    fontSize: { md: "2.5rem", xs: "1.5rem" },
+                    lineHeight: "3rem",
+                  }}
+                >
+                  Are you an artist?
+                </Typography>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    color: "#fff",
+                    fontWeight: 400,
+                    fontSize: { md: "1rem", xs: "0.75rem" },
+                    lineHeight: "2rem",
+                    opacity: 0.8,
+                  }}
+                >
+                  Be one of the first and become a genesis NFT creator!
+                </Typography>
+              </Box>
+              <Button type="primary" onClick={() => router.push("/nft")}>
+                Apply now!
+              </Button>
+            </Box>
+          </Box>
         </Grid>
         <Grid item xs={12} md={12} lg={8} mt={!largerThenMd ? 2 : undefined}>
           {loadingDashboard ? (
