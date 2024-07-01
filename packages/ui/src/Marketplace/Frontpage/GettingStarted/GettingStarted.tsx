@@ -1,6 +1,6 @@
+import React from "react";
 import { ArrowRightAlt } from "@mui/icons-material";
 import { Box, Grid, Typography } from "@mui/material";
-import React from "react";
 import GettingStartedCard from "./GettingStartedCard";
 import { GettingStartedCardProps, GettingStartedProps } from "@phoenix-protocol/types";
 

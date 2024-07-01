@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Fade,
@@ -7,7 +8,6 @@ import {
   useTheme,
 } from "@mui/material";
 import {ArrowForward, ArrowBack, ArrowRightAlt} from "@mui/icons-material";
-import React from "react";
 import PopularNftsCard from "./PopularNftsCard";
 import { PopularNftCardProps, PopularNftsProps } from "@phoenix-protocol/types";
 

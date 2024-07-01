@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Fade,
@@ -8,7 +9,6 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ArrowForward } from "@mui/icons-material";
-import React from "react";
 import FeaturedCard from "./FeaturedCard";
 import { FeaturedCardProps, FeaturedProps } from "@phoenix-protocol/types";
 

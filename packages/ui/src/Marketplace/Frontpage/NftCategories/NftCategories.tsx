@@ -1,6 +1,6 @@
+import React from "react";
 import { ArrowRightAlt } from "@mui/icons-material";
 import { Box, Fade, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
-import React from "react";
 import NftCategoriesCard from "./NftCategoriesCard";
 import { NftCategoriesCardProps, NftCategoriesProps } from "@phoenix-protocol/types";
 

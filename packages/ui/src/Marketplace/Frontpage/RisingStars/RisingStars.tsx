@@ -1,5 +1,5 @@
-import { Box, Fade, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
+import { Box, Fade, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import RisingStarsCard from "./RisingStarsCard";
 import { RisingStarCardProps, RisingStarsProps } from "@phoenix-protocol/types";
 
