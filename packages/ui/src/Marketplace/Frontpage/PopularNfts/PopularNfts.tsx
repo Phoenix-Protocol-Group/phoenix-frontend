@@ -67,7 +67,9 @@ const ArrowButtonStyles = {
   cursor: "pointer",
 };
 
-export interface NftCardProps {
+export interface PopularNftCardProps {
+  id: string;
+  _onClick?: (id: string) => void;
   image: string;
   collectionName: string;
   nftName: string;
@@ -76,8 +78,9 @@ export interface NftCardProps {
   icon: string;
 }
 
-export interface FeaturedProps {
-  entries: NftCardProps[];
+export interface PopularNftsProps {
+  entries: PopularNftCardProps[];
+  onEntryClick: (id: string) => void;
   forwardClick?: () => void;
   backwardClick?: () => void;
   activeTime: "6h" | "1d" | "7d" | "30d";
@@ -85,7 +88,7 @@ export interface FeaturedProps {
   onViewAllClick: () => void;
 }
 
-const PopularNfts = (props: FeaturedProps) => {
+const PopularNfts = (props: PopularNftsProps) => {
   const [ready, setReady] = React.useState<boolean>(false);
 
   const theme = useTheme();
@@ -265,7 +268,7 @@ const PopularNfts = (props: FeaturedProps) => {
       <Grid container spacing={2}>
         {props.entries
           .slice(0, entryLength)
-          .map((item: NftCardProps, index: number) => (
+          .map((item: PopularNftCardProps, index: number) => (
             <Fade
               key={index}
               in={ready}
@@ -273,7 +276,7 @@ const PopularNfts = (props: FeaturedProps) => {
               unmountOnExit
             >
               <Grid item xs={6} md={12 / 5}>
-                <PopularNftsCard {...item} />
+                <PopularNftsCard _onClick={props.onEntryClick} {...item} />
               </Grid>
             </Fade>
           ))}

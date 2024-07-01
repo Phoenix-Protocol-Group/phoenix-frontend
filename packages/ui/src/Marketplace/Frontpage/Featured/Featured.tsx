@@ -12,6 +12,8 @@ import React from "react";
 import FeaturedCard from "./FeaturedCard";
 
 export interface FeaturedCardProps {
+  id: string;
+  _onClick?: (id: string) => void;
   image: string;
   name: string;
   price: string;
@@ -21,6 +23,7 @@ export interface FeaturedCardProps {
 
 export interface FeaturedProps {
   entries: FeaturedCardProps[];
+  onEntryClick: (id: string) => void;
   forwardClick?: () => void;
   backwardClick?: () => void;
 }
@@ -122,7 +125,7 @@ const Featured = (props: FeaturedProps) => {
               unmountOnExit
             >
               <Grid item xs={6} md={12 / 5}>
-                <FeaturedCard {...item} />
+                <FeaturedCard _onClick={props.onEntryClick} {...item} />
               </Grid>
             </Fade>
           ))}

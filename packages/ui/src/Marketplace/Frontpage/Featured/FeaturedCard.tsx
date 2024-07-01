@@ -2,6 +2,8 @@ import { Box, Grid, Typography } from "@mui/material";
 import { FeaturedCardProps } from "./Featured";
 
 const FeaturedCard = ({
+  id,
+  _onClick,
   image,
   name,
   price,
@@ -10,6 +12,7 @@ const FeaturedCard = ({
 }: FeaturedCardProps) => {
   return (
     <Box
+      onClick={() => _onClick(id)}
       sx={{
         border: "1px solid #2C2C31",
         backgroundColor: "#1F2123",

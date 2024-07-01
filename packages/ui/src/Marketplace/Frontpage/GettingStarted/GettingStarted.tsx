@@ -14,7 +14,7 @@ export interface GettingStartedProps {
   onViewAllClick: () => void;
 }
 
-const NftCategories = (props: GettingStartedProps) => {
+const GettingStarted = (props: GettingStartedProps) => {
   return (
     <Box>
       <Box
@@ -76,4 +76,4 @@ const NftCategories = (props: GettingStartedProps) => {
   );
 };
 
-export default NftCategories;
+export default GettingStarted;

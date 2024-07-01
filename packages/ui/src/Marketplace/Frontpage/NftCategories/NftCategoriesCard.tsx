@@ -4,6 +4,7 @@ import { NftCategoriesCardProps } from "./NftCategories";
 const NftCategoriesCard = (props: NftCategoriesCardProps) => {
   return (
     <Box
+      onClick={() => props._onClick(props.id)}
       sx={{
         border: "1px solid #2C2C31",
         borderRadius: "12px",

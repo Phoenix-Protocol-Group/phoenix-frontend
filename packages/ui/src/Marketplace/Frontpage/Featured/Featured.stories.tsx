@@ -14,6 +14,7 @@ export default meta;
 type Story = StoryObj<typeof Featured>;
 
 const demoItem = {
+  id: "1234",
   image: "/banklocker.png",
   name: "Collection Name",
   price: "21.3K",
@@ -30,6 +31,7 @@ export const Primary: Story = {
 export const Slider: Story = {
   args: {
     entries: [demoItem, demoItem, demoItem, demoItem, demoItem, demoItem],
+    onClick: (id: string) => {},
     forwardClick: () => {},
     backwardClick: () => {}
   },

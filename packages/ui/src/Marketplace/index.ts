@@ -1,4 +1,4 @@
-import Frontpage from "./Frontpage";
+import Frontpage from "./Frontpage/Frontpage";
 import * as Shared from "./Shared";
 import CreateCollection from "./CreateCollection/CreateCollection";
 import CollectionsOverview from './CollectionsOverview/CollectionsOverview';

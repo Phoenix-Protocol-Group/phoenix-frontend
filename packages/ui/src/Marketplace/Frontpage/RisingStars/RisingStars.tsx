@@ -49,6 +49,8 @@ const tabSelectedStyles = {
 };
 
 export interface RisingStarCardProps {
+  id: string;
+  _onClick?: (id: string) => void;
   image: string;
   collectionName: string;
   percent: number;
@@ -56,6 +58,7 @@ export interface RisingStarCardProps {
 
 export interface RisingStarsProps {
   entries: RisingStarCardProps[];
+  onEntryClick: (id: string) => void;
   activeTime: "6h" | "1d" | "7d" | "30d";
   setActiveTime: (time: "6h" | "1d" | "7d" | "30d") => void;
 }
@@ -189,7 +192,7 @@ const RisingStars = (props: RisingStarsProps) => {
             unmountOnExit
           >
             <Grid item xs={6} md={4}>
-              <RisingStarsCard {...item} />
+              <RisingStarsCard _onClick={props.onEntryClick} {...item} />
             </Grid>
           </Fade>
         ))}

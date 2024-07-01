@@ -1,10 +1,11 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
-import { NftCardProps } from "./PopularNfts";
+import { PopularNftCardProps } from "./PopularNfts";
 
-const PopularNftsCard = (props: NftCardProps) => {
+const PopularNftsCard = (props: PopularNftCardProps) => {
   return (
     <Box
+      onClick={() => props._onClick(props.id)}
       sx={{
         border: "1px solid #2C2C31",
         backgroundColor: "#1F2123",

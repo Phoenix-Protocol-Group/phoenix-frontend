@@ -4,12 +4,15 @@ import React from "react";
 import NftCategoriesCard from "./NftCategoriesCard";
 
 export interface NftCategoriesCardProps {
+  id: string;
+  _onClick?: (id: string) => void;
   image: string;
   name: string;
 }
 
 export interface NftCategoriesProps {
   entries: NftCategoriesCardProps[];
+  onEntryClick: (id: string) => void;
   onViewAllClick: () => void;
 }
 
@@ -104,7 +107,7 @@ const NftCategories = (props: NftCategoriesProps) => {
               unmountOnExit
             >
               <Grid item xs={6} md={12 / 5}>
-                <NftCategoriesCard {...item} />
+                <NftCategoriesCard _onClick={props.onEntryClick} {...item} />
               </Grid>
             </Fade>
           ))}
