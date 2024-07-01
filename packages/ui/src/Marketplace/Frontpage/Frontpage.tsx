@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, Grid } from "@mui/material";
 import Featured from "./Featured/Featured";
 import TopCollections from "./TopCollections/TopCollections";
