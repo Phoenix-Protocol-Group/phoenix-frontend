@@ -235,7 +235,7 @@ function MultistepForm() {
         backdropFilter: "blur(42px)",
         padding: "16px",
         borderRadius: "8px",
-        width: "600px",
+        width: { md: "600px", xs: "100%" },
         height: "600px",
         display: "flex",
         flexDirection: "column",
