@@ -17,6 +17,10 @@ import { Button } from "@phoenix-protocol/ui";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import ChatIcon from "@mui/icons-material/Chat"; // Assuming this for Discord
 import TwitterIcon from "@mui/icons-material/Twitter";
+import {
+  GoogleReCaptchaProvider,
+  useGoogleReCaptcha,
+} from "react-google-recaptcha-v3";
 
 interface FormData {
   collectionName: string;
@@ -39,9 +43,10 @@ const initialData: FormData = {
   exampleLink: "",
 };
 
-export default function MultistepForm() {
+function MultistepForm() {
   const [formData, setFormData] = useState<FormData>(initialData);
   const [step, setStep] = useState(1);
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,11 +58,19 @@ export default function MultistepForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(1);
+    if (!executeRecaptcha) {
+      alert("Recaptcha not ready");
+      return;
+    }
+
+    // const recaptchaToken = await executeRecaptcha("submit");
+
     try {
       await axios.post("https://api.web3forms.com/submit", {
         ...formData,
-        access_key: "42ff79c5-a769-49e7-b66c-b8612256c2fc",
+        access_key: "ab1330c1-1bc2-4ea2-a6ae-451c0515b84d",
+        // "g-recaptcha-response": recaptchaToken,
+        ccemail: "PhoenixNFTS@proton.me",
       });
       alert("Submission successful!");
     } catch (error) {
@@ -232,6 +245,7 @@ export default function MultistepForm() {
       }}
     >
       <form onSubmit={handleSubmit} id="submit-form" style={{ width: "100%" }}>
+        <input type="hidden" name="ccemail" value="PhoenixNFTS@proton.me" />
         <Typography variant="h6" gutterBottom>{`Step ${step} of 4`}</Typography>
         <motion.div
           initial={{ opacity: 0 }}
@@ -262,5 +276,13 @@ export default function MultistepForm() {
         </Box>
       </form>
     </Box>
+  );
+}
+
+export default function App() {
+  return (
+    <GoogleReCaptchaProvider reCaptchaKey="6LeazAUqAAAAAHY4YYykLcjOge77DNF9V8WygidO">
+      <MultistepForm />
+    </GoogleReCaptchaProvider>
   );
 }

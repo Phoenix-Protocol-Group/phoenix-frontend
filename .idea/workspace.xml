@@ -4,10 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4e4788e-0992-4eba-bad6-62c4e7bddfcf" name="Changes" comment="Attempt to fix android signing">
+    <list default="true" id="d4e4788e-0992-4eba-bad6-62c4e7bddfcf" name="Changes" comment="Add nft form">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/state/src/state/persist/createConnectWalletActions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/persist/createConnectWalletActions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/state/src/state/wallet/wallet-connect.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/state/src/state/wallet/wallet-connect.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.yarn/install-state.gz" beforeDir="false" afterPath="$PROJECT_DIR$/.yarn/install-state.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/core/components/NftForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/core/components/NftForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/core/components/NftTerms.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/core/components/NftTerms.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/core/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/core/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,7 +20,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="optimize-utils" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -52,7 +55,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;add-walletconnect&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;js.linters.configure.manually.selectedeslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
@@ -80,10 +83,11 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/packages/contracts/src/phoenix-nft" />
+      <recent name="$PROJECT_DIR$/packages/contracts/src/phoenix-nft-collection" />
+      <recent name="$PROJECT_DIR$/packages/contracts/src/phoenix-auctions" />
+      <recent name="$PROJECT_DIR$/packages/core/public" />
       <recent name="$PROJECT_DIR$/packages/core/public/cryptoIcons" />
-      <recent name="$PROJECT_DIR$/packages/core/app" />
-      <recent name="$PROJECT_DIR$/packages/ui/public/cryptoIcons" />
-      <recent name="$PROJECT_DIR$/packages/core/assets" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -117,6 +121,11 @@
       <workItem from="1717673612909" duration="8576000" />
       <workItem from="1718209855935" duration="77000" />
       <workItem from="1718268552822" duration="9516000" />
+      <workItem from="1719363896830" duration="4166000" />
+      <workItem from="1719744513277" duration="2311000" />
+      <workItem from="1719827860031" duration="1709000" />
+      <workItem from="1719830093243" duration="169000" />
+      <workItem from="1719830271486" duration="5969000" />
     </task>
     <task id="LOCAL-00001" summary="Upgrade to js sdk 12 rc3">
       <option name="closed" value="true" />
@@ -350,7 +359,71 @@
       <option name="project" value="LOCAL" />
       <updated>1718280730223</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Cleanup SidebarNavigation.tsx">
+      <option name="closed" value="true" />
+      <created>1719359372279</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1719359372279</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Cleanup AssetSelector.tsx">
+      <option name="closed" value="true" />
+      <created>1719359639872</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1719359639872</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Improve loading video">
+      <option name="closed" value="true" />
+      <created>1719360820748</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1719360820748</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Fix button component">
+      <option name="closed" value="true" />
+      <created>1719360831476</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1719360831476</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Improve SwapContainer.tsx">
+      <option name="closed" value="true" />
+      <created>1719360841859</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1719360841859</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Improve TradeHistory.tsx">
+      <option name="closed" value="true" />
+      <created>1719363074326</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1719363074326</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Improve TradeHistory.tsx">
+      <option name="closed" value="true" />
+      <created>1719403250559</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1719403250559</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Add nft form">
+      <option name="closed" value="true" />
+      <created>1719849509635</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1719849509635</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -361,7 +434,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -371,13 +456,6 @@
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT_PROFILE" value="Project Default" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Upgrade to js sdk 12 rc3" />
-    <MESSAGE value="Add missing type" />
-    <MESSAGE value="Fix all contract calls" />
-    <MESSAGE value="Fix build" />
-    <MESSAGE value="Export vesting contract" />
-    <MESSAGE value="Remove unneeded localStorage usage" />
-    <MESSAGE value="Add publicKey to signing transactions" />
     <MESSAGE value="Add signTransaction param to all SigningClients" />
     <MESSAGE value="Add jsdocs, sort imports, reformating code" />
     <MESSAGE value="Fix import // fix build" />
@@ -396,7 +474,14 @@
     <MESSAGE value="Add more PHO Token datasets from the past" />
     <MESSAGE value="Connect wallet" />
     <MESSAGE value="Attempt to fix android signing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Attempt to fix android signing" />
+    <MESSAGE value="Cleanup SidebarNavigation.tsx" />
+    <MESSAGE value="Cleanup AssetSelector.tsx" />
+    <MESSAGE value="Improve loading video" />
+    <MESSAGE value="Fix button component" />
+    <MESSAGE value="Improve SwapContainer.tsx" />
+    <MESSAGE value="Improve TradeHistory.tsx" />
+    <MESSAGE value="Add nft form" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add nft form" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />

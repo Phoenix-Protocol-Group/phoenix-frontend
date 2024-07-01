@@ -14,6 +14,7 @@ const TermsAndConditions: React.FC = () => {
           creators has several benefits. Phoenix will feature these collections
           within the marketplace. We will also host a Twitter/X space with the
           creators. Finally, we will create a Discord chat for your collections.
+          {/* eslint-disable-next-line react/no-unescaped-entities */}
           We look forward to your submissions and can't wait to launch!
         </Typography>
         <Typography variant="h4" gutterBottom>
@@ -82,6 +83,7 @@ const TermsAndConditions: React.FC = () => {
         </Typography>
         <Typography paragraph>
           Any disputes arising from the submission and review process will be
+          {/* eslint-disable-next-line react/no-unescaped-entities */}
           resolved through mediation in accordance with the platform's dispute
           resolution policies.
         </Typography>
