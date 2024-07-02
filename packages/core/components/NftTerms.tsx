@@ -25,8 +25,7 @@ const TermsAndConditions: React.FC = () => {
         </Typography>
         <Typography paragraph>
           All submissions must be original, high-quality artwork. Low-quality or
-          incomplete artwork will not be accepted. - AI-generated content is
-          strictly prohibited. Only manually created art will be considered.
+          incomplete artwork will not be accepted.
         </Typography>
         <Typography variant="h6" gutterBottom>
           2. Prohibited Content
