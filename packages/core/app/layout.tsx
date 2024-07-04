@@ -324,7 +324,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               display: "flex",
               justifyContent: "center",
               padding: "16px",
-              ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
+              ...(pathname.includes("marketplace") ? {} : pathname === "/pools" ? poolPageStyles : swapPageStyle),
             }}
           >
             {/* Child Components */}
