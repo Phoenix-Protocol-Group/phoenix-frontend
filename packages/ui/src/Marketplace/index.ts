@@ -6,6 +6,7 @@ import CollectionSingle from './CollectionSingle/CollectionSingle';
 import CreateNftBulk from './CreateNftBulk/CreateNftBulk';
 import CreateNft from './CreateNft/CreateNft';
 import NftSingle from "./NftSingle/NftSingle";
+import CreateSomething from "./CreateSomething/CreateSomething";
 
 export {
   Frontpage,
@@ -15,5 +16,6 @@ export {
   CollectionSingle,
   NftSingle,
   CreateNftBulk,
-  CreateNft
+  CreateNft,
+  CreateSomething
 };

@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
 import { ArrowForward } from "@mui/icons-material";
 
@@ -10,21 +11,23 @@ export interface CreateOptionCardProps {
 const CreateOptionCard = (props: CreateOptionCardProps) => {
   return (
     <Box
+      onClick={props.onClick}
       sx={{
-        background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
+        background: "background: linear-gradient(180deg, #292B2C 0%, #222426 100%)",
         p: 4,
         borderRadius: "16px",
         mb: 2,
       }}
     >
       <Grid container>
-        <Grid item xs={6}>
+        <Grid item xs>
           <Typography
             sx={{
               fontSize: "24px",
               lineHeight: "28px",
               color: "#FFF",
               fontWeight: 700,
+              mb: 1
             }}
           >
             {props.title}
@@ -33,7 +36,7 @@ const CreateOptionCard = (props: CreateOptionCardProps) => {
             sx={{
               fontSize: "16px",
               lineHeight: "22px",
-              color: "#FFF",
+              color: "rgba(255, 255, 255, 0.4)",
               opacity: 0.6,
             }}
           >
@@ -42,7 +45,7 @@ const CreateOptionCard = (props: CreateOptionCardProps) => {
         </Grid>
         <Grid
           item
-          xs={6}
+          xs="auto"
           sx={{
             display: "flex",
             justifyContent: "flex-end",
