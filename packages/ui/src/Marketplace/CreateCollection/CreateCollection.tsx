@@ -81,7 +81,7 @@ const CreateCollection = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Grid container spacing={3}>
-                    <Grid item xs={7} sm={9} md={10}>
+                    <Grid item xs={7} sm={8} md={9}>
                       <TextInput
                         label="CONTRACT NAME"
                         helpText="help"
@@ -90,7 +90,7 @@ const CreateCollection = () => {
                         onChange={setCollectionName}
                       />
                     </Grid>
-                    <Grid item xs={5} sm={3} md={2}>
+                    <Grid item xs={5} sm={4} md={3}>
                       <TextInput
                         label="TOKEN SYMBOL"
                         helpText="help"

@@ -13,10 +13,11 @@ const CreateOptionCard = (props: CreateOptionCardProps) => {
     <Box
       onClick={props.onClick}
       sx={{
-        background: "background: linear-gradient(180deg, #292B2C 0%, #222426 100%)",
+        background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
         p: 4,
         borderRadius: "16px",
         mb: 2,
+        cursor: "pointer"
       }}
     >
       <Grid container>

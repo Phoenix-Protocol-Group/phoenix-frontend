@@ -15,7 +15,13 @@ type Story = StoryObj<typeof CreateSomething>;
 
 export const Primary: Story = {
   args: {
-    onCreateCollectionClick: () => {alert("collection")},
-    onCreateNftClick: () => {alert("nft")},
+    title: "Create NFT",
+    subTitle: "Choose how you want to create your NFT",
+    title1: "foo",
+    title2: "bar",
+    description1: "desc1",
+    description2: "desc2",
+    option1Click: () => {alert("collection")},
+    option2Click: () => {alert("nft")},
   },
 };

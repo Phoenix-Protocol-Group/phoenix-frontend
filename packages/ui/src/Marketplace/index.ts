@@ -17,5 +17,5 @@ export {
   NftSingle,
   CreateNftBulk,
   CreateNft,
-  CreateSomething
+  CreateSomething,
 };

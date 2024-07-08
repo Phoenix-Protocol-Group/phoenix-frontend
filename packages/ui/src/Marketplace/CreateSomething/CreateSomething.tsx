@@ -3,8 +3,14 @@ import React from "react";
 import { CreateOptionCard } from "../Shared";
 
 export interface CreateSomethingProps {
-  onCreateCollectionClick: () => void;
-  onCreateNftClick: () => void;
+  title: string;
+  subTitle: string;
+  title1: string,
+  title2: string,
+  description1: string,
+  description2: string,
+  option1Click: () => void;
+  option2Click: () => void;
 }
 
 const CreateSomething = (props: CreateSomethingProps) => {
@@ -28,7 +34,7 @@ const CreateSomething = (props: CreateSomethingProps) => {
               mb: 1.5,
             }}
           >
-            Create something!
+            {props.title}
           </Typography>
           <Typography
             sx={{
@@ -38,23 +44,23 @@ const CreateSomething = (props: CreateSomethingProps) => {
               color: "#BFBFBF",
             }}
           >
-            Please select what would you like to create today
+            {props.subTitle}
           </Typography>
         </Grid>
         <Grid item xs={12}>
           <Grid container rowSpacing={2}>
             <Grid item xs={12}>
               <CreateOptionCard
-                title="Drop a Collection"
-                description="Launch your NFT collection for others to purchase. Your items won't display until they've been minted."
-                onClick={props.onCreateCollectionClick}
+                title={props.title1}
+                description={props.description1}
+                onClick={props.option1Click}
               />
             </Grid>
             <Grid item xs={12}>
               <CreateOptionCard
-                title="Mint an NFT"
-                description="Create a public collection and immediately mint NFTs directly to your wallet to own or list for sale."
-                onClick={props.onCreateNftClick}
+                title={props.title2}
+                description={props.description2}
+                onClick={props.option2Click}
               />
             </Grid>
           </Grid>
