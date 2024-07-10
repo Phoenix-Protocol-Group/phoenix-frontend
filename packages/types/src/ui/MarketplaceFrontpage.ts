@@ -112,3 +112,12 @@ export interface GettingStartedProps {
   entries: GettingStartedCardProps[];
   onViewAllClick: () => void;
 }
+
+export interface FrontpageProps {
+  featuredProps: FeaturedProps;
+  topCollectionsProps: TopCollectionsProps;
+  popularNftsProps: PopularNftsProps;
+  risingStarsProps: RisingStarsProps;
+  nftCategoriesProps: NftCategoriesProps;
+  gettingStartedProps: GettingStartedProps;
+}

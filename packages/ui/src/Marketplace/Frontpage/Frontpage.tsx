@@ -6,24 +6,7 @@ import PopularNfts from "./PopularNfts/PopularNfts";
 import RisingStars from "./RisingStars/RisingStars";
 import NftCategories from "./NftCategories/NftCategories";
 import GettingStarted from "./GettingStarted/GettingStarted";
-import { FeaturedProps, GettingStartedProps, NftCategoriesProps, PopularNftsProps, RisingStarsProps, TopCollectionsProps } from "@phoenix-protocol/types";
-
-export interface FeaturedCardProps {
-  image: string;
-  name: string;
-  price: string;
-  volume: string;
-  icon: string;
-}
-
-export interface FrontpageProps {
-  featuredProps: FeaturedProps;
-  topCollectionsProps: TopCollectionsProps;
-  popularNftsProps: PopularNftsProps;
-  risingStarsProps: RisingStarsProps;
-  nftCategoriesProps: NftCategoriesProps;
-  gettingStartedProps: GettingStartedProps;
-}
+import { FrontpageProps } from "@phoenix-protocol/types";
 
 const Frontpage = (props: FrontpageProps) => {
   return (
