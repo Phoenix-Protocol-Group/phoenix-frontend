@@ -1,6 +1,6 @@
 import { Box, Grid, Typography } from "@mui/material";
-import { NftListingEntryProps } from "./NftListing";
 import { Button } from "../../../Button/Button";
+import { NftListingEntryProps } from "@phoenix-protocol/types";
 
 const NftListingEntry = (props: NftListingEntryProps) => {
   return (

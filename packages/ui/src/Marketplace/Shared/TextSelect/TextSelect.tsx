@@ -7,20 +7,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-
-export interface TextSelectItemProps {
-  label: string;
-  value: string;
-}
-
-export interface TextSelectProps {
-  label: string;
-  helpText?: string;
-  placeholder: string;
-  value: string;
-  onChange: (value: string) => void;
-  items: TextSelectItemProps[];
-}
+import { TextSelectItemProps, TextSelectProps } from "@phoenix-protocol/types";
 
 const TextSelect = (props: TextSelectProps) => {
   return (

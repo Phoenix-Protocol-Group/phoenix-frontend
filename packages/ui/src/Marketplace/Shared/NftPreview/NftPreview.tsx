@@ -1,13 +1,6 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
-
-export interface NftPreviewProps {
-  image: string;
-  collectionName: string;
-  nftName: string;
-  price: string;
-  ownedBy: string;
-}
+import { NftPreviewProps } from "@phoenix-protocol/types";
 
 const NftPreview = (props: NftPreviewProps) => {
   return (

@@ -17,44 +17,7 @@ import { Button } from "../../../Button/Button";
 import { ExpandMore, ExpandLess, Search, Tune } from "@mui/icons-material";
 import NftListingEntry from "./NftListingEntry";
 import TextInput from "../TextInput/TextInput";
-
-type AuctionStatus = "ALL" | "NOW" | "AUCTION";
-type AuctionType = "ALL" | "MULTIPLE" | "SINGLE";
-
-export interface NftListingProps {
-  listForSaleClick?: (id: string) => void;
-  nftEntries: NftListingEntryProps[];
-  searchTerm: string;
-  setSearchTerm: (searchTerm: string) => void;
-  order: string;
-  orderItems: {
-    value: string;
-    label: string;
-  }[];
-  setOrder: (order: string) => void;
-  activeCurrency: "crypto" | "usd";
-  setActiveCurrency: (view: "crypto" | "usd") => void;
-  //filter properties
-  minPrice: string;
-  setMinPrice: (minPrice: string) => void;
-  maxPrice: string;
-  setMaxPrice: (maxPrice: string) => void;
-  status: AuctionStatus;
-  setStatus: (status: AuctionStatus) => void;
-  type: AuctionType;
-  setType: (status: AuctionType) => void;
-}
-
-export interface NftListingEntryProps {
-  id: string;
-  image: string;
-  collectionName: string;
-  nftName: string;
-  price: string;
-  ownedBy: string;
-  listForSale?: boolean;
-  _listForSaleClick?: (id: string) => void; //use listForSaleClick in NftListingProps
-}
+import { AuctionStatus, AuctionType, NftListingProps } from "@phoenix-protocol/types";
 
 const outlinedIconButtonStyle = {
   border: "1px solid #2C2C31",

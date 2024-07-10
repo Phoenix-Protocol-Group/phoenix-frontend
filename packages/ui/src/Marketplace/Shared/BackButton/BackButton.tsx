@@ -1,10 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
-
-export interface BackButtonProps {
-  onClick: () => void;
-}
+import { BackButtonProps } from "@phoenix-protocol/types";
 
 const BackButton = (props: BackButtonProps) => {
   return (

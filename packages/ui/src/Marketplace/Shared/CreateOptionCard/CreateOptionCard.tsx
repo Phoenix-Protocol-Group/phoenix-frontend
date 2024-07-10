@@ -1,12 +1,7 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
 import { ArrowForward } from "@mui/icons-material";
-
-export interface CreateOptionCardProps {
-  title: string;
-  description: string;
-  onClick: () => void;
-}
+import { CreateOptionCardProps } from "@phoenix-protocol/types";
 
 const CreateOptionCard = (props: CreateOptionCardProps) => {
   return (

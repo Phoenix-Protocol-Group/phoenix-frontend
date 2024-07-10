@@ -1,12 +1,6 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
-
-export interface CollectionPreviewProps {
-  image: string;
-  collectionName: string;
-  floorPrice: string;
-  volume: string;
-}
+import { CollectionPreviewProps } from "@phoenix-protocol/types";
 
 const CollectionPreview = (props: CollectionPreviewProps) => {
   return (

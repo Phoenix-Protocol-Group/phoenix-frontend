@@ -2,14 +2,7 @@ import React from "react";
 import { Box, Tooltip, Typography } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-
-export interface ImageUploadProps {
-  title: string;
-  helpText?: string;
-  onFileDrop: (file: File) => void;
-  description1: string;
-  description2?: string;
-}
+import { ImageUploadProps } from "@phoenix-protocol/types";
 
 const ImageUpload = (props: ImageUploadProps) => {
   const [isDragging, setIsDragging] = React.useState(false);

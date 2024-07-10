@@ -1,15 +1,7 @@
 import { TextField, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-
-export interface TextInputProps {
-  label?: string;
-  helpText?: string;
-  placeholder: string;
-  name?: string; //optional for grouped input onChange Events
-  value: string;
-  onChange: (val: string, name?: string) => void;
-}
+import { TextInputProps } from "@phoenix-protocol/types";
 
 const TextInput = (props: TextInputProps) => {
   return (
