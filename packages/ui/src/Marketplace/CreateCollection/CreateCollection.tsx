@@ -10,6 +10,7 @@ import {
 } from "../Shared";
 import React from "react";
 import { Button } from "../../Button/Button";
+import { CreateCollectionProps } from "@phoenix-protocol/types";
 
 const h2Style = {
   fontSize: "32px",
@@ -30,27 +31,10 @@ const h3Style = {
   fontWeight: 700,
 };
 
-const CreateCollection = () => {
-  const [collectionName, setCollectionName] = React.useState("");
-  const [tokenSymbol, setTokenSymbol] = React.useState("");
-  const [description, setDescription] = React.useState("");
-
-  const categoryItems = [
-    {
-      value: "foo",
-      label: "Foo",
-    },
-    {
-      value: "bar",
-      label: "Bar",
-    },
-  ];
-
-  const [category, setCategory] = React.useState("foo");
-
+const CreateCollection = (props: CreateCollectionProps) => {
   return (
     <Box>
-      <BackButton onClick={() => {}} />
+      <BackButton onClick={props.onBackButtonClick} />
       <Grid container columnSpacing={6} rowSpacing={4} pt={3}>
         <Grid item xs={12} lg={8}>
           <Grid container rowSpacing={4}>
@@ -86,8 +70,8 @@ const CreateCollection = () => {
                         label="CONTRACT NAME"
                         helpText="help"
                         placeholder="My Collection Name"
-                        value={collectionName}
-                        onChange={setCollectionName}
+                        value={props.name}
+                        onChange={props.setName}
                       />
                     </Grid>
                     <Grid item xs={5} sm={4} md={3}>
@@ -95,8 +79,8 @@ const CreateCollection = () => {
                         label="TOKEN SYMBOL"
                         helpText="help"
                         placeholder="MCN"
-                        value={tokenSymbol}
-                        onChange={setTokenSymbol}
+                        value={props.symbol}
+                        onChange={props.setSymbol}
                       />
                     </Grid>
                   </Grid>
@@ -106,17 +90,17 @@ const CreateCollection = () => {
                     label="DESCRIPTION"
                     helpText="help"
                     placeholder="Provide details description of your collection."
-                    value={description}
-                    onChange={setDescription}
+                    value={props.description}
+                    onChange={props.setDescription}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextSelect
                     label="CATEGORY"
                     placeholder="My Collection Name"
-                    value={category}
-                    items={categoryItems}
-                    onChange={setCategory}
+                    value={props.category}
+                    items={props.categories}
+                    onChange={props.setCategory}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -128,8 +112,8 @@ const CreateCollection = () => {
         </Grid>
         <Grid item xs={12} lg={4}>
           <CollectionPreview
-            image="/nftPreview.png"
-            collectionName="Collection Name"
+            image={props.previewImage ? props.previewImage : "/nftPreview.png"}
+            collectionName={props.name ? props.name : "Collection Name"}
             floorPrice="21.3K"
             volume="42.5K"
           />
@@ -142,8 +126,9 @@ const CreateCollection = () => {
               mr: 1.5,
             }}
             label="Create Collection"
+            onClick={props.onSubmitClick}
           />
-          <Button type="secondary" label="Back" />
+          <Button type="secondary" label="Back" onClick={props.onBackButtonClick} />
         </Grid>
       </Grid>
     </Box>

@@ -14,5 +14,7 @@ export default meta;
 type Story = StoryObj<typeof CreateCollection>;
 
 export const Primary: Story = {
-  args: {},
+  args: {
+    
+  },
 };
