@@ -4,3 +4,4 @@ export * from "./CreateSomething";
 export * from "./CreateCollection";
 export * from "./CollectionSingle";
 export * from "./CollectionsOverview";
+export * from "./CreateNftSingle";

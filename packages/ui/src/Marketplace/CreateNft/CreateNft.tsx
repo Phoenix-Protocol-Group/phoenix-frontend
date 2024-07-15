@@ -10,6 +10,7 @@ import {
 } from "../Shared";
 import React from "react";
 import { Button } from "../../Button/Button";
+import { CreateNftProps } from "@phoenix-protocol/types";
 
 const h2Style = {
   fontSize: "32px",
@@ -30,28 +31,10 @@ const h3Style = {
   fontWeight: 700,
 };
 
-const CreateNft = () => {
-  const [category, setCategory] = React.useState("");
-  const [nftName, setNftName] = React.useState("");
-  const [nftSupply, setNftSupply] = React.useState("");
-  const [description, setDescription] = React.useState("");
-  const [file, setFile] = React.useState<File | undefined>(undefined);
-  const [externalLink, setExternalLink] = React.useState("");
-
-  const categoryItems = [
-    {
-      value: "foo",
-      label: "Foo",
-    },
-    {
-      value: "bar",
-      label: "Bar",
-    },
-  ];
-
+const CreateNft = (props: CreateNftProps) => {
   return (
     <Box>
-      <BackButton onClick={() => {}} />
+      <BackButton onClick={props.onBackButtonClick} />
       <Grid container columnSpacing={6} rowSpacing={4} pt={3}>
         <Grid item xs={12} lg={8}>
           <Grid container rowSpacing={5}>
@@ -78,9 +61,9 @@ const CreateNft = () => {
                         label="CATEGORY"
                         helpText="help"
                         placeholder="My Collection Name"
-                        value={category}
-                        onChange={setCategory}
-                        items={categoryItems}
+                        value={props.category}
+                        onChange={props.setCategory}
+                        items={props.categories}
                       />
                     </Grid>
                     <Grid
@@ -100,7 +83,7 @@ const CreateNft = () => {
                     >
                       <Button
                         label="Create Collection"
-                        onClick={() => {}}
+                        onClick={props.onCreateCollectionClick}
                         sx={{
                           padding: "14px 40px",
                           marginTop: {
@@ -119,7 +102,7 @@ const CreateNft = () => {
                     helpText=""
                     description1="Max size 50 MB. File types: JPG, PNG, SVG, MP4 or GIF"
                     onFileDrop={(file: File) => {
-                      setFile(file);
+                      props.setFile(file);
                     }}
                   />
                 </Grid>
@@ -130,8 +113,8 @@ const CreateNft = () => {
                         label="NAME"
                         helpText="help"
                         placeholder="Name your NFT"
-                        value={nftName}
-                        onChange={setNftName}
+                        value={props.name}
+                        onChange={props.setName}
                       />
                     </Grid>
                     <Grid item xs={5} sm={3} md={2}>
@@ -139,8 +122,8 @@ const CreateNft = () => {
                         label="SUPPLY"
                         helpText="help"
                         placeholder="1"
-                        value={nftSupply}
-                        onChange={setNftSupply}
+                        value={props.supply}
+                        onChange={props.setSupply}
                       />
                     </Grid>
                   </Grid>
@@ -150,16 +133,16 @@ const CreateNft = () => {
                     label="DESCRIPTION"
                     helpText="help"
                     placeholder="Provide details description of your collection."
-                    value={description}
-                    onChange={setDescription}
+                    value={props.description}
+                    onChange={props.setDescription}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextInput
                     label="EXTERNAL LINK"
                     placeholder="https://www.yoursite.io/item/2137"
-                    value={externalLink}
-                    onChange={setExternalLink}
+                    value={props.externalLink}
+                    onChange={props.setExternalLink}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -171,9 +154,9 @@ const CreateNft = () => {
         </Grid>
         <Grid item xs={12} lg={4}>
           <NftPreview
-            image="/nftPreview.png"
-            collectionName="Collection Name"
-            nftName="NFT Name"
+            image={props.previewImage ? props.previewImage : "/nftPreview.png"}
+            collectionName={props.category ? props.category : "Collection Name"}
+            nftName={props.name ? props.name : "NFT Name"}
             price="21.3K"
             ownedBy="You"
           />
@@ -186,9 +169,9 @@ const CreateNft = () => {
               mr: 1.5,
             }}
             label="Create Item"
-            onClick={() => {}}
+            onClick={props.onSubmitClick}
           />
-          <Button type="secondary" label="Back" onClick={() => {}} />
+          <Button type="secondary" label="Back" onClick={props.onBackButtonClick} />
         </Grid>
       </Grid>
     </Box>
