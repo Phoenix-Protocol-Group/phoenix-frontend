@@ -14,6 +14,7 @@ import SearchIcon from "@mui/icons-material/Search";
 
 import CollectionsOverviewHeader from "./CollectionsOverviewHeader";
 import CollectionsOverviewEntry from "./CollectionsOverviewEntry";
+import { CollectionsOverviewProps } from "@phoenix-protocol/types";
 
 const BoxStyle = {
   padding: "15px",
@@ -91,51 +92,6 @@ const headerRightAligned = {
   justifyContent: "flex-end",
   pr: 0.5,
 };
-
-export interface CollectionsOverviewEntryProps {
-  _key?: number; //used for key and index number next to collection name
-  _onClick?: (id: string) => void; //used to trigger onEntryClick
-  id: string;
-  previewImage: string;
-  collectionName: string;
-  floorPrice: string;
-  bestOffer: string;
-  volume: string;
-  volumePercent?: string;
-  owners: string;
-  ownersPercent?: string;
-  forSalePercent: string;
-  forSaleNumbers: string;
-}
-
-export interface CollectionsOverviewProps {
-  entries: CollectionsOverviewEntryProps[];
-  onEntryClick: (id: string) => void;
-  activeSort: {
-    column:
-      | "collection"
-      | "floorPrice"
-      | "bestOffer"
-      | "volume"
-      | "owners"
-      | "forSale"
-      | undefined;
-    direction: "asc" | "desc";
-  };
-  searchTerm: string;
-  setSearchTerm: (searchTerm: string) => void;
-  category: string;
-  categoryItems: {
-    value: string;
-    label: string;
-  }[];
-  setCategory: (category: string) => void;
-  handleSort: (column: string) => void;
-  activeCurrency: "crypto" | "usd";
-  setActiveCurrency: (view: "crypto" | "usd") => void;
-  activeTime: "6h" | "1d" | "7d" | "30d";
-  setActiveTime: (time: "6h" | "1d" | "7d" | "30d") => void;
-}
 
 const CollectionsOverview = (props: CollectionsOverviewProps) => {
   return (
