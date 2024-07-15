@@ -11,6 +11,8 @@ const BackButton = (props: BackButtonProps) => {
         display: "flex",
         alignItems: "center",
         cursor: "pointer",
+        position: "relative",
+        zIndex: 2,
         "&:hover .backButton-label": {
           textDecoration: "underline",
         },
