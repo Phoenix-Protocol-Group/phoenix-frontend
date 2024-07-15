@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material";
 import { TextSelectItemProps } from "@phoenix-protocol/types";
 import { CreateCollection } from "@phoenix-protocol/ui";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const router = useRouter();
@@ -14,9 +14,17 @@ export default function Page() {
   const [description, setDescription] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const [categories, setCategories] = useState<TextSelectItemProps[]>([]);
+  const [file, setFile] = useState<File | undefined>();
   const [previewImage, setPreviewImage] = useState<string | undefined>(
     undefined
   );
+
+  useEffect(() => {
+    if(!file) return;
+
+    const url = URL.createObjectURL(file);
+    setPreviewImage(url);
+  }, [file]);
 
   const handleSubmitClick = () => {
 
@@ -56,10 +64,7 @@ export default function Page() {
           category={category}
           setCategory={setCategory}
           previewImage={previewImage}
-          setFile={(file: File) => {
-            const url = URL.createObjectURL(file);
-            setPreviewImage(url);
-          }}
+          setFile={setFile}
         />
       </Box>
     </Box>
