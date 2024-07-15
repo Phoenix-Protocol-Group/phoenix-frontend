@@ -53,14 +53,14 @@ export default function Page() {
       </Typography>
       <Box mx={2} position="relative">
         <CreateSomething
-          title="Create something!"
-          subTitle="Please select what would you like to create today"
-          title1="Drop a Collection"
-          description1="Launch your NFT collection for others to purchase. Your items won't display until they've been minted."
-          option1Click={() => {navigateTo("/collection")}}
-          title2="Mint an NFT"
-          description2="Create a public collection and immediately mint NFTs directly to your wallet to own or list for sale."
-          option2Click={() => {navigateTo("/nft")}}
+          title="Create NFT"
+          subTitle="Choose how you want to create your NFT"
+          title1="Mint Single NFT"
+          description1="Create a single NFT from scratch"
+          option1Click={() => {navigateTo("/single")}}
+          title2="Mint Multiple NFTs"
+          description2="Create NFTs in bulk, you will need NFT metadata files for this"
+          option2Click={() => {navigateTo("/bulk")}}
         />
       </Box>
     </Box>
