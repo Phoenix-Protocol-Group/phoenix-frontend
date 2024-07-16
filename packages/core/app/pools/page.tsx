@@ -92,17 +92,17 @@ export default function Page() {
           {
             // XLM / USDC
             address: "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX",
-            amount: 50000,
+            amount: 12500,
           },
           // XLM/PHO
           {
             address: "CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH",
-            amount: 100000,
+            amount: 25000,
           },
           {
             // PHO/USDC
             address: "CAZ6W4WHVGQBGURYTUOLCUOOHW6VQGAAPSPCD72VEDZMBBPY7H43AYEC",
-            amount: 75000,
+            amount: 18750,
           },
         ];
         const valueStaked = tvl * ratioStaked;
