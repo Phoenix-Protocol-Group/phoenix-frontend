@@ -5,15 +5,11 @@ import { CollectionsOverviewEntryProps } from "@phoenix-protocol/types";
 const TopCollectionsEntry = (props: CollectionsOverviewEntryProps) => {
   const BoxStyle = {
     padding: "11px 16px",
-    mb: 2,
     borderRadius: "8px",
     cursor: "pointer",
     border: "1px solid #2C2C31",
     background:
       "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-    "&:last-of-type": {
-      marginBottom: "0 !important"
-    },
     "&:hover": {
       outline: "1px solid #E2621B",
     },
@@ -32,14 +28,14 @@ const TopCollectionsEntry = (props: CollectionsOverviewEntryProps) => {
   }
 
   return (
-    <Box key={props._key} sx={BoxStyle} onClick={() => props._onClick(props.id)}>
+    <Box sx={BoxStyle}>
       <Grid container alignItems="center">
         <Grid item xs={3} sx={{
           display: "flex",
           alignItems: "center"
         }}>
           <Typography sx={{ ...EntryTextStyle, opacity: 0.6, mr: 1.5 }}>
-            {props._key+1}
+            {props._number+1}
           </Typography>
           <Box
             component="img"

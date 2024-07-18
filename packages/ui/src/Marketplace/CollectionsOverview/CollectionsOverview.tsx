@@ -114,8 +114,8 @@ const CollectionsOverview = (props: CollectionsOverviewProps) => {
           gap: 2,
           flexDirection: {
             xs: "column",
-            sm: "row"
-          }
+            sm: "row",
+          },
         }}
       >
         <Grid container spacing={2}>
@@ -179,7 +179,9 @@ const CollectionsOverview = (props: CollectionsOverviewProps) => {
                 onChange={(e) => props.setCategory(e.target.value)}
                 sx={{
                   boxShadow: "none",
-                  ".MuiOutlinedInput-notchedOutline": {border: "1px solid #2C2C31 !important", },
+                  ".MuiOutlinedInput-notchedOutline": {
+                    border: "1px solid #2C2C31 !important",
+                  },
                   background:
                     "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
                   borderRadius: "8px",
@@ -272,7 +274,7 @@ const CollectionsOverview = (props: CollectionsOverviewProps) => {
         <Grid container>
           <Grid item xs={3}>
             <CollectionsOverviewHeader
-              handleSort={props.handleSort}
+              setSort={props.setSort}
               label="collection"
               active={
                 props.activeSort.column === "collection"
@@ -283,7 +285,7 @@ const CollectionsOverview = (props: CollectionsOverviewProps) => {
           </Grid>
           <Grid item xs={2} sx={headerRightAligned}>
             <CollectionsOverviewHeader
-              handleSort={props.handleSort}
+              setSort={props.setSort}
               label="floor price"
               active={
                 props.activeSort.column === "floorPrice"
@@ -294,7 +296,7 @@ const CollectionsOverview = (props: CollectionsOverviewProps) => {
           </Grid>
           <Grid item xs={2} sx={headerRightAligned}>
             <CollectionsOverviewHeader
-              handleSort={props.handleSort}
+              setSort={props.setSort}
               label="best offer"
               active={
                 props.activeSort.column === "bestOffer"
@@ -305,7 +307,7 @@ const CollectionsOverview = (props: CollectionsOverviewProps) => {
           </Grid>
           <Grid item xs={2} sx={headerRightAligned}>
             <CollectionsOverviewHeader
-              handleSort={props.handleSort}
+              setSort={props.setSort}
               label="volume"
               active={
                 props.activeSort.column === "volume"
@@ -316,7 +318,7 @@ const CollectionsOverview = (props: CollectionsOverviewProps) => {
           </Grid>
           <Grid item xs={2} sx={headerRightAligned}>
             <CollectionsOverviewHeader
-              handleSort={props.handleSort}
+              setSort={props.setSort}
               label="owners"
               active={
                 props.activeSort.column === "owners"
@@ -327,7 +329,7 @@ const CollectionsOverview = (props: CollectionsOverviewProps) => {
           </Grid>
           <Grid item xs={1} sx={headerRightAligned}>
             <CollectionsOverviewHeader
-              handleSort={props.handleSort}
+              setSort={props.setSort}
               label="for sale"
               active={
                 props.activeSort.column === "forSale"
@@ -341,7 +343,18 @@ const CollectionsOverview = (props: CollectionsOverviewProps) => {
       <Box sx={{ minWidth: "700px" }}>
         {props.entries.length ? (
           props.entries.map((entry, index) => (
-            <CollectionsOverviewEntry _key={index} _onClick={props.onEntryClick} {...entry} />
+            <Box
+              key={index}
+              onClick={() => props.onEntryClick(entry.id)}
+              sx={{
+                mb: 2,
+                "&:last-of-type": {
+                  marginBottom: "0 !important",
+                },
+              }}
+            >
+              <CollectionsOverviewEntry _number={index} {...entry} />
+            </Box>
           ))
         ) : (
           <Box>

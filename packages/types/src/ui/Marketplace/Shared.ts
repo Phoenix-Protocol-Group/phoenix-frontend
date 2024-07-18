@@ -26,6 +26,8 @@ export interface ImageUploadProps {
 export type AuctionStatus = "ALL" | "NOW" | "AUCTION";
 export type AuctionType = "ALL" | "MULTIPLE" | "SINGLE";
 
+export type Currency = "crypto" | "usd";
+
 export interface NftListingProps {
   listForSaleClick?: (id: string) => void;
   nftEntries: NftListingEntryProps[];
@@ -37,8 +39,8 @@ export interface NftListingProps {
     label: string;
   }[];
   setOrder: (order: string) => void;
-  activeCurrency: "crypto" | "usd";
-  setActiveCurrency: (view: "crypto" | "usd") => void;
+  activeCurrency: Currency;
+  setActiveCurrency: (view: Currency) => void;
   //filter properties
   minPrice: string;
   setMinPrice: (minPrice: string) => void;

@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { ArrowDownward, SwapVert } from "@mui/icons-material";
+import { CollectionsOverviewActiveSort } from "@phoenix-protocol/types";
 
 function convertToCamelCase(input: string): string {
   return input
@@ -11,11 +12,11 @@ function convertToCamelCase(input: string): string {
 const TopCollectionsHeader = ({
   label,
   active,
-  handleSort,
+  setSort,
 }: {
   label: string;
   active: "asc" | "desc" | false;
-  handleSort(column: string): void;
+  setSort(sort: CollectionsOverviewActiveSort): void;
 }) => (
   <Box
     sx={{
@@ -24,7 +25,17 @@ const TopCollectionsHeader = ({
       cursor: "pointer",
     }}
     onClick={() => {
-      handleSort(convertToCamelCase(label));
+      setSort({
+        column: convertToCamelCase(label) as
+          | "collection"
+          | "floorPrice"
+          | "bestOffer"
+          | "volume"
+          | "owners"
+          | "forSale"
+          | undefined,
+        direction: "desc",
+      });
     }}
   >
     {label === "collection" && (
@@ -46,7 +57,7 @@ const TopCollectionsHeader = ({
         lineHeight: "200%",
         fontWeight: "700",
         textTransform: "uppercase",
-        opacity: active ? "1" : "0.6"
+        opacity: active ? "1" : "0.6",
       }}
     >
       {label}
