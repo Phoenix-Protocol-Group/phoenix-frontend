@@ -5,7 +5,7 @@ import { CreateNftBulkEntryProps } from "@phoenix-protocol/types";
 
 const CreateNftBulkCard = (props: CreateNftBulkEntryProps) => {
   const handleChange = (val: string, name: string) => {
-    props.onChange(props.id, name, val);
+    props._onChange(props.id, name, val);
   };
 
   const [previewImage, setPreviewImage] = React.useState<string>("");
