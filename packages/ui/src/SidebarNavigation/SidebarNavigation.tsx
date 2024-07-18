@@ -228,9 +228,8 @@ const ItemList = ({
   return (
     <>
       {items.map((item) => (
-        <>
+        <React.Fragment key={item.key}>
           <ListItem
-            key={item.label}
             disablePadding
             className={item.label}
             sx={{
@@ -297,7 +296,7 @@ const ItemList = ({
               <List component="div" disablePadding>
                 {item.childItems.map((childItem: any) => (
                   <ListItem
-                    key={childItem.label}
+                    key={item.label}
                     disablePadding
                     className={item.label}
                     sx={{
@@ -342,7 +341,7 @@ const ItemList = ({
               </List>
             </Collapse>
           )}
-        </>
+        </React.Fragment>
       ))}
     </>
   );
