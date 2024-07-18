@@ -1,5 +1,7 @@
+import { Currency, TextSelectItemProps } from "./Shared";
+
 export interface CollectionsOverviewEntryProps {
-  _key?: number; //used for key and index number next to collection name
+  _number?: number; //used to display numbers
   _onClick?: (id: string) => void; //used to trigger onEntryClick
   id: string;
   previewImage: string;
@@ -14,31 +16,32 @@ export interface CollectionsOverviewEntryProps {
   forSaleNumbers: string;
 }
 
+export interface CollectionsOverviewActiveSort {
+  column:
+    | "collection"
+    | "floorPrice"
+    | "bestOffer"
+    | "volume"
+    | "owners"
+    | "forSale"
+    | undefined;
+  direction: "asc" | "desc";
+}
+
+export type CollectionsOverviewTimeOptions = "6h" | "1d" | "7d" | "30d";
+
 export interface CollectionsOverviewProps {
   entries: CollectionsOverviewEntryProps[];
   onEntryClick: (id: string) => void;
-  activeSort: {
-    column:
-      | "collection"
-      | "floorPrice"
-      | "bestOffer"
-      | "volume"
-      | "owners"
-      | "forSale"
-      | undefined;
-    direction: "asc" | "desc";
-  };
+  activeSort: CollectionsOverviewActiveSort;
+  setSort: (sort: CollectionsOverviewActiveSort) => void;
   searchTerm: string;
   setSearchTerm: (searchTerm: string) => void;
   category: string;
-  categoryItems: {
-    value: string;
-    label: string;
-  }[];
+  categoryItems: TextSelectItemProps[];
   setCategory: (category: string) => void;
-  handleSort: (column: string) => void;
-  activeCurrency: "crypto" | "usd";
-  setActiveCurrency: (view: "crypto" | "usd") => void;
-  activeTime: "6h" | "1d" | "7d" | "30d";
-  setActiveTime: (time: "6h" | "1d" | "7d" | "30d") => void;
+  activeCurrency: Currency;
+  setActiveCurrency: (view: Currency) => void;
+  activeTime: CollectionsOverviewTimeOptions;
+  setActiveTime: (time: CollectionsOverviewTimeOptions) => void;
 }

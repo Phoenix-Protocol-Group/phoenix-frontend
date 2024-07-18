@@ -5,7 +5,7 @@ export interface CreateNftBulkEntryProps {
   name: string;
   description: string;
   file: File;
-  onChange?: (id: number, key: string, value: string) => void; //only used in child card component
+  _onChange?: (id: number, key: string, value: string) => void; //only used in child card component
 }
 
 export interface CreateNftBulkProps {
