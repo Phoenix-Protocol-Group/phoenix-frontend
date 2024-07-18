@@ -3,14 +3,7 @@ import { BackButton, TextSelect } from "../Shared";
 import React from "react";
 import { Button } from "../../Button/Button";
 import CreateNftBulkCard from "./CreateNftBulkCard";
-
-export interface CreateNftBulkCardProps {
-  id: number;
-  image: string;
-  name: string;
-  description: string;
-  onChange: (id: number, key: string, value: string) => void;
-}
+import { CreateNftBulkEntryProps, CreateNftBulkProps } from "@phoenix-protocol/types";
 
 const h2Style = {
   fontSize: "32px",
@@ -31,47 +24,34 @@ const h3Style = {
   fontWeight: 700,
 };
 
-const CreateNftBulk = () => {
-  const [category, setCategory] = React.useState("");
-
+const CreateNftBulk = (props: CreateNftBulkProps) => {
   const handleItemChange = (id: number, key: string, value: string) => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, [key]: value } : item
-      )
+    const newEntries = props.entries.map((item) =>
+      item.id === id ? { ...item, [key]: value } : item
     );
+
+    props.setEntries(newEntries);
   };
 
-  const [items, setItems] = React.useState<CreateNftBulkCardProps[]>([
-    {
-      id: 1,
-      image: "/nftPreview.png",
-      name: "foo",
-      description: "bar",
-      onChange: handleItemChange,
-    },
-    {
-      id: 2,
-      image: "/nftPreview.png",
-      name: "foo",
-      description: "bar",
-      onChange: handleItemChange,
-    },
-    {
-      id: 3,
-      image: "/nftPreview.png",
-      name: "foo",
-      description: "bar",
-      onChange: handleItemChange,
-    },
-    {
-      id: 4,
-      image: "/nftPreview.png",
-      name: "foo",
-      description: "bar",
-      onChange: handleItemChange,
-    },
-  ]);
+  const handleClick = () => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.multiple = true;
+    fileInput.accept = "image/*";
+    fileInput.onchange = (event: any) => {
+      if (event.target.files && event.target.files.length > 0) {
+        const newEntries: CreateNftBulkEntryProps[] = Array.from(event.target.files).map((file: File, index) => ({
+          id: index,
+          file: file,
+          name: file.name.split(".")[0] || "NFT Name",
+          description: "Your awesome Description"
+        }));
+    
+        props.setEntries((prevEntries) => [...prevEntries, ...newEntries]);
+      }
+    };
+    fileInput.click();
+  };
 
   const categoryItems = [
     {
@@ -86,7 +66,7 @@ const CreateNftBulk = () => {
 
   return (
     <Box>
-      <BackButton onClick={() => {}} />
+      <BackButton onClick={props.onBackButtonClick} />
       <Grid container rowSpacing={5}>
         <Grid item xs={12}>
           <Grid container pt={3} rowSpacing={4}>
@@ -113,14 +93,14 @@ const CreateNftBulk = () => {
               <Button
                 type="secondary"
                 label="+ Add Files"
-                onClick={() => {}}
+                onClick={handleClick}
                 sx={{
                   padding: "14px 40px",
                 }}
               />
               <Button
                 label="Create Items"
-                onClick={() => {}}
+                onClick={props.onSubmitClick}
                 sx={{
                   padding: "14px 40px",
                   ml: 1.5,
@@ -143,8 +123,8 @@ const CreateNftBulk = () => {
                     label="CATEGORY"
                     placeholder="My Collection Name"
                     helpText="help"
-                    value={category}
-                    onChange={setCategory}
+                    value={props.category}
+                    onChange={props.setCategory}
                     items={categoryItems}
                   />
                 </Grid>
@@ -184,9 +164,9 @@ const CreateNftBulk = () => {
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                {items.map((item: CreateNftBulkCardProps, index: number) => (
-                  <Grid item xs={12} sm={4} md={3} key={index}>
-                    <CreateNftBulkCard {...item} />
+                {props.entries.map((item: CreateNftBulkEntryProps) => (
+                  <Grid item xs={12} sm={4} md={3} key={item.id}>
+                    <CreateNftBulkCard {...item} onChange={handleItemChange}/>
                   </Grid>
                 ))}
               </Grid>

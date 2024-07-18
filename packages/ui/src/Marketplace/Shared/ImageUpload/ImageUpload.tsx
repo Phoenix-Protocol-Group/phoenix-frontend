@@ -38,6 +38,7 @@ const ImageUpload = (props: ImageUploadProps) => {
   const handleClick = () => {
     const fileInput = document.createElement("input");
     fileInput.type = "file";
+    fileInput.accept = "image/*";
     fileInput.onchange = (event: any) => {
       if (event.target.files && event.target.files.length > 0) {
         props.onFileDrop(event.target.files[0]);

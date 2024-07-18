@@ -1,13 +1,21 @@
 import { Box, Grid } from "@mui/material";
 import React from "react";
-import { CreateNftBulkCardProps } from "./CreateNftBulk";
 import { TextArea, TextInput } from "../Shared";
-import { Button } from "../../Button/Button";
+import { CreateNftBulkEntryProps } from "@phoenix-protocol/types";
 
-const CreateNftBulkCard = (props: CreateNftBulkCardProps) => {
+const CreateNftBulkCard = (props: CreateNftBulkEntryProps) => {
   const handleChange = (val: string, name: string) => {
     props.onChange(props.id, name, val);
   };
+
+  const [previewImage, setPreviewImage] = React.useState<string>("");
+
+  React.useEffect(() => {
+    if (!props.file) return;
+
+    const url = URL.createObjectURL(props.file);
+    setPreviewImage(url);
+  }, [props.file])
 
   return (
     <Box
@@ -27,7 +35,7 @@ const CreateNftBulkCard = (props: CreateNftBulkCardProps) => {
           objectFit: "cover",
         }}
         alt="NFT Preview Image"
-        src={props.image}
+        src={previewImage}
       />
       <Grid container rowSpacing={1} sx={{
         background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
