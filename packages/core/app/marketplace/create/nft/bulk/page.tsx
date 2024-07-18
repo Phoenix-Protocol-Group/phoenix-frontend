@@ -6,8 +6,6 @@ import { CreateNftBulk } from "@phoenix-protocol/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const mockFile = new File([""], "/nftPreview.png", { type: "image/png" });
-
 export default function Page() {
   const router = useRouter();
 

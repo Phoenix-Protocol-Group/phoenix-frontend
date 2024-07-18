@@ -53,17 +53,6 @@ const CreateNftBulk = (props: CreateNftBulkProps) => {
     fileInput.click();
   };
 
-  const categoryItems = [
-    {
-      value: "foo",
-      label: "Foo",
-    },
-    {
-      value: "bar",
-      label: "Bar",
-    },
-  ];
-
   return (
     <Box>
       <BackButton onClick={props.onBackButtonClick} />
@@ -125,7 +114,7 @@ const CreateNftBulk = (props: CreateNftBulkProps) => {
                     helpText="help"
                     value={props.category}
                     onChange={props.setCategory}
-                    items={categoryItems}
+                    items={props.categories}
                   />
                 </Grid>
                 <Grid
@@ -166,7 +155,7 @@ const CreateNftBulk = (props: CreateNftBulkProps) => {
               <Grid container spacing={2}>
                 {props.entries.map((item: CreateNftBulkEntryProps) => (
                   <Grid item xs={12} sm={4} md={3} key={item.id}>
-                    <CreateNftBulkCard {...item} onChange={handleItemChange}/>
+                    <CreateNftBulkCard {...item} _onChange={handleItemChange}/>
                   </Grid>
                 ))}
               </Grid>
