@@ -17,10 +17,6 @@ export default function Page() {
 
   const handleSubmitClick = () => {};
 
-  const handleBackButtonClick = () => {
-    router.back();
-  };
-
   return (
     <Box
       sx={{
@@ -41,8 +37,13 @@ export default function Page() {
       </Typography>
       <Box mx={2}>
         <CreateNftBulk
-          onBackButtonClick={handleBackButtonClick}
+          onBackButtonClick={() => {
+            router.back();
+          }}
           onSubmitClick={handleSubmitClick}
+          onCreateCollectionClick={() => {
+            router.push("/marketplace/create/collection");
+          }}
           categories={categories}
           category={category}
           setCategory={setCategory}

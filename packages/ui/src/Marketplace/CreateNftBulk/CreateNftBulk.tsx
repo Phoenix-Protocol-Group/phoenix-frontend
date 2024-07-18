@@ -147,7 +147,7 @@ const CreateNftBulk = (props: CreateNftBulkProps) => {
                   <Button
                     label="Create Collection"
                     type="secondary"
-                    onClick={() => {}}
+                    onClick={props.onCreateCollectionClick}
                     sx={{
                       padding: "14px 40px",
                     }}

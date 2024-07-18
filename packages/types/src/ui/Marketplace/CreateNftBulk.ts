@@ -11,6 +11,7 @@ export interface CreateNftBulkEntryProps {
 export interface CreateNftBulkProps {
   onBackButtonClick: () => void;
   onSubmitClick: () => void;
+  onCreateCollectionClick: () => void;
   categories: TextSelectItemProps[];
   category: string;
   setCategory: (category: string) => void;
