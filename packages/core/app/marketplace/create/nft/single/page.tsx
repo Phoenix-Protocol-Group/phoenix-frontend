@@ -45,7 +45,7 @@ export default function Page() {
           mb: 6,
         }}
       >
-        Marketplace
+        Create
       </Typography>
       <Box mx={2}>
         <CreateNft
