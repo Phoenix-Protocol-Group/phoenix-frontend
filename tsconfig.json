@@ -4,7 +4,8 @@
     "jsx": "react",
     "module": "CommonJS",
     "declaration": true,
-    "moduleResolution": "Node"
+    "declarationMap": true,
+    "moduleResolution": "Node",
   },
   "exclude": ["**/*.spec.ts"]
 }

@@ -2,7 +2,8 @@ import { SidebarNavigation } from "@phoenix-protocol/ui";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { BugReport } from "@mui/icons-material";
-import React from "react";
+import React, { useEffect } from "react";
+import { SidebarItems } from "@phoenix-protocol/types";
 
 const SideNav = ({
   navOpen,
@@ -13,6 +14,10 @@ const SideNav = ({
 }) => {
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    console.log(pathname);
+  });
 
   const navItems = [
     {
@@ -55,6 +60,40 @@ const SideNav = ({
       ),
       active: pathname == "/pools",
       href: "/pools",
+    },
+    {
+      label: "Marketplace",
+      icon: (
+        <Image
+          alt="Marketplace Icon"
+          width={24}
+          height={24}
+          src={
+            pathname.includes("marketplace")
+              ? "/marketplaceIconActive.svg"
+              : "/marketplaceIcon.svg"
+          }
+        />
+      ),
+      active: pathname == "/marketplace",
+      href: "/marketplace",
+      childItems: [
+        {
+          label: "Collections",
+          active: pathname == "/marketplace/collections",
+          href: "/marketplace/collections",
+        },
+        {
+          label: "NFTs",
+          active: pathname == "/marketplace/nfts",
+          href: "/marketplace/nfts",
+        },
+        {
+          label: "Create",
+          active: pathname.includes("marketplace/create"),
+          href: "/marketplace/create",
+        },
+      ],
     },
     {
       label: "Trade History",
