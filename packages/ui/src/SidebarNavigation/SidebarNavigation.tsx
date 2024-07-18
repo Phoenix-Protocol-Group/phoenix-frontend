@@ -13,9 +13,11 @@ import {
   ListSubheader,
   useMediaQuery,
   useTheme,
+  Collapse,
 } from "@mui/material";
 import { DrawerProps } from "@phoenix-protocol/types";
 import { motion, MotionProps } from "framer-motion"; // Import MotionProps
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 
 const drawerWidth = 240;
 
@@ -217,60 +219,130 @@ const ItemList = ({
   onNavClick: (href: string, target?: string) => void;
   open: boolean;
 }) => {
+  const [marketplaceOpen, setMarketplaceOpen] = React.useState(true);
+
+  const handleClick = () => {
+    setMarketplaceOpen(!marketplaceOpen);
+  };
+
   return (
     <>
       {items.map((item) => (
-        <ListItem
-          key={item.label}
-          disablePadding
-          className={item.label}
-          sx={{
-            margin: "0 16px",
-            width: "unset",
-            borderRadius: "12px",
-            overflow: "hidden",
-            border:
-              item.active && open
-                ? "1px solid #E2491A"
-                : "1px solid transparent",
-            background:
-              item.active && open ? "rgba(226, 73, 26, 0.10)" : "transparent",
-            height: open ? "unset" : "32px",
-            marginBottom: open ? 0 : "16px",
-          }}
-        >
-          <ListItemButton
-            onClick={() => {
-              if (!largerThenMd) {
-                setOpen(false);
-              }
-              onNavClick(item.href, item.target);
-            }}
+        <>
+          <ListItem
+            key={item.label}
+            disablePadding
+            className={item.label}
             sx={{
-              padding: 0,
+              margin: "0 16px",
+              width: "unset",
+              borderRadius: "12px",
+              overflow: "hidden",
+              border:
+                item.active && open
+                  ? "1px solid #E2491A"
+                  : "1px solid transparent",
+              background:
+                item.active && open ? "rgba(226, 73, 26, 0.10)" : "transparent",
+              height: open ? "unset" : "32px",
+              marginBottom: open ? 0 : "16px",
             }}
           >
-            <ListItemIcon
+            <ListItemButton
+              onClick={() => {
+                if (!largerThenMd) {
+                  setOpen(false);
+                }
+                onNavClick(item.href, item.target);
+              }}
               sx={{
-                minWidth: "24px",
-                marginLeft: open ? "20px" : "1px",
+                padding: 0,
               }}
             >
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText
-              primaryTypographyProps={{
-                fontSize: "14px",
-                lineHeight: "20px",
-              }}
-              sx={{
-                padding: "16px 24px 16px 20px",
-                opacity: item.active ? 1 : 0.6,
-              }}
-              primary={item.label}
-            />
-          </ListItemButton>
-        </ListItem>
+              {item.icon && (
+                <ListItemIcon
+                  sx={{
+                    minWidth: "24px",
+                    marginLeft: open ? "20px" : "1px",
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+              )}
+              <ListItemText
+                primaryTypographyProps={{
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                }}
+                sx={{
+                  padding: "16px 24px 16px 20px",
+                  opacity:
+                    item.active ||
+                    (item.childItems &&
+                      item.childItems.some((item: any) => item.active))
+                      ? 1
+                      : 0.6,
+                }}
+                primary={item.label}
+              />
+              {item.childItems && (
+                <IconButton onClick={handleClick}>
+                  {marketplaceOpen ? <ExpandLess /> : <ExpandMore />}
+                </IconButton>
+              )}
+            </ListItemButton>
+          </ListItem>
+          {item.childItems && (
+            <Collapse in={marketplaceOpen} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {item.childItems.map((childItem: any) => (
+                  <ListItem
+                    key={childItem.label}
+                    disablePadding
+                    className={item.label}
+                    sx={{
+                      margin: "0 16px",
+                      width: "unset",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      border:
+                        childItem.active && open
+                          ? "1px solid #E2491A"
+                          : "1px solid transparent",
+                      background:
+                        childItem.active && open
+                          ? "rgba(226, 73, 26, 0.10)"
+                          : "transparent",
+                      height: open ? "unset" : "32px",
+                      marginBottom: open ? 0 : "16px",
+                    }}
+                  >
+                    <ListItemButton
+                      onClick={() => {
+                        onNavClick(childItem.href, childItem.target);
+                      }}
+                      sx={{
+                        padding: 0,
+                      }}
+                    >
+                      <ListItemText
+                        primaryTypographyProps={{
+                          fontSize: "14px",
+                          lineHeight: "20px",
+                        }}
+                        sx={{
+                          padding: "10px 12px 10px 64px",
+                          opacity: childItem.active ? 1 : 0.6,
+                        }}
+                        primary={childItem.label}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            </Collapse>
+          )}
+        </>
       ))}
     </>
   );
