@@ -67,7 +67,7 @@ export default function Page() {
           mb: 6,
         }}
       >
-        Create
+        Collections
       </Typography>
       <Box mx={2} position="relative">
         <CollectionsOverview

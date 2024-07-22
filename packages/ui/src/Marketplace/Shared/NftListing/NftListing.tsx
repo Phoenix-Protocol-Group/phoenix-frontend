@@ -127,7 +127,7 @@ const NftListing = (props: NftListingProps) => {
                   color: "white",
                   width: "100%",
                   "&::placeholder": {
-                    color: "rgba(255, 255, 255, 0.6)",
+                    color: "rgba(255, 255, 255, 0.063)",
                     fontSize: "14px",
                     lineHeight: "24px",
                   },
@@ -430,10 +430,12 @@ const NftListing = (props: NftListingProps) => {
           >
             {props.nftEntries.map((entry: any, index: number) => (
               <Grid item xs={6} sm={4} md={3} lg={12 / 5} key={index}>
-                <NftListingEntry
-                  _listForSaleClick={props.listForSaleClick}
-                  {...entry}
-                />
+                <Box key={index} onClick={() => props.onEntryClick(entry.id)}>
+                  <NftListingEntry
+                    _listForSaleClick={props.listForSaleClick}
+                    {...entry}
+                  />
+                </Box>
               </Grid>
             ))}
           </Grid>

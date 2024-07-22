@@ -65,6 +65,7 @@ const CollectionInfoItem = ({
 );
 
 const CollectionSingle = (props: CollectionSingleProps) => {
+  const [showMore, setShowMore] = React.useState<boolean>(false);
   return (
     <Box>
       <Grid
@@ -142,9 +143,10 @@ const CollectionSingle = (props: CollectionSingleProps) => {
                     color: "#C3C3C3",
                   }}
                 >
-                  {props.description.substring(0, 60)}...
+                  {showMore ? props.description : props.description.substring(0, 60)}...
                 </Typography>
                 <Button
+                  onClick={() => setShowMore(!showMore)}
                   sx={{
                     fontSize: "14px",
                     lineHeight: "20px",
@@ -191,6 +193,7 @@ const CollectionSingle = (props: CollectionSingleProps) => {
             <IosShare sx={{ fontSize: "14px", color: "white" }} />
           </Button>
           <PhoenixButton
+            onClick={props.onMakeCollectionOfferClick}
             label="Make Collection Offer"
             sx={{
               fontSize: "14px",
