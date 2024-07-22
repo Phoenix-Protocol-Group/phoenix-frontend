@@ -3,7 +3,7 @@
 import { Box, Typography } from "@mui/material";
 import { AuctionStatus, AuctionType, Currency, NftListingEntryProps, TextSelectItemProps } from "@phoenix-protocol/types";
 import {
-  CollectionSingle,
+  Shared,
 } from "@phoenix-protocol/ui";
 import { useEffect, useState } from "react";
 
@@ -26,25 +26,7 @@ const demoEntryOwned: NftListingEntryProps = {
   listForSale: true,
 }
 
-interface CollectionPageProps {
-  readonly params: {
-    readonly collectionAddress: string;
-  };
-}
-
-export default function Page({ params }: CollectionPageProps) {
-  const [name, setName] = useState<string>("");
-  const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
-  const [creator, setCreator] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [likes, setLikes] = useState<number>(0);
-  const [floorPrice, setFloorPrice] = useState<string>("");
-  const [bestOffer, setBestOffer] = useState<string>("");
-  const [volume7d, setVolume7d] = useState<string>("");
-  const [owners, setOwners] = useState<string>("");
-  const [forSale, setForSale] = useState<string>("");
-  const [total, setTotal] = useState<string>("");
-  const [royalities, setRoyalities] = useState<string>("");
+export default function Page() {
   const [entries, setEntries] = useState<NftListingEntryProps[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [order, setOrder] = useState<string>("");
@@ -67,10 +49,6 @@ export default function Page({ params }: CollectionPageProps) {
     alert("offer")
   };
 
-  const handleListForSaleClick = (id: string) => {
-    alert(`list for sale ${id}`)
-  };
-
   const fetchEntries = () => {
     setEntries([demoEntry, demoEntry, demoEntry, demoEntry, demoEntryOwned])
   }
@@ -78,6 +56,10 @@ export default function Page({ params }: CollectionPageProps) {
   const fetchCollectionInfo = () => {
     //set all collection infos
   }
+
+  const handleListForSaleClick = (id: string) => {
+    alert(`list for sale ${id}`)
+  };
 
   useEffect(() => {
     fetchCollectionInfo();
@@ -103,21 +85,7 @@ export default function Page({ params }: CollectionPageProps) {
         Collection Overview
       </Typography>
       <Box mx={2} position="relative">
-        <CollectionSingle
-          name={name}
-          previewImage={previewImage}
-          creator={creator}
-          description={description}
-          likes={likes}
-          onShareClick={handleShareClick}
-          onMakeCollectionOfferClick={handleCollectionOfferClick}
-          floorPrice={floorPrice}
-          bestOffer={bestOffer}
-          volume7d={volume7d}
-          owners={owners}
-          forSale={forSale}
-          total={total}
-          royalities={royalities}
+        <Shared.NftListing
           nftEntries={entries}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}

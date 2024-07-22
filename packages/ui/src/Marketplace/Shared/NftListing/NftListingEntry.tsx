@@ -65,12 +65,16 @@ const NftListingEntry = (props: NftListingEntryProps) => {
         <Grid container>
           {props.listForSale ? (
             <Grid item xs={12}>
-              <Button 
+              <Button
                 sx={{
-                  padding: "12px 40px 12px 40px"
+                  padding: "12px 40px 12px 40px",
+                  position: "relative",
                 }}
                 label="List For Sale"
-                onClick={() => props._listForSaleClick(props.id)}
+                onClick={(event: any) => {
+                  event.stopPropagation();
+                  props._listForSaleClick(props.id);
+                }}
               />
             </Grid>
           ) : (
