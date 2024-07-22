@@ -31,13 +31,11 @@ export type Currency = "crypto" | "usd";
 export interface NftListingProps {
   listForSaleClick?: (id: string) => void;
   nftEntries: NftListingEntryProps[];
+  onEntryClick: (id: string) => void;
   searchTerm: string;
   setSearchTerm: (searchTerm: string) => void;
   order: string;
-  orderItems: {
-    value: string;
-    label: string;
-  }[];
+  orderItems: TextSelectItemProps[];
   setOrder: (order: string) => void;
   activeCurrency: Currency;
   setActiveCurrency: (view: Currency) => void;

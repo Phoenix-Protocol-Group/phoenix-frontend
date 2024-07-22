@@ -5,7 +5,6 @@ export interface CollectionSingleProps extends NftListingProps {
   previewImage: string | undefined;
   creator: string;
   description: string;
-  onMoreClick: () => void;
   likes: number;
   onShareClick: () => void;
   onMakeCollectionOfferClick: () => void;
