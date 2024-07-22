@@ -58,24 +58,6 @@ export default function Page() {
         width: "100%",
       }}
     >
-      <Box
-        sx={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        <Box
-          component="img"
-          sx={{
-            width: "100%",
-          }}
-          alt="The house from the offer."
-          src="/create_something_background.svg"
-        />
-      </Box>
       <Typography
         component="h1"
         sx={{
