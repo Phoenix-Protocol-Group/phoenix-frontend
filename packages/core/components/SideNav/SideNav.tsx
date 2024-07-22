@@ -80,7 +80,7 @@ const SideNav = ({
       childItems: [
         {
           label: "Collections",
-          active: pathname == "/marketplace/collections",
+          active: pathname.includes("marketplace/collections"),
           href: "/marketplace/collections",
         },
         {
