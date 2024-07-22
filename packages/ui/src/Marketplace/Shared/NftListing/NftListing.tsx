@@ -52,6 +52,7 @@ const tabUnselectedStyles = {
   fontStyle: "normal",
   fontWeight: 700,
   lineHeight: "1.25rem", // 200%
+  userSelect: "none"
 };
 
 const tabSelectedStyles = {
@@ -72,6 +73,7 @@ const tabSelectedStyles = {
   fontStyle: "normal",
   fontWeight: 700,
   lineHeight: "1.25rem", // 200%
+  userSelect: "none"
 };
 
 const NftListing = (props: NftListingProps) => {
