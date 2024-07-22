@@ -5,6 +5,7 @@ import { CollectionsOverviewActiveSort, CollectionsOverviewEntryProps, Collectio
 import {
   CollectionsOverview,
 } from "@phoenix-protocol/ui";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const demoItem = {
@@ -22,6 +23,9 @@ const demoItem = {
 };
 
 export default function Page() {
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [entries, setEntries] = useState<CollectionsOverviewEntryProps[]>([]);
   const [category, setCategory] = useState<string>("all");
@@ -43,7 +47,7 @@ export default function Page() {
   };
 
   const onEntryClick = (id: string) => {
-    alert(id)
+    router.push(`${pathname}/${id}`);
   };
 
   useEffect(() => {
