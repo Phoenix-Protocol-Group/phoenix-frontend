@@ -3,7 +3,6 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { BugReport } from "@mui/icons-material";
 import React, { useEffect } from "react";
-import { SidebarItems } from "@phoenix-protocol/types";
 
 const SideNav = ({
   navOpen,

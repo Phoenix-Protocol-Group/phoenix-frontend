@@ -285,7 +285,9 @@ const ItemList = ({
                 primary={item.label}
               />
               {item.childItems && (
-                <IconButton onClick={handleClick}>
+                <IconButton onClick={handleClick} sx={{
+                  opacity: item.active || item.childItems.some((item: any) => item.active) ? 1 : 0.6,
+                }}>
                   {marketplaceOpen ? <ExpandLess /> : <ExpandMore />}
                 </IconButton>
               )}
