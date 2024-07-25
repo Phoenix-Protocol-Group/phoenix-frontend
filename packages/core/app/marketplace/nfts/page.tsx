@@ -42,6 +42,7 @@ export default function Page() {
   const [type, setType] = useState<AuctionType>("ALL");
 
   const onEntryClick = (id: string) => {
+    
     router.push(`${pathname}/${id}`);
   };
 

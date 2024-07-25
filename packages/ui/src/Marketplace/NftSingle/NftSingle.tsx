@@ -2,25 +2,7 @@ import React from "react";
 import { Box, Button as MuiButton, Grid, Typography } from "@mui/material";
 import { Button } from "../../Button/Button";
 import NftSingleModal from "./NftSingleModal";
-import NftSingleCard from "./NftSingleCard";
-
-export interface NftSingleProps {
-  listForSale?: boolean;
-  listForSaleClick?: () => void;
-  previewImage: string;
-  collectionName: string;
-  nftName: string;
-  nftDescription: string;
-  lastSale: string;
-  bestOffer: string;
-  floorPrice: string;
-  owner: string;
-  auctionEnds: Date;
-  availableSupply: string;
-  totalSupply: string;
-  price: string;
-  priceUsd: string;
-}
+import { NftSingleProps } from "@phoenix-protocol/types";
 
 const NftDescriptionItem = ({
   label,
@@ -74,11 +56,6 @@ const NftSingle = (props: NftSingleProps) => {
 
   const [showFullDesc, setShowFullDesc] = React.useState(false);
   const [timeLeft, setTimeLeft] = React.useState<any>(calculateTimeLeft());
-
-  const [traitsOpen, setTraitsOpen] = React.useState(true);
-  const [priceHistoryOpen, setPriceHistoryOpen] = React.useState(true);
-  const [offersOpen, setOffersOpen] = React.useState(true);
-  const [activityOpen, setActivityOpen] = React.useState(true);
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -307,8 +284,8 @@ const NftSingle = (props: NftSingleProps) => {
                     },
                   }}
                 >
-                  <Button label="Buy now" />
-                  <Button label="Make Offer" type="secondary" />
+                  <Button label="Buy now" onClick={props.onBuyNowClick} />
+                  <Button label="Make Offer" type="secondary" onClick={props.onMakeOfferClick} />
                 </Grid>
               </Grid>
             </Box>
