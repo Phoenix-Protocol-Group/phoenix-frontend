@@ -6,3 +6,4 @@ export * from "./CollectionSingle";
 export * from "./CollectionsOverview";
 export * from "./CreateNftSingle";
 export * from "./CreateNftBulk";
+export * from "./NftSingle";
