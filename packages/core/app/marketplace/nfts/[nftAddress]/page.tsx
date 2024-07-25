@@ -59,6 +59,7 @@ export default function Page({ params }: NftPageProps) {
   const [totalSupply, setTotalSupply] = useState<string>("20");
   const [price, setPrice] = useState<string>("150,68K PHO");
   const [priceUsd, setPriceUsd] = useState<string>("2,407.04");
+  const [listForSale, setListForSale] = useState<boolean>(false);
 
   const fetchNftInfo = () => {
     
@@ -70,6 +71,10 @@ export default function Page({ params }: NftPageProps) {
 
   const handleMakeOfferClick = () => {
     alert("make offer")
+  };
+
+  const handleListForSaleClick = () => {
+    alert("list for sale")
   };
 
   useEffect(() => {
@@ -111,6 +116,8 @@ export default function Page({ params }: NftPageProps) {
           priceUsd={priceUsd}
           onBuyNowClick={handleBuyNowClick}
           onMakeOfferClick={handleMakeOfferClick}
+          listForSale={listForSale}
+          listForSaleClick={handleListForSaleClick}
         />
       </Box>
     </Box>
