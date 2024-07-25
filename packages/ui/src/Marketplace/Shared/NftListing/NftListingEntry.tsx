@@ -5,7 +5,9 @@ import { NftListingEntryProps } from "@phoenix-protocol/types";
 
 const NftListingEntry = (props: NftListingEntryProps) => {
   return (
-    <Box position="relative">
+    <Box position="relative" sx={{
+      cursor: "pointer"
+    }}>
       <Box
         component="img"
         sx={{

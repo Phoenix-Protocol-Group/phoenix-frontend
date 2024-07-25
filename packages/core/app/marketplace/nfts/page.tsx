@@ -5,6 +5,7 @@ import { AuctionStatus, AuctionType, Currency, NftListingEntryProps, TextSelectI
 import {
   Shared,
 } from "@phoenix-protocol/ui";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const demoEntry: NftListingEntryProps = {
@@ -27,6 +28,9 @@ const demoEntryOwned: NftListingEntryProps = {
 }
 
 export default function Page() {
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [entries, setEntries] = useState<NftListingEntryProps[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [order, setOrder] = useState<string>("");
@@ -37,8 +41,8 @@ export default function Page() {
   const [status, setStatus] = useState<AuctionStatus>('ALL');
   const [type, setType] = useState<AuctionType>("ALL");
 
-  const handleEntryClick = (id: string) => {
-    alert(id)
+  const onEntryClick = (id: string) => {
+    router.push(`${pathname}/${id}`);
   };
 
   const handleShareClick = () => {
@@ -102,7 +106,7 @@ export default function Page() {
           setStatus={setStatus}
           type={type}
           setType={setType}
-          onEntryClick={handleEntryClick}
+          onEntryClick={onEntryClick}
           listForSaleClick={handleListForSaleClick}
         />
       </Box>
