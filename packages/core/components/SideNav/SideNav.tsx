@@ -84,7 +84,7 @@ const SideNav = ({
         },
         {
           label: "NFTs",
-          active: pathname == "/marketplace/nfts",
+          active: pathname.includes("marketplace/nfts"),
           href: "/marketplace/nfts",
         },
         {
