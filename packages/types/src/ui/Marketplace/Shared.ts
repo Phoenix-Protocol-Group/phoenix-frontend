@@ -93,7 +93,7 @@ export interface TextSelectItemProps {
 }
 
 export interface TextSelectProps {
-  label: string;
+  label?: string;
   helpText?: string;
   placeholder: string;
   value: string;

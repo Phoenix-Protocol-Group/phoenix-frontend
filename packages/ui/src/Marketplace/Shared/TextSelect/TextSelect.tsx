@@ -12,29 +12,31 @@ import { TextSelectItemProps, TextSelectProps } from "@phoenix-protocol/types";
 const TextSelect = (props: TextSelectProps) => {
   return (
     <>
-      <Typography
-        sx={{
-          fontSize: "12px",
-          lineHeight: "17px",
-          mb: 1.5,
-          color: "#BFBFBF",
-        }}
-      >
-        {props.label}{" "}
-        {props.helpText && (
-          <Tooltip title={props.helpText}>
-            <HelpOutlineIcon
-              sx={{
-                ml: 1,
-                fontSize: "16px",
-                position: "relative",
-                top: 3,
-                "&:hover": { color: "#FFF" },
-              }}
-            />
-          </Tooltip>
-        )}
-      </Typography>
+      {props.label && props.helpText && (
+        <Typography
+          sx={{
+            fontSize: "12px",
+            lineHeight: "17px",
+            mb: 1.5,
+            color: "#BFBFBF",
+          }}
+        >
+          {props.label}{" "}
+          {props.helpText && (
+            <Tooltip title={props.helpText}>
+              <HelpOutlineIcon
+                sx={{
+                  ml: 1,
+                  fontSize: "16px",
+                  position: "relative",
+                  top: 3,
+                  "&:hover": { color: "#FFF" },
+                }}
+              />
+            </Tooltip>
+          )}
+        </Typography>
+      )}
       <FormControl
         sx={{
           minWidth: 120,
@@ -52,13 +54,18 @@ const TextSelect = (props: TextSelectProps) => {
               return props.placeholder;
             }
 
-            return props.items.find(item => item.value === selected).label;
+            return props.items.find((item) => item.value === selected).label;
           }}
           displayEmpty
           inputProps={{ "aria-label": "Without label" }}
-          sx={{ borderRadius: "16px", opacity: 0.6, fontSize: "14px", "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#E2621B !important"
-          } }}
+          sx={{
+            borderRadius: "16px",
+            opacity: 0.6,
+            fontSize: "14px",
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#E2621B !important",
+            },
+          }}
         >
           {props.items.map((item: TextSelectItemProps, index: number) => (
             <MenuItem key={index} value={item.value}>
