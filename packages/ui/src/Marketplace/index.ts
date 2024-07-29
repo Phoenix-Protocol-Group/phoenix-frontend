@@ -7,10 +7,12 @@ import CreateNftBulk from './CreateNftBulk/CreateNftBulk';
 import CreateNft from './CreateNft/CreateNft';
 import NftSingle from "./NftSingle/NftSingle";
 import CreateSomething from "./CreateSomething/CreateSomething";
+import * as Modals from "./Modals";
 
 export {
   Frontpage,
   Shared,
+  Modals,
   CreateCollection,
   CollectionsOverview,
   CollectionSingle,
