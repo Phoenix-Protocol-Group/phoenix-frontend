@@ -7,3 +7,4 @@ export * from "./CollectionsOverview";
 export * from "./CreateNftSingle";
 export * from "./CreateNftBulk";
 export * from "./NftSingle";
+export * from "./MakeOfferModal";
