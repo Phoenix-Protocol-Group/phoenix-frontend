@@ -23,8 +23,7 @@ export const Primary: Story = {
     priceUsd: "1000",
     collectionName: "Collection Name",
     quantity: "1",
-    balance: "15012",
-    floorPrice: "20128",
+    phoenixFee: "7.5",
     bestOffer: "24690",
   },
 };

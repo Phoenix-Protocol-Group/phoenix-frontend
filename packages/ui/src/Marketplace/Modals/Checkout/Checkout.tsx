@@ -12,8 +12,7 @@ export interface CheckoutProps {
   price: string;
   priceUsd: string;
   collectionName: string;
-  balance: string;
-  floorPrice: string;
+  phoenixFee: string;
   bestOffer: string;
   quantity: string;
   onQuantityChange: (val: string) => void;
@@ -190,7 +189,7 @@ const Checkout = (props: CheckoutProps) => {
                   p: 2,
                   background:
                     "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
-                  border: "1px solid #2D303A",
+                  border: "1px solid #E23F1C",
                   borderRadius: "12px",
                 }}
               >
@@ -209,7 +208,7 @@ const Checkout = (props: CheckoutProps) => {
                         color: "#BDBEBE",
                       }}
                     >
-                      BALANCE
+                      PRICE
                     </Typography>
                     <Typography
                       sx={{
@@ -219,7 +218,7 @@ const Checkout = (props: CheckoutProps) => {
                         color: "#FFF",
                       }}
                     >
-                      {props.balance} PHO
+                      {props.price} PHO
                     </Typography>
                   </Grid>
                   <Grid
@@ -236,7 +235,7 @@ const Checkout = (props: CheckoutProps) => {
                         color: "#BDBEBE",
                       }}
                     >
-                      FLOOR PRICE
+                      PHOENIX FEE
                     </Typography>
                     <Typography
                       sx={{
@@ -246,7 +245,7 @@ const Checkout = (props: CheckoutProps) => {
                         color: "#FFF",
                       }}
                     >
-                      {props.floorPrice} PHO
+                      {props.phoenixFee}%
                     </Typography>
                   </Grid>
                   <Grid
