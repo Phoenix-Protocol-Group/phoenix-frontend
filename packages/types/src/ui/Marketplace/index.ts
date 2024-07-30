@@ -8,3 +8,4 @@ export * from "./CreateNftSingle";
 export * from "./CreateNftBulk";
 export * from "./NftSingle";
 export * from "./MakeOfferModal";
+export * from "./CheckoutModal";

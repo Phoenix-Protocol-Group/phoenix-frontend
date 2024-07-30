@@ -2,23 +2,9 @@ import React from "react";
 import { Box, Grid, Modal, Typography } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
 import Colors from "../../../Theme/colors";
-import { TextInput, TextSelect } from "../../Shared";
+import { TextInput } from "../../Shared";
 import { Button } from "../../../Button/Button";
-
-export interface CheckoutProps {
-  open: boolean;
-  onClose: () => void;
-  nftName: string;
-  price: string;
-  priceUsd: string;
-  collectionName: string;
-  phoenixFee: string;
-  bestOffer: string;
-  quantity: string;
-  onQuantityChange: (val: string) => void;
-  onMakeOfferClick: () => void;
-  onBuyPhoClick: () => void;
-}
+import { CheckoutProps } from "@phoenix-protocol/types";
 
 const Checkout = (props: CheckoutProps) => {
   const style = {
