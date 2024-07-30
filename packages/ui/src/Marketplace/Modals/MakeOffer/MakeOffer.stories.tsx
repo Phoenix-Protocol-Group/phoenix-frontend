@@ -26,6 +26,5 @@ export const Primary: Story = {
     floorPrice: "20128",
     bestOffer: "24690",
     duration: "7",
-    
   },
 };
