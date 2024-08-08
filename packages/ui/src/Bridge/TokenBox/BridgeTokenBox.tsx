@@ -1,15 +1,17 @@
 import { Box, Button, Grid, Input, Skeleton, Typography } from "@mui/material";
 import React from "react";
-import { Token, TokenBoxProps } from "@phoenix-protocol/types";
+import { Chain, Token, TokenBoxProps } from "@phoenix-protocol/types";
 
 const AssetButton = ({
   token,
   onClick,
   hideDropdownButton = false,
+  chain,
 }: {
   token: Token;
   onClick?: () => void;
   hideDropdownButton?: boolean;
+  chain?: Chain;
 }) => {
   return (
     <Button
@@ -32,16 +34,40 @@ const AssetButton = ({
         minWidth: "96px",
       }}
     >
-      <Box display="flex">
-        <Box
-          component={"img"}
-          src={token.icon}
-          sx={{
-            maxWidth: "24px",
-            marginRight: "8px",
-          }}
-        />
-        {token.name}
+      <Box>
+        <Box display="flex">
+          <Box
+            component={"img"}
+            src={token.icon}
+            sx={{
+              maxWidth: "24px",
+              marginRight: "8px",
+            }}
+          />
+          {token.name}
+        </Box>
+        {chain && (
+          <Box
+            sx={{
+              mt: 1,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography sx={{ textTransform: "none", fontSize: 12 }}>
+              on
+            </Typography>
+            <Box
+              component={"img"}
+              sx={{ width: 16, height: 16 }}
+              src={chain.icon}
+            />{" "}
+            <Typography sx={{ textTransform: "none", fontSize: 12 }}>
+              {chain.name}
+            </Typography>
+          </Box>
+        )}
       </Box>
       <Box
         component={"img"}
@@ -54,13 +80,14 @@ const AssetButton = ({
   );
 };
 
-const TokenBox = ({
+const BridgeTokenBox = ({
   token,
   onAssetClick,
   onChange,
   value,
   hideDropdownButton = false,
   disabled = false,
+  chain,
   loadingValues = false,
 }: TokenBoxProps) => {
   const [usdPrice, setUsdPrice] = React.useState(
@@ -140,6 +167,7 @@ const TokenBox = ({
             hideDropdownButton={hideDropdownButton}
             token={token}
             onClick={onAssetClick}
+            chain={chain}
           />
         </Grid>
         <Grid
@@ -200,4 +228,4 @@ const TokenBox = ({
   );
 };
 
-export { TokenBox };
+export { BridgeTokenBox };

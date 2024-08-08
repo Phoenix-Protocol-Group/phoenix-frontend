@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { AssetSelector } from "./AssetSelector";
+import { BridgeAssetSelector } from "./BridgeAssetSelector";
 import { Token } from "@phoenix-protocol/types";
 
 const testTokens: Token[] = [
@@ -41,16 +41,16 @@ const testTokens: Token[] = [
 ];
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
-const meta: Meta<typeof AssetSelector> = {
+const meta: Meta<typeof BridgeAssetSelector> = {
   title: "Bridge/AssetSelector",
   // @ts-ignore
-  component: AssetSelector,
+  component: BridgeAssetSelector,
 };
 
 export default meta;
 
 // The story type for the component https://storybook.js.org/docs/react/api/csf#named-story-exports
-type Story = StoryObj<typeof AssetSelector>;
+type Story = StoryObj<typeof BridgeAssetSelector>;
 
 export const Primary: Story = {
   args: {

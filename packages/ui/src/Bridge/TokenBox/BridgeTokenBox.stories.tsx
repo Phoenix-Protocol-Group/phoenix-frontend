@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { TokenBox } from "./TokenBox";
+import { BridgeTokenBox } from "./BridgeTokenBox";
 
 const token = {
   name: "USDT",
@@ -10,16 +10,16 @@ const token = {
 };
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
-const meta: Meta<typeof TokenBox> = {
+const meta: Meta<typeof BridgeTokenBox> = {
   title: "Bridge/TokenBox",
   // @ts-ignore
-  component: TokenBox,
+  component: BridgeTokenBox,
 };
 
 export default meta;
 
 // The story type for the component https://storybook.js.org/docs/react/api/csf#named-story-exports
-type Story = StoryObj<typeof TokenBox>;
+type Story = StoryObj<typeof BridgeTokenBox>;
 
 export const Primary: Story = {
   args: {

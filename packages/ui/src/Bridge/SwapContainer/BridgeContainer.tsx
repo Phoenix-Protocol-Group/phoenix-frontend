@@ -12,9 +12,9 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
-import { TokenBox } from "../TokenBox/TokenBox";
+import { BridgeTokenBox } from "../TokenBox/BridgeTokenBox";
 import { Button } from "../../Button/Button";
-import { SwapContainerProps } from "@phoenix-protocol/types";
+import { BridgeContainerProps } from "@phoenix-protocol/types";
 
 const listItemContainer = {
   display: "flex",
@@ -81,15 +81,13 @@ const SwapAssetsButton = ({ onClick }: { onClick: () => void }) => {
   );
 };
 
-const SwapContainer = ({
+const BridgeContainer = ({
   fromToken,
   toToken,
   exchangeRate,
   networkFee,
-  route,
-  estSellPrice,
-  minSellPrice,
-  slippageTolerance,
+  fromChain,
+  toChain,
   fromTokenValue,
   toTokenValue,
   onOptionsClick,
@@ -103,7 +101,7 @@ const SwapContainer = ({
   trustlineButtonActive = false,
   trustlineButtonDisabled = false,
   trustlineAssetName,
-}: SwapContainerProps) => {
+}: BridgeContainerProps) => {
   const [expanded, setExpanded] = useState(true);
 
   return (
@@ -147,9 +145,10 @@ const SwapContainer = ({
           </IconButton>
         </Box>
         <div className="token-box">
-          <TokenBox
+          <BridgeTokenBox
             value={fromTokenValue}
             token={fromToken}
+            chain={fromChain}
             onAssetClick={() => onTokenSelectorClick(true)}
             onChange={(value) => onInputChange(true, value)}
           />
@@ -164,12 +163,13 @@ const SwapContainer = ({
             <SwapAssetsButton onClick={onSwapTokensClick} />
           </Box>
 
-          <TokenBox
+          <BridgeTokenBox
             value={toTokenValue}
             token={toToken}
             onAssetClick={() => onTokenSelectorClick(false)}
             onChange={(value) => onInputChange(false, value)}
             disabled={true}
+            chain={toChain}
             loadingValues={loadingSimulate}
           />
         </div>
@@ -229,7 +229,7 @@ const SwapContainer = ({
                   fontWeight: "700",
                 }}
               >
-                Swap details
+                Bridge details
               </Typography>
             </AccordionSummary>
             <AccordionDetails
@@ -247,27 +247,36 @@ const SwapContainer = ({
                 }}
               >
                 <ListItem sx={listItemContainer}>
-                  <Typography sx={listItemNameStyle}>Exchange rate</Typography>
+                  <Typography sx={listItemNameStyle}>Fees</Typography>
                   <Typography sx={listItemContentStyle}>
                     {exchangeRate}
                   </Typography>
                 </ListItem>
                 <ListItem sx={listItemContainer}>
-                  <Typography sx={listItemNameStyle}>Protocol fee</Typography>
+                  <Typography sx={listItemNameStyle}>
+                    Average Transfer Time
+                  </Typography>
                   <Typography sx={listItemContentStyle}>
                     {networkFee}
                   </Typography>
                 </ListItem>
                 <ListItem sx={listItemContainer}>
-                  <Typography sx={listItemNameStyle}>Route</Typography>
-                  <Typography sx={listItemContentStyle}>{route}</Typography>
-                </ListItem>
-                <ListItem sx={listItemContainer}>
                   <Typography sx={listItemNameStyle}>
-                    Slippage tolerance
+                    Bridge Provider
                   </Typography>
-                  <Typography sx={listItemContentStyle}>
-                    {slippageTolerance}
+                  <Typography
+                    sx={{
+                      ...listItemContentStyle,
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      sx={{ mr: 1 }}
+                      src="/chainIcons/allbridge.png"
+                    />{" "}
+                    Allbridge
                   </Typography>
                 </ListItem>
               </List>
@@ -279,4 +288,4 @@ const SwapContainer = ({
   );
 };
 
-export { SwapContainer };
+export { BridgeContainer };

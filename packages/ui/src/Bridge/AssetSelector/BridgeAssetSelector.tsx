@@ -10,7 +10,7 @@ import {
 import { motion } from "framer-motion";
 import { KeyboardArrowLeft } from "@mui/icons-material";
 import { BridgeAssetSelectorProps, Chain } from "@phoenix-protocol/types";
-import AssetItem from "./AssetItem";
+import BridgeAssetItem from "./BridgeAssetItem";
 
 const containerStyle = {
   borderRadius: "16px",
@@ -48,7 +48,7 @@ const scrollbarStyles = {
   },
 };
 
-const AssetSelector = ({
+const BridgeAssetSelector = ({
   chains,
   onClose,
   onTokenClick,
@@ -159,7 +159,11 @@ const AssetSelector = ({
                 }}
               >
                 {getFilteredTokens().map((token, index) => (
-                  <AssetItem key={index} token={token} onClick={onTokenClick} />
+                  <BridgeAssetItem
+                    key={index}
+                    token={token}
+                    onClick={onTokenClick}
+                  />
                 ))}
                 <Box
                   sx={{
@@ -197,4 +201,4 @@ const AssetSelector = ({
   );
 };
 
-export { AssetSelector };
+export { BridgeAssetSelector };

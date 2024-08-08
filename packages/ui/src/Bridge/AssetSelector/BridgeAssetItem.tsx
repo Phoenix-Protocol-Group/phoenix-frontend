@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Button } from "@mui/material";
 import { Token } from "@phoenix-protocol/types";
 
-const AssetItem = ({
+const BridgeAssetItem = ({
   token,
   onClick,
 }: {
@@ -42,4 +42,4 @@ const AssetItem = ({
   );
 };
 
-export default AssetItem;
+export default BridgeAssetItem;
