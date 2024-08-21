@@ -40,7 +40,7 @@
   },
   "packageManager": "yarn@3.6.4",
   "dependencies": {
-    "@stellar/stellar-sdk": "12.0.0-rc.3",
+    "@stellar/stellar-sdk": "^12.1.0",
     "@walletconnect/modal": "^2.6.2",
     "@walletconnect/sign-client": "^2.13.1",
     "@walletconnect/types": "^2.13.1"
