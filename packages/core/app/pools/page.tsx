@@ -42,9 +42,6 @@ export default function Page() {
         PairContract.query_config(),
         PairContract.query_pool_info(),
       ]);
-      console.log(1);
-      console.log(pairConfig.result);
-      console.log(2);
       if (pairConfig?.result && pairInfo?.result) {
         const [tokenA, tokenB] = await Promise.all([
           store.fetchTokenInfo(pairConfig.result.token_a),
