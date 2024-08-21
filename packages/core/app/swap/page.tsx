@@ -104,6 +104,9 @@ export default function SwapPage() {
         operations: operations,
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
         max_spread_bps: BigInt(maxSpread * 100),
+        deadline: undefined,
+        pool_type: 0,
+        max_allowed_fee_bps: undefined,
       });
 
       await tx?.signAndSend();
@@ -149,6 +152,7 @@ export default function SwapPage() {
       const tx = await contract.simulate_swap({
         operations: operations,
         amount: BigInt(tokenAmounts[0] * 10 ** 7),
+        pool_type: 0,
       });
 
       if (tx.result.ask_amount && tx.result.commission_amounts) {

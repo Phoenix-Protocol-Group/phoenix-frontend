@@ -201,6 +201,7 @@ export default function Page({ params }: PoolPageProps) {
         min_a: undefined,
         min_b: undefined,
         custom_slippage_bps: undefined,
+        deadline: undefined,
       });
       await tx.signAndSend();
 
@@ -257,6 +258,7 @@ export default function Page({ params }: PoolPageProps) {
         ),
         min_a: BigInt(1),
         min_b: BigInt(1),
+        deadline: undefined,
       });
       await tx.signAndSend();
       setLoading(false);

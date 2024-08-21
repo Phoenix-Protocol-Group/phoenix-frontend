@@ -42,7 +42,6 @@ export default function Page() {
         PairContract.query_config(),
         PairContract.query_pool_info(),
       ]);
-
       if (pairConfig?.result && pairInfo?.result) {
         const [tokenA, tokenB] = await Promise.all([
           store.fetchTokenInfo(pairConfig.result.token_a),
@@ -168,9 +167,9 @@ export default function Page() {
         : [];
 
     const poolsFiltered: Pool[] = poolWithData.filter(
-      (el) =>
+      (el: any) =>
         el !== undefined ||
-        el?.tokens.length >= 2 ||
+        el.tokens.length >= 2 ||
         el.poolAddress !==
           "CBXBKAB6QIRUGTG77OQZHC46BIIPA5WDKIKZKPA2H7Q7CPKQ555W3EVB"
     );

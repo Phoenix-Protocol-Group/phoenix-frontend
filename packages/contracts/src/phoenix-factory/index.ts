@@ -1,18 +1,25 @@
 import { Buffer } from "buffer";
-import type {
-  i128,
-  i64,
-  Option,
-  u32,
-  u64,
-} from "@stellar/stellar-sdk/contract";
+import { Address } from "@stellar/stellar-sdk";
 import {
   AssembledTransaction,
   Client as ContractClient,
   ClientOptions as ContractClientOptions,
+  Result,
   Spec as ContractSpec,
 } from "@stellar/stellar-sdk/contract";
-
+import type {
+  u32,
+  i32,
+  u64,
+  i64,
+  u128,
+  i128,
+  u256,
+  i256,
+  Option,
+  Typepoint,
+  Duration,
+} from "@stellar/stellar-sdk/contract";
 export * from "@stellar/stellar-sdk";
 export * as contract from "@stellar/stellar-sdk/contract";
 export * as rpc from "@stellar/stellar-sdk/rpc";
@@ -23,9 +30,9 @@ if (typeof window !== "undefined") {
 }
 
 export const networks = {
-  unknown: {
-    networkPassphrase: "Public Global Stellar Network ; September 2015",
-    contractId: "CB4SVAWJA6TSRNOJZ7W2AWFW46D5VR4ZMFZKDIKXEINZCZEGZCJZCKMI",
+  testnet: {
+    networkPassphrase: "Test SDF Network ; September 2015",
+    contractId: "0",
   },
 } as const;
 
@@ -109,6 +116,7 @@ export interface LiquidityPoolInfo {
 
 export interface StakedResponse {
   stakes: Array<Stake>;
+  total_stake: i128;
 }
 
 export interface Stake {
@@ -136,6 +144,7 @@ export interface StakeInitInfo {
 
 export interface LiquidityPoolInitInfo {
   admin: string;
+  default_slippage_bps: i64;
   fee_recipient: string;
   max_allowed_slippage_bps: i64;
   max_allowed_spread_bps: i64;
@@ -143,6 +152,11 @@ export interface LiquidityPoolInitInfo {
   stake_init_info: StakeInitInfo;
   swap_fee_bps: i64;
   token_init_info: TokenInitInfo;
+}
+
+export enum PoolType {
+  Xyk = 0,
+  Stable = 1,
 }
 
 export interface Client {
@@ -154,6 +168,7 @@ export interface Client {
       admin,
       multihop_wasm_hash,
       lp_wasm_hash,
+      stable_wasm_hash,
       stake_wasm_hash,
       token_wasm_hash,
       whitelisted_accounts,
@@ -162,6 +177,7 @@ export interface Client {
       admin: string;
       multihop_wasm_hash: Buffer;
       lp_wasm_hash: Buffer;
+      stable_wasm_hash: Buffer;
       stake_wasm_hash: Buffer;
       token_wasm_hash: Buffer;
       whitelisted_accounts: Array<string>;
@@ -194,11 +210,19 @@ export interface Client {
       lp_init_info,
       share_token_name,
       share_token_symbol,
+      pool_type,
+      amp,
+      default_slippage_bps,
+      max_allowed_fee_bps,
     }: {
       sender: string;
       lp_init_info: LiquidityPoolInitInfo;
       share_token_name: string;
       share_token_symbol: string;
+      pool_type: PoolType;
+      amp: Option<u64>;
+      default_slippage_bps: i64;
+      max_allowed_fee_bps: i64;
     },
     options?: {
       /**
@@ -429,7 +453,10 @@ export interface Client {
    * Construct and simulate a update transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
   update: (
-    { new_wasm_hash }: { new_wasm_hash: Buffer },
+    {
+      new_wasm_hash,
+      new_stable_pool_hash,
+    }: { new_wasm_hash: Buffer; new_stable_pool_hash: Buffer },
     options?: {
       /**
        * The fee to pay for the transaction. Default: BASE_FEE
@@ -452,8 +479,8 @@ export class Client extends ContractClient {
   constructor(public readonly options: ContractClientOptions) {
     super(
       new ContractSpec([
-        "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAABwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAABJtdWx0aWhvcF93YXNtX2hhc2gAAAAAA+4AAAAgAAAAAAAAAAxscF93YXNtX2hhc2gAAAPuAAAAIAAAAAAAAAAPc3Rha2Vfd2FzbV9oYXNoAAAAA+4AAAAgAAAAAAAAAA90b2tlbl93YXNtX2hhc2gAAAAD7gAAACAAAAAAAAAAFHdoaXRlbGlzdGVkX2FjY291bnRzAAAD6gAAABMAAAAAAAAAEWxwX3Rva2VuX2RlY2ltYWxzAAAAAAAABAAAAAA=",
-        "AAAAAAAAAAAAAAAVY3JlYXRlX2xpcXVpZGl0eV9wb29sAAAAAAAABAAAAAAAAAAGc2VuZGVyAAAAAAATAAAAAAAAAAxscF9pbml0X2luZm8AAAfQAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAAAAAAQc2hhcmVfdG9rZW5fbmFtZQAAABAAAAAAAAAAEnNoYXJlX3Rva2VuX3N5bWJvbAAAAAAAEAAAAAEAAAAT",
+        "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAACAAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAABJtdWx0aWhvcF93YXNtX2hhc2gAAAAAA+4AAAAgAAAAAAAAAAxscF93YXNtX2hhc2gAAAPuAAAAIAAAAAAAAAAQc3RhYmxlX3dhc21faGFzaAAAA+4AAAAgAAAAAAAAAA9zdGFrZV93YXNtX2hhc2gAAAAD7gAAACAAAAAAAAAAD3Rva2VuX3dhc21faGFzaAAAAAPuAAAAIAAAAAAAAAAUd2hpdGVsaXN0ZWRfYWNjb3VudHMAAAPqAAAAEwAAAAAAAAARbHBfdG9rZW5fZGVjaW1hbHMAAAAAAAAEAAAAAA==",
+        "AAAAAAAAAAAAAAAVY3JlYXRlX2xpcXVpZGl0eV9wb29sAAAAAAAACAAAAAAAAAAGc2VuZGVyAAAAAAATAAAAAAAAAAxscF9pbml0X2luZm8AAAfQAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAAAAAAQc2hhcmVfdG9rZW5fbmFtZQAAABAAAAAAAAAAEnNoYXJlX3Rva2VuX3N5bWJvbAAAAAAAEAAAAAAAAAAJcG9vbF90eXBlAAAAAAAH0AAAAAhQb29sVHlwZQAAAAAAAAADYW1wAAAAA+gAAAAGAAAAAAAAABRkZWZhdWx0X3NsaXBwYWdlX2JwcwAAAAcAAAAAAAAAE21heF9hbGxvd2VkX2ZlZV9icHMAAAAABwAAAAEAAAAT",
         "AAAAAAAAAAAAAAAbdXBkYXRlX3doaXRlbGlzdGVkX2FjY291bnRzAAAAAAMAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAGdG9fYWRkAAAAAAPqAAAAEwAAAAAAAAAJdG9fcmVtb3ZlAAAAAAAD6gAAABMAAAAA",
         "AAAAAAAAAAAAAAASdXBkYXRlX3dhc21faGFzaGVzAAAAAAADAAAAAAAAAAxscF93YXNtX2hhc2gAAAPoAAAD7gAAACAAAAAAAAAAD3N0YWtlX3dhc21faGFzaAAAAAPoAAAD7gAAACAAAAAAAAAAD3Rva2VuX3dhc21faGFzaAAAAAPoAAAD7gAAACAAAAAA",
         "AAAAAAAAAAAAAAALcXVlcnlfcG9vbHMAAAAAAAAAAAEAAAPqAAAAEw==",
@@ -463,7 +490,7 @@ export class Client extends ContractClient {
         "AAAAAAAAAAAAAAAJZ2V0X2FkbWluAAAAAAAAAAAAAAEAAAAT",
         "AAAAAAAAAAAAAAAKZ2V0X2NvbmZpZwAAAAAAAAAAAAEAAAfQAAAABkNvbmZpZwAA",
         "AAAAAAAAAAAAAAAUcXVlcnlfdXNlcl9wb3J0Zm9saW8AAAACAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAAB3N0YWtpbmcAAAAAAQAAAAEAAAfQAAAADVVzZXJQb3J0Zm9saW8AAAA=",
-        "AAAAAAAAAAAAAAAGdXBkYXRlAAAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
+        "AAAAAAAAAAAAAAAGdXBkYXRlAAAAAAACAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAAAAAAFG5ld19zdGFibGVfcG9vbF9oYXNoAAAD7gAAACAAAAAA",
         "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAHAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAEAAAAAAAAAD1doaXRlTGlzdGVFbXB0eQAAAAACAAAAAAAAAA1Ob3RBdXRob3JpemVkAAAAAAAAAwAAAAAAAAAVTGlxdWlkaXR5UG9vbE5vdEZvdW5kAAAAAAAABAAAAAAAAAAWVG9rZW5BQmlnZ2VyVGhhblRva2VuQgAAAAAABQAAAAAAAAAPTWluU3Rha2VJbnZhbGlkAAAAAAYAAAAAAAAAEE1pblJld2FyZEludmFsaWQAAAAH",
         "AAAAAQAAAAAAAAAAAAAADFBhaXJUdXBsZUtleQAAAAIAAAAAAAAAB3Rva2VuX2EAAAAAEwAAAAAAAAAHdG9rZW5fYgAAAAAT",
         "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAABwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAABFscF90b2tlbl9kZWNpbWFscwAAAAAAAAQAAAAAAAAADGxwX3dhc21faGFzaAAAA+4AAAAgAAAAAAAAABBtdWx0aWhvcF9hZGRyZXNzAAAAEwAAAAAAAAAPc3Rha2Vfd2FzbV9oYXNoAAAAA+4AAAAgAAAAAAAAAA90b2tlbl93YXNtX2hhc2gAAAAD7gAAACAAAAAAAAAAFHdoaXRlbGlzdGVkX2FjY291bnRzAAAD6gAAABM=",
@@ -473,11 +500,12 @@ export class Client extends ContractClient {
         "AAAAAQAAAAAAAAAAAAAABUFzc2V0AAAAAAAAAgAAABRBZGRyZXNzIG9mIHRoZSBhc3NldAAAAAdhZGRyZXNzAAAAABMAAAAsVGhlIHRvdGFsIGFtb3VudCBvZiB0aG9zZSB0b2tlbnMgaW4gdGhlIHBvb2wAAAAGYW1vdW50AAAAAAAL",
         "AAAAAQAAAG5UaGlzIHN0cnVjdCBpcyB1c2VkIHRvIHJldHVybiBhIHF1ZXJ5IHJlc3VsdCB3aXRoIHRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGFuZCBhc3NldHMgaW4gYSBzcGVjaWZpYyBwb29sLgAAAAAAAAAAAAxQb29sUmVzcG9uc2UAAAAEAAAAM1RoZSBhc3NldCBBIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYQAAAAfQAAAABUFzc2V0AAAAAAAAM1RoZSBhc3NldCBCIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYgAAAAfQAAAABUFzc2V0AAAAAAAALlRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGN1cnJlbnRseSBpc3N1ZWQAAAAAAA5hc3NldF9scF9zaGFyZQAAAAAH0AAAAAVBc3NldAAAAAAAADhUaGUgYWRkcmVzcyBvZiB0aGUgU3Rha2UgY29udHJhY3QgZm9yIHRoZSBsaXF1aWRpdHkgcG9vbAAAAA1zdGFrZV9hZGRyZXNzAAAAAAAAEw==",
         "AAAAAQAAAAAAAAAAAAAAEUxpcXVpZGl0eVBvb2xJbmZvAAAAAAAAAwAAAAAAAAAMcG9vbF9hZGRyZXNzAAAAEwAAAAAAAAANcG9vbF9yZXNwb25zZQAAAAAAB9AAAAAMUG9vbFJlc3BvbnNlAAAAAAAAAA10b3RhbF9mZWVfYnBzAAAAAAAABw==",
-        "AAAAAQAAAAAAAAAAAAAADlN0YWtlZFJlc3BvbnNlAAAAAAABAAAAAAAAAAZzdGFrZXMAAAAAA+oAAAfQAAAABVN0YWtlAAAA",
+        "AAAAAQAAAAAAAAAAAAAADlN0YWtlZFJlc3BvbnNlAAAAAAACAAAAAAAAAAZzdGFrZXMAAAAAA+oAAAfQAAAABVN0YWtlAAAAAAAAAAAAAAt0b3RhbF9zdGFrZQAAAAAL",
         "AAAAAQAAAAAAAAAAAAAABVN0YWtlAAAAAAAAAgAAABtUaGUgYW1vdW50IG9mIHN0YWtlZCB0b2tlbnMAAAAABXN0YWtlAAAAAAAACwAAACVUaGUgdGltZXN0YW1wIHdoZW4gdGhlIHN0YWtlIHdhcyBtYWRlAAAAAAAAD3N0YWtlX3RpbWVzdGFtcAAAAAAG",
         "AAAAAQAAAAAAAAAAAAAADVRva2VuSW5pdEluZm8AAAAAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
         "AAAAAQAAAAAAAAAAAAAADVN0YWtlSW5pdEluZm8AAAAAAAAEAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAADm1heF9jb21wbGV4aXR5AAAAAAAEAAAAAAAAAAhtaW5fYm9uZAAAAAsAAAAAAAAACm1pbl9yZXdhcmQAAAAAAAs=",
-        "AAAAAQAAAAAAAAAAAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAgAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAANZmVlX3JlY2lwaWVudAAAAAAAABMAAAAAAAAAGG1heF9hbGxvd2VkX3NsaXBwYWdlX2JwcwAAAAcAAAAAAAAAFm1heF9hbGxvd2VkX3NwcmVhZF9icHMAAAAAAAcAAAAAAAAAEG1heF9yZWZlcnJhbF9icHMAAAAHAAAAAAAAAA9zdGFrZV9pbml0X2luZm8AAAAH0AAAAA1TdGFrZUluaXRJbmZvAAAAAAAAAAAAAAxzd2FwX2ZlZV9icHMAAAAHAAAAAAAAAA90b2tlbl9pbml0X2luZm8AAAAH0AAAAA1Ub2tlbkluaXRJbmZvAAAA",
+        "AAAAAQAAAAAAAAAAAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAkAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAUZGVmYXVsdF9zbGlwcGFnZV9icHMAAAAHAAAAAAAAAA1mZWVfcmVjaXBpZW50AAAAAAAAEwAAAAAAAAAYbWF4X2FsbG93ZWRfc2xpcHBhZ2VfYnBzAAAABwAAAAAAAAAWbWF4X2FsbG93ZWRfc3ByZWFkX2JwcwAAAAAABwAAAAAAAAAQbWF4X3JlZmVycmFsX2JwcwAAAAcAAAAAAAAAD3N0YWtlX2luaXRfaW5mbwAAAAfQAAAADVN0YWtlSW5pdEluZm8AAAAAAAAAAAAADHN3YXBfZmVlX2JwcwAAAAcAAAAAAAAAD3Rva2VuX2luaXRfaW5mbwAAAAfQAAAADVRva2VuSW5pdEluZm8AAAA=",
+        "AAAAAwAAAAAAAAAAAAAACFBvb2xUeXBlAAAAAgAAAAAAAAADWHlrAAAAAAAAAAAAAAAABlN0YWJsZQAAAAAAAQ==",
       ]),
       options
     );

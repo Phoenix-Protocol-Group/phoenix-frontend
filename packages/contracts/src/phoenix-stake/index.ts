@@ -1,12 +1,25 @@
 import { Buffer } from "buffer";
-import type { i128, u128, u32, u64 } from "@stellar/stellar-sdk/contract";
+import { Address } from "@stellar/stellar-sdk";
 import {
   AssembledTransaction,
   Client as ContractClient,
   ClientOptions as ContractClientOptions,
+  Result,
   Spec as ContractSpec,
 } from "@stellar/stellar-sdk/contract";
-
+import type {
+  u32,
+  i32,
+  u64,
+  i64,
+  u128,
+  i128,
+  u256,
+  i256,
+  Option,
+  Typepoint,
+  Duration,
+} from "@stellar/stellar-sdk/contract";
 export * from "@stellar/stellar-sdk";
 export * as contract from "@stellar/stellar-sdk/contract";
 export * as rpc from "@stellar/stellar-sdk/rpc";
@@ -17,9 +30,9 @@ if (typeof window !== "undefined") {
 }
 
 export const networks = {
-  unknown: {
-    networkPassphrase: "Public Global Stellar Network ; September 2015",
-    contractId: "CDP6DT2YU75ZMOPTTCQ563H2XZDDWHPWKRQ6N2W5LNVE5HHRSB4MMRNQ",
+  testnet: {
+    networkPassphrase: "Test SDF Network ; September 2015",
+    contractId: "0",
   },
 } as const;
 
