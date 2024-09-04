@@ -9,9 +9,10 @@ export * as PhoenixMultihopContract from "./phoenix-multihop";
 export * as PhoenixVestingContract from "./phoenix-vesting";
 
 // NFT
-export * as PhoenixNFTCollectionContract from "./phoenix-nft-collection/MockClient";
-export * as PhoenixNFTContract from "./phoenix-nft/MockClient";
-export * as PhoenixNFTAuctions from "./phoenix-nft-auctions/MockClient";
+export * as PhoenixNFTCollectionContract from "./phoenix-nft-collection";
+export * as PhoenixNFTMintContract from "./phoenix-nft-mint";
+export * as PhoenixNFTContract from "./phoenix-nft";
+export * as PhoenixNFTAuctions from "./phoenix-nft-auctions";
 
 // Utils and misc
 export * from "./fetchPho";
