@@ -92,6 +92,8 @@ export default function Page({ params }: PoolPageProps) {
   // Set APR
   const [maxApr, setMaxApr] = useState<number>(0);
 
+  // Rewards
+  const [rewards, setRewards] = useState<Token[]>([]);
   // Stake Contract
   const [StakeContract, setStakeContract, StakeContractRef] = refuse.default<
     PhoenixStakeContract.Client | undefined
@@ -611,9 +613,86 @@ export default function Page({ params }: PoolPageProps) {
             };
           });
           setUserStakes(_stakes);
+          await loadRewards(stakeContract);
           return _stakes;
         }
       }
+    }
+  };
+
+  const loadRewards = async (stakeContract = StakeContract) => {
+    // Stake Contract
+    const _rewards = await stakeContract?.query_withdrawable_rewards({
+      user: storePersist.wallet.address!,
+    });
+
+    const __rewards = _rewards?.result.rewards?.map(async (reward: any) => {
+      console.log(reward);
+      // Get the token
+      const token = await store.fetchTokenInfo(reward.reward_address);
+      return {
+        name: token?.symbol.toUpperCase(),
+        icon: `/cryptoIcons/${token?.symbol.toLowerCase()}.svg`,
+        usdValue: "0",
+        amount:
+          Number(reward.reward_amount.toString()) / 10 ** token?.decimals!,
+        category: "",
+      };
+    });
+
+    const rew = await Promise.all(__rewards);
+    setRewards(rew);
+  };
+
+  const claimTokens = async () => {
+    try {
+      setLoading(true);
+
+      const stakeSigner =
+        storePersist.wallet.walletType === "wallet-connect"
+          ? store.walletConnectInstance
+          : new Signer();
+
+      let stakeAddress: string | undefined = stakeContractAddress;
+      if (stakeContractAddress === "") {
+        stakeAddress = await fetchStakingAddress();
+      }
+
+      const SigningStakeContract = new PhoenixStakeContract.Client({
+        publicKey: storePersist.wallet.address!,
+        contractId: stakeAddress!,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+        signTransaction: (tx: string) =>
+          storePersist.wallet.walletType === "wallet-connect"
+            ? stakeSigner.signTransaction(tx)
+            : stakeSigner.sign(tx),
+      });
+
+      const tx = await SigningStakeContract.withdraw_rewards({
+        sender: storePersist.wallet.address!,
+      });
+
+      await tx?.signAndSend();
+      setLoading(false);
+      // Wait 7 Seconds for the next block and fetch new balances
+      setTimeout(() => {
+        getPool();
+      }, 7000);
+    } catch (error: any) {
+      handleXDRIssues(
+        error,
+        setSuccessModalOpen,
+        setLoading,
+        setErrorModalOpen,
+        storePersist,
+        setErrorDescripption,
+        resolveContractError,
+        setTokenAmounts,
+        0,
+        0,
+        getPool
+      );
     }
   };
 
@@ -738,9 +817,9 @@ export default function Page({ params }: PoolPageProps) {
           </Box>
           <Box sx={{ mb: 4 }}>
             <LiquidityMining
-              rewards={[]}
+              rewards={rewards}
               balance={lpToken?.amount || 0}
-              onClaimRewards={() => {}}
+              onClaimRewards={() => claimTokens()}
               onStake={(amount) => {
                 stake(amount);
               }}
