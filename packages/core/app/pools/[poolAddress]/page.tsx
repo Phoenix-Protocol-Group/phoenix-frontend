@@ -621,27 +621,30 @@ export default function Page({ params }: PoolPageProps) {
   };
 
   const loadRewards = async (stakeContract = StakeContract) => {
-    // Stake Contract
-    const _rewards = await stakeContract?.query_withdrawable_rewards({
-      user: storePersist.wallet.address!,
-    });
+    try {
+      // Stake Contract
+      const _rewards = await stakeContract?.query_withdrawable_rewards({
+        user: storePersist.wallet.address!,
+      });
 
-    const __rewards = _rewards?.result.rewards?.map(async (reward: any) => {
-      console.log(reward);
-      // Get the token
-      const token = await store.fetchTokenInfo(reward.reward_address);
-      return {
-        name: token?.symbol.toUpperCase(),
-        icon: `/cryptoIcons/${token?.symbol.toLowerCase()}.svg`,
-        usdValue: "0",
-        amount:
-          Number(reward.reward_amount.toString()) / 10 ** token?.decimals!,
-        category: "",
-      };
-    });
+      const __rewards = _rewards?.result.rewards?.map(async (reward: any) => {
+        // Get the token
+        const token = await store.fetchTokenInfo(reward.reward_address);
+        return {
+          name: token?.symbol.toUpperCase(),
+          icon: `/cryptoIcons/${token?.symbol.toLowerCase()}.svg`,
+          usdValue: "0",
+          amount:
+            Number(reward.reward_amount.toString()) / 10 ** token?.decimals!,
+          category: "",
+        };
+      });
 
-    const rew = await Promise.all(__rewards);
-    setRewards(rew);
+      const rew = await Promise.all(__rewards);
+      setRewards(rew);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const claimTokens = async () => {
