@@ -1,7 +1,11 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
-import { PhoenixNFTCollectionDeployerContract } from "@phoenix-protocol/contracts";
+import { PinataSDK } from "pinata";
+import {
+  PhoenixNFTCollectionDeployerContract,
+  PhoenixNFTMintContract,
+} from "@phoenix-protocol/contracts";
 import { TextSelectItemProps } from "@phoenix-protocol/types";
 import { constants, Signer } from "@phoenix-protocol/utils";
 import { CreateCollection } from "@phoenix-protocol/ui";
@@ -24,12 +28,27 @@ export default function Page() {
     undefined
   );
 
+  const pinata = new PinataSDK({
+    pinataJwt: //@todo must be moved to server side place
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1Mjk1ZmIzNy1jYmU3LTQ0YTYtYmU1OS0yNTE0MTg5ZTc1YTYiLCJlbWFpbCI6InZhcm5vdHVzZWRAcHJvdG9ubWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX0seyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMTYwZDY3YmM5NThjZTYwNTc5YjMiLCJzY29wZWRLZXlTZWNyZXQiOiJiMzlhM2MwOTRiZGQwMDk4OWYzYmY4ODk1MzE0NDk2MjljM2U4MDEwZjNmYzJjM2Q1NjBmNDMzZDZjZjAxOWFjIiwiaWF0IjoxNzI2NDk0OTA3fQ.g98zhDPGIzNwKk2H4PlxQDWQLH7X9YK_BYhX1LvpJiA",
+    pinataGateway: "lime-genetic-whitefish-192.mypinata.cloud",
+  });
+
   useEffect(() => {
     if (!file) return;
 
     const url = URL.createObjectURL(file);
     setPreviewImage(url);
   }, [file]);
+
+  const uploadPreviewImage = async () => {
+    if (!file) {
+      return undefined;
+    }
+
+    const upload = await pinata.upload.file(file);
+    return upload;
+  };
 
   const handleSubmitClick = async () => {
     if (!storePersist) return;
@@ -69,7 +88,31 @@ export default function Page() {
 
       const res = await tx?.signAndSend();
 
-      if(res.result) {
+      if (res.result) {
+        const previewImage = await uploadPreviewImage();
+        console.log(previewImage);
+
+        if (previewImage) {
+          const CollectionContract = new PhoenixNFTMintContract.Client({
+            publicKey: storePersist.wallet.address!,
+            contractId: res.result,
+            networkPassphrase: constants.NETWORK_PASSPHRASE,
+            rpcUrl: constants.RPC_URL,
+            // @ts-ignore
+            signTransaction: (tx: string) =>
+              storePersist.wallet.walletType === "wallet-connect"
+                ? signer.signTransaction(tx)
+                : // @ts-ignore
+                  signer.sign(tx),
+          });
+
+          const collectionUriTx = await CollectionContract.set_collection_uri({
+            uri: Buffer.from(previewImage.cid, "utf8"),
+          });
+
+          const collectionUriRes = await collectionUriTx?.signAndSend();
+        }
+
         router.push(`/marketplace/collections/${res.result}`)
       }
     } catch (e) {

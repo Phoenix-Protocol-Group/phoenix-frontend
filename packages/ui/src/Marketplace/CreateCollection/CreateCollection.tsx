@@ -60,7 +60,7 @@ const CreateCollection = (props: CreateCollectionProps) => {
                     helpText=""
                     description1="You may change this after deploying your contract."
                     description2="Recommended size: 350 x 350. File types: JPG, PNG, SVG, or GIF"
-                    onFileDrop={(file: File) => {}}
+                    onFileDrop={(file: File) => {props.setFile(file)}}
                   />
                 </Grid>
                 <Grid item xs={12}>

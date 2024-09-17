@@ -1,10 +1,14 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
+import { PhoenixNFTMintContract } from "@phoenix-protocol/contracts";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { AuctionStatus, AuctionType, Currency, NftListingEntryProps, TextSelectItemProps } from "@phoenix-protocol/types";
 import {
   CollectionSingle,
 } from "@phoenix-protocol/ui";
+import { constants } from "@phoenix-protocol/utils";
+import { PinataSDK } from "pinata";
 import { useEffect, useState } from "react";
 
 const demoEntry: NftListingEntryProps = {
@@ -33,6 +37,9 @@ interface CollectionPageProps {
 }
 
 export default function Page({ params }: CollectionPageProps) {
+  const store = useAppStore();
+  const storePersist = usePersistStore();
+
   const [name, setName] = useState<string>("");
   const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
   const [creator, setCreator] = useState<string>("");
@@ -55,6 +62,18 @@ export default function Page({ params }: CollectionPageProps) {
   const [status, setStatus] = useState<AuctionStatus>('ALL');
   const [type, setType] = useState<AuctionType>("ALL");
 
+  const CollectionContract = new PhoenixNFTMintContract.Client({
+    contractId: params.collectionAddress,
+    networkPassphrase: constants.NETWORK_PASSPHRASE,
+    rpcUrl: constants.RPC_URL,
+  });
+
+  const pinata = new PinataSDK({
+    pinataJwt: //@todo must be moved to server side place
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1Mjk1ZmIzNy1jYmU3LTQ0YTYtYmU1OS0yNTE0MTg5ZTc1YTYiLCJlbWFpbCI6InZhcm5vdHVzZWRAcHJvdG9ubWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX0seyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMTYwZDY3YmM5NThjZTYwNTc5YjMiLCJzY29wZWRLZXlTZWNyZXQiOiJiMzlhM2MwOTRiZGQwMDk4OWYzYmY4ODk1MzE0NDk2MjljM2U4MDEwZjNmYzJjM2Q1NjBmNDMzZDZjZjAxOWFjIiwiaWF0IjoxNzI2NDk0OTA3fQ.g98zhDPGIzNwKk2H4PlxQDWQLH7X9YK_BYhX1LvpJiA",
+    pinataGateway: "lime-genetic-whitefish-192.mypinata.cloud",
+  });
+
   const handleEntryClick = (id: string) => {
     alert(id)
   };
@@ -75,8 +94,21 @@ export default function Page({ params }: CollectionPageProps) {
     setEntries([demoEntry, demoEntry, demoEntry, demoEntry, demoEntryOwned])
   }
 
-  const fetchCollectionInfo = () => {
-    //set all collection infos
+  const fetchCollectionInfo = async () => {
+    try {
+      const previewImageObj = (await CollectionContract.collection_uri()).result.unwrap();
+      const previewImageCid = previewImageObj.uri.toString();
+
+      const url = await pinata.gateways.createSignedURL({
+        cid: previewImageCid,
+        expires: 1800,
+      });
+
+      setPreviewImage(url);
+      
+    } catch(e) {
+      console.error(e);
+    }
   }
 
   useEffect(() => {
