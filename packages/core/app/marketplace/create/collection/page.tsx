@@ -67,8 +67,7 @@ export default function Page() {
       const CollectionDeployerContract =
         new PhoenixNFTCollectionDeployerContract.Client({
           publicKey: storePersist.wallet.address!,
-          contractId:
-            "CDH7YFXQFAHAFIPH64SC77WWD2RTII3XK6SVESRUHFBAHFWFJYNMKKSY", //@todo move to constants
+          contractId: constants.COLLECTION_DEPLOYER_ADDRESS,
           networkPassphrase: constants.NETWORK_PASSPHRASE,
           rpcUrl: constants.RPC_URL,
           // @ts-ignore
