@@ -58,7 +58,7 @@ const CreateNft = (props: CreateNftProps) => {
                   <Grid container spacing={3}>
                     <Grid item xs={12} sm>
                       <TextSelect
-                        label="CATEGORY"
+                        label="COLLECTION"
                         helpText="help"
                         placeholder="My Collection Name"
                         value={props.category}
