@@ -1,12 +1,16 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
+import { PhoenixNFTCollectionDeployerContract } from "@phoenix-protocol/contracts";
+import { usePersistStore } from "@phoenix-protocol/state";
 import { TextSelectItemProps } from "@phoenix-protocol/types";
 import { CreateNft } from "@phoenix-protocol/ui";
+import { constants } from "@phoenix-protocol/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
+  const storePersist = usePersistStore();
   const router = useRouter();
 
   const [name, setName] = useState<string>("");
@@ -20,6 +24,23 @@ export default function Page() {
     undefined
   );
 
+  const DeployerContract = new PhoenixNFTCollectionDeployerContract.Client({
+    contractId: constants.COLLECTION_DEPLOYER_ADDRESS,
+    networkPassphrase: constants.NETWORK_PASSPHRASE,
+    rpcUrl: constants.RPC_URL,
+  });
+
+  const fetchUserCollections = async () => {
+    const userCollections = (await DeployerContract.query_collection_by_creator({
+      creator: storePersist.wallet.address!
+    })).result.unwrap();
+
+
+    console.log(userCollections);
+  };
+
+  const handleSubmitClick = () => {};
+
   useEffect(() => {
     if (!file) return;
 
@@ -27,7 +48,10 @@ export default function Page() {
     setPreviewImage(url);
   }, [file]);
 
-  const handleSubmitClick = () => {};
+  useEffect(() => {
+    fetchUserCollections();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storePersist.wallet.address])
 
   return (
     <Box
