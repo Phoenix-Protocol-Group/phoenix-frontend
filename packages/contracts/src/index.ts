@@ -11,7 +11,6 @@ export * as PhoenixVestingContract from "./phoenix-vesting";
 // NFT
 export * as PhoenixNFTCollectionContract from "./phoenix-nft-collection";
 export * as PhoenixNFTCollectionDeployerContract from "./phoenix-nft-collection-deployer";
-export * as PhoenixNFTMintContract from "./phoenix-nft-mint";
 export * as PhoenixNFTContract from "./phoenix-nft";
 export * as PhoenixNFTAuctions from "./phoenix-nft-auctions";
 
