@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
-import { PhoenixNFTMintContract } from "@phoenix-protocol/contracts";
+import { PhoenixNFTCollectionContract } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { AuctionStatus, AuctionType, Currency, NftListingEntryProps, TextSelectItemProps } from "@phoenix-protocol/types";
 import {
@@ -62,7 +62,7 @@ export default function Page({ params }: CollectionPageProps) {
   const [status, setStatus] = useState<AuctionStatus>('ALL');
   const [type, setType] = useState<AuctionType>("ALL");
 
-  const CollectionContract = new PhoenixNFTMintContract.Client({
+  const CollectionContract = new PhoenixNFTCollectionContract.Client({
     contractId: params.collectionAddress,
     networkPassphrase: constants.NETWORK_PASSPHRASE,
     rpcUrl: constants.RPC_URL,

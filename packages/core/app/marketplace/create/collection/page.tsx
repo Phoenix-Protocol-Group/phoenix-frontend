@@ -4,7 +4,6 @@ import { Box, Typography } from "@mui/material";
 import { PinataSDK } from "pinata";
 import {
   PhoenixNFTCollectionDeployerContract,
-  PhoenixNFTMintContract,
 } from "@phoenix-protocol/contracts";
 import { TextSelectItemProps } from "@phoenix-protocol/types";
 import { constants, Signer } from "@phoenix-protocol/utils";
@@ -12,6 +11,7 @@ import { CreateCollection } from "@phoenix-protocol/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
+import { PhoenixNFTCollectionContract } from '@phoenix-protocol/contracts';
 
 export default function Page() {
   const store = useAppStore();
@@ -92,7 +92,7 @@ export default function Page() {
         console.log(previewImage);
 
         if (previewImage) {
-          const CollectionContract = new PhoenixNFTMintContract.Client({
+          const CollectionContract = new PhoenixNFTCollectionContract.Client({
             publicKey: storePersist.wallet.address!,
             contractId: res.result,
             networkPassphrase: constants.NETWORK_PASSPHRASE,
@@ -106,6 +106,7 @@ export default function Page() {
           });
 
           const collectionUriTx = await CollectionContract.set_collection_uri({
+            sender: storePersist.wallet.address!,
             uri: Buffer.from(previewImage.cid, "utf8"),
           });
 
