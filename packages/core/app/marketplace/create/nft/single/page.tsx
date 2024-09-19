@@ -1,23 +1,24 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
-import { PhoenixNFTCollectionDeployerContract } from "@phoenix-protocol/contracts";
-import { usePersistStore } from "@phoenix-protocol/state";
+import { PhoenixNFTCollectionContract, PhoenixNFTCollectionDeployerContract } from "@phoenix-protocol/contracts";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { TextSelectItemProps } from "@phoenix-protocol/types";
 import { CreateNft } from "@phoenix-protocol/ui";
-import { constants } from "@phoenix-protocol/utils";
+import { constants, Signer } from "@phoenix-protocol/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
+  const store = useAppStore();
   const storePersist = usePersistStore();
   const router = useRouter();
 
   const [name, setName] = useState<string>("");
   const [supply, setSupply] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [category, setCategory] = useState<string>("");
-  const [categories, setCategories] = useState<TextSelectItemProps[]>([]);
+  const [collection, setCollection] = useState<string>("");
+  const [collections, setCollections] = useState<TextSelectItemProps[]>([]);
   const [file, setFile] = useState<File | undefined>();
   const [externalLink, setExternalLink] = useState<string>("");
   const [previewImage, setPreviewImage] = useState<string | undefined>(
@@ -31,15 +32,47 @@ export default function Page() {
   });
 
   const fetchUserCollections = async () => {
+    if(!storePersist.wallet.address) return;
+
     const userCollections = (await DeployerContract.query_collection_by_creator({
       creator: storePersist.wallet.address!
     })).result.unwrap();
 
-
-    console.log(userCollections);
+    const renamedArray = userCollections.map(({ collection, name, ...rest }: {collection: string, name: string}) => ({ value: collection, label: name, ...rest }));
+    setCollections(renamedArray);
   };
 
-  const handleSubmitClick = () => {};
+  const handleSubmitClick = async () => {
+    try {
+      const signer =
+        storePersist.wallet.walletType === "wallet-connect"
+          ? store.walletConnectInstance
+          : new Signer();
+
+      const CollectionContract =
+        new PhoenixNFTCollectionContract.Client({
+          publicKey: storePersist.wallet.address!,
+          contractId: collection,
+          networkPassphrase: constants.NETWORK_PASSPHRASE,
+          rpcUrl: constants.RPC_URL,
+          // @ts-ignore
+          signTransaction: (tx: string) =>
+            storePersist.wallet.walletType === "wallet-connect"
+              ? signer.signTransaction(tx)
+              : // @ts-ignore
+                signer.sign(tx),
+        });
+
+      /*
+      const tx = await CollectionContract.mint({
+        sender: storePersist.wallet.address!,
+
+      });
+      */
+    } catch(e) {
+      console.error(e);
+    }
+  };
 
   useEffect(() => {
     if (!file) return;
@@ -51,7 +84,7 @@ export default function Page() {
   useEffect(() => {
     fetchUserCollections();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storePersist.wallet.address])
+  }, [storePersist.wallet.address]);
 
   return (
     <Box
@@ -86,9 +119,9 @@ export default function Page() {
           setSupply={setSupply}
           description={description}
           setDescription={setDescription}
-          categories={categories}
-          category={category}
-          setCategory={setCategory}
+          categories={collections}
+          category={collection}
+          setCategory={setCollection}
           previewImage={previewImage}
           externalLink={externalLink}
           setExternalLink={setExternalLink}
