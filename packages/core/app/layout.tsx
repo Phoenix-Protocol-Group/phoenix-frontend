@@ -241,6 +241,80 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           name="description"
           content="Explore Phoenix DeFi Hub on Soroban - your gateway to innovative decentralized finance solutions. Experience seamless, secure, and advanced DeFi services with cutting-edge smart contract capabilities. Join the future of finance today."
         />
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://app.phoenix-hub.io" />
+        <meta property="og:title" content="Phoenix DeFi Hub on Soroban" />
+        <meta
+          property="og:description"
+          content="Explore Phoenix DeFi Hub on Soroban - your gateway to innovative decentralized finance solutions. Experience seamless, secure, and advanced DeFi services with cutting-edge smart contract capabilities. Join the future of finance today."
+        />
+        <meta
+          property="og:image"
+          content="https://app.phoenix-hub.io//socials.png"
+        />
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content="https://app.phoenix-hub.io" />
+        <meta name="twitter:title" content="Phoenix DeFi Hub on Soroban" />
+        <meta
+          name="twitter:description"
+          content="Explore Phoenix DeFi Hub on Soroban - your gateway to innovative decentralized finance solutions. Experience seamless, secure, and advanced DeFi services with cutting-edge smart contract capabilities. Join the future of finance today."
+        />
+        <meta
+          name="twitter:image"
+          content="https://app.phoenix-hub.io/socials-square.png"
+        />
+        {/* Additional tags for responsiveness and browser compatibility */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+      </head>
+      <body>
+        <Providers>
+          <Box
+            sx={{
+              width: "100%",
+              mt: 3,
+            }}
+          >
+            <Box
+              sx={{
+                maxWidth: "600px",
+                margin: "auto",
+                background:
+                  "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+                backdropFilter: "blur(42px)",
+                p: 4,
+                borderRadius: "16px",
+              }}
+            >
+              <Box component={"img"} src="/logo.png" />
+              <Typography>
+                The app is currently under maintenance. Please check back later.
+              </Typography>
+              <Typography sx={{ mt: 1, fontWeight: 600 }}>Changes:</Typography>
+              <List>
+                <ListItem>
+                  Some users experienced issues with connecting to the App. We
+                  expect to be back within the next few hours. Please check our
+                  twitter for more frequent updates!
+                </ListItem>
+              </List>
+              <Typography>We apologize for the inconvenience.</Typography>
+            </Box>
+          </Box>
+        </Providers>
+      </body>
+    </html>
+  );
+
+  return (
+    <html lang="en">
+      <head>
+        <meta
+          name="description"
+          content="Explore Phoenix DeFi Hub on Soroban - your gateway to innovative decentralized finance solutions. Experience seamless, secure, and advanced DeFi services with cutting-edge smart contract capabilities. Join the future of finance today."
+        />
 
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
