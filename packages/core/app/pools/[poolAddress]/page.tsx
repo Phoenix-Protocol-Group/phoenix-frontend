@@ -506,26 +506,11 @@ export default function Page({ params }: PoolPageProps) {
             amount: 18750,
           },
         ];
-
-        // Get if theres an old account and how many it has in LP Share tokens
-        const newContracts = {
-          CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX: 987682920776,
-          CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH: 1129293845852,
-          CBISULYO5ZGS32WTNCBMEFCNKNSLFXCQ4Z3XHVDP4X4FLPSEALGSY3PS: 56363823174,
-        };
-
-        let oldAmount = 0;
-        if (newContracts.hasOwnProperty(params.poolAddress)) {
-          oldAmount +=
-            newContracts[params.poolAddress as keyof typeof newContracts];
-        }
-
         const stakingInfo = await stakeContractAddress.query_total_staked();
         const totalStaked = Number(stakingInfo?.result);
 
         const ratioStaked =
-          totalStaked /
-          (Number(pairInfo.result.asset_lp_share.amount) - oldAmount);
+          totalStaked / Number(pairInfo.result.asset_lp_share.amount);
         const valueStaked = tvl * ratioStaked;
         const poolIncentive = poolIncentives.find(
           (incentive) => incentive.address === params.poolAddress
@@ -550,8 +535,7 @@ export default function Page({ params }: PoolPageProps) {
             // Get the total amount of LP tokens in the pool
             const info = pairInfo.result;
 
-            const lpShareAmount =
-              Number(info.asset_lp_share.amount) - oldAmount;
+            const lpShareAmount = Number(info.asset_lp_share.amount);
 
             const lpShareAmountDec =
               Number(lpShareAmount) / 10 ** (_lpToken?.decimals || 7);
