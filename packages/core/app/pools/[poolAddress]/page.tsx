@@ -372,14 +372,18 @@ export default function Page({ params }: PoolPageProps) {
             ? stakeSigner.signTransaction(tx)
             : stakeSigner.sign(tx),
       });
-      const tx = await SigningStakeContract.unbond({
-        sender: storePersist.wallet.address!,
-        stake_amount: BigInt(
-          (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-        ),
-        stake_timestamp: BigInt(stake_timestamp),
-      });
-      await tx?.signAndSend();
+      const tx = await SigningStakeContract.unbond(
+        {
+          sender: storePersist.wallet.address!,
+          stake_amount: BigInt(
+            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+          ),
+          stake_timestamp: BigInt(stake_timestamp),
+        },
+        { simulate: false }
+      );
+      await tx?.simulate({ restore: true });
+      // await tx?.signAndSend();
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
