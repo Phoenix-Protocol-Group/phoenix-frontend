@@ -5,6 +5,10 @@ import { priceExport } from "./exportedPrices";
 export async function fetchTokenPrices(symbol?: string, tokenId?: string) {
   const client = createApolloClient();
 
+  if (symbol == "VCHF" || symbol == "VEUR") {
+    return fetchDollarValue(symbol === "VCHF" ? "chf" : "eur");
+  }
+
   const GET_PRICES = gql`
     query GetPrices($symbol: String, $tokenId: String) {
       prices(symbol: $symbol, tokenId: $tokenId) {
@@ -148,5 +152,29 @@ export async function fetchTokenPrices2(
   } catch (error) {
     console.error("Error fetching prices:", error);
     throw error;
+  }
+}
+
+/**
+ * Hacky solution until API is updated
+ * @param currency
+ * @returns
+ */
+async function fetchDollarValue(
+  currency: "chf" | "eur"
+): Promise<number | null> {
+  try {
+    const response = await fetch(
+      `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${currency}.json`
+    );
+    if (!response.ok) {
+      throw new Error(`Error fetching data: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data[currency].usd;
+  } catch (error) {
+    console.error("Fetch error: ", error);
+    return null;
   }
 }
