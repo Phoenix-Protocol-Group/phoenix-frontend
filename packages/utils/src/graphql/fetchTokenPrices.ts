@@ -7,6 +7,8 @@ export async function fetchTokenPrices(symbol?: string, tokenId?: string) {
 
   if (symbol == "VCHF" || symbol == "VEUR") {
     return fetchDollarValue(symbol === "VCHF" ? "chf" : "eur");
+  } else if (symbol == "USDx") {
+    return 1;
   }
 
   const GET_PRICES = gql`
