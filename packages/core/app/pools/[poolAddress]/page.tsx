@@ -239,7 +239,7 @@ export default function Page({ params }: PoolPageProps) {
   };
 
   // Remove Liquidity
-  const removeLiquidity = async (lpTokenAmount: number) => {
+  const removeLiquidity = async (lpTokenAmount: number, fix?: boolean) => {
     try {
       setLoading(true);
       const stakeSigner =
@@ -257,16 +257,30 @@ export default function Page({ params }: PoolPageProps) {
             ? stakeSigner.signTransaction(tx)
             : stakeSigner.sign(tx),
       });
-      const tx = await SigningPairContract.withdraw_liquidity({
-        sender: storePersist.wallet.address!,
-        share_amount: BigInt(
-          (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-        ),
-        min_a: BigInt(1),
-        min_b: BigInt(1),
-        deadline: undefined,
-      });
-      await tx.signAndSend();
+      if (fix === true) {
+        const tx = await SigningPairContract.withdraw_liquidity(
+          {
+            sender: storePersist.wallet.address!,
+            share_amount: BigInt(10),
+            min_a: BigInt(1),
+            min_b: BigInt(1),
+            deadline: undefined,
+          },
+          { simulate: false }
+        );
+        await tx.simulate({ restore: true });
+      } else {
+        const tx = await SigningPairContract.withdraw_liquidity({
+          sender: storePersist.wallet.address!,
+          share_amount: BigInt(
+            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+          ),
+          min_a: BigInt(1),
+          min_b: BigInt(1),
+          deadline: undefined,
+        });
+        await tx.signAndSend();
+      }
       setLoading(false);
       setTokenAmounts([lpTokenAmount]);
       setStakeModalOpen(true);
@@ -856,8 +870,8 @@ export default function Page({ params }: PoolPageProps) {
               onAddLiquidity={(tokenAAmount, tokenBAmount) => {
                 provideLiquidity(tokenAAmount, tokenBAmount);
               }}
-              onRemoveLiquidity={(liquidityTokenAmount) => {
-                removeLiquidity(liquidityTokenAmount);
+              onRemoveLiquidity={(liquidityTokenAmount, fix) => {
+                removeLiquidity(liquidityTokenAmount, fix);
               }}
             />
           ) : (
