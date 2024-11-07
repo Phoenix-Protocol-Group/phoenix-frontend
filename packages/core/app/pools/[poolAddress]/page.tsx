@@ -192,23 +192,19 @@ export default function Page({ params }: PoolPageProps) {
             ? stakeSigner.signTransaction(tx)
             : stakeSigner.sign(tx),
       });
-      const tx = await SigningPairContract.provide_liquidity(
-        {
-          sender: storePersist.wallet.address!,
-          desired_a: BigInt(
-            (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
-          ),
-          desired_b: BigInt(
-            (tokenBAmount * 10 ** (tokenB?.decimals || 7)).toFixed(0)
-          ),
-          min_a: undefined,
-          min_b: undefined,
-          custom_slippage_bps: undefined,
-          deadline: undefined,
-        },
-        { simulate: false }
-      );
-      await tx.simulate({ restore: true });
+      const tx = await SigningPairContract.provide_liquidity({
+        sender: storePersist.wallet.address!,
+        desired_a: BigInt(
+          (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
+        ),
+        desired_b: BigInt(
+          (tokenBAmount * 10 ** (tokenB?.decimals || 7)).toFixed(0)
+        ),
+        min_a: undefined,
+        min_b: undefined,
+        custom_slippage_bps: undefined,
+        deadline: undefined,
+      });
       await tx.signAndSend();
 
       setLoading(false);
