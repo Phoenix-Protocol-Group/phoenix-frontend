@@ -14,7 +14,7 @@ import PoolLiquidity from "../PoolLiquidity/PoolLiquidity";
 import { SidebarNavigation } from "../../SidebarNavigation/SidebarNavigation";
 import { useState } from "react";
 import MailIcon from "@mui/icons-material/Mail";
-import { AppBar } from "../../AppBar/AppBar";
+import { AppBar } from "../../AppBar/AppBar";
 import { testTokens } from "../../Dashboard/WalletBalanceTable/WalletBalanceTable.stories";
 
 const args = {
@@ -71,6 +71,9 @@ const args = {
         onClick: () => {
           // Empty function
         },
+        onClickFix: () => {
+          // Empty function
+        },
       },
       {
         icon: "cryptoIcons/btc.svg",
@@ -82,6 +85,9 @@ const args = {
           tokenValueInUsd: "55,000.50",
         },
         onClick: () => {
+          // Empty function
+        },
+        onClickFix: () => {
           // Empty function
         },
       },
@@ -97,6 +103,9 @@ const args = {
         onClick: () => {
           // Empty function
         },
+        onClickFix: () => {
+          // Empty function
+        },
       },
       {
         icon: "cryptoIcons/btc.svg",
@@ -110,6 +119,9 @@ const args = {
         onClick: () => {
           // Empty function
         },
+        onClickFix: () => {
+          // Empty function
+        },
       },
       {
         icon: "cryptoIcons/btc.svg",
@@ -121,6 +133,9 @@ const args = {
           tokenValueInUsd: "8,007.50",
         },
         onClick: () => {
+          // Empty function
+        },
+        onClickFix: () => {
           // Empty function
         },
       },
