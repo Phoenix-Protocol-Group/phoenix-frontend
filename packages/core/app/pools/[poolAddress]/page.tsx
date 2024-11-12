@@ -48,6 +48,7 @@ interface Entry {
     tokenValueInUsd: string;
   };
   onClick: () => void;
+  onClickFix: () => void;
 }
 
 interface PoolPageProps {
@@ -362,7 +363,11 @@ export default function Page({ params }: PoolPageProps) {
   };
 
   // Stake
-  const unstake = async (lpTokenAmount: number, stake_timestamp: number) => {
+  const unstake = async (
+    lpTokenAmount: number,
+    stake_timestamp: number,
+    fix?: boolean
+  ) => {
     try {
       setLoading(true);
 
@@ -386,14 +391,28 @@ export default function Page({ params }: PoolPageProps) {
             ? stakeSigner.signTransaction(tx)
             : stakeSigner.sign(tx),
       });
-      const tx = await SigningStakeContract.unbond({
-        sender: storePersist.wallet.address!,
-        stake_amount: BigInt(
-          (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-        ),
-        stake_timestamp: BigInt(stake_timestamp),
-      });
-      await tx?.signAndSend();
+      if (!fix) {
+        const tx = await SigningStakeContract.unbond({
+          sender: storePersist.wallet.address!,
+          stake_amount: BigInt(
+            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+          ),
+          stake_timestamp: BigInt(stake_timestamp),
+        });
+        await tx.signAndSend();
+      } else {
+        const tx = await SigningStakeContract.unbond(
+          {
+            sender: storePersist.wallet.address!,
+            stake_amount: BigInt(
+              (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+            ),
+            stake_timestamp: BigInt(stake_timestamp),
+          },
+          { simulate: false }
+        );
+        tx.simulate({ restore: true });
+      }
       setLoading(false);
       //!todo view transaction id in blockexplorer
       setTokenAmounts([lpTokenAmount]);
@@ -624,6 +643,13 @@ export default function Page({ params }: PoolPageProps) {
               },
               onClick: () => {
                 unstake(Number(stake.stake) / 10 ** 7, stake.stake_timestamp);
+              },
+              onClickFix: () => {
+                unstake(
+                  Number(stake.stake) / 10 ** 7,
+                  stake.stake_timestamp,
+                  true
+                );
               },
             };
           });

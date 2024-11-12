@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import StakingList from "./StakingList";
 import { Grid } from "@mui/material";
+import { StakingListEntry as Entry } from "@phoenix-protocol/types";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof StakingList> = {
@@ -95,12 +96,12 @@ const entries = [
 
 export const Primary: Story = {
   args: {
-    entries,
+    entries: entries as Entry[],
   },
 };
 
 export const NoEntries: Story = {
   args: {
-    entries: []
+    entries: [],
   },
 };
