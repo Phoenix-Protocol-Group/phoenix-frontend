@@ -120,10 +120,11 @@ export default function Page() {
       // Filter by date range
       if (activeFilters.dateRange.from || activeFilters.dateRange.to) {
         const from = activeFilters.dateRange.from
-          ? new Date(activeFilters.dateRange.from).setHours(0, 0, 0, 0)
+          ? new Date(activeFilters.dateRange.from).setHours(0, 0, 0, 0) / 1000
           : null;
         const to = activeFilters.dateRange.to
-          ? new Date(activeFilters.dateRange.to).setHours(23, 59, 59, 999)
+          ? new Date(activeFilters.dateRange.to).setHours(23, 59, 59, 999) /
+            1000
           : null;
 
         if (from && tradeTimestamp < from) return false;
@@ -157,7 +158,20 @@ export default function Page() {
       return true;
     });
 
-    setHistory(filteredTrades.slice(0, pageSize));
+    // Sort the filtered trades
+    const sortedTrades = filteredTrades.sort((a, b) => {
+      if (sortBy === "date") {
+        return sortOrder === "asc" ? a.date - b.date : b.date - a.date;
+      } else if (sortBy) {
+        return sortOrder === "asc"
+          ? a[sortBy] - b[sortBy]
+          : b[sortBy] - a[sortBy];
+      }
+      return 0;
+    });
+
+    // Update history with sorted and filtered trades
+    setHistory(sortedTrades.slice(0, pageSize));
   };
 
   const loadMore = () => {
