@@ -31,6 +31,38 @@ export default function Page() {
     rpcUrl: constants.RPC_URL,
   });
 
+  const handleUpload = async () => {
+    if (!file || !name || !description) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("name", name);
+    formData.append("description", description);
+
+    try {
+      const response = await fetch("/api/nft/upload/single", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Upload failed");
+      }
+
+      const data = await response.json();
+      return data.IpfsHash;
+    } catch (error: any) {
+      console.error("Error uploading:", error);
+    }
+  };
+
+  useEffect(() => {
+
+  }, [])
+
   const fetchUserCollections = async () => {
     if(!storePersist.wallet.address) return;
 
@@ -63,12 +95,20 @@ export default function Page() {
                 signer.sign(tx),
         });
 
-      /*
       const tx = await CollectionContract.mint({
         sender: storePersist.wallet.address!,
-
+        to: storePersist.wallet.address!, //@TODO add input field for destination address 
+        id: Math.floor(Math.random() * 100), //@TODO add input field for id
+        amount: BigInt(Number(supply)),
       });
-      */
+
+      const res = await tx?.signAndSend();
+
+      console.log(res);
+
+      if(res.result) {
+
+      }
     } catch(e) {
       console.error(e);
     }
@@ -109,7 +149,7 @@ export default function Page() {
           onBackButtonClick={() => {
             router.back();
           }}
-          onSubmitClick={handleSubmitClick}
+          onSubmitClick={handleUpload}
           onCreateCollectionClick={() => {
             router.push("/marketplace/create/collection");
           }}

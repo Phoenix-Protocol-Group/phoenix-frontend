@@ -41,9 +41,10 @@
   "packageManager": "yarn@3.6.4",
   "dependencies": {
     "@stellar/stellar-sdk": "12.0.0-rc.3",
+    "@types/formidable": "^3.4.5",
     "@walletconnect/modal": "^2.6.2",
     "@walletconnect/sign-client": "^2.13.1",
     "@walletconnect/types": "^2.13.1",
-    "pinata": "^1.2.0"
+    "pinata-web3": "^0.5.2"
   }
 }
