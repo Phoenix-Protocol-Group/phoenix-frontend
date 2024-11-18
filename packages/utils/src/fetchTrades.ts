@@ -89,7 +89,9 @@ export async function fetchAllTrades(appStore: any) {
       assetTradeCount[assetB] = (assetTradeCount[assetB] || 0) + 1;
 
       // Check if trade is within the last 24 hours
-      const tradeTimestamp = new Date(trade.trade_timestamp).getTime();
+      const tradeTimestamp =
+        new Date(trade.trade_timestamp * 1000).getTime() / 1000;
+
       if (tradeTimestamp >= oneDayAgo) {
         totalTradeCount24h += 1;
       }

@@ -69,12 +69,6 @@ export default function Page() {
     },
   });
 
-  const loadMetaData = async () => {
-    const { activeAccountsLast24h, totalAccounts, totalTrades } =
-      await fetchHistoryMetaData();
-    setMeta({ activeAccountsLast24h, totalAccounts, totalTrades });
-  };
-
   const loadPriceData = async () => {
     const result = await fetchHistoricalPrices(
       undefined,
@@ -210,7 +204,6 @@ export default function Page() {
   }, [selectedTimeEpoch]);
 
   useEffect(() => {
-    loadMetaData();
     loadVolumeData("daily");
     loadPriceData();
     loadAllTrades();
@@ -254,7 +247,7 @@ export default function Page() {
       </Grid>
       <TransactionsCards
         activeTraders={meta.activeAccountsLast24h.toString()}
-        totalTraders={meta.totalAccounts.toString()}
+        totalTraders={meta.activeAccountsLast24h.toString()}
         mostTradedAsset={mostTradedAsset}
         totalTrades={meta.totalTrades.toString()}
       />
