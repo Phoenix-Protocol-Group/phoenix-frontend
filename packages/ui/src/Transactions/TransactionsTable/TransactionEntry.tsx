@@ -89,7 +89,7 @@ const TransactionEntry = (props: TransactionTableEntryProps) => {
             ${props.tradeValue}
           </Typography>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <Typography
             sx={{
               color: "#FFF",
@@ -99,16 +99,6 @@ const TransactionEntry = (props: TransactionTableEntryProps) => {
           >
             {props.date}
           </Typography>
-        </Grid>
-        <Grid item xs={1}>
-          <Link
-            href={`https://stellarchain.io/transactions/${props.txHash}`}
-            target="_blank"
-          >
-            <IconButton>
-              <ManageSearch sx={{ fontSize: "20px" }} />
-            </IconButton>
-          </Link>
         </Grid>
       </Grid>
     </Box>

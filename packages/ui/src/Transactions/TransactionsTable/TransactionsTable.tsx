@@ -201,21 +201,12 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                 }
               />
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <TransactionHeader
                 handleSort={handleSort}
                 label="Date"
                 active={
                   activeSort.column === "date" ? activeSort.direction : false
-                }
-              />
-            </Grid>
-            <Grid item xs={1}>
-              <TransactionHeader
-                handleSort={handleSort}
-                label="Explore"
-                active={
-                  activeSort.column === "actions" ? activeSort.direction : false
                 }
               />
             </Grid>
@@ -235,7 +226,11 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                 assets={entry.assets}
                 tradeSize={entry.tradeSize}
                 tradeValue={entry.tradeValue}
-                date={entry.date}
+                date={
+                  new Date(Number(entry.date)).toLocaleDateString() +
+                  " " +
+                  new Date(Number(entry.date)).toLocaleTimeString()
+                }
                 txHash={entry.txHash}
               />
             </motion.div>

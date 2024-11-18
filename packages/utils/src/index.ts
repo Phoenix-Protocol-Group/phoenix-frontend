@@ -11,6 +11,7 @@ export * from "./graphql";
 export * from "./prices";
 export * from "./errorResolver";
 export * from "./trustlines";
+export * from "./fetchTrades";
 import Signer from "./wallets/Signer";
 
 export { WalletConnect } from "./wallets/wallet-connect";
