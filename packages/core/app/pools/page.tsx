@@ -13,14 +13,23 @@ import {
   fetchTokenPrices,
   formatCurrency,
 } from "@phoenix-protocol/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Pool, PoolsFilter } from "@phoenix-protocol/types";
 import { Helmet } from "react-helmet";
 import { Box } from "@mui/material";
 import { FACTORY_ADDRESS } from "@phoenix-protocol/utils/build/constants";
 import { LiquidityPoolInfo } from "@phoenix-protocol/contracts/build/phoenix-pair";
+import { motion } from "framer-motion";
 
+/**
+ * Page Component - Phoenix DeFi Pools Overview
+ *
+ * This component renders an overview of available liquidity pools in the Phoenix DeFi Hub.
+ * It features interactive pool management options, including sorting, filtering, and viewing detailed liquidity information.
+ *
+ * @component
+ */
 export default function Page() {
   const store = useAppStore(); // Global state management
   const router = useRouter(); // Next.js router
@@ -28,9 +37,17 @@ export default function Page() {
   const [allPools, setAllPools] = useState<Pool[]>([]); // State to hold pool data
   const storePersist = usePersistStore(); // Persisted state
   const [poolFilter, setPoolFilter] = useState<PoolsFilter>("ALL");
+  const isInitialMount = useRef(true); // To track the initial component mount
 
-  // Fetch pool information by its address
-  const fetchPool = async (poolAddress: string) => {
+  /**
+   * Fetch pool information by its address.
+   *
+   * @async
+   * @function fetchPool
+   * @param {string} poolAddress - The address of the liquidity pool.
+   * @returns {Promise<Pool | undefined>} A promise that resolves to the pool information or undefined in case of failure.
+   */
+  const fetchPool = useCallback(async (poolAddress: string) => {
     try {
       const PairContract = new PhoenixPairContract.Client({
         contractId: poolAddress,
@@ -42,6 +59,7 @@ export default function Page() {
         PairContract.query_config(),
         PairContract.query_pool_info(),
       ]);
+
       if (pairConfig?.result && pairInfo?.result) {
         const [tokenA, tokenB] = await Promise.all([
           store.fetchTokenInfo(pairConfig.result.token_a),
@@ -50,8 +68,8 @@ export default function Page() {
 
         // Fetch prices and calculate TVL
         const [priceA, priceB] = await Promise.all([
-          await fetchTokenPrices(tokenA?.symbol || ""),
-          await fetchTokenPrices(tokenB?.symbol || ""),
+          fetchTokenPrices(tokenA?.symbol || ""),
+          fetchTokenPrices(tokenB?.symbol || ""),
         ]);
 
         const tvl =
@@ -68,51 +86,51 @@ export default function Page() {
           rpcUrl: constants.RPC_URL,
         });
 
-        const stakingInfo = await StakeContract.query_total_staked();
+        const [stakingInfo, allPoolDetails] = await Promise.all([
+          StakeContract.query_total_staked(),
+          new PhoenixFactoryContract.Client({
+            contractId: FACTORY_ADDRESS,
+            networkPassphrase: constants.NETWORK_PASSPHRASE,
+            rpcUrl: constants.RPC_URL,
+          }).query_all_pools_details(),
+        ]);
+
         const totalStaked = Number(stakingInfo.result);
-
-        const FactoryContract = new PhoenixFactoryContract.Client({
-          contractId: FACTORY_ADDRESS,
-          networkPassphrase: constants.NETWORK_PASSPHRASE,
-          rpcUrl: constants.RPC_URL,
-        });
-
-        const allPoolDetails: LiquidityPoolInfo[] = (
-          await FactoryContract.query_all_pools_details()
-        ).result;
         const totalTokens = Number(
-          allPoolDetails.find((pool) => pool.pool_address === poolAddress)
-            ?.pool_response.asset_lp_share.amount
+          allPoolDetails.result.find(
+            (pool: any) => pool.pool_address === poolAddress
+          )?.pool_response.asset_lp_share.amount
         );
 
         const ratioStaked = totalStaked / totalTokens;
-        // Calculate APR by get the value of the total staked amount and the incentive amount
+        const valueStaked = tvl * ratioStaked;
+
+        // Calculate APR based on incentives
         const poolIncentives = [
           {
-            // XLM / USDC
             address: "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX",
             amount: 12500,
           },
-          // XLM/PHO
           {
             address: "CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH",
             amount: 25000,
           },
           {
-            // PHO/USDC
             address: "CAZ6W4WHVGQBGURYTUOLCUOOHW6VQGAAPSPCD72VEDZMBBPY7H43AYEC",
             amount: 18750,
           },
         ];
-        const valueStaked = tvl * ratioStaked;
+
         const poolIncentive = poolIncentives.find(
           (incentive) => incentive.address === poolAddress
-        )!;
+        );
+
         const phoprice = await fetchPho();
         const _apr =
-          ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
+          ((poolIncentive?.amount || 0 * phoprice) / valueStaked) * 100 * 6;
 
         const apr = isNaN(_apr) ? 0 : _apr;
+
         // Construct and return pool object if all fetches are successful
         return {
           tokens: [
@@ -145,10 +163,15 @@ export default function Page() {
       console.log(e);
     }
     return;
-  };
+  }, []);
 
-  // Fetch all pools' data
-  const fetchPools = async () => {
+  /**
+   * Fetch all pools' data.
+   *
+   * @async
+   * @function fetchPools
+   */
+  const fetchPools = useCallback(async () => {
     const FactoryContract = new PhoenixFactoryContract.Client({
       contractId: constants.FACTORY_ADDRESS,
       networkPassphrase: constants.NETWORK_PASSPHRASE,
@@ -168,45 +191,50 @@ export default function Page() {
 
     const poolsFiltered: Pool[] = poolWithData.filter(
       (el: any) =>
-        el !== undefined ||
-        el.tokens.length >= 2 ||
+        el !== undefined &&
+        el.tokens.length >= 2 &&
         el.poolAddress !==
           "CBXBKAB6QIRUGTG77OQZHC46BIIPA5WDKIKZKPA2H7Q7CPKQ555W3EVB"
     );
     setAllPools(poolsFiltered as Pool[]);
-  };
+    setLoading(false);
+  }, [fetchPool]);
 
-  // Method for handling user tour events
-  const initUserTour = () => {
-    // Check if the user has already skipped the tour
+  /**
+   * Initialize user tour.
+   *
+   * @function initUserTour
+   */
+  const initUserTour = useCallback(() => {
     if (storePersist.userTour.skipped && !storePersist.userTour.active) {
       return;
     }
 
-    // If the user has started the tour, we need to resume it from the last step
     if (storePersist.userTour.active) {
       store.setTourRunning(true);
       store.setTourStep(7);
     }
-  };
+  }, [store, storePersist]);
 
-  // On component mount, fetch pools and update loading state
+  // On component mount, fetch pools
   useEffect(() => {
-    fetchPools().then(() => setLoading(false));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fetchPools();
+  }, [fetchPools]);
 
   // Effect hook to initialize the user tour delayed to avoid hydration issues
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     if (!loading) {
       const timer = setTimeout(() => {
         initUserTour();
       }, 1000);
       return () => clearTimeout(timer);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
+  }, [loading, initUserTour]);
+
   // Render: conditionally display skeleton loader or pool data
   return loading ? (
     <Box sx={{ mt: { xs: 12, md: 0 } }}>
@@ -220,19 +248,25 @@ export default function Page() {
       <Helmet>
         <title>Phoenix DeFi Hub - Pools Overview</title>
       </Helmet>
-      <Pools
-        pools={allPools}
-        filter={poolFilter}
-        sort="HighAPR"
-        onAddLiquidityClick={() => {}}
-        onShowDetailsClick={(pool) => {
-          router.push(`/pools/${pool.poolAddress}`);
-        }}
-        onFilterClick={(by: string) => {
-          setPoolFilter(by as PoolsFilter);
-        }}
-        onSortSelect={() => {}}
-      />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeInOut" }}
+      >
+        <Pools
+          pools={allPools}
+          filter={poolFilter}
+          sort="HighAPR"
+          onAddLiquidityClick={() => {}}
+          onShowDetailsClick={(pool) => {
+            router.push(`/pools/${pool.poolAddress}`);
+          }}
+          onFilterClick={(by: string) => {
+            setPoolFilter(by as PoolsFilter);
+          }}
+          onSortSelect={() => {}}
+        />
+      </motion.div>
     </Box>
   );
 }
