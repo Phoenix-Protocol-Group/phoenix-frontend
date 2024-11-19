@@ -9,18 +9,32 @@ import {
 } from "@mui/material";
 import { StakingListEntry as Entry } from "@phoenix-protocol/types";
 import ConstructionIcon from "@mui/icons-material/Construction";
+import { motion } from "framer-motion";
 
+// Define common typography style for consistent styling
 const typoStyle = {
-  fontSize: "0.875rem",
+  color: "#FFF",
+  fontSize: "1rem",
   fontWeight: 700,
-  lineHeight: "140%",
 };
 
+/**
+ * StakingEntry Component
+ * Renders an individual staking entry.
+ *
+ * @component
+ * @param {Object} props - Component properties.
+ * @param {Entry} props.entry - The staking entry data.
+ * @param {boolean} props.mobile - Whether the component is displayed on a mobile device.
+ */
 const StakingEntry = ({ entry, mobile }: { entry: Entry; mobile: boolean }) => {
-  console.log(entry);
   return (
     <Grid
       container
+      component={motion.div}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
       sx={{
         borderRadius: "0.5rem",
         background:
@@ -36,6 +50,7 @@ const StakingEntry = ({ entry, mobile }: { entry: Entry; mobile: boolean }) => {
             width={32}
             maxWidth={"100%"}
             src="/cryptoIcons/poolIcon.png"
+            alt="Pool Icon"
           />
           <Typography sx={typoStyle}>{entry.title}</Typography>
         </Box>
@@ -72,9 +87,7 @@ const StakingEntry = ({ entry, mobile }: { entry: Entry; mobile: boolean }) => {
       </Grid>
       <Grid item xs={12} md={1} sx={{ display: "flex" }}>
         <IconButton
-          aria-label="actions"
-          id="long-button"
-          aria-haspopup="true"
+          aria-label="Manage Entry"
           sx={{
             background:
               "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
@@ -84,18 +97,18 @@ const StakingEntry = ({ entry, mobile }: { entry: Entry; mobile: boolean }) => {
             mr: 2,
           }}
           onClick={entry.onClick}
+          component={motion.div}
+          whileHover={{ scale: 1.1 }}
         >
-          <Box component="img" src="/sliders.svg" />
+          <Box component="img" src="/sliders.svg" alt="Manage Icon" />
           {mobile && (
             <Typography sx={{ opacity: "0.7", fontSize: "0.75rem" }}>
-              Manage{" "}
+              Manage
             </Typography>
           )}
         </IconButton>
         <IconButton
-          aria-label="actions"
-          id="long-button"
-          aria-haspopup="true"
+          aria-label="Fix Entry"
           sx={{
             background:
               "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
@@ -104,6 +117,8 @@ const StakingEntry = ({ entry, mobile }: { entry: Entry; mobile: boolean }) => {
             alignItems: "center",
           }}
           onClick={entry.onClickFix}
+          component={motion.div}
+          whileHover={{ scale: 1.1 }}
         >
           <ConstructionIcon sx={{ height: "20px", width: "20px" }} />
         </IconButton>
@@ -112,9 +127,18 @@ const StakingEntry = ({ entry, mobile }: { entry: Entry; mobile: boolean }) => {
   );
 };
 
+/**
+ * StakingList Component
+ * Renders a list of staking entries.
+ *
+ * @component
+ * @param {Object} props - Component properties.
+ * @param {Entry[]} props.entries - The list of staking entries.
+ */
 const StakingList = ({ entries }: { entries: Entry[] }) => {
   const theme = useTheme();
   const largerThenSm = useMediaQuery(theme.breakpoints.up("sm"));
+
   return (
     <Box>
       {largerThenSm && (

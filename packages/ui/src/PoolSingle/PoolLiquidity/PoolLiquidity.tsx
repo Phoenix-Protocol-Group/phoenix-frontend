@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   Box,
   Button as MuiButton,
@@ -12,7 +12,15 @@ import TabContext from "@mui/lab/TabContext";
 import { TokenBox } from "../../Swap";
 import { Button } from "../../Button/Button";
 import { LabTabProps, PoolLiquidityProps } from "@phoenix-protocol/types";
+import { motion } from "framer-motion";
 
+/**
+ * GlowingChart Component
+ *
+ * @component
+ * @param {Object} props - Component properties.
+ * @param {number[][]} props.data - Data to be used in the chart.
+ */
 const GlowingChart = ({ data }: { data: number[][] }) => (
   <ResponsiveContainer width="100%" height={200}>
     <AreaChart
@@ -43,6 +51,20 @@ const GlowingChart = ({ data }: { data: number[][] }) => (
   </ResponsiveContainer>
 );
 
+/**
+ * LabTabs Component
+ * Handles Add and Remove liquidity for tokens.
+ *
+ * @component
+ * @param {LabTabProps} props - Component properties.
+ * @param {Object} props.tokenA - Token A details.
+ * @param {Object} props.tokenB - Token B details.
+ * @param {number} props.liquidityA - Liquidity of token A.
+ * @param {number} props.liquidityB - Liquidity of token B.
+ * @param {Object} props.liquidityToken - Liquidity token details.
+ * @param {Function} props.onAddLiquidity - Function to handle adding liquidity.
+ * @param {Function} props.onRemoveLiquidity - Function to handle removing liquidity.
+ */
 const LabTabs = ({
   tokenA,
   tokenB,
@@ -57,21 +79,28 @@ const LabTabs = ({
   const [tokenBValue, setTokenBValue] = useState<string | undefined>(undefined);
   const [tokenCValue, setTokenCValue] = useState<string | undefined>(undefined);
 
-  const liquidityRatio = liquidityA / liquidityB;
+  const liquidityRatio = useMemo(
+    () => liquidityA / liquidityB,
+    [liquidityA, liquidityB]
+  );
 
-  const keepRatioA = (val: string) => {
-    setTokenAValue(val);
+  const keepRatioA = useCallback(
+    (val: string) => {
+      setTokenAValue(val);
+      const valB = Number(val) / liquidityRatio;
+      setTokenBValue(valB.toFixed(4));
+    },
+    [liquidityRatio]
+  );
 
-    const valB = Number(val) / liquidityRatio;
-    setTokenBValue(valB.toFixed(4));
-  };
-
-  const keepRatioB = (val: string) => {
-    setTokenBValue(val);
-
-    const valA = Number(val) * liquidityRatio;
-    setTokenAValue(valA.toFixed(4));
-  };
+  const keepRatioB = useCallback(
+    (val: string) => {
+      setTokenBValue(val);
+      const valA = Number(val) * liquidityRatio;
+      setTokenAValue(valA.toFixed(4));
+    },
+    [liquidityRatio]
+  );
 
   const buttonStyles = {
     display: "flex",
@@ -84,10 +113,18 @@ const LabTabs = ({
     fontSize: "0.875rem",
     background: "none",
     boxShadow: "none",
+    alignItems: "center",
+    justifyContent: "center",
     "&:hover": {
       background: "#37373D",
       boxShadow: "none",
     },
+  };
+
+  const tokenBoxStyles = {
+    width: "100%",
+    maxWidth: "350px",
+    mx: "auto", // Center horizontally
   };
 
   return (
@@ -96,14 +133,19 @@ const LabTabs = ({
       sx={{ width: "100%", typography: "body1", mt: 2, p: "1.4rem" }}
     >
       <TabContext value={value}>
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
           <MuiButton
             variant="contained"
             onClick={() => setValue("1")}
             sx={{
               ...buttonStyles,
               background: value === "1" ? "#37373D" : "none",
+              transition: "all 0.3s ease-in-out",
+              flex: 1,
+              maxWidth: "200px",
             }}
+            component={motion.div}
+            whileHover={{ scale: 1.05 }}
           >
             Add liquidity
           </MuiButton>
@@ -114,19 +156,26 @@ const LabTabs = ({
               ...buttonStyles,
               background: value === "2" ? "#37373D" : "none",
               ml: 1,
+              transition: "all 0.3s ease-in-out",
+              flex: 1,
+              maxWidth: "200px",
             }}
+            component={motion.div}
+            whileHover={{ scale: 1.05 }}
           >
             Remove liquidity
           </MuiButton>
         </Box>
         <TabPanel sx={{ padding: "0", mt: "1rem" }} value="1">
-          <TokenBox
-            value={tokenAValue}
-            onChange={(val) => keepRatioA(val)}
-            token={tokenA}
-            hideDropdownButton={true}
-          />
-          <Box sx={{ mt: "0.5rem" }}>
+          <Box sx={tokenBoxStyles}>
+            <TokenBox
+              value={tokenAValue}
+              onChange={(val) => keepRatioA(val)}
+              token={tokenA}
+              hideDropdownButton={true}
+            />
+          </Box>
+          <Box sx={{ mt: "0.5rem", ...tokenBoxStyles }}>
             <TokenBox
               onChange={(val) => keepRatioB(val)}
               value={tokenBValue}
@@ -138,31 +187,42 @@ const LabTabs = ({
             onClick={() =>
               onAddLiquidity(Number(tokenAValue), Number(tokenBValue))
             }
-            sx={{ mt: "0.5rem" }}
+            sx={{
+              mt: "2rem",
+              mx: "auto",
+              display: "block",
+              alignItems: "center",
+            }}
             fullWidth
-            // @ts-ignore
-            variant="primary"
           >
             Add Liquidity
           </Button>
         </TabPanel>
         <TabPanel sx={{ padding: "0", mt: "1rem" }} value="2">
-          <TokenBox
-            onChange={(val) => setTokenCValue(val)}
-            value={tokenCValue}
-            token={liquidityToken}
-            hideDropdownButton={true}
-          />
+          <Box sx={tokenBoxStyles}>
+            <TokenBox
+              onChange={(val) => setTokenCValue(val)}
+              value={tokenCValue}
+              token={liquidityToken}
+              hideDropdownButton={true}
+            />
+          </Box>
           <Button
             onClick={() => onRemoveLiquidity(Number(tokenCValue))}
-            sx={{ mt: "0.5rem" }}
+            sx={{
+              mt: "2rem",
+              mx: "auto",
+              display: "block",
+              alignItems: "center",
+            }}
             fullWidth
-            // @ts-ignore
-            variant="primary"
           >
             Remove Liquidity
           </Button>
-          <Typography variant="body2">
+          <Typography
+            variant="body2"
+            sx={{ textAlign: "center", mt: "0.5rem" }}
+          >
             Having issues removing liquidity? Click{" "}
             <span
               style={{ cursor: "pointer", fontWeight: 600 }}
@@ -177,6 +237,21 @@ const LabTabs = ({
   );
 };
 
+/**
+ * PoolLiquidity Component
+ * Displays pool information, liquidity stats, and allows users to add or remove liquidity.
+ *
+ * @component
+ * @param {PoolLiquidityProps} props - Component properties.
+ * @param {Object} props.tokenA - Token A details.
+ * @param {Object} props.tokenB - Token B details.
+ * @param {number} props.liquidityA - Liquidity of token A.
+ * @param {number} props.liquidityB - Liquidity of token B.
+ * @param {Object} props.liquidityToken - Liquidity token details.
+ * @param {Array} props.poolHistory - Historical data for the pool.
+ * @param {Function} props.onAddLiquidity - Function to handle adding liquidity.
+ * @param {Function} props.onRemoveLiquidity - Function to handle removing liquidity.
+ */
 const PoolLiquidity = ({
   tokenA,
   tokenB,
@@ -195,6 +270,10 @@ const PoolLiquidity = ({
           "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
         backdropFilter: "blur(42px)",
       }}
+      component={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
     >
       <Box
         sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
@@ -202,13 +281,17 @@ const PoolLiquidity = ({
         <Box sx={{ padding: "1.5rem" }}>
           <Box
             sx={{ height: "4rem", width: "4rem" }}
-            component="img"
+            component={motion.img}
             src={tokenA.icon}
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.3 }}
           />
           <Box
             sx={{ ml: -1, height: "4rem", width: "4rem" }}
-            component="img"
+            component={motion.img}
             src={tokenB.icon}
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.3 }}
           />
         </Box>
       </Box>

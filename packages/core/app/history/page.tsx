@@ -226,6 +226,7 @@ export default function Page() {
   return (
     <Box
       sx={{
+        maxWidth: "none", // Remove max-width restriction on the entire page
         width: "100%",
         padding: { xs: 0, md: "2.5rem" },
         mt: { xs: "4.5rem", md: 0 },

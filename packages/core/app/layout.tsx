@@ -343,14 +343,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
             }}
           >
-            {/* Child Components */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-            >
-              {children}
-            </motion.div>
+            {children}
           </Box>
         </body>
       </Providers>

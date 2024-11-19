@@ -1,3 +1,13 @@
+/**
+ * OptionButton Component
+ * A button that displays a percentage option for staking.
+ *
+ * @component
+ * @param {Object} props - Component properties.
+ * @param {number} props.value - The percentage value to set the stake amount.
+ * @param {string} props.title - The button label.
+ * @param {function} props.onClick - The function to handle button click.
+ */
 import React, { useState } from "react";
 import {
   Box,
@@ -10,6 +20,7 @@ import {
 } from "@mui/material";
 import { Button } from "../../Button/Button";
 import { Token, LiquidityMiningProps } from "@phoenix-protocol/types";
+import { motion } from "framer-motion";
 
 const OptionButton = ({
   value,
@@ -39,12 +50,26 @@ const OptionButton = ({
             "linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.06) 100%)",
         },
       }}
+      component={motion.div}
+      whileHover={{ scale: 1.05 }}
     >
       {title}
     </MuiButton>
   );
 };
 
+/**
+ * StakeInput Component
+ * Handles user input for staking tokens.
+ *
+ * @component
+ * @param {Object} props - Component properties.
+ * @param {function} props.onStake - Function to handle staking.
+ * @param {number} props.balance - The user's token balance.
+ * @param {string} props.amount - The current stake amount.
+ * @param {function} props.setAmount - Function to set the stake amount.
+ * @param {string} props.tokenName - The name of the token.
+ */
 const StakeInput = ({
   onStake,
   balance,
@@ -164,6 +189,8 @@ const StakeInput = ({
             //@ts-ignore
             size="large"
             onClick={onStake}
+            component={motion.div}
+            whileHover={{ scale: 1.05 }}
           >
             Stake
           </Button>
@@ -176,6 +203,15 @@ const StakeInput = ({
   );
 };
 
+/**
+ * ClaimRewards Component
+ * Displays the rewards the user can claim and provides a button to claim them.
+ *
+ * @component
+ * @param {Object} props - Component properties.
+ * @param {Token[]} props.rewards - The list of rewards available.
+ * @param {function} props.onClaim - Function to handle claiming rewards.
+ */
 const ClaimRewards = ({
   rewards,
   onClaim,
@@ -196,6 +232,10 @@ const ClaimRewards = ({
         padding: "1rem",
         height: !largerThenMd ? "calc(100% + 44px)" : "100%",
       }}
+      component={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
     >
       <Box>
         <Typography sx={{ opacity: 0.7, fontSize: "0.875rem" }}>
@@ -234,8 +274,12 @@ const ClaimRewards = ({
           position: "absolute",
           bottom: "1rem",
           width: "calc(100% - 2rem)",
+          background: rewards.length > 0 ? "#E2621B" : "#6F6F6F",
         }}
         onClick={onClaim}
+        disabled={rewards.length === 0}
+        component={motion.div}
+        whileHover={{ scale: rewards.length > 0 ? 1.05 : 1 }}
       >
         Claim
       </Button>
@@ -243,6 +287,18 @@ const ClaimRewards = ({
   );
 };
 
+/**
+ * LiquidityMining Component
+ * Main component for liquidity mining, allowing users to stake tokens and claim rewards.
+ *
+ * @component
+ * @param {LiquidityMiningProps} props - Component properties.
+ * @param {Token[]} props.rewards - The list of rewards available.
+ * @param {function} props.onClaimRewards - Function to handle claiming rewards.
+ * @param {number} props.balance - The user's token balance.
+ * @param {string} props.tokenName - The name of the token.
+ * @param {function} props.onStake - Function to handle staking tokens.
+ */
 const LiquidityMining = ({
   rewards,
   onClaimRewards,
