@@ -6,6 +6,9 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useDebounce } from "use-debounce";
 import { motion } from "framer-motion";
 
+// TX Hook
+import { useContractTransaction } from "@/hooks/useContractTransaction";
+
 // Component and utility imports
 import {
   AssetSelector,
@@ -73,6 +76,8 @@ export default function SwapPage(): JSX.Element {
 
   const [fromAmount] = useDebounce<number>(tokenAmounts[0], 500);
 
+  const { executeContractTransaction } = useContractTransaction();
+
   /**
    * Executes the swap transaction.
    * This function signs and sends the transaction using WalletConnect or Signer.
@@ -80,58 +85,32 @@ export default function SwapPage(): JSX.Element {
    * @async
    */
   const doSwap = useCallback(async (): Promise<void> => {
-    setTxBroadcasting(true);
     try {
-      const swapSigner =
-        storePersist.wallet.walletType === "wallet-connect"
-          ? appStore.walletConnectInstance
-          : new Signer();
-
-      // Create contract instance
-      const contract = new PhoenixMultihopContract.Client({
-        publicKey: storePersist.wallet.address!,
-        contractId: constants.MULTIHOP_ADDRESS,
-        networkPassphrase: constants.NETWORK_PASSPHRASE,
-        rpcUrl: constants.RPC_URL,
-        // @ts-ignore
-        signTransaction: (tx: string) =>
-          storePersist.wallet.walletType === "wallet-connect"
-            ? swapSigner.signTransaction(tx)
-            : // @ts-ignore
-              swapSigner.sign(tx),
+      // Execute the transaction using the hook
+      await executeContractTransaction({
+        contractType: "multihop",
+        contractAddress: constants.MULTIHOP_ADDRESS,
+        transactionFunction: async (client) => {
+          return client.swap({
+            recipient: storePersist.wallet.address!,
+            operations,
+            amount: BigInt(tokenAmounts[0] * 10 ** 7),
+            max_spread_bps: BigInt(maxSpread * 100),
+            deadline: undefined,
+            pool_type: 0,
+            max_allowed_fee_bps: undefined,
+          });
+        },
       });
-
-      // Execute swap
-      const tx = await contract.swap({
-        recipient: storePersist.wallet.address!,
-        operations,
-        amount: BigInt(tokenAmounts[0] * 10 ** 7),
-        max_spread_bps: BigInt(maxSpread * 100),
-        deadline: undefined,
-        pool_type: 0,
-        max_allowed_fee_bps: undefined,
-      });
-
-      await tx?.signAndSend();
-      setSuccessModalOpen(true);
 
       // Wait for the next block and fetch token balances
       setTimeout(async () => {
         await appStore.fetchTokenInfo(fromToken?.name!);
         await appStore.fetchTokenInfo(toToken?.name!);
       }, 7000);
-    } catch (e) {
-      handleXDRIssues(
-        e as Error,
-        setSuccessModalOpen,
-        setTxBroadcasting,
-        setErrorModalOpen,
-        storePersist,
-        setErrorDescription,
-        resolveContractError
-      );
+    } catch (error) {
+      console.error("Error during swap transaction", error);
     }
-    setTxBroadcasting(false);
   }, [
     appStore,
     fromToken?.name,
@@ -140,6 +119,7 @@ export default function SwapPage(): JSX.Element {
     storePersist,
     toToken?.name,
     tokenAmounts,
+    executeContractTransaction,
   ]);
 
   /**

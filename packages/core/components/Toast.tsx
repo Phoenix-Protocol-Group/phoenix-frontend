@@ -143,7 +143,7 @@ export const Toast: FC<ToastProps> = ({
             <Button
               variant="text"
               color="primary"
-              href={`https://blockexplorer.com/tx/${transactionId}`}
+              href={`https://stellar.expert/explorer/public/tx/${transactionId}`}
               target="_blank"
               sx={{
                 textTransform: "none",

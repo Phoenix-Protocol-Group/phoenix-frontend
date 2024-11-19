@@ -10,14 +10,9 @@ import {
   Skeleton as PhoenixSkeleton,
   StakingList,
 } from "@phoenix-protocol/ui";
+import { useContractTransaction } from "@/hooks/useContractTransaction";
 import { Token } from "@phoenix-protocol/types";
-import {
-  Loading,
-  PoolError,
-  PoolSuccess,
-  StakeSuccess,
-  UnstakeSuccess,
-} from "../../../components/Modal/Modal";
+import { Loading } from "../../../components/Modal/Modal";
 
 import {
   constants,
@@ -74,15 +69,12 @@ export default function Page({ params }: PoolPageProps) {
   const store = useAppStore();
   const storePersist = usePersistStore();
 
+  const { executeContractTransaction } = useContractTransaction();
+
   // Let's have some variable to see if the pool even exists
   const [poolNotFound, setPoolNotFound] = useState<boolean>(false);
 
-  const [sucessModalOpen, setSuccessModalOpen] = useState<boolean>(false);
-  const [stakeModalOpen, setStakeModalOpen] = useState<boolean>(false);
-  const [unstakeModalOpen, setUnstakeModalOpen] = useState<boolean>(false);
-  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [errorDescription, setErrorDescripption] = useState<string>("");
   const [tokenAmounts, setTokenAmounts] = useState<number[]>([0]);
 
   // Token Balances
@@ -176,190 +168,95 @@ export default function Page({ params }: PoolPageProps) {
     tokenAAmount: number,
     tokenBAmount: number
   ) => {
-    try {
-      setLoading(true);
-      const stakeSigner =
-        storePersist.wallet.walletType === "wallet-connect"
-          ? store.walletConnectInstance
-          : new Signer();
-
-      const SigningPairContract = new PhoenixPairContract.Client({
-        publicKey: storePersist.wallet.address!,
-        contractId: params.poolAddress,
-        networkPassphrase: constants.NETWORK_PASSPHRASE,
-        rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) =>
-          storePersist.wallet.walletType === "wallet-connect"
-            ? stakeSigner.signTransaction(tx)
-            : stakeSigner.sign(tx),
-      });
-      const tx = await SigningPairContract.provide_liquidity({
-        sender: storePersist.wallet.address!,
-        desired_a: BigInt(
-          (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
-        ),
-        desired_b: BigInt(
-          (tokenBAmount * 10 ** (tokenB?.decimals || 7)).toFixed(0)
-        ),
-        min_a: undefined,
-        min_b: undefined,
-        custom_slippage_bps: undefined,
-        deadline: undefined,
-      });
-      await tx.signAndSend();
-
-      setLoading(false);
-      //!todo view transaction id in blockexplorer
-      setTokenAmounts([tokenAAmount, tokenBAmount]);
-      // Refresh pool data
-      await getPool();
-      setSuccessModalOpen(true);
-      // Wait 7 Seconds for the next block and fetch new balances
-      setTimeout(() => {
-        getPool();
-      }, 7000);
-    } catch (error: any) {
-      handleXDRIssues(
-        error,
-        setSuccessModalOpen,
-        setLoading,
-        setErrorModalOpen,
-        storePersist,
-        setErrorDescripption,
-        resolveContractError,
-        setTokenAmounts,
-        tokenAAmount,
-        tokenBAmount,
-        getPool
-      );
-    }
+    await executeContractTransaction({
+      contractType: "pair",
+      contractAddress: params.poolAddress,
+      transactionFunction: async (client) => {
+        return client.provide_liquidity({
+          sender: storePersist.wallet.address!,
+          desired_a: BigInt(
+            (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
+          ),
+          desired_b: BigInt(
+            (tokenBAmount * 10 ** (tokenB?.decimals || 7)).toFixed(0)
+          ),
+          min_a: undefined,
+          min_b: undefined,
+          custom_slippage_bps: undefined,
+          deadline: undefined,
+        });
+      },
+    });
+    // Refresh pool data
+    await getPool();
+    setTokenAmounts([tokenAAmount, tokenBAmount]);
+    setTimeout(() => {
+      getPool();
+    }, 7000);
   };
 
   // Remove Liquidity
   const removeLiquidity = async (lpTokenAmount: number, fix?: boolean) => {
-    try {
-      setLoading(true);
-      const stakeSigner =
-        storePersist.wallet.walletType === "wallet-connect"
-          ? store.walletConnectInstance
-          : new Signer();
-
-      const SigningPairContract = new PhoenixPairContract.Client({
-        publicKey: storePersist.wallet.address!,
-        contractId: params.poolAddress,
-        networkPassphrase: constants.NETWORK_PASSPHRASE,
-        rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) =>
-          storePersist.wallet.walletType === "wallet-connect"
-            ? stakeSigner.signTransaction(tx)
-            : stakeSigner.sign(tx),
-      });
-      if (fix === true) {
-        const tx = await SigningPairContract.withdraw_liquidity(
-          {
+    await executeContractTransaction({
+      contractType: "pair",
+      contractAddress: params.poolAddress,
+      transactionFunction: async (client) => {
+        if (fix) {
+          return client.withdraw_liquidity(
+            {
+              sender: storePersist.wallet.address!,
+              share_amount: BigInt(10),
+              min_a: BigInt(1),
+              min_b: BigInt(1),
+              deadline: undefined,
+            },
+            { simulate: false }
+          );
+        } else {
+          return client.withdraw_liquidity({
             sender: storePersist.wallet.address!,
-            share_amount: BigInt(10),
+            share_amount: BigInt(
+              (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+            ),
             min_a: BigInt(1),
             min_b: BigInt(1),
             deadline: undefined,
-          },
-          { simulate: false }
-        );
-        await tx.simulate({ restore: true });
-      } else {
-        const tx = await SigningPairContract.withdraw_liquidity({
-          sender: storePersist.wallet.address!,
-          share_amount: BigInt(
-            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-          ),
-          min_a: BigInt(1),
-          min_b: BigInt(1),
-          deadline: undefined,
-        });
-        await tx.signAndSend();
-      }
-      setLoading(false);
-      setTokenAmounts([lpTokenAmount]);
-      setStakeModalOpen(true);
-      // Wait 7 Seconds for the next block and fetch new balances
-      setTimeout(() => {
-        getPool();
-      }, 7000);
-    } catch (error: any) {
-      handleXDRIssues(
-        error,
-        setSuccessModalOpen,
-        setLoading,
-        setErrorModalOpen,
-        storePersist,
-        setErrorDescripption,
-        resolveContractError,
-        setTokenAmounts,
-        lpTokenAmount,
-        undefined,
-        getPool
-      );
-    }
+          });
+        }
+      },
+    });
+    setTokenAmounts([lpTokenAmount]);
+    // Wait 7 Seconds for the next block and fetch new balances
+    setTimeout(() => {
+      getPool();
+    }, 7000);
   };
 
   // Stake
   const stake = async (lpTokenAmount: number) => {
-    try {
-      setLoading(true);
-
-      const stakeSigner =
-        storePersist.wallet.walletType === "wallet-connect"
-          ? store.walletConnectInstance
-          : new Signer();
-
-      let stakeAddress: string | undefined = stakeContractAddress;
-      if (stakeContractAddress === "") {
-        stakeAddress = await fetchStakingAddress();
-      }
-
-      const SigningStakeContract = new PhoenixStakeContract.Client({
-        publicKey: storePersist.wallet.address!,
-        contractId: stakeAddress!,
-        networkPassphrase: constants.NETWORK_PASSPHRASE,
-        rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) =>
-          storePersist.wallet.walletType === "wallet-connect"
-            ? stakeSigner.signTransaction(tx)
-            : stakeSigner.sign(tx),
-      });
-
-      const tx = await SigningStakeContract.bond({
-        sender: storePersist.wallet.address!,
-        tokens: BigInt(
-          (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-        ),
-      });
-
-      await tx?.signAndSend();
-      await fetchStakes();
-      setLoading(false);
-      //!todo view transaction id in blockexplorer
-      setTokenAmounts([lpTokenAmount]);
-      setStakeModalOpen(true);
-      // Wait 7 Seconds for the next block and fetch new balances
-      setTimeout(() => {
-        getPool();
-      }, 7000);
-    } catch (error: any) {
-      handleXDRIssues(
-        error,
-        setSuccessModalOpen,
-        setLoading,
-        setErrorModalOpen,
-        storePersist,
-        setErrorDescripption,
-        resolveContractError,
-        setTokenAmounts,
-        lpTokenAmount,
-        undefined,
-        getPool
-      );
+    let stakeAddress: string | undefined = stakeContractAddress;
+    if (stakeContractAddress === "") {
+      stakeAddress = await fetchStakingAddress();
     }
+
+    await executeContractTransaction({
+      contractType: "stake",
+      contractAddress: stakeAddress!,
+      transactionFunction: async (client) => {
+        return client.bond({
+          sender: storePersist.wallet.address!,
+          tokens: BigInt(
+            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+          ),
+        });
+      },
+    });
+    await fetchStakes();
+    setTokenAmounts([lpTokenAmount]);
+    // Wait 7 Seconds for the next block and fetch new balances
+    setTimeout(() => {
+      getPool();
+    }, 7000);
   };
 
   // Stake
@@ -368,74 +265,42 @@ export default function Page({ params }: PoolPageProps) {
     stake_timestamp: number,
     fix?: boolean
   ) => {
-    try {
-      setLoading(true);
+    let stakeAddress: string | undefined = stakeContractAddress;
+    if (stakeContractAddress === "") {
+      stakeAddress = await fetchStakingAddress();
+    }
 
-      const stakeSigner =
-        storePersist.wallet.walletType === "wallet-connect"
-          ? store.walletConnectInstance
-          : new Signer();
-
-      let stakeAddress: string | undefined = stakeContractAddress;
-      if (stakeContractAddress === "") {
-        stakeAddress = await fetchStakingAddress();
-      }
-
-      const SigningStakeContract = new PhoenixStakeContract.Client({
-        publicKey: storePersist.wallet.address!,
-        contractId: stakeAddress!,
-        networkPassphrase: constants.NETWORK_PASSPHRASE,
-        rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) =>
-          storePersist.wallet.walletType === "wallet-connect"
-            ? stakeSigner.signTransaction(tx)
-            : stakeSigner.sign(tx),
-      });
-      if (!fix) {
-        const tx = await SigningStakeContract.unbond({
-          sender: storePersist.wallet.address!,
-          stake_amount: BigInt(
-            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-          ),
-          stake_timestamp: BigInt(stake_timestamp),
-        });
-        await tx.signAndSend();
-      } else {
-        const tx = await SigningStakeContract.unbond(
-          {
+    await executeContractTransaction({
+      contractType: "stake",
+      contractAddress: stakeAddress!,
+      transactionFunction: async (client) => {
+        if (fix) {
+          return client.unbond(
+            {
+              sender: storePersist.wallet.address!,
+              stake_amount: BigInt(
+                (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+              ),
+              stake_timestamp: BigInt(stake_timestamp),
+            },
+            { simulate: false }
+          );
+        } else {
+          return client.unbond({
             sender: storePersist.wallet.address!,
             stake_amount: BigInt(
               (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
             ),
             stake_timestamp: BigInt(stake_timestamp),
-          },
-          { simulate: false }
-        );
-        tx.simulate({ restore: true });
-      }
-      setLoading(false);
-      //!todo view transaction id in blockexplorer
-      setTokenAmounts([lpTokenAmount]);
-      setUnstakeModalOpen(true);
-      // Wait 7 Seconds for the next block and fetch new balances
-      setTimeout(() => {
-        getPool();
-      }, 7000);
-    } catch (error: any) {
-      handleXDRIssues(
-        error,
-        setSuccessModalOpen,
-        setLoading,
-        setErrorModalOpen,
-        storePersist,
-        setErrorDescripption,
-        resolveContractError,
-        setTokenAmounts,
-        lpTokenAmount,
-        undefined,
-        getPool
-      );
-    }
+          });
+        }
+      },
+    });
+    setTokenAmounts([lpTokenAmount]);
+    // Wait 7 Seconds for the next block and fetch new balances
+    setTimeout(() => {
+      getPool();
+    }, 7000);
   };
 
   // Function to fetch pool config and info from chain
@@ -689,55 +554,24 @@ export default function Page({ params }: PoolPageProps) {
   };
 
   const claimTokens = async () => {
-    try {
-      setLoading(true);
-
-      const stakeSigner =
-        storePersist.wallet.walletType === "wallet-connect"
-          ? store.walletConnectInstance
-          : new Signer();
-
-      let stakeAddress: string | undefined = stakeContractAddress;
-      if (stakeContractAddress === "") {
-        stakeAddress = await fetchStakingAddress();
-      }
-
-      const SigningStakeContract = new PhoenixStakeContract.Client({
-        publicKey: storePersist.wallet.address!,
-        contractId: stakeAddress!,
-        networkPassphrase: constants.NETWORK_PASSPHRASE,
-        rpcUrl: constants.RPC_URL,
-        signTransaction: (tx: string) =>
-          storePersist.wallet.walletType === "wallet-connect"
-            ? stakeSigner.signTransaction(tx)
-            : stakeSigner.sign(tx),
-      });
-
-      const tx = await SigningStakeContract.withdraw_rewards({
-        sender: storePersist.wallet.address!,
-      });
-
-      await tx?.signAndSend();
-      setLoading(false);
-      // Wait 7 Seconds for the next block and fetch new balances
-      setTimeout(() => {
-        getPool();
-      }, 7000);
-    } catch (error: any) {
-      handleXDRIssues(
-        error,
-        setSuccessModalOpen,
-        setLoading,
-        setErrorModalOpen,
-        storePersist,
-        setErrorDescripption,
-        resolveContractError,
-        setTokenAmounts,
-        0,
-        0,
-        getPool
-      );
+    let stakeAddress: string | undefined = stakeContractAddress;
+    if (stakeContractAddress === "") {
+      stakeAddress = await fetchStakingAddress();
     }
+
+    await executeContractTransaction({
+      contractType: "stake",
+      contractAddress: stakeAddress!,
+      transactionFunction: async (client) => {
+        return client.withdraw_rewards({
+          sender: storePersist.wallet.address!,
+        });
+      },
+    });
+    // Wait 7 Seconds for the next block and fetch new balances
+    setTimeout(() => {
+      getPool();
+    }, 7000);
   };
 
   useEffect(() => {
@@ -762,40 +596,6 @@ export default function Page({ params }: PoolPageProps) {
       </Helmet>
       {overviewStyles}
       {loading && <Loading open={loading} setOpen={setLoading} />}
-      {sucessModalOpen && (
-        <PoolSuccess
-          open={sucessModalOpen}
-          setOpen={setSuccessModalOpen}
-          tokenAmounts={tokenAmounts}
-          onButtonClick={() => console.log("click")}
-          tokens={[tokenA as Token, tokenB as Token]}
-        />
-      )}
-      {errorModalOpen && (
-        <PoolError
-          open={errorModalOpen}
-          setOpen={setErrorModalOpen}
-          error={errorDescription}
-        />
-      )}
-      {stakeModalOpen && (
-        <StakeSuccess
-          open={stakeModalOpen}
-          tokenAmounts={tokenAmounts}
-          setOpen={setStakeModalOpen}
-          onButtonClick={() => console.log("click")}
-          token={lpToken as Token}
-        />
-      )}
-      {unstakeModalOpen && (
-        <UnstakeSuccess
-          open={unstakeModalOpen}
-          tokenAmounts={tokenAmounts}
-          setOpen={setUnstakeModalOpen}
-          onButtonClick={() => console.log("click")}
-          token={lpToken as Token}
-        />
-      )}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         {tokenA?.icon ? (
           <Box sx={{ display: "flex", alignItems: "center" }}>

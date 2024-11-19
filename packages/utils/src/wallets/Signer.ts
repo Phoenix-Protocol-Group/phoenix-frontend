@@ -1,8 +1,11 @@
-import {lobstr} from "./lobstr";
-import {Wallet} from "./types";
-import {xBull} from "./xbull";
-import {WalletConnect as WalletClient, WalletConnectAllowedMethods,} from "./wallet-connect";
-import {NETWORK_PASSPHRASE} from "../constants";
+import { lobstr } from "./lobstr";
+import { Wallet } from "./types";
+import { xBull } from "./xbull";
+import {
+  WalletConnect as WalletClient,
+  WalletConnectAllowedMethods,
+} from "./wallet-connect";
+import { NETWORK_PASSPHRASE } from "../constants";
 
 const initializeWalletConnect = async () => {
   const walletConnectInstance = new WalletClient({
