@@ -142,7 +142,7 @@ const DashboardPriceCharts = ({
               mt: "1.25rem",
             }}
           >
-            {assetName} Price (Last 24 hours)
+            {assetName} Price
           </Typography>
 
           {/* Price and Percentage Section */}
