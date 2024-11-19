@@ -1,196 +1,179 @@
-import { Box, Grid, Typography } from "@mui/material";
 import React from "react";
+import { Box, Grid, Typography } from "@mui/material";
+import { motion } from "framer-motion";
 import {
   DashboardStatsProps,
   GainerOrLooserAsset,
 } from "@phoenix-protocol/types";
 
-const AssetStat = ({
-  title,
-  icon,
-  value,
-}: {
-  title: string;
-  icon: string;
-  value: string;
-}) => (
-  <Box
-    sx={{
-      borderRadius: "0.75rem",
-      border: "1px solid rgba(255, 255, 255, 0.10)",
-    }}
-  >
-    <Box
-      sx={{
-        display: "flex",
-        padding: "1.5rem 2rem",
-        alignItems: "center",
-      }}
-    >
-      <Box
-        sx={{
-          background:
-            "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-          borderRadius: "0.5rem",
-          padding: "0.25rem",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Box component="img" alt="Hand Icon" src={icon} />
-      </Box>
-      <Box sx={{ marginLeft: "1.5rem" }}>
-        <Typography
-          sx={{
-            color: "rgba(255, 255, 255, 0.50);",
-            fontSize: "0.875rem",
-            fontWeight: 400,
-          }}
-        >
-          {title}
-        </Typography>
-        <Typography sx={{ fontSize: "1.5rem", fontWeight: 700 }}>
-          {value}
-        </Typography>
-      </Box>
-    </Box>
-  </Box>
-);
-
+/**
+ * GainerAndLooser
+ * Displays the details of a top gainer or loser asset.
+ *
+ * @param {Object} props
+ * @param {string} props.title - The title ("Top Gainer" or "Top Loser").
+ * @param {GainerOrLooserAsset} props.asset - The asset details.
+ * @returns {JSX.Element} The gainer or loser component.
+ */
 const GainerAndLooser = ({
   title,
-  asset: { name, symbol, price, change, icon, volume },
+  asset: { name, symbol, price, change, icon },
 }: {
   title: string;
   asset: GainerOrLooserAsset;
 }) => (
-  <Box>
-    <Typography sx={{ fontSize: "1.125rem", fontWeight: 700, opacity: 0.8 }}>
-      {title}
-    </Typography>
+  <motion.div
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.4, ease: "easeInOut" }}
+  >
     <Box
       sx={{
+        borderRadius: "12px",
+        padding: "1.5rem",
+        background:
+          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+        backdropFilter: "blur(42px)",
         display: "flex",
-        alignItems: "center",
-        marginTop: "1rem",
-        gap: 1,
+        flexDirection: "column",
+        justifyContent: "space-between",
+        height: "100%",
       }}
     >
-      <Box component="img" alt="Asset Icon" src={icon} />
       <Typography
         sx={{
-          leadingTrim: "both",
-          textEdge: "cap",
-          fontSize: "0.875rem",
+          fontSize: "1rem",
+          fontWeight: 600,
+          color: "#FFFFFF",
+          opacity: 0.9,
+          mb: "1rem",
+        }}
+      >
+        {title}
+      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          mb: "1rem",
+        }}
+      >
+        <Box
+          component="img"
+          src={icon}
+          alt={`${name} Icon`}
+          sx={{
+            width: "40px",
+            height: "40px",
+            marginRight: "1rem",
+          }}
+        />
+        <Box>
+          <Typography
+            sx={{
+              fontSize: "1.125rem",
+              fontWeight: 700,
+              color: "#FFFFFF",
+            }}
+          >
+            {name}
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: "0.875rem",
+              fontWeight: 400,
+              color: "rgba(255, 255, 255, 0.7)",
+            }}
+          >
+            {symbol}
+          </Typography>
+        </Box>
+      </Box>
+      <Typography
+        sx={{
+          fontSize: "2rem",
           fontWeight: 700,
+          color: "#FFFFFF",
         }}
       >
-        {name}
+        ${price}
       </Typography>
-      <Typography
+      <Box
         sx={{
-          leadingTrim: "both",
-          textEdge: "cap",
-          fontSize: "0.75rem",
-          fontWeight: 400,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: "1rem",
         }}
       >
-        {symbol}
-      </Typography>
-    </Box>
-    <Typography
-      sx={{
-        marginTop: "0.75rem",
-        fontSize: "1.5rem",
-        fontWeight: 700,
-        letterSpacing: "-0.0625rem",
-      }}
-    >
-      {price}
-    </Typography>
-    <Box sx={{ display: "flex", gap: 4, marginTop: "1.5rem" }}>
-      <Box>
-        <Typography sx={{ fontSize: "0.75rem", fontWeight: 400, opacity: 0.5 }}>
+        <Typography
+          sx={{
+            fontSize: "0.875rem",
+            fontWeight: 500,
+            color: "rgba(255, 255, 255, 0.6)",
+          }}
+        >
           Change (24h)
         </Typography>
-        <Box sx={{ display: "flex", gap: 1, marginTop: "0.5rem" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            color: change > 0 ? "#5BFF22" : "#FF2255",
+          }}
+        >
           <Box
             component="img"
-            alt="Green arrow up"
             src={change > 0 ? "/green-arrow.svg" : "/red-arrow.svg"}
-            sx={{ transform: `rotate(${change > 0 ? 0 : 180}deg)` }}
+            alt="Change Arrow"
+            sx={{
+              width: "16px",
+              height: "16px",
+              marginRight: "0.5rem",
+              transform: change > 0 ? "none" : "rotate(180deg)",
+            }}
           />
-          <Typography sx={{ fontSize: "1rem", fontWeight: 700 }}>
+          <Typography
+            sx={{
+              fontSize: "1rem",
+              fontWeight: 600,
+            }}
+          >
             {change}%
           </Typography>
         </Box>
       </Box>
-      {/* 
-      <Box>
-        <Typography sx={{ fontSize: "0.75rem", fontWeight: 400, opacity: 0.5 }}>
-          Volume (24h)
-        </Typography>
-        <Box sx={{ marginTop: "0.5rem" }}>
-          <Typography sx={{ fontSize: "1rem", fontWeight: 700 }}>
-            {volume}
-          </Typography>
-        </Box>
-      </Box>
-      */}
     </Box>
-  </Box>
+  </motion.div>
 );
 
-const DashboardStats = ({
-  lockedAssets,
-  availableAssets,
-  loser,
-  gainer,
-}: DashboardStatsProps) => {
+/**
+ * DashboardStats
+ * Displays the dashboard statistics, including the top gainer and loser.
+ *
+ * @param {DashboardStatsProps} props - Contains data for gainer and loser.
+ * @returns {JSX.Element} The dashboard statistics component.
+ */
+const DashboardStats = ({ gainer, loser }: DashboardStatsProps) => {
   return (
     <Box
       sx={{
         background:
           "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        borderRadius: "1rem",
+        borderRadius: "16px",
         padding: "2rem",
+        display: "flex",
+        justifyContent: "space-between",
+        gap: "1rem",
+        overflow: "hidden",
+        height: "100%",
       }}
     >
-      {/*  <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <AssetStat
-            title="Available assets"
-            icon="/hand-coins.svg"
-            value={availableAssets}
-          />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <AssetStat
-            title="Locked assets"
-            icon="/coins.svg"
-            value={lockedAssets}
-          />
-        </Grid>
-      </Grid>
-    */}
-      <Grid container sx={{ px: "1.6rem", mt: 3 }}>
-        <Grid item xs={12} md={6} sx={{ padding: "1.2rem" }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6}>
           <GainerAndLooser title="Top Gainer" asset={gainer} />
         </Grid>
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            padding: "1.2rem 2.8rem",
-            borderLeft: "1px solid rgba(255, 255, 255, 0.10)",
-            paddingRight: {
-              xs: "0",
-              md: "2.8rem",
-            },
-          }}
-        >
+        <Grid item xs={12} sm={6}>
           <GainerAndLooser title="Top Loser" asset={loser} />
         </Grid>
       </Grid>

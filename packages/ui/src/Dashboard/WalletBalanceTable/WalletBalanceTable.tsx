@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   FormControl,
@@ -14,17 +15,22 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarIcon from "@mui/icons-material/Star";
+import { motion } from "framer-motion";
 import {
   FilterAndTabPanelProps,
   ListItemProps,
   WalletBalanceTableProps,
 } from "@phoenix-protocol/types";
-import { HelpCenter, HelpCenterOutlined } from "@mui/icons-material";
+import { HelpCenterOutlined } from "@mui/icons-material";
 
+/**
+ * Accessibility properties for tabs.
+ * @param {number} index - The index of the tab.
+ * @returns {object} - Accessibility properties for the tab.
+ */
 function a11yProps(index: number) {
   return {
     id: `category-tab-${index}`,
@@ -32,6 +38,12 @@ function a11yProps(index: number) {
   };
 }
 
+/**
+ * FilterAndTabPanel
+ * Handles category selection, search, and sorting for the wallet table.
+ * @param {FilterAndTabPanelProps} props - Filter and tab panel props.
+ * @returns {JSX.Element}
+ */
 const FilterAndTabPanel = ({
   categories,
   searchTerm,
@@ -43,6 +55,7 @@ const FilterAndTabPanel = ({
   isMobile,
 }: FilterAndTabPanelProps) => {
   const [value, setValue] = useState<number>(0);
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -72,14 +85,14 @@ const FilterAndTabPanel = ({
         >
           <Tab
             label="All Assets"
-            {...a11yProps(10)}
+            {...a11yProps(0)}
             onClick={() => setCategory("All")}
           />
           {categories.map((cat, index) => (
             <Tab
               key={index}
               label={cat}
-              {...a11yProps(index)}
+              {...a11yProps(index + 1)}
               onClick={() => setCategory(cat)}
             />
           ))}
@@ -149,9 +162,7 @@ const FilterAndTabPanel = ({
           <FormControl fullWidth>
             <Select
               value={category}
-              onChange={(e) =>
-                setCategory(e.target.value as "highest" | "lowest")
-              }
+              onChange={(e) => setCategory(e.target.value as string)}
               displayEmpty
               inputProps={{ "aria-label": "Without label" }}
               sx={{
@@ -194,14 +205,6 @@ const FilterAndTabPanel = ({
               },
             }}
             onChange={(e) => setSearchTerm(e.target.value)}
-            InputLabelProps={{
-              sx: {
-                color: "white!important",
-                fontSize: "0.8125rem",
-                opacity: 0.6,
-                textAlign: "center",
-              },
-            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -212,8 +215,6 @@ const FilterAndTabPanel = ({
                 color: "white",
                 opacity: 0.6,
                 width: "100%",
-                fontSize: "0.8125rem",
-                lineHeight: "1.125rem",
                 borderRadius: "16px",
                 "&:hover fieldset": {
                   border: "1px solid #E2621B!important",
@@ -235,8 +236,6 @@ const FilterAndTabPanel = ({
                 borderRadius: "16px",
                 opacity: 0.6,
                 color: "white",
-                fontSize: "0.8125rem",
-                lineHeight: "1.125rem",
               }}
             >
               <MenuItem value={"highest"}>Highest Balance</MenuItem>
@@ -249,113 +248,95 @@ const FilterAndTabPanel = ({
   }
 };
 
+/**
+ * ListItem
+ * Represents a single token in the wallet balance table.
+ * Supports adding/removing favorites and displaying token details.
+ * @param {ListItemProps} props - Props for the list item.
+ * @returns {JSX.Element}
+ */
 const ListItem = ({
   token: { name, icon, usdValue, amount, contractId },
   onTokenClick,
 }: ListItemProps) => {
   const [favorites, setFavorites] = useState<string[]>([]);
 
+  // Sync favorites with localStorage
   useEffect(() => {
-    localStorage.setItem("items", JSON.stringify(favorites));
-  }, [favorites]);
-
-  useEffect(() => {
-    const items = JSON.parse(localStorage.getItem("favorites")!) || [];
-    if (items) {
-      setFavorites(items);
-    }
+    const storedFavorites = JSON.parse(
+      localStorage.getItem("favorites") || "[]"
+    );
+    setFavorites(storedFavorites);
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
+
   return (
-    <Box
-      sx={{
-        borderTop: "1px solid #F0F3F61A",
-        py: "1.3rem",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Box sx={{ maxWidth: "24px" }} component={"img"} src={icon} />
-        <Typography
-          sx={{
-            fontWeight: 700,
-            fontSize: "1.125rem",
-            lineHeight: "1.125rem",
-          }}
-        >
-          {name}
-        </Typography>
-        {name !== "XLM" && (
-          <HelpCenterOutlined
-            sx={{ fontSize: "1.125rem", cursor: "pointer" }}
-            onClick={() => onTokenClick(contractId)}
-          />
-        )}
+      <Box
+        sx={{
+          borderTop: "1px solid #F0F3F61A",
+          py: "1.3rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box sx={{ maxWidth: "24px" }} component={"img"} src={icon} />
+          <Typography sx={{ fontWeight: 700, fontSize: "1.125rem" }}>
+            {name}
+          </Typography>
+          {name !== "XLM" && (
+            <HelpCenterOutlined
+              sx={{ fontSize: "1.125rem", cursor: "pointer" }}
+              onClick={() => onTokenClick(contractId)}
+            />
+          )}
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Typography sx={{ fontWeight: 700, fontSize: "1.125rem" }}>
+            {amount}
+          </Typography>
+          <Typography sx={{ color: "#808191", ml: "0.5rem" }}>
+            ${(usdValue * amount).toFixed(2)}
+          </Typography>
+          {!favorites.includes(name) ? (
+            <Tooltip title="Add to favorites">
+              <IconButton onClick={() => setFavorites([...favorites, name])}>
+                <StarBorderIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Remove from favorites">
+              <IconButton
+                onClick={() =>
+                  setFavorites(favorites.filter((f) => f !== name))
+                }
+              >
+                <StarIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
       </Box>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Typography
-          sx={{
-            fontWeight: 700,
-            fontSize: "1.125rem",
-            lineHeight: "1.125rem",
-          }}
-        >
-          {amount}
-        </Typography>
-        <Typography
-          sx={{
-            color: "#808191",
-            fontWeight: 500,
-            fontSize: "0.75rem",
-            lineHeight: "1rem",
-            ml: "0.5rem",
-          }}
-        >
-          ${(usdValue * amount).toFixed(2)}
-        </Typography>
-        {!favorites.includes(name) ? (
-          <Tooltip title="Add to favorites">
-            <IconButton onClick={() => setFavorites([...favorites, name])}>
-              <StarBorderIcon />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <Tooltip title="Remove from favorites">
-            <IconButton
-              onClick={() => setFavorites(favorites.filter((f) => f !== name))}
-            >
-              <StarIcon />
-            </IconButton>
-          </Tooltip>
-        )}
-      </Box>
-    </Box>
+    </motion.div>
   );
 };
 
-const scrollbarStyles = {
-  /* Firefox */
-  scrollbarWidth: "thin",
-  scrollbarColor: "#E2491A #1B1B1B",
-
-  /* Chrome, Edge, and Safari */
-  "&::-webkit-scrollbar": {
-    width: "4px",
-  },
-
-  "&::-webkit-scrollbar-track": {
-    background:
-      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);",
-  },
-
-  "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#E2491A",
-    borderRadius: "8px",
-  },
-};
-
+/**
+ * WalletBalanceTable
+ * Displays a list of tokens with search, sorting, and filtering capabilities.
+ * Includes favorite functionality and modern styling.
+ * @param {WalletBalanceTableProps} props - Props for the wallet balance table.
+ * @returns {JSX.Element}
+ */
 const WalletBalanceTable = ({
   tokens,
   onTokenClick,
@@ -364,11 +345,29 @@ const WalletBalanceTable = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
 
-  const categories = tokens.map((token) => token.category);
-  const uniqueCategories = [...new Set(categories)];
+  const categories = useMemo(
+    () => [...new Set(tokens.map((token) => token.category))],
+    [tokens]
+  );
 
   const theme = useTheme();
-  const largerThenMd = useMediaQuery(theme.breakpoints.up("xl"));
+  const largerThanMd = useMediaQuery(theme.breakpoints.up("xl"));
+
+  // Filter, search, and sort tokens
+  const filteredTokens = useMemo(() => {
+    const filtered = tokens.filter(
+      (token) => token.category === category || category === "All"
+    );
+    const searched = filtered.filter((token) =>
+      token.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const sorted = searched.sort((a, b) => {
+      const aValue = a.amount * a.usdValue;
+      const bValue = b.amount * b.usdValue;
+      return sort === "highest" ? bValue - aValue : aValue - bValue;
+    });
+    return sorted;
+  }, [tokens, category, searchTerm, sort]);
 
   return (
     <Box
@@ -377,61 +376,45 @@ const WalletBalanceTable = ({
         p: "1.6rem",
         background:
           "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        height: largerThenMd ? "26rem" : "auto",
-        mb: {
-          xs: 2,
-          md: 0,
-        },
+        height: largerThanMd ? "26rem" : "auto",
+        mb: { xs: 2, md: 0 },
       }}
     >
       <FilterAndTabPanel
         searchTerm={searchTerm}
         category={category}
-        categories={uniqueCategories}
+        categories={categories}
         setCategory={setCategory}
         setSearchTerm={setSearchTerm}
         setSort={setSort}
         sort={sort}
-        isMobile={!largerThenMd}
+        isMobile={!largerThanMd}
       />
       <Box
         sx={{
           overflow: "auto",
           maxHeight: "19rem",
           mt: { xs: 2, md: 0 },
-          ...scrollbarStyles,
+          "&::-webkit-scrollbar": {
+            width: "4px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#E2491A",
+            borderRadius: "8px",
+          },
         }}
       >
-        {tokens.length ? (
-          [...tokens]
-            .filter(
-              (token) => token.category === category || category === "All"
-            )
-            .filter((token) =>
-              token.name.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-            .sort((a, b) => {
-              const aTrueValue = a.amount * a.usdValue;
-              const bTrueValue = b.amount * b.usdValue;
-
-              if (sort === "highest") {
-                return bTrueValue - aTrueValue;
-              } else {
-                return aTrueValue - bTrueValue;
-              }
-            })
-            .map((token, index) => (
-              <ListItem token={token} onTokenClick={onTokenClick} key={index} />
-            ))
+        {filteredTokens.length ? (
+          filteredTokens.map((token, index) => (
+            <ListItem token={token} onTokenClick={onTokenClick} key={index} />
+          ))
         ) : (
           <Typography
             sx={{
               color: "#FFF",
               fontSize: "14px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              pt: 1,
+              textAlign: "center",
+              pt: 2,
             }}
           >
             Looks like you haven't acquired any tokens.
