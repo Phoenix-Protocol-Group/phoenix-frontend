@@ -3,15 +3,16 @@
 import { Box, Container, Typography } from "@mui/material";
 import { HelpCenterArticle } from "@phoenix-protocol/types";
 import { HelpCenter } from "@phoenix-protocol/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 
 interface ArticlePageProps {
-  readonly params: {
+  readonly params: Promise<{
     readonly articleID: string;
-  };
+  }>;
 }
 
-export default function Page({ params }: ArticlePageProps) {
+export default function Page(props: ArticlePageProps) {
+  const params = use(props.params);
   const [article, setArticle] = useState<HelpCenterArticle | undefined>(
     undefined
   );

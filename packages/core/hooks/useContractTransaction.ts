@@ -131,7 +131,7 @@ export const useContractTransaction = () => {
 
         addAsyncToast(promise, loadingMessage);
       } catch (error) {
-        console.error("Error executing contract transaction", error);
+        console.log("Error executing contract transaction", error);
         addAsyncToast(Promise.reject(error), loadingMessage);
       }
     },

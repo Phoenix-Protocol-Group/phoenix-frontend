@@ -37,7 +37,7 @@ export async function fetchTokenPrices(symbol?: string, tokenId?: string) {
 
     return data.prices;
   } catch (error) {
-    console.error("Error fetching prices:", error);
+    console.log("Error fetching prices:", error);
     throw error;
   }
 }
@@ -101,7 +101,7 @@ export async function fetchHistoricalPrices(
 
     return parsedPrices;
   } catch (error) {
-    console.error("Error fetching prices:", error);
+    console.log("Error fetching prices:", error);
     throw error;
   }
 }
@@ -152,7 +152,7 @@ export async function fetchTokenPrices2(
 
     return Number((((newValue - oldValue) / oldValue) * 100).toFixed(2));
   } catch (error) {
-    console.error("Error fetching prices:", error);
+    console.log("Error fetching prices:", error);
     throw error;
   }
 }
@@ -176,7 +176,7 @@ async function fetchDollarValue(
     const data = await response.json();
     return data[currency].usd;
   } catch (error) {
-    console.error("Fetch error: ", error);
+    console.log("Fetch error: ", error);
     return null;
   }
 }

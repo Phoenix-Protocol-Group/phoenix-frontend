@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Box, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { Helmet } from "react-helmet";
+import { Box, Grid, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { motion } from "framer-motion";
+import Head from "next/head";
 import {
   AnchorServices,
   AssetInfoModal,
@@ -32,17 +33,15 @@ export default function Page() {
   const theme = useTheme();
   const router = useRouter();
   const appStore = useAppStore();
-  const persistStore = usePersistStore();
-  const largerThanMd = useMediaQuery(theme.breakpoints.up("md"));
 
   // State management
   const [anchors, setAnchors] = useState<Anchor[]>([]);
   const [anchorOpen, setAnchorOpen] = useState(false);
-  const [gainerAsset, setGainerAsset] = useState<GainerOrLooserAsset | null>(
-    null
+  const [gainerAsset, setGainerAsset] = useState<GainerOrLooserAsset>(
+    {} as GainerOrLooserAsset
   );
-  const [loserAsset, setLoserAsset] = useState<GainerOrLooserAsset | null>(
-    null
+  const [loserAsset, setLoserAsset] = useState<GainerOrLooserAsset>(
+    {} as GainerOrLooserAsset
   );
   const [allTokens, setAllTokens] = useState<any[]>([]);
   const [xlmPriceChart, setXlmPriceChart] = useState<any[]>([]);
@@ -57,6 +56,7 @@ export default function Page() {
   useEffect(() => {
     const initData = async () => {
       try {
+        console.log(1);
         setLoadingDashboard(true);
 
         // Fetch anchors
@@ -65,12 +65,15 @@ export default function Page() {
 
         // Fetch gainer and loser
         const { winner, loser } = await fetchBiggestWinnerAndLoser();
+        console.log("Winner", winner);
         const allTokens = await appStore.getAllTokens();
-
+        console.log("Winner", winner);
         const gainer = allTokens.find((token) => token.name === winner.symbol);
         const loserAsset = allTokens.find(
           (token) => token.name === loser.symbol
         );
+
+        console.log("Winner", winner);
 
         if (gainer && loserAsset) {
           setGainerAsset({
@@ -112,7 +115,7 @@ export default function Page() {
         // Load all token balances
         setAllTokens(allTokens);
       } catch (error) {
-        console.error("Failed to initialize data:", error);
+        console.log("Failed to initialize data:", error);
       } finally {
         setLoadingDashboard(false);
         setLoadingBalances(false);
@@ -164,9 +167,9 @@ export default function Page() {
 
   return (
     <Box sx={{ marginTop: { md: 0, xs: 12 } }}>
-      <Helmet>
+      <Head>
         <title>Phoenix DeFi Hub - Dashboard</title>
-      </Helmet>
+      </Head>
 
       {/* Anchor Services */}
       {anchors.length > 0 && (

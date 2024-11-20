@@ -90,7 +90,7 @@ const ConnectWallet = ({
       try {
         await connect(connector);
       } catch (error) {
-        console.error("Wallet connection failed:", error);
+        console.log("Wallet connection failed:", error);
       } finally {
         setLoading(false);
         setOpen(false);

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { ReactNode, useEffect, useState, useCallback } from "react";
+import { useTheme } from "@mui/material/styles";
 import {
   Box,
   Grid,
@@ -8,17 +9,13 @@ import {
   ListItem,
   Typography,
   useMediaQuery,
-  useTheme,
 } from "@mui/material";
 import Providers from "../providers";
 import TopBar from "@/components/TopBar/TopBar";
 import SideNav from "@/components/SideNav/SideNav";
 import { usePathname, useRouter } from "next/navigation";
-import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import JoyRideTooltip from "@/components/JoyRideTooltip";
-import { joyride } from "@phoenix-protocol/utils";
-import { DisclaimerModal, TourModal } from "@phoenix-protocol/ui";
+import { DisclaimerModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
 import { motion } from "framer-motion";
 import { ToastProvider } from "@/providers/ToastProvider";
@@ -40,78 +37,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const [navOpen, setNavOpen] = useState<boolean>(largerThanMd);
   // Retrieve the current pathname
   const pathname = usePathname();
-  // Get AppStore
-  const appStore = useAppStore();
   // Get PersistStore
   const persistStore = usePersistStore();
-  // State to manage tour initialization
-  const [initialized, setInitialized] = useState<boolean>(false);
-  // State to handle tour modal open/close
-  const [tourModalOpen, setTourModalOpen] = useState<boolean>(false);
   // State to handle disclaimer modal
   const [disclaimerModalOpen, setDisclaimerModalOpen] =
     useState<boolean>(false);
   // Router
-  const router = useRouter();
-
-  /**
-   * Callback for Joyride tour.
-   * Handles different actions such as navigating to different pages during the tour.
-   *
-   * @param {Object} data - Joyride callback data.
-   */
-  const handleJoyrideCallback = useCallback(
-    async (data: any) => {
-      const { action, index, status, type } = data;
-
-      // Open Wallet Modal on second step
-      if (action === ACTIONS.NEXT && index === 1) {
-        appStore.setWalletModalOpen(true);
-      }
-
-      // Close Wallet Modal on third step
-      if (action === ACTIONS.NEXT && index === 2) {
-        appStore.setWalletModalOpen(false);
-      }
-
-      // Navigate to swap page on fourth step
-      if (action === ACTIONS.NEXT && index === 3) {
-        appStore.setTourStep(4);
-        router.push("/swap");
-      }
-
-      // Navigate to pools page on eighth step
-      if (action === ACTIONS.NEXT && index === 7) {
-        appStore.setTourStep(7);
-        router.push("/pools");
-      }
-
-      // Navigate to pool single page on ninth step
-      if (action === ACTIONS.NEXT && index === 8) {
-        appStore.setTourStep(8);
-        router.push(
-          "/pools/CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX"
-        );
-      }
-
-      // End the tour after the last step
-      if (action === ACTIONS.NEXT && index === 11) {
-        appStore.setTourStep(10);
-        appStore.setTourRunning(false);
-        persistStore.setUserTourActive(false);
-        persistStore.skipUserTour();
-      }
-
-      if ([EVENTS.STEP_AFTER].includes(type)) {
-        appStore.setTourStep(index + (action === ACTIONS.PREV ? -1 : 1));
-      } else if (action === ACTIONS.NEXT && type === EVENTS.TARGET_NOT_FOUND) {
-        appStore.setTourRunning(false);
-      } else if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
-        appStore.setTourRunning(false);
-      }
-    },
-    [router]
-  );
 
   // useEffect to set navigation state based on screen size without animation on initial load
   useEffect(() => {
@@ -130,53 +61,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         persistStore.disconnectWallet();
       }
     }
-  }, [persistStore]);
+  }, []);
 
-  // Use effect hook to delay the joyride until the page has loaded to avoid hydration issues
   useEffect(() => {
-    if (persistStore.userTour.skipped && !persistStore.userTour.active) {
-      setInitialized(true);
-      appStore.setTourRunning(false);
-      return;
-    }
-
-    if (persistStore.userTour.active) {
-      appStore.setTourRunning(true);
-      appStore.setTourStep(persistStore.userTour.step);
-    }
-
-    const appStorageValue = localStorage?.getItem("app-storage");
-    let skippedTour: boolean = false;
-
-    if (appStorageValue !== null) {
-      try {
-        const parsedValue = JSON.parse(appStorageValue);
-        skippedTour = parsedValue?.state?.userTour?.skipped;
-      } catch (error) {
-        console.error("Error parsing app-storage value:", error);
-      }
-    }
-
-    if (
-      !persistStore.userTour.active &&
-      !persistStore.userTour.skipped &&
-      persistStore.userTour.step === 0 &&
-      !skippedTour
-    ) {
-      setTourModalOpen(true);
-      router.push("/");
-    }
-
     if (!persistStore.disclaimer.accepted) {
       setDisclaimerModalOpen(true);
     }
-
-    const timer = setTimeout(() => {
-      setInitialized(true);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [persistStore, router]);
-
+  }, [persistStore.disclaimer.accepted]);
   /**
    * Handles accepting or rejecting the disclaimer.
    *
@@ -228,10 +119,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
   // Hacky way to avoid overflows
   const css = `
-    body {
-      overflow-x: hidden!important;
-    }
-  `;
+      body {
+        overflow-x: hidden!important;
+      }
+    `;
 
   return (
     <html lang="en">
@@ -289,44 +180,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             >
               <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
             </motion.div>
-
-            {/* Joyride Tour */}
-            {initialized && persistStore.disclaimer.accepted && (
-              <>
-                <TourModal
-                  open={tourModalOpen}
-                  setOpen={(state) => {
-                    setTourModalOpen(state);
-                    appStore.setTourRunning(false);
-                    persistStore.skipUserTour();
-                  }}
-                  onClick={() => {
-                    setTourModalOpen(false);
-                    appStore.setTourRunning(true);
-                    persistStore.setUserTourActive(true);
-                    persistStore.setUserTourStep(0);
-                  }}
-                />
-                <Joyride
-                  // @ts-ignore
-                  steps={joyride.steps}
-                  continuous={true}
-                  tooltipComponent={JoyRideTooltip}
-                  run={appStore.tourRunning}
-                  stepIndex={appStore.tourStep}
-                  callback={handleJoyrideCallback}
-                  disableScrolling={true}
-                  disableOverlayClose={true}
-                  keyboardNavigation={false}
-                  styles={{
-                    options: {
-                      arrowColor: "#1F2123",
-                      zIndex: 1400,
-                    },
-                  }}
-                />
-              </>
-            )}
 
             <DisclaimerModal
               open={!persistStore.disclaimer.accepted}

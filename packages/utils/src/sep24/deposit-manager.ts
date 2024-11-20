@@ -33,7 +33,7 @@ export class DepositManager {
         walletName: "Demo wallet",
       });
     } catch (error) {
-      console.error("Error opening transfer server:", error);
+      console.log("Error opening transfer server:", error);
       throw error;
     }
   }
@@ -45,7 +45,7 @@ export class DepositManager {
     try {
       return await fetchTransferInfos(transferServer);
     } catch (error) {
-      console.error("Error fetching transfer info:", error);
+      console.log("Error fetching transfer info:", error);
       throw error;
     }
   }
@@ -71,7 +71,7 @@ export class DepositManager {
         signedChallengeTransaction,
       });
     } catch (error) {
-      console.error("Error in SEP-10 Authentication:", error);
+      console.log("Error in SEP-10 Authentication:", error);
       throw error;
     }
   }
@@ -95,7 +95,7 @@ export class DepositManager {
       const url = new URL(instructions.data.url);
       return open(url.toString(), "popup", "width=500,height=800");
     } catch (error) {
-      console.error("Error handling deposit:", error);
+      console.log("Error handling deposit:", error);
       throw error;
     }
   }

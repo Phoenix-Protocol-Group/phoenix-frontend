@@ -2,7 +2,13 @@
 "use client";
 
 // React-related imports
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  type JSX,
+} from "react";
 import { useDebounce } from "use-debounce";
 import { motion } from "framer-motion";
 
@@ -34,8 +40,7 @@ import {
 } from "@phoenix-protocol/utils";
 import { LoadingSwap, SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
-import { Helmet } from "react-helmet";
-import { handleXDRIssues } from "@/lib/txErrors";
+import Head from "next/head";
 
 /**
  * SwapPage Component
@@ -109,7 +114,7 @@ export default function SwapPage(): JSX.Element {
         await appStore.fetchTokenInfo(toToken?.name!);
       }, 7000);
     } catch (error) {
-      console.error("Error during swap transaction", error);
+      console.log("Error during swap transaction", error);
     }
   }, [
     appStore,
@@ -173,7 +178,7 @@ export default function SwapPage(): JSX.Element {
           });
         }
       } catch (e) {
-        console.error(e);
+        console.log(e);
       }
       setLoadingSimulate(false);
     }
@@ -219,17 +224,6 @@ export default function SwapPage(): JSX.Element {
     setIsFrom(isFromToken);
   }, []);
 
-  /**
-   * Initializes the user tour if applicable.
-   */
-  const initUserTour = useCallback((): void => {
-    if (storePersist.userTour.skipped && !storePersist.userTour.active) return;
-    if (storePersist.userTour.active) {
-      appStore.setTourRunning(true);
-      appStore.setTourStep(3);
-    }
-  }, [storePersist.userTour.active, storePersist.userTour.skipped]);
-
   // Effect hook to fetch all tokens once the component mounts
   useEffect(() => {
     const getAllTokens = async (): Promise<void> => {
@@ -256,14 +250,6 @@ export default function SwapPage(): JSX.Element {
     };
     getAllTokens();
   }, []);
-
-  // Effect hook to initialize the user tour delayed to avoid hydration issues
-  useEffect(() => {
-    if (!isLoading) {
-      const timer = setTimeout(() => initUserTour(), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [initUserTour, isLoading]);
 
   // Effect hook to simulate swaps on token change
   useEffect(() => {
@@ -348,7 +334,7 @@ export default function SwapPage(): JSX.Element {
       );
       setTrustlineButtonActive(false);
     } catch (e) {
-      console.error(e);
+      console.log(e);
     }
     setTxBroadcasting(false);
   }, [storePersist.wallet.address, trustlineTokenName]);
@@ -359,9 +345,9 @@ export default function SwapPage(): JSX.Element {
     </Box>
   ) : (
     <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
-      <Helmet>
+      <Head>
         <title>Phoenix DeFi Hub - Swap your tokens</title>
-      </Helmet>
+      </Head>
       {fromToken && toToken && (
         <SwapSuccess
           open={successModalOpen}

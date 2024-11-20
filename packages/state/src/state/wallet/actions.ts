@@ -47,24 +47,41 @@ export const createWalletActions = (
           const parsedValue = JSON.parse(appStorageValue);
           address = parsedValue?.state?.wallet?.address;
         } catch (error) {
-          console.error("Error parsing app-storage value:", error);
+          console.log("Error parsing app-storage value:", error);
         }
       }
+      let parsedResults: LiquidityPoolInfo[];
+      try {
+        const publicKey = address || constants.TESTING_SOURCE.accountId();
 
-      const publicKey = address || constants.TESTING_SOURCE.accountId();
+        // Factory contract
+        const factoryContract = new PhoenixFactoryContract.Client({
+          publicKey,
+          contractId: constants.FACTORY_ADDRESS,
+          networkPassphrase: constants.NETWORK_PASSPHRASE,
+          rpcUrl: constants.RPC_URL,
+        });
+        // Fetch all available tokens from chain
+        const allPoolsDetails = await factoryContract.query_all_pools_details();
 
-      // Factory contract
-      const factoryContract = new PhoenixFactoryContract.Client({
-        publicKey,
-        contractId: constants.FACTORY_ADDRESS,
-        networkPassphrase: constants.NETWORK_PASSPHRASE,
-        rpcUrl: constants.RPC_URL,
-      });
-      // Fetch all available tokens from chain
-      const allPoolsDetails = await factoryContract.query_all_pools_details();
+        // Parse results
+        parsedResults = allPoolsDetails.result;
+      } catch (e) {
+        const publicKey = constants.TESTING_SOURCE.accountId();
 
-      // Parse results
-      const parsedResults: LiquidityPoolInfo[] = allPoolsDetails.result;
+        // Factory contract
+        const factoryContract = new PhoenixFactoryContract.Client({
+          publicKey,
+          contractId: constants.FACTORY_ADDRESS,
+          networkPassphrase: constants.NETWORK_PASSPHRASE,
+          rpcUrl: constants.RPC_URL,
+        });
+        // Fetch all available tokens from chain
+        const allPoolsDetails = await factoryContract.query_all_pools_details();
+
+        // Parse results
+        parsedResults = allPoolsDetails.result;
+      }
 
       // Loop through all pools and get asset_a and asset_b addresses in an array
       const _allAssets = parsedResults

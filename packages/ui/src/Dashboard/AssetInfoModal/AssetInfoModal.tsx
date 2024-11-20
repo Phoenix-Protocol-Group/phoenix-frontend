@@ -3,26 +3,16 @@ import {
   Box,
   Typography,
   Modal as MuiModal,
-  Grid,
-  CircularProgress,
   Avatar,
-  Tooltip,
-  IconButton,
   Table,
   TableBody,
   TableRow,
   TableCell,
 } from "@mui/material";
 import Colors from "../../Theme/colors";
-import { Button } from "../../Button/Button";
 import { AssetInfoModalProps } from "@phoenix-protocol/types";
-import { CopyAll } from "@mui/icons-material";
 
-const AssetInfoModal = ({
-  open,
-  onClose,
-  asset,
-}: AssetInfoModalProps): React.ReactNode => {
+const AssetInfoModal = ({ open, onClose, asset }: AssetInfoModalProps) => {
   const style = {
     position: "absolute" as "absolute",
     top: "50%",
@@ -132,10 +122,7 @@ const AssetInfoModal = ({
                     <TableRow>
                       <TableCell>Total Supply</TableCell>
                       <TableCell sx={{ display: "flex", alignItems: "center" }}>
-                        {(
-                          Number(asset.supply) /
-                          10 ** 7
-                        ).toFixed()}
+                        {(Number(asset.supply) / 10 ** 7).toFixed()}
                         <Avatar
                           src={asset.tomlInfo.image}
                           sx={{ width: 24, height: 24, ml: 1 }}

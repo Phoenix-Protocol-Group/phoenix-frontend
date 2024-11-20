@@ -1,4 +1,4 @@
-import { xBullWalletConnect } from "xBull-Wallet-Connect";
+import { xBullWalletConnect } from "@creit.tech/xbull-wallet-connect";
 import { Wallet } from "./types";
 
 /**

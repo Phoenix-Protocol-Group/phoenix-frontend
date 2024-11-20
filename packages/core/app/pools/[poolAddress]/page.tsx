@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, use } from "react";
 import * as refuse from "react-usestateref";
 import { Box, GlobalStyles, Grid, Skeleton, Typography } from "@mui/material";
 import {
@@ -30,8 +30,7 @@ import {
 } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import Link from "next/link";
-import { Helmet } from "react-helmet";
-import { handleXDRIssues } from "@/lib/txErrors";
+import Head from "next/head";
 
 interface Entry {
   icon: string;
@@ -47,9 +46,9 @@ interface Entry {
 }
 
 interface PoolPageProps {
-  readonly params: {
+  readonly params: Promise<{
     readonly poolAddress: string;
-  };
+  }>;
 }
 
 const overviewStyles = (
@@ -64,7 +63,8 @@ interface _Token extends Token {
   readonly decimals: number;
 }
 
-export default function Page({ params }: PoolPageProps) {
+export default function Page(props: PoolPageProps) {
+  const params = use(props.params);
   // Load App Store
   const store = useAppStore();
   const storePersist = usePersistStore();
@@ -110,31 +110,6 @@ export default function Page({ params }: PoolPageProps) {
     rpcUrl: constants.RPC_URL,
   });
 
-  // Method for handling user tour events
-  const initUserTour = () => {
-    // Check if the user has already skipped the tour
-    if (storePersist.userTour.skipped && !storePersist.userTour.active) {
-      return;
-    }
-
-    // If the user has started the tour, we need to resume it from the last step
-    if (storePersist.userTour.active) {
-      store.setTourRunning(true);
-      store.setTourStep(8);
-    }
-  };
-
-  // Effect hook to initialize the user tour delayed to avoid hydration issues
-  useEffect(() => {
-    if (!loading) {
-      const timer = setTimeout(() => {
-        initUserTour();
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
-
   const fetchStakingAddress = async (): Promise<string | undefined> => {
     try {
       // Fetch pool config and info from chain
@@ -160,7 +135,7 @@ export default function Page({ params }: PoolPageProps) {
         return pairConfig.result.stake_contract.toString();
       }
     } catch (e) {
-      console.error(e);
+      console.log(e);
     }
   };
   // Provide Liquidity
@@ -591,9 +566,9 @@ export default function Page({ params }: PoolPageProps) {
   }
   return (
     <Box sx={{ mt: { xs: 12, md: 0 } }}>
-      <Helmet>
+      <Head>
         <title>{`Phoenix DeFi Hub - ${tokenA?.name} / ${tokenB?.name}`}</title>
-      </Helmet>
+      </Head>
       {overviewStyles}
       {loading && <Loading open={loading} setOpen={setLoading} />}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>

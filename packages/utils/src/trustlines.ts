@@ -46,10 +46,10 @@ function getWalletType(): string {
       const walletType = parsedValue?.state?.wallet?.walletType;
       return walletType;
     } catch (error) {
-      console.error("Error parsing app-storage value:", error);
+      console.log("Error parsing app-storage value:", error);
     }
   } else {
-    console.error("app-storage key not found in localStorage.");
+    console.log("app-storage key not found in localStorage.");
   }
   return "";
 }

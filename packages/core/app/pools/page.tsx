@@ -16,11 +16,11 @@ import {
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Pool, PoolsFilter } from "@phoenix-protocol/types";
-import { Helmet } from "react-helmet";
 import { Box } from "@mui/material";
 import { FACTORY_ADDRESS } from "@phoenix-protocol/utils/build/constants";
 import { LiquidityPoolInfo } from "@phoenix-protocol/contracts/build/phoenix-pair";
 import { motion } from "framer-motion";
+import Head from "next/head";
 
 /**
  * Page Component - Phoenix DeFi Pools Overview
@@ -200,54 +200,24 @@ export default function Page() {
     setLoading(false);
   }, [fetchPool]);
 
-  /**
-   * Initialize user tour.
-   *
-   * @function initUserTour
-   */
-  const initUserTour = useCallback(() => {
-    if (storePersist.userTour.skipped && !storePersist.userTour.active) {
-      return;
-    }
-
-    if (storePersist.userTour.active) {
-      store.setTourRunning(true);
-      store.setTourStep(7);
-    }
-  }, [store, storePersist]);
-
   // On component mount, fetch pools
   useEffect(() => {
     fetchPools();
   }, [fetchPools]);
 
-  // Effect hook to initialize the user tour delayed to avoid hydration issues
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    if (!loading) {
-      const timer = setTimeout(() => {
-        initUserTour();
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [loading, initUserTour]);
-
   // Render: conditionally display skeleton loader or pool data
   return loading ? (
     <Box sx={{ mt: { xs: 12, md: 0 } }}>
-      <Helmet>
+      <Head>
         <title>Phoenix DeFi Hub - Pools Overview</title>
-      </Helmet>
+      </Head>
       <Skeleton.Pools />
     </Box>
   ) : (
     <Box sx={{ mt: { xs: 12, md: 0 }, width: "100%" }}>
-      <Helmet>
+      <Head>
         <title>Phoenix DeFi Hub - Pools Overview</title>
-      </Helmet>
+      </Head>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

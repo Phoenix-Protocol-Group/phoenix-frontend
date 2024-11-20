@@ -51,5 +51,5 @@ export function handleXDRIssues(
   }
 
   setLoading(false);
-  console.error(error);
+  console.log(error);
 }
