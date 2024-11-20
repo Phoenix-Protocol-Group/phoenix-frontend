@@ -1,17 +1,14 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
-import { PinataSDK } from "pinata";
-import {
-  PhoenixNFTCollectionDeployerContract,
-} from "@phoenix-protocol/contracts";
+import { PhoenixNFTCollectionDeployerContract } from "@phoenix-protocol/contracts";
 import { TextSelectItemProps } from "@phoenix-protocol/types";
 import { constants, Signer } from "@phoenix-protocol/utils";
 import { CreateCollection } from "@phoenix-protocol/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import { PhoenixNFTCollectionContract } from '@phoenix-protocol/contracts';
+import { PhoenixNFTCollectionContract } from "@phoenix-protocol/contracts";
 
 export default function Page() {
   const store = useAppStore();
@@ -28,12 +25,6 @@ export default function Page() {
     undefined
   );
 
-  const pinata = new PinataSDK({
-    pinataJwt: //@todo must be moved to server side place
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1Mjk1ZmIzNy1jYmU3LTQ0YTYtYmU1OS0yNTE0MTg5ZTc1YTYiLCJlbWFpbCI6InZhcm5vdHVzZWRAcHJvdG9ubWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX0seyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMTYwZDY3YmM5NThjZTYwNTc5YjMiLCJzY29wZWRLZXlTZWNyZXQiOiJiMzlhM2MwOTRiZGQwMDk4OWYzYmY4ODk1MzE0NDk2MjljM2U4MDEwZjNmYzJjM2Q1NjBmNDMzZDZjZjAxOWFjIiwiaWF0IjoxNzI2NDk0OTA3fQ.g98zhDPGIzNwKk2H4PlxQDWQLH7X9YK_BYhX1LvpJiA",
-    pinataGateway: "lime-genetic-whitefish-192.mypinata.cloud",
-  });
-
   useEffect(() => {
     if (!file) return;
 
@@ -46,12 +37,31 @@ export default function Page() {
       return undefined;
     }
 
-    const upload = await pinata.upload.file(file);
-    return upload;
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/api/upload/collection", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Upload failed");
+      }
+
+      const data = await response.json();
+      return data.IpfsHash;
+    } catch (error: any) {
+      console.error("Error uploading:", error);
+    }
   };
 
   const handleSubmitClick = async () => {
     if (!storePersist) return;
+
+    console.log("handle")
 
     const randomBytes = new Uint8Array(32);
     const random = crypto.getRandomValues(randomBytes);
@@ -68,8 +78,8 @@ export default function Page() {
         new PhoenixNFTCollectionDeployerContract.Client({
           publicKey: storePersist.wallet.address!,
           contractId: constants.COLLECTION_DEPLOYER_ADDRESS,
-          networkPassphrase: constants.NETWORK_PASSPHRASE,
-          rpcUrl: constants.RPC_URL,
+          networkPassphrase: "Test SDF Network ; September 2015",
+          rpcUrl: "https://soroban-testnet.stellar.org",
           // @ts-ignore
           signTransaction: (tx: string) =>
             storePersist.wallet.walletType === "wallet-connect"
@@ -77,19 +87,26 @@ export default function Page() {
               : // @ts-ignore
                 signer.sign(tx),
         });
+          
+      console.log("foo")
 
-      const tx = await CollectionDeployerContract.deploy_new_collection({
-        salt,
-        admin: storePersist.wallet.address!,
-        name,
-        symbol,
-      });
+      const tx = await CollectionDeployerContract.deploy_new_collection(
+        {
+          salt,
+          admin: storePersist.wallet.address!,
+          name,
+          symbol,
+        }
+      );
+
+      console.log(tx);
 
       const res = await tx?.signAndSend();
 
+      console.log(res);
+
       if (res.result) {
-        const previewImage = await uploadPreviewImage();
-        console.log(previewImage);
+        const previewImageUrl = await uploadPreviewImage();
 
         if (previewImage) {
           const CollectionContract = new PhoenixNFTCollectionContract.Client({
@@ -107,13 +124,13 @@ export default function Page() {
 
           const collectionUriTx = await CollectionContract.set_collection_uri({
             sender: storePersist.wallet.address!,
-            uri: Buffer.from(previewImage.cid, "utf8"),
+            uri: Buffer.from(previewImageUrl, "utf8"),
           });
 
-          const collectionUriRes = await collectionUriTx?.signAndSend();
+          await collectionUriTx?.signAndSend();
         }
 
-        router.push(`/marketplace/collections/${res.result}`)
+        //router.push(`/marketplace/collections/${res.result}`)
       }
     } catch (e) {
       console.error(e);
