@@ -15,7 +15,7 @@ export const NETWORK_PASSPHRASE: string =
  * The Soroban RPC endpoint used to initialize this library.
  */
 export const RPC_URL: string =
-  "https://soroban-testnet.stellar.org/";
+  "https://soroban-testnet.stellar.org";
 
 /**
  * Factory contract address
@@ -33,7 +33,7 @@ export const MULTIHOP_ADDRESS: string =
  * NFT collection deployer address
  */
 export const COLLECTION_DEPLOYER_ADDRESS: string =
-  "CCQJIP3KLXEHSYGQJCWORN5NINFU7NURP3K56GPMZ26WOY6XRDVCH2IA";
+  "CADOSCUCEL53DG7RSOSN2YIBLMLSUN3WECAUOAES4RRRCCC7LLS25CY2";
 
 /**
  * Phoenix History Indexer

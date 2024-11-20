@@ -7,14 +7,15 @@ import { createConnectWalletActions } from "./persist/createConnectWalletActions
 import { createLayoutActions } from "./layout/actions";
 import { createUserTourActions } from "./persist/createUserTourActions";
 import { createDisclaimerAction } from "./persist/createDisclaimerActions";
+import { NETWORK_PASSPHRASE, RPC_URL } from "../constants";
 
 //@ts-ignore
 export const useAppStore = create<AppStore>()((set, get) => {
   // Create a new server instance.
-  const server = new Horizon.Server("https://soroban-rpc.stellar.org");
+  const server = new Horizon.Server(RPC_URL);
 
   // The network passphrase for the test network.
-  const networkPassphrase = "Public Global Stellar Network ; September 2015";
+  const networkPassphrase = NETWORK_PASSPHRASE;
 
   // Create some states for the app and layouting
   const layout = createLayoutActions(set, get);
@@ -34,11 +35,10 @@ export const usePersistStore = create<AppStorePersist>()(
   persist(
     (set, get) => {
       // Create a new server instance.
-      const server = new Horizon.Server("https://soroban-rpc.stellar.org");
+      const server = new Horizon.Server(RPC_URL);
 
       // The network passphrase for the test network.
-      const networkPassphrase =
-        "Public Global Stellar Network ; September 2015";
+      const networkPassphrase = NETWORK_PASSPHRASE;
 
       // Create a wallet with the given server and network passphrase.
       const walletPersist = createConnectWalletActions();

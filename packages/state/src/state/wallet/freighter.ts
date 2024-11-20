@@ -1,5 +1,6 @@
 import freighterApi from "@stellar/freighter-api";
 import {Connector, NetworkDetails} from "@phoenix-protocol/types";
+import { RPC_URL } from "../../constants";
 
 export function freighter(): Connector {
   return {
@@ -19,13 +20,20 @@ export function freighter(): Connector {
       // !TODO - find a better solution here
       return {
         ...(await freighterApi.getNetworkDetails()),
-        networkUrl: "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
+        networkUrl: RPC_URL,
       };
     },
-    getPublicKey(): Promise<string> {
-      return freighterApi.getPublicKey();
+    async getPublicKey(): Promise<string> {
+      const address = await freighterApi.getAddress();
+
+      if(address.error) {
+        console.log("error getting public key", address.error);
+        return "";
+      } else {
+        return address.address;
+      }
     },
-    signTransaction(
+    async signTransaction(
       xdr: string,
       opts?: {
         network?: string;
@@ -33,7 +41,14 @@ export function freighter(): Connector {
         accountToSign?: string;
       }
     ): Promise<string> {
-      return freighterApi.signTransaction(xdr, opts);
+      const res = await freighterApi.signTransaction(xdr, opts);
+
+      if(res.error) {
+        console.log("error signing transaction", res.error);
+        return "";
+      } else {
+        return res.signedTxXdr;
+      }
     },
   };
 }
