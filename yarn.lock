@@ -2076,6 +2076,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@creit.tech/xbull-wallet-connect@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@creit.tech/xbull-wallet-connect@npm:0.3.0"
+  dependencies:
+    rxjs: ^7.5.5
+    tweetnacl: ^1.0.3
+    tweetnacl-util: ^0.15.1
+  checksum: 2b3f42dcb66d0cf46a5a5f61eeddb7cfba549caa996f4f4946ff8f853209ab16c92bfd150092f8e9bf2cc1bc090a518e233a50845284b5d3a8b292eab1ee654c
+  languageName: node
+  linkType: hard
+
 "@discoveryjs/json-ext@npm:^0.5.3":
   version: 0.5.7
   resolution: "@discoveryjs/json-ext@npm:0.5.7"
@@ -3776,16 +3787,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/phoenix-frontend@workspace:."
   dependencies:
-    "@stellar/stellar-sdk": 12.0.0-rc.3
+    "@stellar/stellar-sdk": 13.0.0
     "@tsconfig/recommended": ^1.0.2
-    "@types/formidable": ^3.4.5
     "@types/jest": ^29.5.2
     "@walletconnect/modal": ^2.6.2
     "@walletconnect/sign-client": ^2.13.1
     "@walletconnect/types": ^2.13.1
-    formidable: ^3.5.2
     jest: ^29.5.0
-    pinata: ^1.2.0
     pinata-web3: ^0.5.2
   languageName: unknown
   linkType: soft
@@ -3794,12 +3802,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/state@workspace:packages/state"
   dependencies:
+    "@creit.tech/xbull-wallet-connect": ^0.3.0
     "@lobstrco/signer-extension-api": ^1.0.0-beta.0
     "@phoenix-protocol/contracts": "workspace:^"
     "@phoenix-protocol/types": "workspace:^"
-    "@stellar/freighter-api": 1.7.1
+    "@stellar/freighter-api": 3.0.0
     "@types/glob": ^7.1.3
     "@types/urijs": ^1.19.19
+    dotenv: ^16.4.5
     react: ^18.2.0
     react-dom: ^18.2.0
     react-query: ^3.39.3
@@ -4806,10 +4816,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stellar/freighter-api@npm:3.0.0":
+  version: 3.0.0
+  resolution: "@stellar/freighter-api@npm:3.0.0"
+  checksum: 218b32066c0c70af7e1bb616e7a42539eba3e79878026c2357917cb07a5790eb9923fd10df78fcd05422b9a6dc12775a8a46303ddd3ebdd51064e076ddd1d8da
+  languageName: node
+  linkType: hard
+
 "@stellar/js-xdr@npm:^3.0.1, @stellar/js-xdr@npm:^3.1.1":
   version: 3.1.1
   resolution: "@stellar/js-xdr@npm:3.1.1"
   checksum: b17bf89551cb3a2f334ae14aebf8d12c9c601ed54616d6df3b370eacdf87db4114a8d909d46091a8944a4f8a751cfe1e639164fe021336f57c83dd524bce2d7b
+  languageName: node
+  linkType: hard
+
+"@stellar/js-xdr@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "@stellar/js-xdr@npm:3.1.2"
+  checksum: 6ecc52402603a1c9e64536bcd5b6348e247655aa662ac383967f48c1c6ac46e84cc48ebdbf3ada416d2c2d75898d1ab28dab6ba65d9018e3eb126ea1b2099f04
   languageName: node
   linkType: hard
 
@@ -4831,21 +4855,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stellar/stellar-base@npm:^12.0.0-rc.1":
-  version: 12.0.0-rc.1
-  resolution: "@stellar/stellar-base@npm:12.0.0-rc.1"
+"@stellar/stellar-base@npm:^13.0.1":
+  version: 13.0.1
+  resolution: "@stellar/stellar-base@npm:13.0.1"
   dependencies:
-    "@stellar/js-xdr": ^3.1.1
+    "@stellar/js-xdr": ^3.1.2
     base32.js: ^0.1.0
     bignumber.js: ^9.1.2
     buffer: ^6.0.3
     sha.js: ^2.3.6
-    sodium-native: ^4.1.1
+    sodium-native: ^4.3.0
     tweetnacl: ^1.0.3
   dependenciesMeta:
     sodium-native:
       optional: true
-  checksum: f9599552c31c8bc2e8af868786b7bf74db1399e3f00c884d49f578e2946055c8dfd36beb33f27483e64dc09db4dfe2a8c794977455d3f2499deb6a6968bfe8a9
+  checksum: b4a4d049c332ab63aa112c183ffed706dac4236b369a1b53eac86e8efcbba228693be5550e39762bc3c13c9c2e56dc76f611454191d54a1c740832059adb52bd
   languageName: node
   linkType: hard
 
@@ -4864,18 +4888,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stellar/stellar-sdk@npm:12.0.0-rc.3":
-  version: 12.0.0-rc.3
-  resolution: "@stellar/stellar-sdk@npm:12.0.0-rc.3"
+"@stellar/stellar-sdk@npm:13.0.0":
+  version: 13.0.0
+  resolution: "@stellar/stellar-sdk@npm:13.0.0"
   dependencies:
-    "@stellar/stellar-base": ^12.0.0-rc.1
-    axios: ^1.6.8
+    "@stellar/stellar-base": ^13.0.1
+    axios: ^1.7.7
     bignumber.js: ^9.1.2
     eventsource: ^2.0.2
+    feaxios: ^0.0.20
     randombytes: ^2.1.0
     toml: ^3.0.0
     urijs: ^1.19.1
-  checksum: e5841f0f6dc2dab51b04602b6cfe6baf0a5b5c6d1d15778f9994d419bb51bb251b5c3d2458821d65ea813ff4afa1014d04d67d59cf6fdb455e62a1beea25b08c
+  checksum: fb3e3c5db9ab43882947b0e19b6a49bea421096e57271a4a2e7eafe3b1fbc79c8b69cbe3281c386050dd04d6825ca6a63641a534b2fe97b108e86722bd4eea35
   languageName: node
   linkType: hard
 
@@ -6222,15 +6247,6 @@ __metadata:
   version: 3.2.1
   resolution: "@types/find-cache-dir@npm:3.2.1"
   checksum: bf5c4e96da40247cd9e6327f54dfccda961a0fb2d70e3c71bd05def94de4c2e6fb310fe8ecb0f04ecf5dbc52214e184b55a2337b0f87250d4ae1e2e7d58321e4
-  languageName: node
-  linkType: hard
-
-"@types/formidable@npm:^3.4.5":
-  version: 3.4.5
-  resolution: "@types/formidable@npm:3.4.5"
-  dependencies:
-    "@types/node": "*"
-  checksum: 27384c8459e44f5e167922927bd31fcd1259555062faacaa490b52f8896a0a5614918ee4ec6ec9123c1418ac127908270c1182a2441d49681b37dc34737c3646
   languageName: node
   linkType: hard
 
@@ -7606,13 +7622,6 @@ __metadata:
     is-array-buffer: ^3.0.4
     is-shared-array-buffer: ^1.0.2
   checksum: 352259cba534dcdd969c92ab002efd2ba5025b2e3b9bead3973150edbdf0696c629d7f4b3f061c5931511e8207bdc2306da614703c820b45dabce39e3daf7e3e
-  languageName: node
-  linkType: hard
-
-"asap@npm:^2.0.0":
-  version: 2.0.6
-  resolution: "asap@npm:2.0.6"
-  checksum: b296c92c4b969e973260e47523207cd5769abd27c245a68c26dc7a0fe8053c55bb04360237cb51cab1df52be939da77150ace99ad331fb7fb13b3423ed73ff3d
   languageName: node
   linkType: hard
 
@@ -9485,16 +9494,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dezalgo@npm:^1.0.4":
-  version: 1.0.4
-  resolution: "dezalgo@npm:1.0.4"
-  dependencies:
-    asap: ^2.0.0
-    wrappy: 1
-  checksum: 895389c6aead740d2ab5da4d3466d20fa30f738010a4d3f4dcccc9fc645ca31c9d10b7e1804ae489b1eb02c7986f9f1f34ba132d409b043082a86d9a4e745624
-  languageName: node
-  linkType: hard
-
 "diff-sequences@npm:^29.4.3, diff-sequences@npm:^29.6.3":
   version: 29.6.3
   resolution: "diff-sequences@npm:29.6.3"
@@ -9626,7 +9625,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:^16.0.0":
+"dotenv@npm:^16.0.0, dotenv@npm:^16.4.5":
   version: 16.4.5
   resolution: "dotenv@npm:16.4.5"
   checksum: 301a12c3d44fd49888b74eb9ccf9f07a1f5df43f489e7fcb89647a2edcd84c42d6bc349dc8df099cd18f07c35c7b04685c1a4f3e6a6a9e6b30f8d48c15b7f49c
@@ -10697,6 +10696,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"feaxios@npm:^0.0.20":
+  version: 0.0.20
+  resolution: "feaxios@npm:0.0.20"
+  dependencies:
+    is-retry-allowed: ^3.0.0
+  checksum: 73ff5dc8b8a814bdd79f55521aa0cb9160f06afcbe36402a891d457d0085bff8cffba08a02878c838f5826c62e240fdefddd01bf931cb38bd89050c4de9f3c9a
+  languageName: node
+  linkType: hard
+
 "fetch-blob@npm:^3.1.2, fetch-blob@npm:^3.1.4":
   version: 3.2.0
   resolution: "fetch-blob@npm:3.2.0"
@@ -10945,17 +10953,6 @@ __metadata:
   dependencies:
     fetch-blob: ^3.1.2
   checksum: 82a34df292afadd82b43d4a740ce387bc08541e0a534358425193017bf9fb3567875dc5f69564984b1da979979b70703aa73dee715a17b6c229752ae736dd9db
-  languageName: node
-  linkType: hard
-
-"formidable@npm:^3.5.2":
-  version: 3.5.2
-  resolution: "formidable@npm:3.5.2"
-  dependencies:
-    dezalgo: ^1.0.4
-    hexoid: ^2.0.0
-    once: ^1.4.0
-  checksum: 7c7972e8a15d45e6d2315a54d77f0900e5c610aff9b5730de326e2b34630604e1eff6c9d666e5504fba4c8818ccaed682d76a4fdb718b160c6afa2c250bf6a76
   languageName: node
   linkType: hard
 
@@ -11552,13 +11549,6 @@ __metadata:
   version: 5.0.0
   resolution: "help-me@npm:5.0.0"
   checksum: 474436627b6c7d2f406a2768453895889eb2712c8ded4c47658d5c6dd46c2ff3f742be4e4e8dedd57b7f1ac6b28803896a2e026a32a977f507222c16f23ab2e1
-  languageName: node
-  linkType: hard
-
-"hexoid@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "hexoid@npm:2.0.0"
-  checksum: 69a92b2bcd7c81c16557de017c59511643e3cb1f0d6e9e9b705859b798bfd059088e4d3cc85e9fe0a9e431007430f15393303c3e74320b5c4c28cb64fc7d8bb4
   languageName: node
   linkType: hard
 
@@ -12273,6 +12263,13 @@ __metadata:
     call-bind: ^1.0.2
     has-tostringtag: ^1.0.0
   checksum: 362399b33535bc8f386d96c45c9feb04cf7f8b41c182f54174c1a45c9abbbe5e31290bbad09a458583ff6bf3b2048672cdb1881b13289569a7c548370856a652
+  languageName: node
+  linkType: hard
+
+"is-retry-allowed@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "is-retry-allowed@npm:3.0.0"
+  checksum: 12d17b44410484c6b0292ca38127b2ad026b65d1c1ead40f055effb2498c1a65b28ac5bc8f0383d0d091f84c1f791c3e09da32219fc3a745c3b1bab106db6cfb
   languageName: node
   linkType: hard
 
@@ -15043,16 +15040,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pinata@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "pinata@npm:1.2.0"
-  dependencies:
-    is-ipfs: ^8.0.4
-    node-fetch: ^3.3.1
-  checksum: 17ba6602ecb4132e31e2a6bf821c412cf52b71b36937c3e82faa8640a7a3a944482f8b87fea89434000ac4598dcd819aff53fa6c7f62e669ff4e20e728512575
-  languageName: node
-  linkType: hard
-
 "pino-abstract-transport@npm:^1.0.0":
   version: 1.2.0
   resolution: "pino-abstract-transport@npm:1.2.0"
@@ -17216,13 +17203,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sodium-native@npm:^4.0.1, sodium-native@npm:^4.0.10, sodium-native@npm:^4.1.1":
+"sodium-native@npm:^4.0.1, sodium-native@npm:^4.0.10":
   version: 4.1.1
   resolution: "sodium-native@npm:4.1.1"
   dependencies:
     node-gyp: latest
     node-gyp-build: ^4.8.0
   checksum: 45941133773d70d20feb688e98023dcdc6b9fa33084ecd34f4fca66661c9e63587daf761d1ba9d46570564712613a567fd4b4934c6be6445bc49a0afc863c232
+  languageName: node
+  linkType: hard
+
+"sodium-native@npm:^4.3.0":
+  version: 4.3.1
+  resolution: "sodium-native@npm:4.3.1"
+  dependencies:
+    node-gyp-build: ^4.8.0
+  checksum: b0d64155d06e0a6bb3c63768eb1371314b260611086cc2200dc56c82a7c8f1fd45b6ff557359a530577f3bce27f109f909443f0038e609a40fa50b67c0ca3935
   languageName: node
   linkType: hard
 
