@@ -21,6 +21,7 @@ import { joyride } from "@phoenix-protocol/utils";
 import { DisclaimerModal, TourModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
 import { motion } from "framer-motion";
+import { ToastProvider } from "@/providers/ToastProvider";
 
 /**
  * RootLayout Component
@@ -273,78 +274,80 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       {/* Wrap components with Providers for context availability */}
       <Providers>
         <body suppressHydrationWarning={true}>
-          <style>{css}</style>
+          <ToastProvider>
+            <style>{css}</style>
 
-          {/* Side Navigation Component with smooth animation, disabled on initial load */}
+            {/* Side Navigation Component with smooth animation, disabled on initial load */}
 
-          <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
+            <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
 
-          {/* Top Navigation Bar with motion */}
-          <motion.div
-            initial={{ y: -50 }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          >
-            <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
-          </motion.div>
+            {/* Top Navigation Bar with motion */}
+            <motion.div
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
+            </motion.div>
 
-          {/* Joyride Tour */}
-          {initialized && persistStore.disclaimer.accepted && (
-            <>
-              <TourModal
-                open={tourModalOpen}
-                setOpen={(state) => {
-                  setTourModalOpen(state);
-                  appStore.setTourRunning(false);
-                  persistStore.skipUserTour();
-                }}
-                onClick={() => {
-                  setTourModalOpen(false);
-                  appStore.setTourRunning(true);
-                  persistStore.setUserTourActive(true);
-                  persistStore.setUserTourStep(0);
-                }}
-              />
-              <Joyride
-                // @ts-ignore
-                steps={joyride.steps}
-                continuous={true}
-                tooltipComponent={JoyRideTooltip}
-                run={appStore.tourRunning}
-                stepIndex={appStore.tourStep}
-                callback={handleJoyrideCallback}
-                disableScrolling={true}
-                disableOverlayClose={true}
-                keyboardNavigation={false}
-                styles={{
-                  options: {
-                    arrowColor: "#1F2123",
-                    zIndex: 1400,
-                  },
-                }}
-              />
-            </>
-          )}
+            {/* Joyride Tour */}
+            {initialized && persistStore.disclaimer.accepted && (
+              <>
+                <TourModal
+                  open={tourModalOpen}
+                  setOpen={(state) => {
+                    setTourModalOpen(state);
+                    appStore.setTourRunning(false);
+                    persistStore.skipUserTour();
+                  }}
+                  onClick={() => {
+                    setTourModalOpen(false);
+                    appStore.setTourRunning(true);
+                    persistStore.setUserTourActive(true);
+                    persistStore.setUserTourStep(0);
+                  }}
+                />
+                <Joyride
+                  // @ts-ignore
+                  steps={joyride.steps}
+                  continuous={true}
+                  tooltipComponent={JoyRideTooltip}
+                  run={appStore.tourRunning}
+                  stepIndex={appStore.tourStep}
+                  callback={handleJoyrideCallback}
+                  disableScrolling={true}
+                  disableOverlayClose={true}
+                  keyboardNavigation={false}
+                  styles={{
+                    options: {
+                      arrowColor: "#1F2123",
+                      zIndex: 1400,
+                    },
+                  }}
+                />
+              </>
+            )}
 
-          <DisclaimerModal
-            open={!persistStore.disclaimer.accepted}
-            onAccepted={onAcceptDisclaimer}
-          />
+            <DisclaimerModal
+              open={!persistStore.disclaimer.accepted}
+              onAccepted={onAcceptDisclaimer}
+            />
 
-          {/* Main Content Area */}
-          <Box
-            sx={{
-              marginLeft: largerThanMd ? (navOpen ? "240px" : "60px") : "0",
-              minHeight: "100vh",
-              transition: "all 0.2s ease-in-out",
-              display: "flex",
-              justifyContent: "center",
-              padding: "16px",
-              ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
-            }}
-          >
-            {children}
-          </Box>
+            {/* Main Content Area */}
+            <Box
+              sx={{
+                marginLeft: largerThanMd ? (navOpen ? "240px" : "60px") : "0",
+                minHeight: "100vh",
+                transition: "all 0.2s ease-in-out",
+                display: "flex",
+                justifyContent: "center",
+                padding: "16px",
+                ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
+              }}
+            >
+              {children}
+            </Box>
+          </ToastProvider>
         </body>
       </Providers>
       <Analytics />
