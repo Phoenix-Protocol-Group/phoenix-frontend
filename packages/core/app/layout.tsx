@@ -100,23 +100,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     },
   };
 
-  const poolPageStyles = {
-    backgroundImage: `url("/BG.svg")`,
-    backgroundRepeat: "no-repeat",
-    backgroundAttachment: "fixed",
-    backgroundPosition: "center",
-    backgroundSize: "cover",
-    paddingBottom: "50px",
-    width: {
-      xs: "100vw",
-      md: largerThanMd
-        ? navOpen
-          ? "calc(100% - 240px)"
-          : "calc(100% - 60px)"
-        : "100%",
-    },
-  };
-
   // Hacky way to avoid overflows
   const css = `
       body {
@@ -195,7 +178,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 display: "flex",
                 justifyContent: "center",
                 padding: "16px",
-                ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
+                ...swapPageStyle,
               }}
             >
               {children}
