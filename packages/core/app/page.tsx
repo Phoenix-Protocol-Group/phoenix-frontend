@@ -176,11 +176,11 @@ export default function Page() {
 
     const info = fetchedInfo._embedded.records.find(
       (el: any) =>
-        el.asset === tokenName.toUpperCase() ||
-        el.asset === tokenName.toUpperCase() + "-1" ||
-        el.asset === tokenName.toUpperCase() + "-2"
+        el.asset.toUpperCase() === tokenName.toUpperCase() ||
+        el.asset.toUpperCase() === tokenName.toUpperCase() + "-1" ||
+        el.asset.toUpperCase() === tokenName.toUpperCase() + "-2"
     );
-
+    console.log(info);
     setSelectedTokenForInfo(info);
     setTokenInfoOpen(true);
   };

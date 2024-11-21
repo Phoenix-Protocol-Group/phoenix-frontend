@@ -12,6 +12,7 @@ import {
   Grid,
   IconButton,
   useTheme,
+  Tooltip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -22,7 +23,11 @@ import {
   ListItemProps,
   WalletBalanceTableProps,
 } from "@phoenix-protocol/types";
-import { ArrowRightAlt, HelpCenterOutlined } from "@mui/icons-material";
+import {
+  ArrowRightAlt,
+  HelpCenterOutlined,
+  InfoOutlined,
+} from "@mui/icons-material";
 import { useMediaQuery } from "@mui/system";
 
 /**
@@ -299,10 +304,47 @@ const ListItem = ({
               {name}
             </Typography>
             {name !== "XLM" && (
-              <HelpCenterOutlined
-                sx={{ fontSize: "1.125rem", cursor: "pointer", ml: 1 }}
-                onClick={() => onTokenClick(contractId)}
-              />
+              <Box
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  marginLeft: "8px",
+                }}
+              >
+                <Tooltip
+                  title="More information"
+                  arrow
+                  placement="top"
+                  sx={{
+                    "& .MuiTooltip-arrow": {
+                      color: "#E2491A",
+                    },
+                    "& .MuiTooltip-tooltip": {
+                      backgroundColor: "#1D1F21",
+                      color: "#FFF",
+                      fontSize: "12px",
+                    },
+                  }}
+                >
+                  <motion.div
+                    whileHover={{
+                      scale: 1.2,
+                      rotate: 15,
+                      transition: { duration: 0.2 },
+                    }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <InfoOutlined
+                      sx={{
+                        color: "#E2621B",
+                        fontSize: "20px",
+                      }}
+                      onClick={() => onTokenClick(contractId)}
+                    />
+                  </motion.div>
+                </Tooltip>
+              </Box>
             )}
           </Grid>
           <Grid item xs={6} md={3}>
