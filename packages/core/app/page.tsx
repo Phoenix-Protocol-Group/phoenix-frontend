@@ -180,7 +180,6 @@ export default function Page() {
         el.asset.toUpperCase() === tokenName.toUpperCase() + "-1" ||
         el.asset.toUpperCase() === tokenName.toUpperCase() + "-2"
     );
-    console.log(info);
     setSelectedTokenForInfo(info);
     setTokenInfoOpen(true);
   };
