@@ -40,7 +40,6 @@ const AssetSelector = ({
     >
       <Box
         sx={{
-          maxWidth: "600px",
           width: "100%",
           padding: "1.5rem",
           background:

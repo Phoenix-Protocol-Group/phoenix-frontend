@@ -556,7 +556,7 @@ export default function Page(props: PoolPageProps) {
 
   if (!params.poolAddress || poolNotFound) {
     return (
-      <Box sx={{ mt: { xs: 12, md: 0 } }}>
+      <Box sx={{ mt: { xs: 12, md: 0 }, maxWidth: "1440px" }}>
         <Typography>{"The pool you're looking for doesn't exist."}</Typography>
         <Typography>
           Return <Link href="/">Home</Link>
@@ -565,7 +565,7 @@ export default function Page(props: PoolPageProps) {
     );
   }
   return (
-    <Box sx={{ mt: { xs: 12, md: 0 } }}>
+    <Box sx={{ mt: { xs: 12, md: 0 }, maxWidth: "1440px" }}>
       {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
       <input type="hidden" value={`Phoenix DeFi Hub - Pool`} />
       {overviewStyles}

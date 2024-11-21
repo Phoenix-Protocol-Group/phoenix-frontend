@@ -344,33 +344,11 @@ export default function SwapPage(): JSX.Element {
       <input type="hidden" value="Phoenix DeFi Hub - Swap your tokens" />
 
       {isLoading ? (
-        <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
+        <Box sx={{ width: "100%", maxWidth: "1440px", mt: 12 }}>
           <Skeleton.Swap />
         </Box>
       ) : (
-        <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
-          {fromToken && toToken && (
-            <SwapSuccess
-              open={successModalOpen}
-              setOpen={setSuccessModalOpen}
-              tokens={[fromToken, toToken]}
-              tokenAmounts={tokenAmounts}
-              onButtonClick={() => {}}
-            />
-          )}
-          {errorModalOpen && (
-            <SwapError
-              open={errorModalOpen}
-              setOpen={setErrorModalOpen}
-              error={errorDescription}
-            />
-          )}
-          <LoadingSwap
-            open={txBroadcasting}
-            setOpen={setTxBroadcasting}
-            toToken={toToken!}
-            fromToken={fromToken!}
-          />
+        <Box sx={{ width: "100%", maxWidth: "1440px", mt: 12 }}>
           <Box>
             {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (
               <motion.div

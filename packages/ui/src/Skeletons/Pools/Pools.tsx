@@ -22,94 +22,123 @@ const descriptionContent = {
   textAlign: "right",
 };
 
-const PoolItem = () => {
+const PoolItemSkeleton = () => {
   return (
-    <Grid item xs={6} md={4} lg={3} xl={2}>
+    <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
       <Box
         sx={{
-          padding: "16px",
-          borderRadius: "8px",
-          background:
-            "linear-gradient(180deg, #292B2C 0%, #222426 100%), #242529",
+          padding: "24px",
+          borderRadius: "20px",
+          background: "rgb(29, 31, 33)",
+          backdropFilter: "blur(20px)",
+          position: "relative",
+          overflow: "hidden",
+          boxShadow: "0 6px 18px rgba(0, 0, 0, 0.4)",
         }}
       >
+        {/* Logos in the background with adjusted opacity and proper circle shape */}
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "12px",
-            marginLeft: "5px",
+            position: "absolute",
+            top: "-10%",
+            left: "-10%",
+            width: "60%",
+            borderRadius: "50%",
+            overflow: "hidden",
           }}
         >
           <Skeleton
             variant="circular"
             sx={{
-              width: {
-                xs: "48px",
-                md: "64px",
-              },
-              height: {
-                xs: "48px",
-                md: "64px",
-              },
-            }}
-          />
-          <Skeleton
-            variant="circular"
-            sx={{
-              width: {
-                xs: "48px",
-                md: "64px",
-              },
-              height: {
-                xs: "48px",
-                md: "64px",
-              },
+              width: "100%",
+              height: "100%",
             }}
           />
         </Box>
-        <Skeleton variant="text" sx={{ fontSize: "18px", minWidth: "120px" }} />
-
-        <Grid
-          container
-          rowSpacing={1}
-          columnSpacing={2}
+        <Box
           sx={{
-            marginBottom: "24px",
+            position: "absolute",
+            top: "-10%",
+            right: "-10%",
+            width: "60%",
+            borderRadius: "50%",
+            overflow: "hidden",
           }}
         >
-          <Grid item xs={6}>
-            <Skeleton
-              variant="text"
-              sx={{ fontSize: "16px", minWidth: "60px" }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <Skeleton
-              variant="text"
-              sx={{ fontSize: "16px", minWidth: "80px" }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <Skeleton
-              variant="text"
-              sx={{ fontSize: "16px", minWidth: "60px" }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <Skeleton
-              variant="text"
-              sx={{ fontSize: "16px", minWidth: "80px" }}
-            />
-          </Grid>
-        </Grid>
+          <Skeleton
+            variant="circular"
+            sx={{
+              width: "100%",
+              height: "100%",
+            }}
+          />
+        </Box>
 
-        <Grid container spacing={1}>
-          <Grid item xs={12} md={7}>
-            <Skeleton variant="rounded" width={90} height={40} />
+        {/* Pool Information with Icons */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            marginBottom: "16px",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <Skeleton
+            variant="circular"
+            sx={{
+              width: "24px",
+              height: "24px",
+            }}
+          />
+          <Skeleton variant="text" sx={{ fontSize: "22px", width: "120px" }} />
+          <Skeleton
+            variant="circular"
+            sx={{
+              width: "24px",
+              height: "24px",
+            }}
+          />
+        </Box>
+
+        <Grid container rowSpacing={1} sx={{ position: "relative", zIndex: 1 }}>
+          <Grid item xs={6}>
+            <Skeleton
+              variant="text"
+              sx={{ ...descriptionHeader, width: "60px" }}
+            />
           </Grid>
-          <Grid item xs={12} md={5}>
-            <Skeleton variant="rounded" width={90} height={40} />
+          <Grid item xs={6} textAlign="right">
+            <Skeleton
+              variant="text"
+              sx={{ ...descriptionContent, width: "80px" }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Skeleton
+              variant="text"
+              sx={{ ...descriptionHeader, width: "60px" }}
+            />
+          </Grid>
+          <Grid item xs={6} textAlign="right">
+            <Skeleton
+              variant="text"
+              sx={{ ...descriptionContent, width: "80px" }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Skeleton
+              variant="text"
+              sx={{ ...descriptionHeader, width: "60px" }}
+            />
+          </Grid>
+          <Grid item xs={6} textAlign="right">
+            <Skeleton
+              variant="text"
+              sx={{ ...descriptionContent, width: "80px" }}
+            />
           </Grid>
         </Grid>
       </Box>
@@ -119,40 +148,23 @@ const PoolItem = () => {
 
 const Pools = () => {
   return (
-    <Box>
-      <Skeleton variant="text" sx={{ fontSize: "36px", maxWidth: "160px" }} />
+    <Box sx={{ flex: 1 }}>
       <Skeleton
         variant="text"
-        sx={{ fontSize: "1rem", width: "100px", marginBottom: "16px" }}
+        sx={{ fontSize: "32px", maxWidth: "160px", marginBottom: "16px" }}
       />
-      <Grid container spacing={1}>
+      <Grid container spacing={2} sx={{ marginBottom: "24px" }}>
         <Grid item xs={9} md={10}>
-          <Skeleton
-            variant="rounded"
-            width="100%"
-            height={30}
-            sx={{
-              marginBottom: "16px",
-            }}
-          />
+          <Skeleton variant="rounded" width="100%" height={46} />
         </Grid>
-        <Grid item xs={5} md={2}>
-          <Skeleton variant="rounded" sx={{ height: "30px", width: "100%" }} />
+        <Grid item xs={3} md={2}>
+          <Skeleton variant="rounded" width="100%" height={46} />
         </Grid>
       </Grid>
-      <Grid container spacing={2}>
-        <PoolItem />
-        <PoolItem />
-        <PoolItem />
-        <PoolItem />
-        <PoolItem />
-        <PoolItem />
-        <PoolItem />
-        <PoolItem />
-        <PoolItem />
-        <PoolItem />
-        <PoolItem />
-        <PoolItem />
+      <Grid container spacing={3}>
+        {Array.from(new Array(8)).map((_, index) => (
+          <PoolItemSkeleton key={index} />
+        ))}
       </Grid>
     </Box>
   );
