@@ -9,8 +9,8 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Tooltip,
   Typography,
+  Skeleton,
 } from "@mui/material";
 import React, { useMemo, useState } from "react";
 import {
@@ -19,28 +19,6 @@ import {
   PoolsProps,
 } from "@phoenix-protocol/types";
 import { motion } from "framer-motion";
-
-// Styles for description header and content
-const descriptionHeader = {
-  color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
-  marginTop: "3px",
-  fontSize: {
-    xs: "12px",
-    md: "14px",
-  },
-  lineHeight: "140%",
-};
-
-const descriptionContent = {
-  color: "#FFF",
-  fontSize: {
-    xs: "12px",
-    md: "18px",
-  },
-  fontWeight: 700,
-  lineHeight: "140%",
-  textAlign: "right",
-};
 
 /**
  * Button Component for Pool Filter
@@ -87,6 +65,7 @@ const FilterButton = React.memo(
     );
   }
 );
+
 const PoolItem = React.memo(
   ({
     pool,
@@ -109,6 +88,9 @@ const PoolItem = React.memo(
         xl={3}
         onClick={() => onShowDetailsClick(pool)}
         component={motion.div}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
@@ -116,152 +98,172 @@ const PoolItem = React.memo(
           sx={{
             padding: "24px",
             borderRadius: "20px",
-            background: "rgb(29, 31, 33)",
-            backdropFilter: "blur(20px)",
+            background:
+              "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
             position: "relative",
-            cursor: "pointer",
             overflow: "hidden",
+            cursor: "pointer",
             boxShadow: "0 6px 18px rgba(0, 0, 0, 0.4)",
           }}
         >
-          {/* Logos in the background with adjusted opacity and proper circle shape */}
+          {/* Logos in the background */}
           <Box
-            component={motion.div}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.15 }}
-            transition={{ duration: 0.5 }}
             sx={{
               position: "absolute",
               top: "-10%",
               left: "-10%",
-              width: "60%",
-              borderRadius: "50%",
-              overflow: "hidden",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              width: "120px",
+              height: "120px",
+              opacity: 0.1,
+              background: `url(${pool.tokens[0].icon}) center / contain no-repeat`,
+              filter: "grayscale(100%)",
             }}
-          >
-            <Box
-              component={motion.img}
-              src={pool.tokens[0].icon}
-              sx={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                borderRadius: "50%",
-              }}
-            />
-          </Box>
+          />
           <Box
-            component={motion.div}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.15 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
             sx={{
               position: "absolute",
               top: "-10%",
               right: "-10%",
-              width: "60%",
-              borderRadius: "50%",
-              overflow: "hidden",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              width: "120px",
+              height: "120px",
+              opacity: 0.1,
+              background: `url(${pool.tokens[1].icon}) center / contain no-repeat`,
+              filter: "grayscale(100%)",
             }}
-          >
-            <Box
-              component={motion.img}
-              src={pool.tokens[1].icon}
-              sx={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                borderRadius: "50%",
-              }}
-            />
-          </Box>
+          />
 
-          {/* Pool Information with Icons */}
+          {/* Pool Information */}
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
+              gap: "12px",
               marginBottom: "16px",
-              position: "relative",
               zIndex: 1,
             }}
           >
             <Box
-              component="img"
-              src={pool.tokens[0].icon}
               sx={{
-                width: "24px",
-                height: "24px",
-                borderRadius: "50%",
-                objectFit: "cover",
+                display: "flex",
+                width: "36px",
+                height: "36px",
+                padding: "4px",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: "32px",
+                background:
+                  "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
               }}
-            />
+            >
+              <Box
+                sx={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "4px",
+                  background: `url(${pool.tokens[0].icon}) transparent 50% / cover no-repeat`,
+                }}
+              />
+            </Box>
             <Typography
               sx={{
                 fontWeight: 700,
-                fontSize: {
-                  xs: "20px",
-                  md: "22px",
-                },
+                fontSize: "20px",
                 color: "#fff",
               }}
             >
               {`${pool.tokens[0].name} - ${pool.tokens[1].name}`}
             </Typography>
             <Box
-              component="img"
-              src={pool.tokens[1].icon}
               sx={{
-                width: "24px",
-                height: "24px",
-                borderRadius: "50%",
-                objectFit: "cover",
+                display: "flex",
+                width: "36px",
+                height: "36px",
+                padding: "4px",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: "32px",
+                background:
+                  "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
               }}
-            />
+            >
+              <Box
+                sx={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "4px",
+                  background: `url(${pool.tokens[1].icon}) transparent 50% / cover no-repeat`,
+                }}
+              />
+            </Box>
           </Box>
 
-          <Grid
-            container
-            rowSpacing={1}
-            sx={{ position: "relative", zIndex: 1 }}
-          >
+          {/* Pool Stats */}
+          <Grid container rowSpacing={1} sx={{ zIndex: 1 }}>
             <Grid item xs={6}>
-              <Typography sx={{ ...descriptionHeader, color: "#ddd" }}>
+              <Typography
+                sx={{
+                  color: "var(--Secondary-S2-2, #BDBEBE)",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                }}
+              >
                 TVL
               </Typography>
             </Grid>
             <Grid item xs={6} textAlign="right">
-              <Typography sx={{ ...descriptionContent, color: "#fff" }}>
+              <Typography
+                sx={{
+                  color: "var(--Secondary-S2, #FFF)",
+                  fontSize: "18px",
+                  fontWeight: 700,
+                }}
+              >
                 {pool.tvl}
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography sx={{ ...descriptionHeader, color: "#ddd" }}>
+              <Typography
+                sx={{
+                  color: "var(--Secondary-S2-2, #BDBEBE)",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                }}
+              >
                 Max APR
               </Typography>
             </Grid>
             <Grid item xs={6} textAlign="right">
-              <Typography sx={{ ...descriptionContent, color: "#fff" }}>
+              <Typography
+                sx={{
+                  color: "var(--Secondary-S2, #FFF)",
+                  fontSize: "18px",
+                  fontWeight: 700,
+                }}
+              >
                 {pool.maxApr}
               </Typography>
             </Grid>
             {filter === "MY" && (
               <>
                 <Grid item xs={6}>
-                  <Typography sx={{ ...descriptionHeader, color: "#ddd" }}>
+                  <Typography
+                    sx={{
+                      color: "var(--Secondary-S2-2, #BDBEBE)",
+                      fontSize: "14px",
+                      fontWeight: 700,
+                    }}
+                  >
                     My Liquidity
                   </Typography>
                 </Grid>
                 <Grid item xs={6} textAlign="right">
-                  <Typography sx={{ ...descriptionContent, color: "#fff" }}>
+                  <Typography
+                    sx={{
+                      color: "var(--Secondary-S2, #FFF)",
+                      fontSize: "18px",
+                      fontWeight: 700,
+                    }}
+                  >
                     {pool.userLiquidity}
                   </Typography>
                 </Grid>
@@ -273,6 +275,7 @@ const PoolItem = React.memo(
     );
   }
 );
+
 /**
  * Pools Overview Component
  *
