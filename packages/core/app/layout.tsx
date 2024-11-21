@@ -19,6 +19,7 @@ import { DisclaimerModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
 import { motion } from "framer-motion";
 import { ToastProvider } from "@/providers/ToastProvider";
+import { RestoreModalProvider } from "@/providers/RestoreModalProvider";
 
 const HiddenInputChecker = () => {
   const [value, setValue] = useState("Phoenix DeFi Hub");
@@ -166,40 +167,42 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <Providers>
         <body suppressHydrationWarning={true}>
           <ToastProvider>
-            <style>{css}</style>
+            <RestoreModalProvider>
+              <style>{css}</style>
 
-            {/* Side Navigation Component with smooth animation, disabled on initial load */}
+              {/* Side Navigation Component with smooth animation, disabled on initial load */}
 
-            <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
+              <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
 
-            {/* Top Navigation Bar with motion */}
-            <motion.div
-              initial={{ y: -50 }}
-              animate={{ y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            >
-              <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
-            </motion.div>
+              {/* Top Navigation Bar with motion */}
+              <motion.div
+                initial={{ y: -50 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
+                <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
+              </motion.div>
 
-            <DisclaimerModal
-              open={!persistStore.disclaimer.accepted}
-              onAccepted={onAcceptDisclaimer}
-            />
+              <DisclaimerModal
+                open={!persistStore.disclaimer.accepted}
+                onAccepted={onAcceptDisclaimer}
+              />
 
-            {/* Main Content Area */}
-            <Box
-              sx={{
-                marginLeft: largerThanMd ? (navOpen ? "240px" : "60px") : "0",
-                minHeight: "100vh",
-                transition: "all 0.2s ease-in-out",
-                display: "flex",
-                justifyContent: "center",
-                padding: "16px",
-                ...swapPageStyle,
-              }}
-            >
-              {children}
-            </Box>
+              {/* Main Content Area */}
+              <Box
+                sx={{
+                  marginLeft: largerThanMd ? (navOpen ? "240px" : "60px") : "0",
+                  minHeight: "100vh",
+                  transition: "all 0.2s ease-in-out",
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "16px",
+                  ...swapPageStyle,
+                }}
+              >
+                {children}
+              </Box>
+            </RestoreModalProvider>
           </ToastProvider>
         </body>
       </Providers>

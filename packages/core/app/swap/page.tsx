@@ -94,16 +94,19 @@ export default function SwapPage(): JSX.Element {
       await executeContractTransaction({
         contractType: "multihop",
         contractAddress: constants.MULTIHOP_ADDRESS,
-        transactionFunction: async (client) => {
-          return client.swap({
-            recipient: storePersist.wallet.address!,
-            operations,
-            amount: BigInt(tokenAmounts[0] * 10 ** 7),
-            max_spread_bps: BigInt(maxSpread * 100),
-            deadline: undefined,
-            pool_type: 0,
-            max_allowed_fee_bps: undefined,
-          });
+        transactionFunction: async (client, restore) => {
+          return client.swap(
+            {
+              recipient: storePersist.wallet.address!,
+              operations,
+              amount: BigInt(tokenAmounts[0] * 10 ** 7),
+              max_spread_bps: BigInt(maxSpread * 100),
+              deadline: undefined,
+              pool_type: 0,
+              max_allowed_fee_bps: undefined,
+            },
+            { simulate: !restore }
+          );
         },
       });
 

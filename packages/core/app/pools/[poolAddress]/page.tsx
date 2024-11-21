@@ -146,20 +146,23 @@ export default function Page(props: PoolPageProps) {
     await executeContractTransaction({
       contractType: "pair",
       contractAddress: params.poolAddress,
-      transactionFunction: async (client) => {
-        return client.provide_liquidity({
-          sender: storePersist.wallet.address!,
-          desired_a: BigInt(
-            (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
-          ),
-          desired_b: BigInt(
-            (tokenBAmount * 10 ** (tokenB?.decimals || 7)).toFixed(0)
-          ),
-          min_a: undefined,
-          min_b: undefined,
-          custom_slippage_bps: undefined,
-          deadline: undefined,
-        });
+      transactionFunction: async (client, restore) => {
+        return client.provide_liquidity(
+          {
+            sender: storePersist.wallet.address!,
+            desired_a: BigInt(
+              (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
+            ),
+            desired_b: BigInt(
+              (tokenBAmount * 10 ** (tokenB?.decimals || 7)).toFixed(0)
+            ),
+            min_a: undefined,
+            min_b: undefined,
+            custom_slippage_bps: undefined,
+            deadline: undefined,
+          },
+          { simulate: !restore }
+        );
       },
     });
     // Refresh pool data
@@ -175,29 +178,17 @@ export default function Page(props: PoolPageProps) {
     await executeContractTransaction({
       contractType: "pair",
       contractAddress: params.poolAddress,
-      transactionFunction: async (client) => {
-        if (fix) {
-          return client.withdraw_liquidity(
-            {
-              sender: storePersist.wallet.address!,
-              share_amount: BigInt(10),
-              min_a: BigInt(1),
-              min_b: BigInt(1),
-              deadline: undefined,
-            },
-            { simulate: false }
-          );
-        } else {
-          return client.withdraw_liquidity({
+      transactionFunction: async (client, restore) => {
+        return client.withdraw_liquidity(
+          {
             sender: storePersist.wallet.address!,
-            share_amount: BigInt(
-              (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-            ),
+            share_amount: BigInt(10),
             min_a: BigInt(1),
             min_b: BigInt(1),
             deadline: undefined,
-          });
-        }
+          },
+          { simulate: !restore }
+        );
       },
     });
     setTokenAmounts([lpTokenAmount]);
@@ -217,13 +208,16 @@ export default function Page(props: PoolPageProps) {
     await executeContractTransaction({
       contractType: "stake",
       contractAddress: stakeAddress!,
-      transactionFunction: async (client) => {
-        return client.bond({
-          sender: storePersist.wallet.address!,
-          tokens: BigInt(
-            (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-          ),
-        });
+      transactionFunction: async (client, restore) => {
+        return client.bond(
+          {
+            sender: storePersist.wallet.address!,
+            tokens: BigInt(
+              (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+            ),
+          },
+          { simulate: !restore }
+        );
       },
     });
     await fetchStakes();
@@ -248,27 +242,17 @@ export default function Page(props: PoolPageProps) {
     await executeContractTransaction({
       contractType: "stake",
       contractAddress: stakeAddress!,
-      transactionFunction: async (client) => {
-        if (fix) {
-          return client.unbond(
-            {
-              sender: storePersist.wallet.address!,
-              stake_amount: BigInt(
-                (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-              ),
-              stake_timestamp: BigInt(stake_timestamp),
-            },
-            { simulate: false }
-          );
-        } else {
-          return client.unbond({
+      transactionFunction: async (client, restore) => {
+        return client.unbond(
+          {
             sender: storePersist.wallet.address!,
             stake_amount: BigInt(
               (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
             ),
             stake_timestamp: BigInt(stake_timestamp),
-          });
-        }
+          },
+          { simulate: !restore }
+        );
       },
     });
     setTokenAmounts([lpTokenAmount]);
@@ -537,10 +521,13 @@ export default function Page(props: PoolPageProps) {
     await executeContractTransaction({
       contractType: "stake",
       contractAddress: stakeAddress!,
-      transactionFunction: async (client) => {
-        return client.withdraw_rewards({
-          sender: storePersist.wallet.address!,
-        });
+      transactionFunction: async (client, restore) => {
+        return client.withdraw_rewards(
+          {
+            sender: storePersist.wallet.address!,
+          },
+          { simulate: !restore }
+        );
       },
     });
     // Wait 7 Seconds for the next block and fetch new balances

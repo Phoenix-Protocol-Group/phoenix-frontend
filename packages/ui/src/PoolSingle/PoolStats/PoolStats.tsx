@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography, Skeleton } from "@mui/material";
 import { PoolStatsProps, PoolStatsBoxProps } from "@phoenix-protocol/types";
 import { motion } from "framer-motion";
 
@@ -10,52 +10,54 @@ import { motion } from "framer-motion";
  * @param {Object} props - The properties for the PoolStatsBox component.
  * @param {string} props.title - The title of the stats box.
  * @param {string | number} props.value - The value to display in the stats box.
+ * @param {boolean} props.loading - Indicates if the component is in loading state.
  */
 const PoolStatsBox = ({ title, value }: PoolStatsBoxProps) => {
   return (
-    <Grid
-      item
-      xs={6}
-      sm={3}
-      component={motion.div}
-      whileHover={{ scale: 1.05 }}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4, ease: "easeInOut" }}
     >
       <Box
         sx={{
-          padding: "0.625rem 1rem",
-          borderRadius: "0.5rem",
-          border: "1px solid #E2621B",
           display: "flex",
-          alignItems: "center",
-          minHeight: "5.5rem",
+          padding: "24px",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          gap: "12px",
+          position: "relative",
+          borderRadius: "12px",
+          border: "1px solid var(--Secondary-S4, #2C2C31)",
           background:
-            "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
-          transition: "all 0.3s ease-in-out",
+            "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+          overflow: "hidden",
         }}
       >
-        <Box>
-          <Typography
-            sx={{
-              opacity: 0.7,
-              fontSize: "0.875rem",
-              lineHeight: "140%",
-              transition: "color 0.3s ease-in-out",
-            }}
-          >
-            {title}
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: "1.125rem",
-              fontWeight: 700,
-              lineHeight: "140%",
-            }}
-          >
-            {value}
-          </Typography>
-        </Box>
+        <Typography
+          sx={{
+            color: "var(--Secondary-S2-2, #BDBEBE)",
+            fontFamily: "Ubuntu",
+            fontSize: "12px",
+            fontWeight: 700,
+            lineHeight: "140%",
+          }}
+        >
+          {title.toUpperCase()}
+        </Typography>
+        <Typography
+          sx={{
+            color: "var(--Secondary-S2, #FFF)",
+            fontFamily: "Ubuntu",
+            fontSize: "24px",
+            fontWeight: 700,
+            lineHeight: "140%",
+          }}
+        >
+          {value}
+        </Typography>
       </Box>
-    </Grid>
+    </motion.div>
   );
 };
 
@@ -65,12 +67,15 @@ const PoolStatsBox = ({ title, value }: PoolStatsBoxProps) => {
  * @component
  * @param {Object} props - The properties for the PoolStats component.
  * @param {Array} props.stats - Array of stat objects with title and value properties.
+ * @param {boolean} props.loading - Indicates if the component is in loading state.
  */
 const PoolStats = ({ stats }: PoolStatsProps) => {
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={3}>
       {stats.map((stat, key) => (
-        <PoolStatsBox key={key} title={stat.title} value={stat.value} />
+        <Grid item xs={12} sm={6} key={key}>
+          <PoolStatsBox title={stat.title} value={stat.value} />
+        </Grid>
       ))}
     </Grid>
   );
