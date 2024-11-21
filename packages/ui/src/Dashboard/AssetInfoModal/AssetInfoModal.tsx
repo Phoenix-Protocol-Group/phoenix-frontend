@@ -29,7 +29,6 @@ const AssetInfoModal = ({ open, onClose, asset }: AssetInfoModalProps) => {
     flexDirection: "column" as "column",
     padding: "24px",
     overflow: "hidden",
-    position: "relative",
   };
 
   const handleCopyToClipboard = useCallback((text) => {
