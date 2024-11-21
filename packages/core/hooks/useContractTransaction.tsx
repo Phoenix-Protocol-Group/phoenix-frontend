@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback } from "react";
 import {
   PhoenixPairContract,
   PhoenixMultihopContract,
@@ -98,8 +98,7 @@ const getContractClient = <T extends ContractType>(
 export const useContractTransaction = () => {
   const { addAsyncToast } = useToast();
   const storePersist = usePersistStore();
-  const { openRestoreModal, closeRestoreModal, restoreTransactionFunction } =
-    useRestoreModal();
+  const { openRestoreModal, closeRestoreModal } = useRestoreModal();
 
   const executeContractTransaction = useCallback(
     async <T extends ContractType>({
@@ -125,7 +124,6 @@ export const useContractTransaction = () => {
             publicKey
           );
 
-          // Pass the `restore` flag internally to `transactionFunction`
           const transaction = await transactionFunction(
             contractClient,
             restore
@@ -133,63 +131,64 @@ export const useContractTransaction = () => {
 
           console.log("Attempting to sign and send transaction...");
 
-          // Step 2: Wrap the signAndSend in try-catch to properly catch any errors
-          let sentTransaction: SentTransaction<any> | undefined;
-          try {
-            if (restore) {
-              console.log("Restoring transaction state...");
-              await transaction.simulate({ restore: true });
-            } else {
-              sentTransaction = await transaction.signAndSend();
-            }
-          } catch (error) {
-            // Log the error and handle it here
-            console.error(
-              "Error during signing and sending transaction:",
-              error
-            );
+          // Step 2: Handle signing and sending the transaction with async toast
+          const promise = new Promise<{ transactionId?: string }>(
+            async (resolve, reject) => {
+              try {
+                if (restore) {
+                  console.log("Restoring transaction state...");
+                  await transaction.simulate({ restore: true });
+                  resolve({});
+                } else {
+                  const sentTransaction = await transaction.signAndSend();
+                  resolve({
+                    transactionId:
+                      sentTransaction.sendTransactionResponse?.hash,
+                  });
+                }
+              } catch (error) {
+                console.error("Error during signing and sending:", error);
 
-            // Ensure the error contains the information needed
-            if (error instanceof Error) {
-              console.log("Error message:", error.message);
-              if (error.message.includes("restore some contract state")) {
-                // Open the modal and save the restore transaction function
-                openRestoreModal(async () => {
-                  try {
-                    await executeTransaction(true); // Retry with restore set to true, which will call simulate with restore
-                  } catch (restoreError) {
-                    console.error(
-                      "Error during restoring transaction:",
-                      restoreError
-                    );
-                    addAsyncToast(Promise.reject(restoreError), loadingMessage);
-                  } finally {
-                    closeRestoreModal();
-                  }
-                });
-                return; // Don't proceed until the user decides to restore
+                // Check if restore is required
+                if (
+                  error instanceof Error &&
+                  error.message.includes("restore some contract state")
+                ) {
+                  openRestoreModal(async () => {
+                    try {
+                      await executeTransaction(true); // Retry with restore
+                      resolve({});
+                    } catch (restoreError) {
+                      console.error(
+                        "Error during restoring transaction:",
+                        restoreError
+                      );
+                      reject(restoreError); // Reject with the restoration error
+                    } finally {
+                      closeRestoreModal();
+                    }
+                  });
+                  return; // Exit early since restore will handle the resolution
+                }
+
+                reject(error); // Reject with the error
               }
             }
-            // Re-throw the error to be handled by addAsyncToast
-            throw error;
-          }
+          );
 
-          // Step 3: If successful, add the promise for the toast
-          const promise: Promise<{ transactionId?: string }> = Promise.resolve({
-            transactionId: sentTransaction
-              ? sentTransaction.sendTransactionResponse?.hash
-              : undefined,
-          });
-
+          // Add the promise to the toast for UI updates
           addAsyncToast(promise, loadingMessage);
+
+          // Delay at least 5 seconds before finishing the transaction process
+          await promise;
+          await new Promise((resolve) => setTimeout(resolve, 5000));
         } catch (error) {
-          // Handle unexpected errors that occur outside of `signAndSend()`
           console.log("Unexpected error executing contract transaction", error);
           addAsyncToast(Promise.reject(error), loadingMessage);
         }
       };
 
-      // Execute transaction initially without restore
+      // Start transaction execution
       await executeTransaction();
     },
     [addAsyncToast, storePersist, openRestoreModal, closeRestoreModal]
