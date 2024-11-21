@@ -40,7 +40,6 @@ import {
 } from "@phoenix-protocol/utils";
 import { LoadingSwap, SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
-import Head from "next/head";
 
 /**
  * SwapPage Component
@@ -339,120 +338,126 @@ export default function SwapPage(): JSX.Element {
     setTxBroadcasting(false);
   }, [storePersist.wallet.address, trustlineTokenName]);
 
-  return isLoading ? (
-    <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
-      <Skeleton.Swap />
-    </Box>
-  ) : (
-    <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
-      <Head>
-        <title>Phoenix DeFi Hub - Swap your tokens</title>
-      </Head>
-      {fromToken && toToken && (
-        <SwapSuccess
-          open={successModalOpen}
-          setOpen={setSuccessModalOpen}
-          tokens={[fromToken, toToken]}
-          tokenAmounts={tokenAmounts}
-          onButtonClick={() => {}}
-        />
-      )}
-      {errorModalOpen && (
-        <SwapError
-          open={errorModalOpen}
-          setOpen={setErrorModalOpen}
-          error={errorDescription}
-        />
-      )}
-      <LoadingSwap
-        open={txBroadcasting}
-        setOpen={setTxBroadcasting}
-        toToken={toToken!}
-        fromToken={fromToken!}
-      />
-      <Box>
-        {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <SwapContainer
-              onOptionsClick={() => setOptionsOpen(true)}
-              onSwapTokensClick={() => {
-                setTokenAmounts((prevAmounts) => [
-                  prevAmounts[1],
-                  prevAmounts[0],
-                ]);
-                setFromToken(toToken);
-                setToToken(fromToken);
-              }}
-              fromTokenValue={tokenAmounts[0].toString()}
-              toTokenValue={tokenAmounts[1].toString()}
-              fromToken={fromToken}
-              toToken={toToken}
-              onTokenSelectorClick={(isFromToken: boolean) =>
-                handleSelectorOpen(isFromToken)
-              }
-              onSwapButtonClick={() => doSwap()}
-              onInputChange={(isFrom: boolean, value: string) => {
-                setTokenAmounts((prevAmounts) =>
-                  isFrom ? [Number(value), 0] : [prevAmounts[0], Number(value)]
-                );
-              }}
-              exchangeRate={exchangeRate}
-              networkFee={networkFee}
-              route={swapRoute}
-              loadingSimulate={loadingSimulate}
-              estSellPrice={"TODO"}
-              minSellPrice={"TODO"}
-              slippageTolerance={`${maxSpread}%`}
-              swapButtonDisabled={
-                tokenAmounts[0] <= 0 ||
-                storePersist.wallet.address === undefined
-              }
-              trustlineButtonActive={trustlineButtonActive}
-              trustlineAssetName={trustlineTokenName}
-              trustlineButtonDisabled={trustlineAssetAmount < 0.5}
-              onTrustlineButtonClick={() => addTrustLine()}
+  return (
+    <>
+      {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
+      <input type="hidden" value="Phoenix DeFi Hub - Swap your tokens" />
+
+      {isLoading ? (
+        <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
+          <Skeleton.Swap />
+        </Box>
+      ) : (
+        <Box sx={{ width: "100%", maxWidth: "600px", mt: 12 }}>
+          {fromToken && toToken && (
+            <SwapSuccess
+              open={successModalOpen}
+              setOpen={setSuccessModalOpen}
+              tokens={[fromToken, toToken]}
+              tokenAmounts={tokenAmounts}
+              onButtonClick={() => {}}
             />
-          </motion.div>
-        )}
-        {optionsOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <SlippageSettings
-              options={["1%", "3%", "5%"]}
-              selectedOption={maxSpread}
-              onClose={() => setOptionsOpen(false)}
-              onChange={(option: string) => setMaxSpread(Number(option))}
+          )}
+          {errorModalOpen && (
+            <SwapError
+              open={errorModalOpen}
+              setOpen={setErrorModalOpen}
+              error={errorDescription}
             />
-          </motion.div>
-        )}
-        {assetSelectorOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {tokens.length > 0 ? (
-              <AssetSelector
-                tokens={tokens}
-                tokensAll={tokens}
-                onClose={() => setAssetSelectorOpen(false)}
-                onTokenClick={handleTokenClick}
-              />
-            ) : (
-              <Skeleton.AssetSelector
-                onClose={() => setAssetSelectorOpen(false)}
-              />
+          )}
+          <LoadingSwap
+            open={txBroadcasting}
+            setOpen={setTxBroadcasting}
+            toToken={toToken!}
+            fromToken={fromToken!}
+          />
+          <Box>
+            {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <SwapContainer
+                  onOptionsClick={() => setOptionsOpen(true)}
+                  onSwapTokensClick={() => {
+                    setTokenAmounts((prevAmounts) => [
+                      prevAmounts[1],
+                      prevAmounts[0],
+                    ]);
+                    setFromToken(toToken);
+                    setToToken(fromToken);
+                  }}
+                  fromTokenValue={tokenAmounts[0].toString()}
+                  toTokenValue={tokenAmounts[1].toString()}
+                  fromToken={fromToken}
+                  toToken={toToken}
+                  onTokenSelectorClick={(isFromToken: boolean) =>
+                    handleSelectorOpen(isFromToken)
+                  }
+                  onSwapButtonClick={() => doSwap()}
+                  onInputChange={(isFrom: boolean, value: string) => {
+                    setTokenAmounts((prevAmounts) =>
+                      isFrom
+                        ? [Number(value), 0]
+                        : [prevAmounts[0], Number(value)]
+                    );
+                  }}
+                  exchangeRate={exchangeRate}
+                  networkFee={networkFee}
+                  route={swapRoute}
+                  loadingSimulate={loadingSimulate}
+                  estSellPrice={"TODO"}
+                  minSellPrice={"TODO"}
+                  slippageTolerance={`${maxSpread}%`}
+                  swapButtonDisabled={
+                    tokenAmounts[0] <= 0 ||
+                    storePersist.wallet.address === undefined
+                  }
+                  trustlineButtonActive={trustlineButtonActive}
+                  trustlineAssetName={trustlineTokenName}
+                  trustlineButtonDisabled={trustlineAssetAmount < 0.5}
+                  onTrustlineButtonClick={() => addTrustLine()}
+                />
+              </motion.div>
             )}
-          </motion.div>
-        )}
-      </Box>
-    </Box>
+            {optionsOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <SlippageSettings
+                  options={["1%", "3%", "5%"]}
+                  selectedOption={maxSpread}
+                  onClose={() => setOptionsOpen(false)}
+                  onChange={(option: string) => setMaxSpread(Number(option))}
+                />
+              </motion.div>
+            )}
+            {assetSelectorOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                {tokens.length > 0 ? (
+                  <AssetSelector
+                    tokens={tokens}
+                    tokensAll={tokens}
+                    onClose={() => setAssetSelectorOpen(false)}
+                    onTokenClick={handleTokenClick}
+                  />
+                ) : (
+                  <Skeleton.AssetSelector
+                    onClose={() => setAssetSelectorOpen(false)}
+                  />
+                )}
+              </motion.div>
+            )}
+          </Box>
+        </Box>
+      )}
+    </>
   );
 }

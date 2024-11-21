@@ -232,6 +232,9 @@ export default function Page() {
         mt: { xs: "4.5rem", md: 0 },
       }}
     >
+      {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
+      <input type="hidden" value="Phoenix DeFi Hub - Transaction History" />
+
       <Typography
         sx={{
           color: "#FFF",

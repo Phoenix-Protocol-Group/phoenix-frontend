@@ -187,9 +187,8 @@ export default function Page() {
 
   return (
     <Box sx={{ marginTop: { md: 0, xs: 12 } }}>
-      <Head>
-        <title>Phoenix DeFi Hub - Dashboard</title>
-      </Head>
+      {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
+      <input type="hidden" value="Phoenix DeFi Hub - Dashboard" />
 
       {/* Anchor Services */}
       {anchors.length > 0 && (

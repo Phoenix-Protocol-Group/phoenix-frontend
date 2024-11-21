@@ -54,11 +54,9 @@ const GlowingChart = ({
             >
               <feGaussianBlur stdDeviation="2" result="blur1" opacity={0} />
               <feGaussianBlur stdDeviation="4" result="blur2" />
-
               <feMerge>
                 <feMergeNode in="blur1" />
                 <feMergeNode in="blur2" />
-
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>

@@ -208,16 +208,16 @@ export default function Page() {
   // Render: conditionally display skeleton loader or pool data
   return loading ? (
     <Box sx={{ mt: { xs: 12, md: 0 } }}>
-      <Head>
-        <title>Phoenix DeFi Hub - Pools Overview</title>
-      </Head>
+      {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
+      <input type="hidden" value="Phoenix DeFi Hub - Pools Overview" />
+
       <Skeleton.Pools />
     </Box>
   ) : (
     <Box sx={{ mt: { xs: 12, md: 0 }, width: "100%" }}>
-      <Head>
-        <title>Phoenix DeFi Hub - Pools Overview</title>
-      </Head>
+      {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
+      <input type="hidden" value="Phoenix DeFi Hub - Pools Overview" />
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

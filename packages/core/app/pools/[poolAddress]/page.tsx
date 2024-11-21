@@ -566,9 +566,8 @@ export default function Page(props: PoolPageProps) {
   }
   return (
     <Box sx={{ mt: { xs: 12, md: 0 } }}>
-      <Head>
-        <title>{`Phoenix DeFi Hub - ${tokenA?.name} / ${tokenB?.name}`}</title>
-      </Head>
+      {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
+      <input type="hidden" value={`Phoenix DeFi Hub - Pool`} />
       {overviewStyles}
       {loading && <Loading open={loading} setOpen={setLoading} />}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>

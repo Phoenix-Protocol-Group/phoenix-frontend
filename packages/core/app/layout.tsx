@@ -20,6 +20,22 @@ import { Analytics } from "@vercel/analytics/react";
 import { motion } from "framer-motion";
 import { ToastProvider } from "@/providers/ToastProvider";
 
+const HiddenInputChecker = () => {
+  const [value, setValue] = useState("Phoenix DeFi Hub");
+  const pathName = usePathname();
+
+  useEffect(() => {
+    const hiddenInput = document.querySelector(
+      'input[type="hidden"]'
+    ) as HTMLInputElement;
+    if (hiddenInput) {
+      setValue(hiddenInput.value);
+    }
+  }, [pathName]);
+
+  return <title>{value}</title>;
+};
+
 /**
  * RootLayout Component
  * The main layout for the application, wrapping all child components with necessary providers,
@@ -144,6 +160,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Additional tags for responsiveness and browser compatibility */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <HiddenInputChecker />
       </head>
       {/* Wrap components with Providers for context availability */}
       <Providers>
