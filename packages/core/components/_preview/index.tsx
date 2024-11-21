@@ -3,7 +3,7 @@ import { Box, Grid, Typography } from "@mui/material";
 
 const NftPreview = (props: any) => {
   return (
-    <Box sx={{ position: "relative", overflow: "hidden" }}>
+    <Box sx={{ position: "relative", overflow: "hidden", borderRadius: "8px" }}>
       {/* Greyed-Out Overlay */}
       <Box
         sx={{
@@ -183,9 +183,9 @@ const NftCarouselPlaceholder = () => {
           <NftPreview
             image={"/nft/1.png"}
             collectionName={"Collection Name"}
-            nftName={"On the Rise!"}
-            ownedBy={"1ug4...x6uh"}
-            price={"100 PHO"}
+            nftName={"Phoenix!"}
+            ownedBy={"GCNP...WPHO"}
+            price={"69.0k"}
           />
         </Grid>
         <Grid item xs={4}>
@@ -193,17 +193,17 @@ const NftCarouselPlaceholder = () => {
             image={"/nft/2.png"}
             collectionName={"Collection Name"}
             nftName={"On the Rise!"}
-            ownedBy={"1ug4...x6uh"}
-            price={"150 PHO"}
+            ownedBy={"GCNP...WPHO"}
+            price={"420.69k"}
           />
         </Grid>
         <Grid item xs={4}>
           <NftPreview
             image={"/nft/3.png"}
             collectionName={"Collection Name"}
-            nftName={"On the Rise!"}
-            ownedBy={"1ug4...x6uh"}
-            price={"200 PHO"}
+            nftName={"We flyin' high!"}
+            ownedBy={"GCNP...WPHO"}
+            price={"13.37"}
           />
         </Grid>
       </Grid>
