@@ -37,6 +37,7 @@ export default function Page() {
   const [allPools, setAllPools] = useState<Pool[]>([]); // State to hold pool data
   const storePersist = usePersistStore(); // Persisted state
   const [poolFilter, setPoolFilter] = useState<PoolsFilter>("ALL");
+  const [sortBy, setSortBy] = useState<string>("HighAPR");
   const isInitialMount = useRef(true); // To track the initial component mount
 
   /**
@@ -226,7 +227,8 @@ export default function Page() {
         <Pools
           pools={allPools}
           filter={poolFilter}
-          sort="HighAPR"
+          //@ts-ignore
+          sort={sortBy}
           onAddLiquidityClick={() => {}}
           onShowDetailsClick={(pool) => {
             router.push(`/pools/${pool.poolAddress}`);
@@ -234,7 +236,9 @@ export default function Page() {
           onFilterClick={(by: string) => {
             setPoolFilter(by as PoolsFilter);
           }}
-          onSortSelect={() => {}}
+          onSortSelect={(by) => {
+            setSortBy(by);
+          }}
         />
       </motion.div>
     </Box>

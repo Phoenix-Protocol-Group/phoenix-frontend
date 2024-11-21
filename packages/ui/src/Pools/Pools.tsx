@@ -115,8 +115,9 @@ const PoolItem = React.memo(
               width: "120px",
               height: "120px",
               opacity: 0.1,
-              background: `url(${pool.tokens[0].icon}) center / contain no-repeat`,
+              background: `url(${pool.tokens[0].icon}) center / cover no-repeat`,
               filter: "grayscale(100%)",
+              borderRadius: "50%",
             }}
           />
           <Box
@@ -127,8 +128,9 @@ const PoolItem = React.memo(
               width: "120px",
               height: "120px",
               opacity: 0.1,
-              background: `url(${pool.tokens[1].icon}) center / contain no-repeat`,
+              background: `url(${pool.tokens[1].icon}) center / cover no-repeat`,
               filter: "grayscale(100%)",
+              borderRadius: "50%",
             }}
           />
 
@@ -159,7 +161,7 @@ const PoolItem = React.memo(
                 sx={{
                   width: "28px",
                   height: "28px",
-                  borderRadius: "4px",
+                  borderRadius: "50%",
                   background: `url(${pool.tokens[0].icon}) transparent 50% / cover no-repeat`,
                 }}
               />
@@ -190,7 +192,7 @@ const PoolItem = React.memo(
                 sx={{
                   width: "28px",
                   height: "28px",
-                  borderRadius: "4px",
+                  borderRadius: "50%",
                   background: `url(${pool.tokens[1].icon}) transparent 50% / cover no-repeat`,
                 }}
               />
@@ -304,28 +306,25 @@ const Pools = ({
     );
 
     // Sort pools based on the selected sorting criteria
+    const sortedPools = [...filteredPools];
     switch (sort) {
       case "HighTVL":
-        filteredPools.sort((a, b) => parseFloat(b.tvl) - parseFloat(a.tvl));
+        sortedPools.sort((a, b) => parseFloat(b.tvl) - parseFloat(a.tvl));
         break;
       case "LowTVL":
-        filteredPools.sort((a, b) => parseFloat(a.tvl) - parseFloat(b.tvl));
+        sortedPools.sort((a, b) => parseFloat(a.tvl) - parseFloat(b.tvl));
         break;
       case "HighAPR":
-        filteredPools.sort(
-          (a, b) => parseFloat(b.maxApr) - parseFloat(a.maxApr)
-        );
+        sortedPools.sort((a, b) => parseFloat(b.maxApr) - parseFloat(a.maxApr));
         break;
       case "LowAPR":
-        filteredPools.sort(
-          (a, b) => parseFloat(a.maxApr) - parseFloat(b.maxApr)
-        );
+        sortedPools.sort((a, b) => parseFloat(a.maxApr) - parseFloat(b.maxApr));
         break;
       default:
         break;
     }
 
-    return filteredPools;
+    return sortedPools;
   }, [pools, searchValue, filter, sort]);
 
   return (
