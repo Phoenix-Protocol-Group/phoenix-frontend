@@ -107,21 +107,6 @@ const StakingEntry = ({ entry, mobile }: { entry: Entry; mobile: boolean }) => {
             </Typography>
           )}
         </IconButton>
-        <IconButton
-          aria-label="Fix Entry"
-          sx={{
-            background:
-              "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-          }}
-          onClick={entry.onClickFix}
-          component={motion.div}
-          whileHover={{ scale: 1.1 }}
-        >
-          <ConstructionIcon sx={{ height: "20px", width: "20px" }} />
-        </IconButton>
       </Grid>
     </Grid>
   );

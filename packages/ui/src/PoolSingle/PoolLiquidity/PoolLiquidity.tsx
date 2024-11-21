@@ -219,18 +219,6 @@ const LabTabs = ({
           >
             Remove Liquidity
           </Button>
-          <Typography
-            variant="body2"
-            sx={{ textAlign: "center", mt: "0.5rem" }}
-          >
-            Having issues removing liquidity? Click{" "}
-            <span
-              style={{ cursor: "pointer", fontWeight: 600 }}
-              onClick={() => onRemoveLiquidity(Number(tokenCValue), true)}
-            >
-              HERE.
-            </span>
-          </Typography>
         </TabPanel>
       </TabContext>
     </Box>
