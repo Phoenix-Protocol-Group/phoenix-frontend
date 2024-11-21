@@ -66,7 +66,12 @@ export const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
     } catch (error) {
       // Update toast to error
       removeToast(id);
-      addToast((error as Error).message || "Something went wrong.", "error");
+      addToast(
+        (error as Error).message || (error as String).length > 0
+          ? JSON.stringify(error)
+          : "Something went wrong.",
+        "error"
+      );
     }
   };
 
