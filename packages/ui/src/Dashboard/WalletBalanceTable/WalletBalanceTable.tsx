@@ -2,17 +2,15 @@ import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   FormControl,
-  Grid,
-  IconButton,
-  InputAdornment,
   MenuItem,
   Select,
-  Tab,
-  Tabs,
   TextField,
-  Tooltip,
   Typography,
-  useMediaQuery,
+  Tabs,
+  Tab,
+  InputAdornment,
+  Grid,
+  IconButton,
   useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -24,7 +22,8 @@ import {
   ListItemProps,
   WalletBalanceTableProps,
 } from "@phoenix-protocol/types";
-import { HelpCenterOutlined } from "@mui/icons-material";
+import { ArrowRightAlt, HelpCenterOutlined } from "@mui/icons-material";
+import { useMediaQuery } from "@mui/system";
 
 /**
  * Accessibility properties for tabs.
@@ -58,184 +57,184 @@ const FilterAndTabPanel = ({
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+    setCategory(newValue === 0 ? "All" : categories[newValue - 1]);
   };
 
-  if (!isMobile) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          sx={{
-            "& .MuiTab-root.Mui-selected": {
-              fontSize: "1.125rem",
-              fontWeight: 700,
-              color: "white",
-            },
-            "& .MuiTab-root": {
-              marginBottom: "1.5rem",
-            },
-          }}
-          TabIndicatorProps={{
-            style: {
-              background:
-                "linear-gradient(137deg, #E2491A 0%, #E21B1B 17.08%, #E2491A 42.71%, #E2AA1B 100%)",
-            },
-          }}
-        >
-          <Tab
-            label="All Assets"
-            {...a11yProps(0)}
-            onClick={() => setCategory("All")}
-          />
-          {categories.map((cat, index) => (
-            <Tab
-              key={index}
-              label={cat}
-              {...a11yProps(index + 1)}
-              onClick={() => setCategory(cat)}
-            />
-          ))}
-        </Tabs>
-        <Box>
-          <TextField
-            id="search"
-            type="search"
-            value={searchTerm}
-            placeholder="Search"
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        marginBottom: "16px",
+      }}
+    >
+      <Grid container spacing={2} alignItems="center">
+        {/* Title */}
+        <Grid item xs={12} md={2}>
+          <Typography
             sx={{
-              color: "white",
-              "&::placeholder": {
-                color: "white",
-                opacity: 0.6,
-                fontSize: "0.8125rem!important",
-              },
+              color: "var(--Secondary-S2, #FFF)",
+              fontFamily: "Ubuntu",
+              fontSize: "24px",
+              fontStyle: "normal",
+              fontWeight: 700,
+              lineHeight: "normal",
             }}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputLabelProps={{
-              sx: {
-                color: "white!important",
-                fontSize: "0.8125rem",
-                opacity: 0.6,
-                textAlign: "center",
-              },
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-              sx: {
-                color: "white",
-                opacity: 0.6,
-                borderRadius: "16px",
-                "&:hover fieldset": {
-                  border: "1px solid #E2621B!important",
-                },
-                "&:focus-within fieldset, &:focus-visible fieldset": {
-                  border: "2px solid #E2621B!important",
-                  color: "white!important",
-                },
-              },
-            }}
-          />
-          <FormControl sx={{ ml: 1, minWidth: 120 }}>
-            <Select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as "highest" | "lowest")}
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              sx={{ borderRadius: "16px", opacity: 0.6 }}
-            >
-              <MenuItem value={"highest"}>Highest Balance</MenuItem>
-              <MenuItem value={"lowest"}>Lowest Balance</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-      </Box>
-    );
-  } else {
-    return (
-      <Grid container p={0} spacing={1}>
-        <Grid item xs={12}>
-          <FormControl fullWidth>
-            <Select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as string)}
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              sx={{
-                borderRadius: "16px",
-                opacity: 0.6,
-                fontSize: "0.8125rem!important",
-                lineHeight: "1.125rem",
-              }}
-            >
-              <MenuItem value={"All"}>All Assets</MenuItem>
-              {categories.map((cat, index) => (
-                <MenuItem key={index} value={cat}>
-                  {cat}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          >
+            Assets
+          </Typography>
         </Grid>
+
+        {/* Tabs, Search, and Sort */}
         <Grid
           item
           xs={12}
-          mb={2}
+          md={10}
           sx={{
             display: "flex",
+            flexWrap: "nowrap",
+            overflow: "hidden",
+            gap: 2,
           }}
         >
+          {/* Tabs for Filtering */}
+          {isMobile ? (
+            <FormControl fullWidth>
+              <Select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                displayEmpty
+                sx={{
+                  height: "48px",
+                  borderRadius: "16px",
+                  background: "#1D1F21",
+                  border: "1px solid #2D303A",
+                  color: "#FFF",
+                  "& .MuiSelect-select": {
+                    fontSize: "13px",
+                    lineHeight: "18px",
+                    padding: "8px 16px",
+                  },
+                }}
+              >
+                <MenuItem value={"All"}>All</MenuItem>
+                {categories.map((cat, index) => (
+                  <MenuItem key={index} value={cat}>
+                    {cat}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{
+                "& .MuiTab-root.Mui-selected": {
+                  fontSize: "1.125rem",
+                  fontWeight: 700,
+                  color: "white",
+                },
+                "& .MuiTab-root": {
+                  textTransform: "none",
+                  height: "48px",
+                  minHeight: "48px",
+                  lineHeight: "48px",
+                  alignItems: "center",
+                  flexShrink: 0,
+                },
+                maxWidth: "50%",
+              }}
+              TabIndicatorProps={{
+                style: {
+                  background:
+                    "linear-gradient(137deg, #E2491A 0%, #E21B1B 17.08%, #E2491A 42.71%, #E2AA1B 100%)",
+                },
+              }}
+            >
+              <Tab label="All" {...a11yProps(0)} />
+              {categories.map((cat, index) => (
+                <Tab key={index} label={cat} {...a11yProps(index + 1)} />
+              ))}
+            </Tabs>
+          )}
+
+          {/* Search Bar */}
           <TextField
-            id="search"
-            type="search"
-            value={searchTerm}
             placeholder="Search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             sx={{
-              color: "white",
-              width: "100%",
+              flexGrow: 1,
+              minWidth: "180px",
+              height: "48px",
+              borderRadius: "16px",
+              background: "#1D1F21",
+              lineHeight: "18px",
+              fontSize: "13px",
+              "& .MuiOutlinedInput-root": {
+                height: "48px",
+                padding: "0 12px",
+                "& input": {
+                  padding: "12px 0",
+                },
+                "& fieldset": {
+                  borderColor: "transparent",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#E2621B",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#E2621B",
+                },
+              },
+              "& .MuiInputAdornment-root img": {
+                marginRight: "8px",
+              },
               "&::placeholder": {
-                color: "white",
+                color: "#FFF",
                 opacity: 0.6,
-                fontSize: "0.8125rem!important",
-                lineHeight: "1.125rem",
               },
             }}
-            onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon />
+                  <img src="/MagnifyingGlass.svg" alt="search" />
                 </InputAdornment>
               ),
-              sx: {
-                color: "white",
-                opacity: 0.6,
-                width: "100%",
-                borderRadius: "16px",
-                "&:hover fieldset": {
-                  border: "1px solid #E2621B!important",
-                },
-                "&:focus-within fieldset, &:focus-visible fieldset": {
-                  border: "2px solid #E2621B!important",
-                  color: "white!important",
-                },
-              },
             }}
           />
-          <FormControl sx={{ ml: 1, minWidth: 150 }}>
+
+          {/* Sort Dropdown */}
+          <FormControl
+            sx={{
+              minWidth: 150,
+              height: "48px",
+              flexGrow: 0,
+              flexShrink: 1,
+            }}
+          >
             <Select
               value={sort}
               onChange={(e) => setSort(e.target.value as "highest" | "lowest")}
               displayEmpty
               inputProps={{ "aria-label": "Without label" }}
               sx={{
+                height: "48px",
                 borderRadius: "16px",
-                opacity: 0.6,
-                color: "white",
+                background: "#1D1F21",
+                border: "1px solid #2D303A",
+                padding: "0 12px",
+                color: "#FFF",
+                "& .MuiSelect-select": {
+                  fontSize: "13px",
+                  lineHeight: "18px",
+                  height: "48px",
+                  display: "flex",
+                  alignItems: "center",
+                },
               }}
             >
               <MenuItem value={"highest"}>Highest Balance</MenuItem>
@@ -244,8 +243,8 @@ const FilterAndTabPanel = ({
           </FormControl>
         </Grid>
       </Grid>
-    );
-  }
+    </Box>
+  );
 };
 
 /**
@@ -261,7 +260,6 @@ const ListItem = ({
 }: ListItemProps) => {
   const [favorites, setFavorites] = useState<string[]>([]);
 
-  // Sync favorites with localStorage
   useEffect(() => {
     const storedFavorites = JSON.parse(
       localStorage.getItem("favorites") || "[]"
@@ -281,50 +279,58 @@ const ListItem = ({
     >
       <Box
         sx={{
-          borderTop: "1px solid #F0F3F61A",
-          py: "1.3rem",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          p: 2,
+          borderRadius: "8px",
+          background:
+            "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          mb: 2,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box sx={{ maxWidth: "24px" }} component={"img"} src={icon} />
-          <Typography sx={{ fontWeight: 700, fontSize: "1.125rem" }}>
-            {name}
-          </Typography>
-          {name !== "XLM" && (
-            <HelpCenterOutlined
-              sx={{ fontSize: "1.125rem", cursor: "pointer" }}
-              onClick={() => onTokenClick(contractId)}
+        <Grid container alignItems="center" spacing={1}>
+          <Grid item xs={6} md={3} display="flex" alignItems="center">
+            <Box
+              component={"img"}
+              src={icon}
+              sx={{ width: "24px", height: "24px", mr: 2 }}
             />
-          )}
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography sx={{ fontWeight: 700, fontSize: "1.125rem" }}>
-            {amount}
-          </Typography>
-          <Typography sx={{ color: "#808191", ml: "0.5rem" }}>
-            ${(usdValue * amount).toFixed(2)}
-          </Typography>
-          {!favorites.includes(name) ? (
-            <Tooltip title="Add to favorites">
+            <Typography
+              sx={{ color: "#FFF", fontWeight: 700, fontSize: "14px" }}
+            >
+              {name}
+            </Typography>
+            {name !== "XLM" && (
+              <HelpCenterOutlined
+                sx={{ fontSize: "1.125rem", cursor: "pointer", ml: 1 }}
+                onClick={() => onTokenClick(contractId)}
+              />
+            )}
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Typography sx={{ color: "#FFF", fontSize: "14px" }}>
+              {amount}
+            </Typography>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Typography sx={{ color: "#FFF", fontSize: "14px", opacity: 0.6 }}>
+              ${(usdValue * amount).toFixed(2)}
+            </Typography>
+          </Grid>
+          <Grid item xs={6} md={3} display="flex" justifyContent="flex-end">
+            {!favorites.includes(name) ? (
               <IconButton onClick={() => setFavorites([...favorites, name])}>
-                <StarBorderIcon />
+                <StarBorderIcon sx={{ color: "#FFF" }} />
               </IconButton>
-            </Tooltip>
-          ) : (
-            <Tooltip title="Remove from favorites">
+            ) : (
               <IconButton
                 onClick={() =>
                   setFavorites(favorites.filter((f) => f !== name))
                 }
               >
-                <StarIcon />
+                <StarIcon sx={{ color: "#FFF" }} />
               </IconButton>
-            </Tooltip>
-          )}
-        </Box>
+            )}
+          </Grid>
+        </Grid>
       </Box>
     </motion.div>
   );
@@ -351,9 +357,8 @@ const WalletBalanceTable = ({
   );
 
   const theme = useTheme();
-  const largerThanMd = useMediaQuery(theme.breakpoints.up("xl"));
+  const largerThanMd = useMediaQuery(theme.breakpoints.up("md"));
 
-  // Filter, search, and sort tokens
   const filteredTokens = useMemo(() => {
     const filtered = tokens.filter(
       (token) => token.category === category || category === "All"
@@ -373,9 +378,6 @@ const WalletBalanceTable = ({
     <Box
       sx={{
         borderRadius: "24px",
-        p: "1.6rem",
-        background:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
         height: largerThanMd ? "26rem" : "auto",
         mb: { xs: 2, md: 0 },
       }}
@@ -393,7 +395,7 @@ const WalletBalanceTable = ({
       <Box
         sx={{
           overflow: "auto",
-          maxHeight: "19rem",
+          maxHeight: largerThanMd ? "19rem" : "auto",
           mt: { xs: 2, md: 0 },
           "&::-webkit-scrollbar": {
             width: "4px",
@@ -402,6 +404,9 @@ const WalletBalanceTable = ({
             backgroundColor: "#E2491A",
             borderRadius: "8px",
           },
+          // Styles for Firefox
+          scrollbarWidth: "thin", // Thin scrollbar width
+          scrollbarColor: "#E2491A #2C2C31", // Thumb color and track color
         }}
       >
         {filteredTokens.length ? (

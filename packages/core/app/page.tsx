@@ -28,6 +28,7 @@ import {
   AssetInfo,
   GainerOrLooserAsset,
 } from "@phoenix-protocol/types";
+import NftCarouselPlaceholder from "@/components/_preview";
 
 export default function Page() {
   const theme = useTheme();
@@ -183,7 +184,7 @@ export default function Page() {
         />
       )}
 
-      <Grid container spacing={3} sx={{ mt: 4 }}>
+      <Grid container spacing={3} sx={{ mt: 4, maxWidth: 1440 }}>
         {/* Banner */}
         <Grid item xs={12}>
           <motion.div
@@ -227,39 +228,43 @@ export default function Page() {
             </Box>
           </motion.div>
         </Grid>
+        <Grid item container lg={9} spacing={3}>
+          {/* Dashboard Stats */}
+          <Grid item xs={12}>
+            {loadingDashboard ? (
+              <Skeleton.DashboardStats />
+            ) : (
+              <DashboardStats {...args.dashboardStatsArgs} />
+            )}
+          </Grid>
 
-        {/* Dashboard Stats */}
-        <Grid item xs={12} lg={6}>
-          {loadingDashboard ? (
-            <Skeleton.DashboardStats />
-          ) : (
-            <DashboardStats {...args.dashboardStatsArgs} />
-          )}
-        </Grid>
+          {/* Price Charts */}
+          <Grid item xs={12} lg={6}>
+            <DashboardPriceCharts {...args.dashboardArgs1} />
+          </Grid>
+          <Grid item xs={12} lg={6}>
+            <DashboardPriceCharts {...args.dashboardArgs2} />
+          </Grid>
 
-        {/* Price Charts */}
-        <Grid item xs={6} md={4} lg={3}>
-          <DashboardPriceCharts {...args.dashboardArgs1} />
+          {/* Wallet Balance Table */}
+          <Grid item xs={12} sx={{ mt: 3 }}>
+            {loadingBalances ? (
+              <Skeleton.WalletBalanceTable />
+            ) : (
+              <WalletBalanceTable {...args.walletBalanceArgs} />
+            )}
+          </Grid>
+          <Grid item xs={12}>
+            <NftCarouselPlaceholder />
+          </Grid>
         </Grid>
-        <Grid item xs={6} md={4} lg={3}>
-          <DashboardPriceCharts {...args.dashboardArgs2} />
-        </Grid>
-
-        {/* Crypto CTA */}
-        <Grid item xs={12} md={4}>
-          <CryptoCTA onClick={() => window.open("https://app.kado.money")} />
-        </Grid>
-
-        {/* Wallet Balance Table */}
-        <Grid item xs={12} md={8}>
-          {loadingBalances ? (
-            <Skeleton.WalletBalanceTable />
-          ) : (
-            <WalletBalanceTable {...args.walletBalanceArgs} />
-          )}
+        <Grid item container lg={3} spacing={3}>
+          {/* Crypto CTA */}
+          <Grid item xs={12}>
+            <CryptoCTA onClick={() => window.open("https://app.kado.money")} />
+          </Grid>
         </Grid>
       </Grid>
-
       {/* Asset Info Modal */}
       {selectedTokenForInfo && (
         <AssetInfoModal

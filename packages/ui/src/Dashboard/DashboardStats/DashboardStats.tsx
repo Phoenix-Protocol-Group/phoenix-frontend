@@ -5,6 +5,8 @@ import {
   DashboardStatsProps,
   GainerOrLooserAsset,
 } from "@phoenix-protocol/types";
+import Image from "next/image";
+import { ArrowUpward } from "@mui/icons-material";
 
 /**
  * GainerAndLooser
@@ -29,117 +31,139 @@ const GainerAndLooser = ({
   >
     <Box
       sx={{
-        borderRadius: "12px",
-        padding: "1.5rem",
-        background:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        backdropFilter: "blur(42px)",
         display: "flex",
+        padding: "24px",
         flexDirection: "column",
-        justifyContent: "space-between",
-        height: "100%",
+        alignItems: "flex-start",
+        gap: "12px",
+        position: "relative",
+        borderRadius: "12px",
+        border: "1px solid var(--Secondary-S4, #2C2C31)",
+        background:
+          "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+        overflow: "hidden",
       }}
     >
-      <Typography
-        sx={{
-          fontSize: "1rem",
-          fontWeight: 600,
-          color: "#FFFFFF",
-          opacity: 0.9,
-          mb: "1rem",
-        }}
-      >
-        {title}
-      </Typography>
+      {/* Grey version of the icon as background */}
       <Box
         sx={{
-          display: "flex",
-          alignItems: "center",
-          mb: "1rem",
+          position: "absolute",
+          top: "-10%",
+          right: "-10%",
+          width: "120px",
+          height: "120px",
+          opacity: 0.1,
+          background: `url(${icon}) center / contain no-repeat`,
+          filter: "grayscale(100%)",
         }}
-      >
-        <Box
-          component="img"
-          src={icon}
-          alt={`${name} Icon`}
-          sx={{
-            width: "40px",
-            height: "40px",
-            marginRight: "1rem",
-          }}
-        />
-        <Box>
-          <Typography
-            sx={{
-              fontSize: "1.125rem",
-              fontWeight: 700,
-              color: "#FFFFFF",
-            }}
-          >
-            {name}
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: "0.875rem",
-              fontWeight: 400,
-              color: "rgba(255, 255, 255, 0.7)",
-            }}
-          >
-            {symbol}
-          </Typography>
-        </Box>
-      </Box>
+      />
+
       <Typography
         sx={{
-          fontSize: "2rem",
+          color: "var(--Secondary-S2-2, #BDBEBE)",
+          fontFamily: "Ubuntu",
+          fontSize: "12px",
           fontWeight: 700,
-          color: "#FFFFFF",
+          lineHeight: "140%",
         }}
       >
-        ${price}
+        {title.toUpperCase()}
       </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            width: "32px",
+            height: "32px",
+            padding: "6px",
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: "32px",
+            background:
+              "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+          }}
+        >
+          <Box
+            sx={{
+              width: "20px",
+              height: "20px",
+              flexShrink: 0,
+              borderRadius: "4px",
+              background: `url(${icon}) transparent 50% / cover no-repeat`,
+            }}
+          />
+        </Box>
+        <Typography
+          sx={{
+            color: "var(--Secondary-S2, #FFF)",
+            fontFamily: "Ubuntu",
+            fontSize: "14px",
+            fontWeight: 700,
+          }}
+        >
+          {name}
+        </Typography>
+        <Typography
+          sx={{
+            color: "var(--Secondary-S2-2, #BDBEBE)",
+            fontFamily: "Ubuntu",
+            fontSize: "12px",
+            fontWeight: 300,
+            lineHeight: "140%",
+          }}
+        >
+          {symbol}
+        </Typography>
+      </Box>
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
           alignItems: "center",
-          marginTop: "1rem",
+          justifyContent: "space-between",
+          width: "100%",
+          gap: 1,
         }}
       >
         <Typography
           sx={{
-            fontSize: "0.875rem",
-            fontWeight: 500,
-            color: "rgba(255, 255, 255, 0.6)",
+            color: "var(--Secondary-S2, #FFF)",
+            fontFamily: "Ubuntu",
+            fontSize: "24px",
+            fontWeight: 700,
           }}
         >
-          Change (24h)
+          {price}
         </Typography>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            color: change > 0 ? "#5BFF22" : "#FF2255",
+            gap: "8px",
+            color: change > 0 ? "#4CAF50" : "#F44336",
           }}
         >
           <Box
-            component="img"
-            src={change > 0 ? "/green-arrow.svg" : "/red-arrow.svg"}
-            alt="Change Arrow"
+            component="span"
             sx={{
               width: "16px",
               height: "16px",
-              marginRight: "0.5rem",
-              transform: change > 0 ? "none" : "rotate(180deg)",
-            }}
-          />
-          <Typography
-            sx={{
-              fontSize: "1rem",
-              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transform: change > 0 ? "rotate(0deg)" : "rotate(180deg)",
             }}
           >
-            {change}%
+            {/* Arrow Icon (up or down) */}
+            <ArrowUpward sx={{ fontSize: "inherit" }} />
+          </Box>
+          <Typography
+            sx={{
+              fontFamily: "Ubuntu",
+              fontSize: "16px",
+              fontWeight: 700,
+            }}
+          >
+            {change > 0 ? `+${change}` : change}%
           </Typography>
         </Box>
       </Box>
@@ -156,28 +180,14 @@ const GainerAndLooser = ({
  */
 const DashboardStats = ({ gainer, loser }: DashboardStatsProps) => {
   return (
-    <Box
-      sx={{
-        background:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        borderRadius: "16px",
-        padding: "2rem",
-        display: "flex",
-        justifyContent: "space-between",
-        gap: "1rem",
-        overflow: "hidden",
-        height: "100%",
-      }}
-    >
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
-          <GainerAndLooser title="Top Gainer" asset={gainer} />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <GainerAndLooser title="Top Loser" asset={loser} />
-        </Grid>
+    <Grid container spacing={3}>
+      <Grid item xs={12} sm={6}>
+        <GainerAndLooser title="Top Gainer (24h)" asset={gainer} />
       </Grid>
-    </Box>
+      <Grid item xs={12} sm={6}>
+        <GainerAndLooser title="Top Loser (24h)" asset={loser} />
+      </Grid>
+    </Grid>
   );
 };
 
