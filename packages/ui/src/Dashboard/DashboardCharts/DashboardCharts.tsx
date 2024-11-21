@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useRef } from "react";
 import { Box, Typography, useTheme, Skeleton } from "@mui/material";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import { AreaChart, Area, YAxis, ResponsiveContainer } from "recharts";
 import {
   DashboardChartsProps,
@@ -13,6 +13,7 @@ import { ArrowUpward } from "@mui/icons-material";
  * A modern, glowing area chart visualization with a strong neon effect on the stroke.
  * @param {Object} props - The component props
  * @param {Data[]} props.data - The chart data
+ * @param {boolean} props.loading - Loading state for the chart
  * @returns {JSX.Element}
  */
 const GlowingChart = ({
@@ -24,7 +25,7 @@ const GlowingChart = ({
 }) => (
   <Box
     sx={{
-      ".recharts-surface": {
+      ".recharts-surface, .recharts-wrapper": {
         overflow: "visible !important",
       },
     }}
@@ -51,9 +52,9 @@ const GlowingChart = ({
               width="200%"
               height="300%"
             >
-              <feGaussianBlur stdDeviation="6" result="blur1" opacity={0} />
-              <feGaussianBlur stdDeviation="10" result="blur2" />
-              <feGaussianBlur stdDeviation="14" result="blur3" />
+              <feGaussianBlur stdDeviation="2" result="blur1" opacity={0} />
+              <feGaussianBlur stdDeviation="4" result="blur2" />
+              <feGaussianBlur stdDeviation="7" result="blur3" />
               <feMerge>
                 <feMergeNode in="blur1" />
                 <feMergeNode in="blur2" />
@@ -94,6 +95,8 @@ const DashboardPriceCharts = ({
   assetName,
 }: DashboardChartsProps) => {
   const theme = useTheme();
+  const controls = useAnimation();
+  const chartRef = useRef(null);
 
   const isLoading = !data || !data.length;
 
@@ -107,11 +110,31 @@ const DashboardPriceCharts = ({
     return 0;
   }, [data]);
 
+  // Force a reflow after animation to fix overflow issue
+  useEffect(() => {
+    if (!isLoading) {
+      controls.start({ opacity: 1, y: 0 }).then(() => {
+        setTimeout(() => {
+          if (chartRef.current) {
+            const elements = chartRef.current.querySelectorAll(
+              ".recharts-wrapper, .recharts-surface"
+            );
+            elements.forEach((element) => {
+              element.style.overflow = "visible";
+            });
+            window.dispatchEvent(new Event("resize"));
+          }
+        }, 100);
+      });
+    }
+  }, [isLoading, controls]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={controls}
       transition={{ duration: 0.6, ease: "easeOut" }}
+      ref={chartRef}
     >
       <Box
         sx={{
