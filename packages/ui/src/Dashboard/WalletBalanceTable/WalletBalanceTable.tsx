@@ -71,11 +71,20 @@ const FilterAndTabPanel = ({
         display: "flex",
         flexDirection: "column",
         marginBottom: "16px",
+        gap: isMobile ? 2 : 0, // Add spacing between elements on mobile
+        width: "100%",
+        maxWidth: "100%",
       }}
     >
-      <Grid container spacing={2} alignItems="center">
+      <Grid
+        container
+        spacing={isMobile ? 0 : 2} // No spacing between Grid items on mobile
+        alignItems="center"
+        direction={isMobile ? "column" : "row"} // Stack elements vertically on mobile
+        wrap="nowrap"
+      >
         {/* Title */}
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12}>
           <Typography
             sx={{
               color: "var(--Secondary-S2, #FFF)",
@@ -84,6 +93,7 @@ const FilterAndTabPanel = ({
               fontStyle: "normal",
               fontWeight: 700,
               lineHeight: "normal",
+              textAlign: isMobile ? "center" : "left", // Center title on mobile
             }}
           >
             Assets
@@ -94,12 +104,11 @@ const FilterAndTabPanel = ({
         <Grid
           item
           xs={12}
-          md={10}
           sx={{
             display: "flex",
-            flexWrap: "nowrap",
-            overflow: "hidden",
-            gap: 2,
+            flexDirection: isMobile ? "column" : "row", // Stack elements vertically on mobile
+            gap: 2, // Add spacing between elements
+            width: "100%",
           }}
         >
           {/* Tabs for Filtering */}
@@ -172,8 +181,7 @@ const FilterAndTabPanel = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             sx={{
-              flexGrow: 1,
-              minWidth: "180px",
+              width: "100%",
               height: "48px",
               borderRadius: "16px",
               background: "#1D1F21",
@@ -198,10 +206,6 @@ const FilterAndTabPanel = ({
               "& .MuiInputAdornment-root img": {
                 marginRight: "8px",
               },
-              "&::placeholder": {
-                color: "#FFF",
-                opacity: 0.6,
-              },
             }}
             InputProps={{
               startAdornment: (
@@ -213,14 +217,7 @@ const FilterAndTabPanel = ({
           />
 
           {/* Sort Dropdown */}
-          <FormControl
-            sx={{
-              minWidth: 150,
-              height: "48px",
-              flexGrow: 0,
-              flexShrink: 1,
-            }}
-          >
+          <FormControl fullWidth>
             <Select
               value={sort}
               onChange={(e) => setSort(e.target.value as "highest" | "lowest")}
@@ -231,7 +228,6 @@ const FilterAndTabPanel = ({
                 borderRadius: "16px",
                 background: "#1D1F21",
                 border: "1px solid #2D303A",
-                padding: "0 12px",
                 color: "#FFF",
                 "& .MuiSelect-select": {
                   fontSize: "13px",

@@ -336,7 +336,7 @@ export default function Page() {
               </Typography>
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sx={{ overflow: "hidden" }}>
             <NftCarouselPlaceholder />
           </Grid>
         </Grid>
