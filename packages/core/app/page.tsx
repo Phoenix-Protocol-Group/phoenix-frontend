@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography, CircularProgress } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { motion } from "framer-motion";
 import Head from "next/head";
@@ -12,7 +12,6 @@ import {
   CryptoCTA,
   DashboardPriceCharts,
   DashboardStats,
-  Skeleton,
   WalletBalanceTable,
 } from "@phoenix-protocol/ui";
 import { useRouter } from "next/navigation";
@@ -23,7 +22,7 @@ import {
   formatCurrency,
 } from "@phoenix-protocol/utils";
 import { getAllAnchors } from "@phoenix-protocol/utils/build/sep24";
-import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
+import { useAppStore } from "@phoenix-protocol/state";
 import {
   Anchor,
   AssetInfo,
@@ -67,15 +66,11 @@ export default function Page() {
 
         // Fetch gainer and loser
         const { winner, loser } = await fetchBiggestWinnerAndLoser();
-        console.log("Winner", winner);
         const allTokens = await appStore.getAllTokens();
-        console.log("Winner", winner);
         const gainer = allTokens.find((token) => token.name === winner.symbol);
         const loserAsset = allTokens.find(
           (token) => token.name === loser.symbol
         );
-
-        console.log("Winner", winner);
 
         if (gainer && loserAsset) {
           setGainerAsset({
@@ -256,7 +251,18 @@ export default function Page() {
           {/* Dashboard Stats */}
           <Grid item xs={12}>
             {loadingDashboard ? (
-              <Skeleton.DashboardStats />
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "20px",
+                  backgroundColor: "#1d1f21",
+                  borderRadius: "12px",
+                }}
+              >
+                <CircularProgress sx={{ color: "#E2491A" }} />
+              </Box>
             ) : (
               <DashboardStats {...args.dashboardStatsArgs} />
             )}
@@ -264,18 +270,72 @@ export default function Page() {
 
           {/* Price Charts */}
           <Grid item xs={12} lg={6}>
-            <DashboardPriceCharts {...args.dashboardArgs1} />
+            {loadingDashboard ? (
+              <Box
+                sx={{
+                  height: "200px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#1d1f21",
+                  borderRadius: "12px",
+                }}
+              >
+                <CircularProgress sx={{ color: "#E2491A" }} />
+              </Box>
+            ) : (
+              <DashboardPriceCharts {...args.dashboardArgs1} />
+            )}
           </Grid>
           <Grid item xs={12} lg={6}>
-            <DashboardPriceCharts {...args.dashboardArgs2} />
+            {loadingDashboard ? (
+              <Box
+                sx={{
+                  height: "200px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#1d1f21",
+                  borderRadius: "12px",
+                }}
+              >
+                <CircularProgress sx={{ color: "#E2491A" }} />
+              </Box>
+            ) : (
+              <DashboardPriceCharts {...args.dashboardArgs2} />
+            )}
           </Grid>
 
           {/* Wallet Balance Table */}
           <Grid item xs={12} sx={{ mt: 3 }}>
             {loadingBalances ? (
-              <Skeleton.WalletBalanceTable />
-            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "200px",
+                  backgroundColor: "#1d1f21",
+                  borderRadius: "12px",
+                }}
+              >
+                <CircularProgress sx={{ color: "#E2491A" }} />
+              </Box>
+            ) : allTokens.length ? (
               <WalletBalanceTable {...args.walletBalanceArgs} />
+            ) : (
+              <Typography
+                sx={{
+                  color: "#FFF",
+                  fontSize: "14px",
+                  textAlign: "center",
+                  padding: "20px",
+                  backgroundColor: "#1d1f21",
+                  borderRadius: "12px",
+                }}
+              >
+                Looks like you haven{"'"}t acquired any tokens.
+              </Typography>
             )}
           </Grid>
           <Grid item xs={12}>

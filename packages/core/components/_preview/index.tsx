@@ -179,7 +179,8 @@ const NftCarouselPlaceholder = () => {
         </Box>
       </Box>
       <Grid container spacing={3}>
-        <Grid item xs={4}>
+        {/* Responsive Grid for NFT Previews */}
+        <Grid item xs={12} md={4}>
           <NftPreview
             image={"/nft/1.png"}
             collectionName={"Collection Name"}
@@ -188,7 +189,7 @@ const NftCarouselPlaceholder = () => {
             price={"69.0k"}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} md={4} sx={{ display: { xs: "none", md: "block" } }}>
           <NftPreview
             image={"/nft/2.png"}
             collectionName={"Collection Name"}
@@ -197,7 +198,7 @@ const NftCarouselPlaceholder = () => {
             price={"420.69k"}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} md={4} sx={{ display: { xs: "none", md: "block" } }}>
           <NftPreview
             image={"/nft/3.png"}
             collectionName={"Collection Name"}

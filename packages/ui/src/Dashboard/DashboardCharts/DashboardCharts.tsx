@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, Skeleton } from "@mui/material";
 import { motion } from "framer-motion";
 import { AreaChart, Area, YAxis, ResponsiveContainer } from "recharts";
 import {
@@ -15,41 +15,70 @@ import { ArrowUpward } from "@mui/icons-material";
  * @param {Data[]} props.data - The chart data
  * @returns {JSX.Element}
  */
-const GlowingChart = ({ data }: { data: Data[] }) => (
-  <ResponsiveContainer width="100%" height={100}>
-    <AreaChart
-      data={data}
-      margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-    >
-      <defs>
-        {/* Filter for strong neon glowing effect */}
-        <filter id="neonGlow" x="-100%" y="-100%" width="200%" height="300%">
-          <feGaussianBlur stdDeviation="6" result="blur1" opacity={0} />
-          <feGaussianBlur stdDeviation="10" result="blur2" />
-          <feGaussianBlur stdDeviation="14" result="blur3" />
-          <feMerge>
-            <feMergeNode in="blur1" />
-            <feMergeNode in="blur2" />
-            <feMergeNode in="blur3" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      <YAxis
-        hide={true}
-        domain={[(dataMin: number) => dataMin * 0.9, "dataMax"]}
+const GlowingChart = ({
+  data,
+  loading,
+}: {
+  data?: Data[];
+  loading: boolean;
+}) => (
+  <Box
+    sx={{
+      ".recharts-surface": {
+        overflow: "visible !important",
+      },
+    }}
+  >
+    {loading ? (
+      <Skeleton
+        variant="rectangular"
+        width="100%"
+        height={100}
+        sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
       />
-      <Area
-        type="monotone"
-        dataKey={(entry) => entry[1]}
-        stroke="#E2491A"
-        strokeWidth={3}
-        isAnimationActive={true}
-        fill="none"
-        filter="url(#neonGlow)"
-      />
-    </AreaChart>
-  </ResponsiveContainer>
+    ) : (
+      <ResponsiveContainer width="100%" height={100}>
+        <AreaChart
+          data={data}
+          margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+        >
+          <defs>
+            {/* Filter for strong neon glowing effect */}
+            <filter
+              id="neonGlow"
+              x="-100%"
+              y="-100%"
+              width="200%"
+              height="300%"
+            >
+              <feGaussianBlur stdDeviation="6" result="blur1" opacity={0} />
+              <feGaussianBlur stdDeviation="10" result="blur2" />
+              <feGaussianBlur stdDeviation="14" result="blur3" />
+              <feMerge>
+                <feMergeNode in="blur1" />
+                <feMergeNode in="blur2" />
+                <feMergeNode in="blur3" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <YAxis
+            hide={true}
+            domain={[(dataMin: number) => dataMin * 0.9, "dataMax"]}
+          />
+          <Area
+            type="monotone"
+            dataKey={(entry) => entry[1]}
+            stroke="#E2491A"
+            strokeWidth={3}
+            isAnimationActive={true}
+            fill="none"
+            filter="url(#neonGlow)"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    )}
+  </Box>
 );
 
 /**
@@ -66,9 +95,11 @@ const DashboardPriceCharts = ({
 }: DashboardChartsProps) => {
   const theme = useTheme();
 
+  const isLoading = !data || !data.length;
+
   // Calculate percentage change and memoize the result for performance
   const differencePercent = useMemo(() => {
-    if (data.length) {
+    if (data?.length) {
       const startPrice = data[0][1];
       const endPrice = data[data.length - 1][1];
       return ((endPrice - startPrice) / startPrice) * 100;
@@ -105,64 +136,94 @@ const DashboardPriceCharts = ({
             paddingRight: "24px",
           }}
         >
-          <Typography
-            sx={{
-              color: "var(--Secondary-S2-2, #BDBEBE)",
-              fontFamily: "Ubuntu",
-              fontSize: "12px",
-              fontWeight: 700,
-              lineHeight: "140%",
-            }}
-          >
-            {assetName.toUpperCase()}
-          </Typography>
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1, mt: "8px" }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                width: "32px",
-                height: "32px",
-                padding: "6px",
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: "32px",
-                background:
-                  "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
-              }}
-            >
-              <Box
-                sx={{
-                  width: "20px",
-                  height: "20px",
-                  flexShrink: 0,
-                  borderRadius: "4px",
-                  background: `url(${icon.small}) transparent 50% / cover no-repeat`,
-                }}
-              />
-            </Box>
-            <Typography
-              sx={{
-                color: "var(--Secondary-S2, #FFF)",
-                fontFamily: "Ubuntu",
-                fontSize: "14px",
-                fontWeight: 700,
-              }}
-            >
-              {assetName}
-            </Typography>
+          {isLoading ? (
+            <Skeleton
+              variant="text"
+              width={80}
+              height={24}
+              sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
+            />
+          ) : (
             <Typography
               sx={{
                 color: "var(--Secondary-S2-2, #BDBEBE)",
                 fontFamily: "Ubuntu",
                 fontSize: "12px",
-                fontWeight: 300,
+                fontWeight: 700,
                 lineHeight: "140%",
               }}
             >
-              XML
+              {assetName?.toUpperCase()}
             </Typography>
+          )}
+          <Box
+            sx={{ display: "flex", alignItems: "center", gap: 1, mt: "8px" }}
+          >
+            {isLoading ? (
+              <>
+                <Skeleton
+                  variant="circular"
+                  width={32}
+                  height={32}
+                  sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
+                />
+                <Skeleton
+                  variant="text"
+                  width={100}
+                  height={24}
+                  sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
+                />
+              </>
+            ) : (
+              <>
+                <Box
+                  sx={{
+                    display: "flex",
+                    width: "32px",
+                    height: "32px",
+                    padding: "6px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderRadius: "32px",
+                    background:
+                      "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: "20px",
+                      height: "20px",
+                      flexShrink: 0,
+                      borderRadius: "4px",
+                      background: `url(${
+                        icon?.small || ""
+                      }) transparent 50% / cover no-repeat`,
+                    }}
+                  />
+                </Box>
+                <Typography
+                  sx={{
+                    color: "var(--Secondary-S2, #FFF)",
+                    fontFamily: "Ubuntu",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                  }}
+                >
+                  {assetName}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: "var(--Secondary-S2-2, #BDBEBE)",
+                    fontFamily: "Ubuntu",
+                    fontSize: "12px",
+                    fontWeight: 300,
+                    lineHeight: "140%",
+                  }}
+                >
+                  XML
+                </Typography>
+              </>
+            )}
           </Box>
           <Box
             sx={{
@@ -173,42 +234,57 @@ const DashboardPriceCharts = ({
               mt: "16px",
             }}
           >
-            <Typography
-              sx={{
-                color: "var(--Secondary-S2, #FFF)",
-                fontFamily: "Ubuntu",
-                fontSize: "24px",
-                fontWeight: 700,
-              }}
-            >
-              ${" "}
-              {data.length ? data[data.length - 1][1].toLocaleString() : "0.00"}
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                ml: "16px",
-                color: differencePercent >= 0 ? "#5BFF22" : "#F22",
-              }}
-            >
-              <ArrowUpward
-                sx={{
-                  fontSize: "16px",
-                  transform:
-                    differencePercent >= 0 ? "rotate(0deg)" : "rotate(180deg)",
-                }}
+            {isLoading ? (
+              <Skeleton
+                variant="text"
+                width={80}
+                height={36}
+                sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
               />
-              <Typography
-                sx={{
-                  fontSize: "16px",
-                  fontWeight: 700,
-                }}
-              >
-                {differencePercent.toFixed(2)}%
-              </Typography>
-            </Box>
+            ) : (
+              <>
+                <Typography
+                  sx={{
+                    color: "var(--Secondary-S2, #FFF)",
+                    fontFamily: "Ubuntu",
+                    fontSize: "24px",
+                    fontWeight: 700,
+                  }}
+                >
+                  ${" "}
+                  {data.length
+                    ? data[data.length - 1][1].toLocaleString()
+                    : "0.00"}
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    ml: "16px",
+                    color: differencePercent >= 0 ? "#5BFF22" : "#F22",
+                  }}
+                >
+                  <ArrowUpward
+                    sx={{
+                      fontSize: "16px",
+                      transform:
+                        differencePercent >= 0
+                          ? "rotate(0deg)"
+                          : "rotate(180deg)",
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontSize: "16px",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {differencePercent.toFixed(2)}%
+                  </Typography>
+                </Box>
+              </>
+            )}
           </Box>
         </Box>
 
@@ -220,7 +296,7 @@ const DashboardPriceCharts = ({
             overflow: "visible",
           }}
         >
-          <GlowingChart data={data} />
+          <GlowingChart data={data} loading={isLoading} />
         </Box>
       </Box>
     </motion.div>
