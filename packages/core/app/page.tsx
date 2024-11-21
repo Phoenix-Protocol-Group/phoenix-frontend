@@ -17,6 +17,7 @@ import {
 } from "@phoenix-protocol/ui";
 import { useRouter } from "next/navigation";
 import {
+  constants,
   fetchBiggestWinnerAndLoser,
   fetchHistoricalPrices,
   formatCurrency,
@@ -29,6 +30,7 @@ import {
   GainerOrLooserAsset,
 } from "@phoenix-protocol/types";
 import NftCarouselPlaceholder from "@/components/_preview";
+import { SorobanTokenContract } from "@phoenix-protocol/contracts";
 
 export default function Page() {
   const theme = useTheme();
@@ -57,7 +59,6 @@ export default function Page() {
   useEffect(() => {
     const initData = async () => {
       try {
-        console.log(1);
         setLoadingDashboard(true);
 
         // Fetch anchors
@@ -138,12 +139,8 @@ export default function Page() {
       },
       walletBalanceArgs: {
         tokens: allTokens,
-        onTokenClick: (tokenAddress: string) => {
-          const token = allTokens.find((t) => t.contractId === tokenAddress);
-          if (token) {
-            setSelectedTokenForInfo(token);
-            setTokenInfoOpen(true);
-          }
+        onTokenClick: (token: string) => {
+          fetchTokenInfo(token);
         },
       },
       dashboardArgs1: {
@@ -165,6 +162,33 @@ export default function Page() {
     }),
     [gainerAsset, loserAsset, allTokens, xlmPriceChart, phoPriceChart]
   );
+
+  const fetchTokenInfo = async (tokenId: string) => {
+    const TokenContract = new SorobanTokenContract.Client({
+      contractId: tokenId,
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
+      rpcUrl: constants.RPC_URL,
+    });
+    const tokenName = (await TokenContract.name()).result
+      .toLowerCase()
+      .replace(":", "-");
+
+    const fetchedInfo = await (
+      await fetch(
+        `https://api.stellar.expert/explorer/public/asset?search=${tokenName}`
+      )
+    ).json();
+
+    const info = fetchedInfo._embedded.records.find(
+      (el: any) =>
+        el.asset === tokenName.toUpperCase() ||
+        el.asset === tokenName.toUpperCase() + "-1" ||
+        el.asset === tokenName.toUpperCase() + "-2"
+    );
+
+    setSelectedTokenForInfo(info);
+    setTokenInfoOpen(true);
+  };
 
   return (
     <Box sx={{ marginTop: { md: 0, xs: 12 } }}>

@@ -48,12 +48,10 @@ export const Primary: Story = {
       tomlInfo: {
         code: "PHO",
         issuer: "GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
-        image:
-          "https://ipfs.io/ipfs/bafkreickzvyqn4crixpgj2wcvpellmcw63575ic7wphsqikkjgoaxmxmuu",
+        image: "/cryptoIcons/pho.svg",
         decimals: 7,
         orgName: "Phoenix Protocol Group",
-        orgLogo:
-          "https://ipfs.io/ipfs/bafkreickzvyqn4crixpgj2wcvpellmcw63575ic7wphsqikkjgoaxmxmuu",
+        orgLogo: "/cryptoIcons/pho.svg",
       },
       paging_token: 1,
     },
