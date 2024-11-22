@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useMemo } from "react";
 import {
   Box,
-  Button as MuiButton,
   Divider,
   Grid,
   Typography,
+  Button as MuiButton,
 } from "@mui/material";
 import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
 import TabPanel from "@mui/lab/TabPanel";
@@ -16,54 +16,46 @@ import { motion } from "framer-motion";
 
 /**
  * GlowingChart Component
- *
- * @component
- * @param {Object} props - Component properties.
- * @param {number[][]} props.data - Data to be used in the chart.
  */
 const GlowingChart = ({ data }: { data: number[][] }) => (
-  <ResponsiveContainer width="100%" height={200}>
-    <AreaChart
-      data={data}
-      margin={{ top: 0, right: -10, left: -10, bottom: 0 }}
-    >
-      <defs>
-        <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="5%" stopColor="#E2491A" stopOpacity={0.2} />
-          <stop offset="95%" stopColor="#E2491A" stopOpacity={0.02} />
-        </linearGradient>
-      </defs>
-      <YAxis
-        hide={true}
-        dataKey={(v) => v[1]}
-        domain={[(dataMin: number) => dataMin * 0.9, "dataMax"]}
-      />
-      <Area
-        type="monotone"
-        dataKey={(v) => v[1]}
-        stroke="#E2491A"
-        strokeWidth={2}
-        isAnimationActive={true}
-        fillOpacity={1}
-        fill="url(#colorUv)"
-      />
-    </AreaChart>
-  </ResponsiveContainer>
+  <Box sx={{ position: "relative", width: "100%", marginTop: "-1rem" }}>
+    <ResponsiveContainer width="100%" height={200}>
+      <AreaChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+        <defs>
+          <filter id="neonGlow" x="-100%" y="-100%" width="200%" height="300%">
+            <feGaussianBlur stdDeviation="2" result="blur1" />
+            <feGaussianBlur stdDeviation="4" result="blur2" />
+            <feMerge>
+              <feMergeNode in="blur1" />
+              <feMergeNode in="blur2" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#E2491A" stopOpacity={0.2} />
+            <stop offset="95%" stopColor="#E2491A" stopOpacity={0.02} />
+          </linearGradient>
+        </defs>
+        <YAxis
+          hide
+          dataKey={(v) => v[1]}
+          domain={[(dataMin: number) => dataMin * 0.9, "dataMax"]}
+        />
+        <Area
+          type="monotone"
+          dataKey={(v) => v[1]}
+          stroke="#E2491A"
+          strokeWidth={2}
+          filter="url(#neonGlow)"
+          fill="url(#chartFill)"
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  </Box>
 );
 
 /**
  * LabTabs Component
- * Handles Add and Remove liquidity for tokens.
- *
- * @component
- * @param {LabTabProps} props - Component properties.
- * @param {Object} props.tokenA - Token A details.
- * @param {Object} props.tokenB - Token B details.
- * @param {number} props.liquidityA - Liquidity of token A.
- * @param {number} props.liquidityB - Liquidity of token B.
- * @param {Object} props.liquidityToken - Liquidity token details.
- * @param {Function} props.onAddLiquidity - Function to handle adding liquidity.
- * @param {Function} props.onRemoveLiquidity - Function to handle removing liquidity.
  */
 const LabTabs = ({
   tokenA,
@@ -87,8 +79,7 @@ const LabTabs = ({
   const keepRatioA = useCallback(
     (val: string) => {
       setTokenAValue(val);
-      const valB = Number(val) / liquidityRatio;
-      setTokenBValue(valB.toFixed(4));
+      setTokenBValue((Number(val) / liquidityRatio).toFixed(4));
     },
     [liquidityRatio]
   );
@@ -96,126 +87,98 @@ const LabTabs = ({
   const keepRatioB = useCallback(
     (val: string) => {
       setTokenBValue(val);
-      const valA = Number(val) * liquidityRatio;
-      setTokenAValue(valA.toFixed(4));
+      setTokenAValue((Number(val) * liquidityRatio).toFixed(4));
     },
     [liquidityRatio]
   );
 
   const buttonStyles = {
-    display: "flex",
-    height: "2.5rem",
-    padding: "0rem 0.75rem",
-    borderRadius: "0.5rem",
-    textTransform: "none",
-    color: "white",
-    fontWeight: 700,
+    flex: 1,
+    maxWidth: "200px",
+    color: "#FFF",
     fontSize: "0.875rem",
-    background: "none",
-    boxShadow: "none",
-    alignItems: "center",
-    justifyContent: "center",
+    fontWeight: 700,
+    textTransform: "none",
+    borderRadius: "12px",
+    transition: "all 0.3s",
+    backgroundImage:
+      "linear-gradient(95.06deg, rgb(226, 73, 26) 0%, rgb(226, 27, 27) 16.92%, rgb(226, 73, 26) 42.31%, rgb(226, 170, 27) 99.08%)",
     "&:hover": {
-      background: "#37373D",
-      boxShadow: "none",
+      transform: "scale(1.05)",
     },
   };
 
-  const tokenBoxStyles = {
-    width: "100%",
-    maxWidth: "350px",
-    mx: "auto", // Center horizontally
-  };
-
   return (
-    <Box
-      className="liquidity"
-      sx={{ width: "100%", typography: "body1", mt: 2, p: "1.4rem" }}
-    >
+    <Box sx={{ width: "100%", typography: "body1", mt: 2 }}>
       <TabContext value={value}>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
           <MuiButton
-            variant="contained"
             onClick={() => setValue("1")}
             sx={{
               ...buttonStyles,
-              background: value === "1" ? "#37373D" : "none",
-              transition: "all 0.3s ease-in-out",
-              flex: 1,
-              maxWidth: "200px",
+              backgroundImage:
+                value === "1"
+                  ? "linear-gradient(95.06deg, rgb(226, 73, 26) 0%, rgb(226, 27, 27) 16.92%, rgb(226, 73, 26) 42.31%, rgb(226, 170, 27) 99.08%)"
+                  : "none",
+              filter: value === "1" ? "brightness(1.2)" : "brightness(1)",
             }}
-            component={motion.div}
-            whileHover={{ scale: 1.05 }}
           >
-            Add liquidity
+            Add Liquidity
           </MuiButton>
           <MuiButton
-            variant="contained"
             onClick={() => setValue("2")}
             sx={{
               ...buttonStyles,
-              background: value === "2" ? "#37373D" : "none",
-              ml: 1,
-              transition: "all 0.3s ease-in-out",
-              flex: 1,
-              maxWidth: "200px",
+              backgroundImage:
+                value === "2"
+                  ? "linear-gradient(95.06deg, rgb(226, 73, 26) 0%, rgb(226, 27, 27) 16.92%, rgb(226, 73, 26) 42.31%, rgb(226, 170, 27) 99.08%)"
+                  : "none",
+              filter: value === "2" ? "brightness(1.2)" : "brightness(1)",
             }}
-            component={motion.div}
-            whileHover={{ scale: 1.05 }}
           >
-            Remove liquidity
+            Remove Liquidity
           </MuiButton>
         </Box>
-        <TabPanel sx={{ padding: "0", mt: "1rem" }} value="1">
-          <Box sx={tokenBoxStyles}>
+        <TabPanel value="1" sx={{ p: 0, mt: 3 }}>
+          <Box>
             <TokenBox
               value={tokenAValue}
               onChange={(val) => keepRatioA(val)}
               token={tokenA}
-              hideDropdownButton={true}
+              hideDropdownButton
             />
           </Box>
-          <Box sx={{ mt: "0.5rem", ...tokenBoxStyles }}>
+          <Box mt={2}>
             <TokenBox
-              onChange={(val) => keepRatioB(val)}
               value={tokenBValue}
+              onChange={(val) => keepRatioB(val)}
               token={tokenB}
-              hideDropdownButton={true}
+              hideDropdownButton
             />
           </Box>
           <Button
             onClick={() =>
               onAddLiquidity(Number(tokenAValue), Number(tokenBValue))
             }
-            sx={{
-              mt: "2rem",
-              mx: "auto",
-              display: "block",
-              alignItems: "center",
-            }}
             fullWidth
+            sx={{ mt: 3 }}
           >
             Add Liquidity
           </Button>
         </TabPanel>
-        <TabPanel sx={{ padding: "0", mt: "1rem" }} value="2">
-          <Box sx={tokenBoxStyles}>
+        <TabPanel value="2" sx={{ p: 0, mt: 3 }}>
+          <Box>
             <TokenBox
-              onChange={(val) => setTokenCValue(val)}
               value={tokenCValue}
+              onChange={(val) => setTokenCValue(val)}
               token={liquidityToken}
-              hideDropdownButton={true}
+              hideDropdownButton
             />
           </Box>
           <Button
             onClick={() => onRemoveLiquidity(Number(tokenCValue))}
-            sx={{
-              mt: "2rem",
-              mx: "auto",
-              display: "block",
-              alignItems: "center",
-            }}
             fullWidth
+            sx={{ mt: 3 }}
           >
             Remove Liquidity
           </Button>
@@ -227,18 +190,6 @@ const LabTabs = ({
 
 /**
  * PoolLiquidity Component
- * Displays pool information, liquidity stats, and allows users to add or remove liquidity.
- *
- * @component
- * @param {PoolLiquidityProps} props - Component properties.
- * @param {Object} props.tokenA - Token A details.
- * @param {Object} props.tokenB - Token B details.
- * @param {number} props.liquidityA - Liquidity of token A.
- * @param {number} props.liquidityB - Liquidity of token B.
- * @param {Object} props.liquidityToken - Liquidity token details.
- * @param {Array} props.poolHistory - Historical data for the pool.
- * @param {Function} props.onAddLiquidity - Function to handle adding liquidity.
- * @param {Function} props.onRemoveLiquidity - Function to handle removing liquidity.
  */
 const PoolLiquidity = ({
   tokenA,
@@ -253,118 +204,76 @@ const PoolLiquidity = ({
   return (
     <Box
       sx={{
-        borderRadius: "0.5rem",
+        borderRadius: "16px",
         background:
           "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        backdropFilter: "blur(42px)",
+        p: 3,
       }}
-      component={motion.div}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
     >
-      <Box
-        sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-      >
-        <Box sx={{ padding: "1.5rem" }}>
-          <Box
-            sx={{ height: "4rem", width: "4rem" }}
-            component={motion.img}
-            src={tokenA.icon}
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.3 }}
-          />
-          <Box
-            sx={{ ml: -1, height: "4rem", width: "4rem" }}
-            component={motion.img}
-            src={tokenB.icon}
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.3 }}
-          />
-        </Box>
-      </Box>
-      <Divider />
-      <Box>
-        <Typography
-          sx={{
-            p: "1.5rem",
-            opacity: 0.7,
-            fontWeight: 400,
-            fontSize: "0.875rem",
-          }}
-        >
-          Pool liquidity
-        </Typography>
-        <GlowingChart data={poolHistory} />
-        <Grid container>
-          <Grid item xs={4}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "column",
-              }}
-            >
-              <Box>
-                <Typography sx={{ fontSize: "0.875rem", opacity: 0.7 }}>
-                  {tokenA.name}
-                </Typography>
-                <Typography sx={{ fontWeight: 700, fontSize: "1.125rem" }}>
-                  {liquidityA}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={4}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "column",
-              }}
-            >
-              <Box>
-                <Typography sx={{ fontSize: "0.875rem", opacity: 0.7 }}>
-                  {tokenB.name}
-                </Typography>
-                <Typography sx={{ fontWeight: 700, fontSize: "1.125rem" }}>
-                  {liquidityB}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={4}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "column",
-              }}
-            >
-              <Box>
-                <Typography sx={{ fontSize: "0.875rem", opacity: 0.7 }}>
-                  Ratio
-                </Typography>
-                <Typography sx={{ fontWeight: 700, fontSize: "1.125rem" }}>
-                  1:{(liquidityB / liquidityA).toFixed(2)}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-        </Grid>
-        <LabTabs
-          tokenA={tokenA}
-          tokenB={tokenB}
-          liquidityA={liquidityA}
-          liquidityB={liquidityB}
-          liquidityToken={liquidityToken}
-          onAddLiquidity={onAddLiquidity}
-          onRemoveLiquidity={onRemoveLiquidity}
+      <Box display="flex" justifyContent="center" gap={2} mb={3}>
+        <motion.img
+          src={tokenA.icon}
+          alt={tokenA.name}
+          width={48}
+          height={48}
+          whileHover={{ scale: 1.1 }}
+        />
+        <motion.img
+          src={tokenB.icon}
+          alt={tokenB.name}
+          width={48}
+          height={48}
+          whileHover={{ scale: 1.1 }}
         />
       </Box>
+      <Typography
+        sx={{ color: "#FFF", textAlign: "center", fontWeight: 700, mb: 2 }}
+      >
+        Pool Liquidity
+      </Typography>
+      <Divider sx={{ mb: 2, borderColor: "rgba(255,255,255,0.1)" }} />
+      <GlowingChart data={poolHistory} />
+      <Grid container spacing={2} mt={2}>
+        <Grid item xs={4}>
+          <Typography
+            sx={{ color: "#FFF", fontSize: "0.875rem", opacity: 0.7 }}
+          >
+            {tokenA.name}
+          </Typography>
+          <Typography sx={{ color: "#FFF", fontWeight: 700 }}>
+            {liquidityA}
+          </Typography>
+        </Grid>
+        <Grid item xs={4}>
+          <Typography
+            sx={{ color: "#FFF", fontSize: "0.875rem", opacity: 0.7 }}
+          >
+            {tokenB.name}
+          </Typography>
+          <Typography sx={{ color: "#FFF", fontWeight: 700 }}>
+            {liquidityB}
+          </Typography>
+        </Grid>
+        <Grid item xs={4}>
+          <Typography
+            sx={{ color: "#FFF", fontSize: "0.875rem", opacity: 0.7 }}
+          >
+            Ratio
+          </Typography>
+          <Typography sx={{ color: "#FFF", fontWeight: 700 }}>
+            1:{(liquidityB / liquidityA).toFixed(2)}
+          </Typography>
+        </Grid>
+      </Grid>
+      <LabTabs
+        tokenA={tokenA}
+        tokenB={tokenB}
+        liquidityA={liquidityA}
+        liquidityB={liquidityB}
+        liquidityToken={liquidityToken}
+        onAddLiquidity={onAddLiquidity}
+        onRemoveLiquidity={onRemoveLiquidity}
+      />
     </Box>
   );
 };
