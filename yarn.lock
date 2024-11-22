@@ -3743,7 +3743,6 @@ __metadata:
   resolution: "@phoenix-protocol/contracts@workspace:packages/contracts"
   dependencies:
     "@phoenix-protocol/utils": "workspace:^"
-    "@stellar/freighter-api": 1.7.1
     bigint-conversion: 2.4.1
     buffer: 6.0.3
     typescript: 5.0.4
@@ -3787,6 +3786,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/phoenix-frontend@workspace:."
   dependencies:
+    "@stellar/freighter-api": ^3.0.0
     "@stellar/stellar-sdk": 13.0.0
     "@tsconfig/recommended": ^1.0.2
     "@types/jest": ^29.5.2
@@ -4809,14 +4809,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stellar/freighter-api@npm:1.7.1":
-  version: 1.7.1
-  resolution: "@stellar/freighter-api@npm:1.7.1"
-  checksum: 02ff598d67e57bbadf24ab807b61045a8d6bbaa6d82dd25168793716eb960911a3fbbeac9cc59f610336a31d19a41de3fef8dd6a6d02826a241fed1615b36847
-  languageName: node
-  linkType: hard
-
-"@stellar/freighter-api@npm:3.0.0":
+"@stellar/freighter-api@npm:3.0.0, @stellar/freighter-api@npm:^3.0.0":
   version: 3.0.0
   resolution: "@stellar/freighter-api@npm:3.0.0"
   checksum: 218b32066c0c70af7e1bb616e7a42539eba3e79878026c2357917cb07a5790eb9923fd10df78fcd05422b9a6dc12775a8a46303ddd3ebdd51064e076ddd1d8da

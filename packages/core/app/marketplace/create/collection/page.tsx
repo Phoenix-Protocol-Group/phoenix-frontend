@@ -78,8 +78,8 @@ export default function Page() {
         new PhoenixNFTCollectionDeployerContract.Client({
           publicKey: storePersist.wallet.address!,
           contractId: constants.COLLECTION_DEPLOYER_ADDRESS,
-          networkPassphrase: "Test SDF Network ; September 2015",
-          rpcUrl: "https://soroban-testnet.stellar.org",
+          networkPassphrase: constants.NETWORK_PASSPHRASE,
+          rpcUrl: constants.RPC_URL,
           // @ts-ignore
           signTransaction: (tx: string) =>
             storePersist.wallet.walletType === "wallet-connect"
@@ -99,11 +99,11 @@ export default function Page() {
         }
       );
 
-      console.log(tx);
+      console.log("tx", tx);
 
       const res = await tx?.signAndSend();
 
-      console.log(res);
+      console.log("res", res);
 
       if (res.result) {
         const previewImageUrl = await uploadPreviewImage();
