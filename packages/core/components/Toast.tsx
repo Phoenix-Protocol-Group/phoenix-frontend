@@ -102,6 +102,26 @@ export const Toast: FC<ToastProps> = ({
                 fontSize: "0.95rem",
                 lineHeight: 1.5,
                 wordBreak: "break-word",
+                maxHeight: "200px",
+                overflow: "auto",
+                /* Firefox */
+                scrollbarWidth: "thin",
+                scrollbarColor: "#E2491A #1B1B1B",
+
+                /* Chrome, Edge, and Safari */
+                "&::-webkit-scrollbar": {
+                  width: "4px",
+                },
+
+                "&::-webkit-scrollbar-track": {
+                  background:
+                    "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);",
+                },
+
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#E2491A",
+                  borderRadius: "8px",
+                },
               }}
             >
               {message}
