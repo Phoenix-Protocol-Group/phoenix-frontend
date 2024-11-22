@@ -40,7 +40,6 @@ const SlippageSettings = ({
   return (
     <Box
       sx={{
-        maxWidth: "600px",
         width: "100%",
       }}
     >

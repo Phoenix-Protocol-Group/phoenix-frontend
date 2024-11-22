@@ -1,8 +1,10 @@
 "use client";
-import { Box, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import { Helmet } from "react-helmet";
-import "./style.css";
+
+import React, { useState, useEffect, useMemo } from "react";
+import { Box, Grid, Typography, CircularProgress } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { motion } from "framer-motion";
+import Head from "next/head";
 import {
   AnchorServices,
   AssetInfoModal,
@@ -10,140 +12,151 @@ import {
   CryptoCTA,
   DashboardPriceCharts,
   DashboardStats,
-  Skeleton,
   WalletBalanceTable,
 } from "@phoenix-protocol/ui";
-
-import { fetchPho, SorobanTokenContract } from "@phoenix-protocol/contracts";
-
-import { useEffect, useState } from "react";
-import {
-  DepositManager,
-  getAllAnchors,
-} from "@phoenix-protocol/utils/build/sep24";
-import { Anchor, AssetInfo } from "@phoenix-protocol/types";
+import { useRouter } from "next/navigation";
 import {
   constants,
   fetchBiggestWinnerAndLoser,
   fetchHistoricalPrices,
-  fetchTokenPrices,
-  fetchTokenPrices2,
   formatCurrency,
 } from "@phoenix-protocol/utils";
-import { useRouter } from "next/navigation";
+import { getAllAnchors } from "@phoenix-protocol/utils/build/sep24";
+import { useAppStore } from "@phoenix-protocol/state";
+import {
+  Anchor,
+  AssetInfo,
+  GainerOrLooserAsset,
+} from "@phoenix-protocol/types";
+import NftCarouselPlaceholder from "@/components/_preview";
+import { SorobanTokenContract } from "@phoenix-protocol/contracts";
 
 export default function Page() {
   const theme = useTheme();
+  const router = useRouter();
   const appStore = useAppStore();
-  const persistStore = usePersistStore();
-  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
-  const [anchorOpen, setAnchorOpen] = useState(false);
+
+  // State management
   const [anchors, setAnchors] = useState<Anchor[]>([]);
-  const [gainerAsset, setGainerAsset] = useState<any>({});
-  const [loserAsset, setLoserAsset] = useState<any>({});
+  const [anchorOpen, setAnchorOpen] = useState(false);
+  const [gainerAsset, setGainerAsset] = useState<GainerOrLooserAsset>(
+    {} as GainerOrLooserAsset
+  );
+  const [loserAsset, setLoserAsset] = useState<GainerOrLooserAsset>(
+    {} as GainerOrLooserAsset
+  );
   const [allTokens, setAllTokens] = useState<any[]>([]);
-  const [xlmPrice, setXlmPrice] = useState<number>(0);
-  const [xlmPriceChange, setXlmPriceChange] = useState<number>(0);
-  const [usdcPrice, setUsdcPrice] = useState(0);
-  const [disclaimer, setDisclaimer] = useState(true);
-  const [selectedTokenForInfo, setSelectedTokenForInfo] = useState<AssetInfo>();
-  const [tokenInfoOpen, setTokenInfoOpen] = useState<boolean>(false);
   const [xlmPriceChart, setXlmPriceChart] = useState<any[]>([]);
   const [phoPriceChart, setPhoPriceChart] = useState<any[]>([]);
-
-  // Loading states
   const [loadingBalances, setLoadingBalances] = useState(true);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
+  const [selectedTokenForInfo, setSelectedTokenForInfo] =
+    useState<AssetInfo | null>(null);
+  const [tokenInfoOpen, setTokenInfoOpen] = useState(false);
 
-  const authenticate = async (anchor: Anchor) => {
-    const manager = new DepositManager(anchor, persistStore.wallet.address!);
-    const transferServer = await manager.openTransferServer();
-    return true;
-  };
+  // Fetch and initialize data
+  useEffect(() => {
+    const initData = async () => {
+      try {
+        setLoadingDashboard(true);
 
-  const sign = async (anchor: Anchor) => {
-    const manager = new DepositManager(anchor, persistStore.wallet.address!);
-    const transferServer = await manager.openTransferServer();
-    const { depositableAssets: supportedAssets } =
-      await manager.fetchTransferInfos(transferServer);
-    const token = await manager.startSep10Auth(transferServer);
-    await manager.handleDeposit(transferServer, supportedAssets, token);
-    return true;
-  };
+        // Fetch anchors
+        const anchors = await getAllAnchors();
+        setAnchors(anchors);
 
-  const initAnchor = async () => {
-    const allAnchors = await getAllAnchors();
-    setAnchors(allAnchors);
-  };
+        // Fetch gainer and loser
+        const { winner, loser } = await fetchBiggestWinnerAndLoser();
+        const allTokens = await appStore.getAllTokens();
+        const gainer = allTokens.find((token) => token.name === winner.symbol);
+        const loserAsset = allTokens.find(
+          (token) => token.name === loser.symbol
+        );
 
-  const getBiggestGainerAndLoser = async () => {
-    setLoadingDashboard(true);
-    const { winner, loser } = await fetchBiggestWinnerAndLoser();
+        if (gainer && loserAsset) {
+          setGainerAsset({
+            name: gainer.name,
+            symbol: gainer.symbol,
+            price: formatCurrency(
+              "USD",
+              winner.price.toString(),
+              navigator.language
+            ),
+            change: winner.percent_change_24,
+            icon: `/cryptoIcons/${winner.symbol.toLowerCase()}.svg`,
+            volume: "TBD",
+          });
 
-    // Resolve names by fetching all assets
-    const _allTokens = await appStore.getAllTokens();
+          setLoserAsset({
+            name: loserAsset.name,
+            symbol: loserAsset.symbol,
+            price: formatCurrency(
+              "USD",
+              loser.price.toString(),
+              navigator.language
+            ),
+            change: loser.percent_change_24,
+            icon: `/cryptoIcons/${loser.symbol.toLowerCase()}.svg`,
+            volume: "TBD",
+          });
+        }
 
-    const _winner = _allTokens.find((token) => token.name === winner.symbol);
-    const _loser = _allTokens.find((token) => token.name === loser.symbol);
+        // Fetch historical prices
+        const [xlmPrices, phoPrices] = await Promise.all([
+          fetchHistoricalPrices(1440, "XLM", undefined, 20),
+          fetchHistoricalPrices(1440, "PHO", undefined, 20),
+        ]);
 
-    const _gainerAsset = {
-      name: _winner.name,
-      symbol: _winner.name,
-      price: formatCurrency("USD", winner.price.toString(), navigator.language),
-      change: winner.percent_change_24,
-      icon: `/cryptoIcons/${winner.symbol.toLowerCase()}.svg`,
-      volume: "TBD",
+        setXlmPriceChart(xlmPrices);
+        setPhoPriceChart(phoPrices);
+
+        // Load all token balances
+        setAllTokens(allTokens);
+      } catch (error) {
+        console.log("Failed to initialize data:", error);
+      } finally {
+        setLoadingDashboard(false);
+        setLoadingBalances(false);
+      }
     };
 
-    const _loserAsset = {
-      name: _loser.name,
-      symbol: _loser.name,
-      price: formatCurrency("USD", loser.price.toString(), navigator.language),
-      change: loser.percent_change_24,
-      icon: `/cryptoIcons/${loser.symbol.toLowerCase()}.svg`,
-      volume: "TBD",
-    };
-
-    setGainerAsset(_gainerAsset);
-    setLoserAsset(_loserAsset);
-    setLoadingDashboard(false);
-  };
-
-  const loadAllBalances = async () => {
-    setLoadingBalances(true);
-    const _allTokens = await appStore.getAllTokens();
-    setAllTokens(_allTokens);
-    setLoadingBalances(false);
-  };
-
-  useEffect(() => {
-    loadAllBalances();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [persistStore.wallet.address]);
-
-  useEffect(() => {
-    initAnchor();
-    getBiggestGainerAndLoser();
-    getXlmPrice();
+    initData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getXlmPrice = async () => {
-    const price = await fetchTokenPrices("XLM");
-    const price2 = await fetchTokenPrices("USDC");
-    const priceChangeXLM = await fetchTokenPrices2("XLM");
-    const phoPrice = await fetchPho();
-
-    setXlmPrice(price);
-    setUsdcPrice(phoPrice);
-    setXlmPriceChange(priceChangeXLM);
-
-    const xlmPrices = await fetchHistoricalPrices(1440, "XLM", undefined, 20);
-    setXlmPriceChart(xlmPrices);
-
-    const phoPrices = await fetchHistoricalPrices(1440, "PHO", undefined, 20);
-    setPhoPriceChart(phoPrices);
-  };
+  // Memoized props for child components
+  const args = useMemo(
+    () => ({
+      dashboardStatsArgs: {
+        gainer: gainerAsset!,
+        loser: loserAsset!,
+        availableAssets: "$100,000",
+        lockedAssets: "$100,000",
+      },
+      walletBalanceArgs: {
+        tokens: allTokens,
+        onTokenClick: (token: string) => {
+          fetchTokenInfo(token);
+        },
+      },
+      dashboardArgs1: {
+        data: xlmPriceChart,
+        icon: {
+          small: "/image-103.png",
+          large: "/image-stellar.png",
+        },
+        assetName: "XLM",
+      },
+      dashboardArgs2: {
+        data: phoPriceChart,
+        icon: {
+          small: "/cryptoIcons/pho.svg",
+          large: "/pho-bg.png",
+        },
+        assetName: "PHO",
+      },
+    }),
+    [gainerAsset, loserAsset, allTokens, xlmPriceChart, phoPriceChart]
+  );
 
   const fetchTokenInfo = async (tokenId: string) => {
     const TokenContract = new SorobanTokenContract.Client({
@@ -163,219 +176,178 @@ export default function Page() {
 
     const info = fetchedInfo._embedded.records.find(
       (el: any) =>
-        el.asset === tokenName.toUpperCase() ||
-        el.asset === tokenName.toUpperCase() + "-1" ||
-        el.asset === tokenName.toUpperCase() + "-2"
+        el.asset.toUpperCase() === tokenName.toUpperCase() ||
+        el.asset.toUpperCase() === tokenName.toUpperCase() + "-1" ||
+        el.asset.toUpperCase() === tokenName.toUpperCase() + "-2"
     );
-
     setSelectedTokenForInfo(info);
     setTokenInfoOpen(true);
   };
 
-  const args = {
-    mainstatsArgs: {
-      stats: [
-        {
-          title: "Total Assets",
-          value: "$100,000",
-          link: "https://google.com",
-        },
-        {
-          title: "Total Rewards",
-          value: "$100,000",
-          link: "https://google.com",
-        },
-        {
-          title: "Staked Phoenix",
-          value: "$100,000",
-          link: "https://google.com",
-        },
-      ],
-    },
-    dashboardArgs1: {
-      data: xlmPriceChart,
-      icon: {
-        small: "/image-103.png",
-        large: "/image-stellar.png",
-      },
-      assetName: "XLM",
-    },
-    dashboardArgs2: {
-      data: phoPriceChart,
-      icon: {
-        small: "/cryptoIcons/pho.svg",
-        large: "/pho-bg.png",
-      },
-      assetName: "PHO",
-    },
-    walletBalanceArgs: {
-      tokens: allTokens,
-      onTokenClick: (token: string) => {
-        fetchTokenInfo(token);
-      },
-    },
-    dashboardStatsArgs: {
-      gainer: gainerAsset,
-      loser: loserAsset,
-      availableAssets: "$100,000",
-      lockedAssets: "$100,000",
-    },
-  };
-
-  const router = useRouter();
-
   return (
     <Box sx={{ marginTop: { md: 0, xs: 12 } }}>
-      <Helmet>
-        <title>Phoenix DeFi Hub - Dashboard</title>
-      </Helmet>
+      {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
+      <input type="hidden" value="Phoenix DeFi Hub - Dashboard" />
+
+      {/* Anchor Services */}
       {anchors.length > 0 && (
         <AnchorServices
           anchors={anchors}
-          open={anchorOpen}
-          authenticate={(anchor) => authenticate(anchor)}
-          // Wait 2 seconds
-          sign={() => new Promise((resolve) => setTimeout(resolve, 2000))}
-          send={(anchor) => sign(anchor)}
-          setOpen={(open) => setAnchorOpen(open)}
+          open={Boolean(anchorOpen)}
+          authenticate={() => Promise.resolve(true)}
+          sign={() => Promise.resolve(true)}
+          send={() => Promise.resolve(true)}
+          setOpen={setAnchorOpen}
         />
       )}
-      <Grid
-        sx={{
-          transition: "all 0.2s ease-in-out",
-          mt: 6,
-          height: "100%",
-        }}
-        container
-        spacing={largerThenMd ? 3 : 1}
-      >
+
+      <Grid container spacing={3} sx={{ mt: 4, maxWidth: 1440 }}>
+        {/* Banner */}
         <Grid item xs={12}>
-          <Box sx={{ position: "relative" }}>
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
             <Box
               sx={{
-                backgroundImage: "url('/banner.png')",
-                padding: 8,
+                background: "url('/banner.png') center/cover",
+                padding: "3rem",
                 borderRadius: "16px",
-                opacity: 0.7,
-                backdropFilter: "blur(42px)",
-                backgroundPosition: "center",
-                backgroundSize: "cover",
-                position: "relative",
-              }}
-            />
-            <Box
-              sx={{
-                position: "absolute",
-                width: "100%",
-                height: "100%",
-                top: 0,
-                padding: { md: "2rem", lg: "2rem 8rem", xs: 1 },
-                margin: "auto",
                 display: "flex",
-                alignItems: "center",
                 justifyContent: "space-between",
+                alignItems: "center",
+                textAlign: "left",
               }}
             >
               <Box>
                 <Typography
                   variant="h1"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 700,
-                    fontSize: { md: "2.5rem", xs: "1.5rem" },
-                    lineHeight: "3rem",
-                  }}
+                  sx={{ fontSize: "2rem", fontWeight: 700, color: "#fff" }}
                 >
                   Are you an artist?
                 </Typography>
                 <Typography
-                  variant="h3"
                   sx={{
-                    color: "#fff",
+                    fontSize: "1rem",
                     fontWeight: 400,
-                    fontSize: { md: "1rem", xs: "0.75rem" },
-                    lineHeight: "2rem",
                     opacity: 0.8,
+                    color: "#fff",
+                    mt: 1,
                   }}
                 >
                   Be one of the first and become a genesis NFT creator!
                 </Typography>
               </Box>
               <Button type="primary" onClick={() => router.push("/nft")}>
-                Apply now!
+                Apply Now!
               </Button>
             </Box>
-          </Box>
+          </motion.div>
         </Grid>
-        <Grid item xs={12} md={12} lg={8} mt={!largerThenMd ? 2 : undefined}>
-          {loadingDashboard ? (
-            <Skeleton.DashboardStats />
-          ) : (
-            <DashboardStats {...args.dashboardStatsArgs} />
-          )}
+        <Grid item container lg={9} spacing={3}>
+          {/* Dashboard Stats */}
+          <Grid item xs={12}>
+            {loadingDashboard ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "20px",
+                  backgroundColor: "#1d1f21",
+                  borderRadius: "12px",
+                }}
+              >
+                <CircularProgress sx={{ color: "#E2491A" }} />
+              </Box>
+            ) : (
+              <DashboardStats {...args.dashboardStatsArgs} />
+            )}
+          </Grid>
+
+          {/* Price Charts */}
+          <Grid item xs={12} lg={6}>
+            {loadingDashboard ? (
+              <Box
+                sx={{
+                  height: "200px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#1d1f21",
+                  borderRadius: "12px",
+                }}
+              >
+                <CircularProgress sx={{ color: "#E2491A" }} />
+              </Box>
+            ) : (
+              <DashboardPriceCharts {...args.dashboardArgs1} />
+            )}
+          </Grid>
+          <Grid item xs={12} lg={6}>
+            {loadingDashboard ? (
+              <Box
+                sx={{
+                  height: "200px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#1d1f21",
+                  borderRadius: "12px",
+                }}
+              >
+                <CircularProgress sx={{ color: "#E2491A" }} />
+              </Box>
+            ) : (
+              <DashboardPriceCharts {...args.dashboardArgs2} />
+            )}
+          </Grid>
+
+          {/* Wallet Balance Table */}
+          <Grid item xs={12} sx={{ mt: 3 }}>
+            {loadingBalances ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "200px",
+                  backgroundColor: "#1d1f21",
+                  borderRadius: "12px",
+                }}
+              >
+                <CircularProgress sx={{ color: "#E2491A" }} />
+              </Box>
+            ) : allTokens.length ? (
+              <WalletBalanceTable {...args.walletBalanceArgs} />
+            ) : (
+              <Typography
+                sx={{
+                  color: "#FFF",
+                  fontSize: "14px",
+                  textAlign: "center",
+                  padding: "20px",
+                  backgroundColor: "#1d1f21",
+                  borderRadius: "12px",
+                }}
+              >
+                Looks like you haven{"'"}t acquired any tokens.
+              </Typography>
+            )}
+          </Grid>
+          <Grid item xs={12} sx={{ overflow: "hidden" }}>
+            <NftCarouselPlaceholder />
+          </Grid>
         </Grid>
-        <Grid
-          item
-          xs={6}
-          md={6}
-          lg={2}
-          mt={!largerThenMd ? 2 : undefined}
-          sx={{
-            pr: {
-              xs: 0,
-              md: 0.5,
-              lg: 0,
-            },
-          }}
-        >
-          <DashboardPriceCharts {...args.dashboardArgs1} />
-        </Grid>
-        <Grid
-          item
-          xs={6}
-          md={6}
-          lg={2}
-          mt={!largerThenMd ? 2 : undefined}
-          sx={{
-            pl: {
-              xs: 0,
-              md: 0.5,
-              lg: 0,
-            },
-          }}
-        >
-          <DashboardPriceCharts {...args.dashboardArgs2} />
-        </Grid>
-        <Grid item xs={12} md={5} lg={4} sx={{ mt: 2 }}>
-          <CryptoCTA
-            onClick={() =>
-              window.open(
-                `https://app.kado.money/
-?onPayAmount=250
-&onPayCurrency=USD
-&onRevCurrency=USDC
-&cryptoList=XLM,USDC
-&network=STELLAR
-&networkList=STELLAR
-&product=BUY
-&productList=BUY` +
-                  (persistStore.wallet.address
-                    ? `&onToAddress=${persistStore.wallet.address}`
-                    : ""),
-                "_blank",
-                "toolbar=yes,scrollbars=yes,resizable=yes,top=0,left=0,width=480,height=620"
-              )
-            }
-          />
-        </Grid>
-        <Grid item xs={12} md={7} lg={8} sx={{ mt: 2 }}>
-          {loadingBalances ? (
-            <Skeleton.WalletBalanceTable />
-          ) : (
-            <WalletBalanceTable {...args.walletBalanceArgs} />
-          )}
+        <Grid item container lg={3} spacing={3}>
+          {/* Crypto CTA */}
+          <Grid item xs={12}>
+            <CryptoCTA onClick={() => window.open("https://app.kado.money")} />
+          </Grid>
         </Grid>
       </Grid>
+      {/* Asset Info Modal */}
       {selectedTokenForInfo && (
         <AssetInfoModal
           open={tokenInfoOpen}

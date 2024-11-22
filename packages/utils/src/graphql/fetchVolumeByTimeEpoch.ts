@@ -53,7 +53,7 @@ async function fetchTickers() {
     const response = await axios.get(`${BASE_URL}/tickers`);
     return response.data.map((ticker: any) => ticker.ticker_id);
   } catch (error) {
-    console.error("Error fetching tickers:", error);
+    console.log("Error fetching tickers:", error);
     throw error;
   }
 }
@@ -152,7 +152,7 @@ export async function fetchDataByTimeEpoch(
       }`]: aggregatedResult,
     };
   } catch (error) {
-    console.error(`Error fetching ${timeEpoch} data:`, error);
+    console.log(`Error fetching ${timeEpoch} data:`, error);
     throw error;
   }
 }

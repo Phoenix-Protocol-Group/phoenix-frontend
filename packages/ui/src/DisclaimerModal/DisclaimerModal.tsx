@@ -10,7 +10,7 @@ import Colors from "../Theme/colors";
 import { Button } from "../Button/Button";
 import { DisclaimerModalProps } from "@phoenix-protocol/types";
 
-const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps): React.ReactNode => {
+const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps) => {
   const style = {
     position: "absolute" as "absolute",
     top: "50%",
@@ -31,7 +31,7 @@ const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps): React.Reac
       aria-labelledby="disclaimer-modal"
       aria-describedby="Disclaimer Message"
       sx={{
-        zIndex: 1300
+        zIndex: 1300,
       }}
     >
       <Box sx={style}>
@@ -97,10 +97,10 @@ const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps): React.Reac
                 websites and/or applications (collectively, our “Services”). By
                 clicking on “I Agree” below, you agree that you have read,
                 understand and accept all of the terms and conditions contained
-                below. For the avoidance of doubt, we do not provide
-                investment, tax or legal advice, and you are solely responsible
-                for determining whether any investment, strategy or transaction
-                is appropriate for you based on your personal investment
+                below. For the avoidance of doubt, we do not provide investment,
+                tax or legal advice, and you are solely responsible for
+                determining whether any investment, strategy or transaction is
+                appropriate for you based on your personal investment
                 objectives, financial circumstances and risk tolerance. No
                 information provided in connection with our Services is to be
                 construed as (a) investment, tax or legal advice or as a
@@ -151,7 +151,7 @@ const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps): React.Reac
                 remove our Services (or any part of our Services) without
                 notice.
               </Typography>
-              <Button onClick={() => onAccepted(true)} label="Accept"/>
+              <Button onClick={() => onAccepted(true)} label="Accept" />
             </Box>
           </Box>
         </Box>

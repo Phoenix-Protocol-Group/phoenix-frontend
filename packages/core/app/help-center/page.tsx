@@ -102,7 +102,7 @@ export default function Page() {
       // @ts-ignore
       setFeaturedArticles(_featuredCategories as HelpCenterArticle[]);
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -122,7 +122,7 @@ export default function Page() {
             })
           );
         } catch (error) {
-          console.error(error);
+          console.log(error);
         }
       };
       fetchResults();

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState, useCallback } from "react";
+import { useTheme } from "@mui/material/styles";
 import {
   Box,
   Grid,
@@ -8,109 +9,66 @@ import {
   ListItem,
   Typography,
   useMediaQuery,
-  useTheme,
 } from "@mui/material";
 import Providers from "../providers";
 import TopBar from "@/components/TopBar/TopBar";
 import SideNav from "@/components/SideNav/SideNav";
 import { usePathname, useRouter } from "next/navigation";
-import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import JoyRideTooltip from "@/components/JoyRideTooltip";
-import { joyride } from "@phoenix-protocol/utils";
-import { DisclaimerModal, TourModal } from "@phoenix-protocol/ui";
+import { DisclaimerModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
+import { motion } from "framer-motion";
+import { ToastProvider } from "@/providers/ToastProvider";
+import { RestoreModalProvider } from "@/providers/RestoreModalProvider";
 
+const HiddenInputChecker = () => {
+  const [value, setValue] = useState("Phoenix DeFi Hub");
+  const pathName = usePathname();
+
+  useEffect(() => {
+    const hiddenInput = document.querySelector(
+      'input[type="hidden"]'
+    ) as HTMLInputElement;
+    if (hiddenInput) {
+      setValue(hiddenInput.value);
+    }
+  }, [pathName]);
+
+  return <title>{value}</title>;
+};
+
+/**
+ * RootLayout Component
+ * The main layout for the application, wrapping all child components with necessary providers,
+ * navigation, modals, and tour functionality.
+ *
+ * @component
+ * @param {ReactNode} children - The children components that will be rendered inside the layout.
+ */
 export default function RootLayout({ children }: { children: ReactNode }) {
   // Use theme for responsive design
   const theme = useTheme();
   // Media query to check screen size
-  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
-  // State to manage navigation open/close status
-  const [navOpen, setNavOpen] = useState(false);
+  const largerThanMd = useMediaQuery(theme.breakpoints.up("md"));
+  // State to manage navigation open/close status, initializing based on screen size
+  const [navOpen, setNavOpen] = useState<boolean>(largerThanMd);
   // Retrieve the current pathname
   const pathname = usePathname();
-  // Get AppStore
-  const appStore = useAppStore();
   // Get PersistStore
   const persistStore = usePersistStore();
-  // State to manage tour initialization
-  const [initialized, setInitialized] = useState(false);
-  // State to handle tour modal open/close
-  const [tourModalOpen, setTourModalOpen] = useState(false);
-
   // State to handle disclaimer modal
-  const [disclaimerModalOpen, setDisclaimerModalOpen] = useState(false);
-
+  const [disclaimerModalOpen, setDisclaimerModalOpen] =
+    useState<boolean>(false);
   // Router
-  const router = useRouter();
 
-  // Joyride Tour
-  const handleJoyrideCallback = async (data: any) => {
-    const { action, index, status, type } = data;
-
-    // Open Wallet Modal on second step
-    if (action === ACTIONS.NEXT && index === 1) {
-      // Mount Wallet Modal to show next step
-      appStore.setWalletModalOpen(true);
-    }
-
-    // Close Wallet Modal on third step
-    if (action === ACTIONS.NEXT && index === 2) {
-      // Unmount Wallet Modal to show next step
-      appStore.setWalletModalOpen(false);
-    }
-
-    // Navigate to swap page on fourth step
-    if (action === ACTIONS.NEXT && index === 3) {
-      appStore.setTourStep(4);
-      // Navigate to swap page
-      router.push("/swap");
-    }
-
-    // Navigate to pools page on eight step
-    if (action === ACTIONS.NEXT && index === 7) {
-      appStore.setTourStep(7);
-      // Navigate to pools page
-      router.push("/pools");
-    }
-
-    // Navigate to pool single page on ninth step
-    if (action === ACTIONS.NEXT && index === 8) {
-      appStore.setTourStep(8);
-      // Navigate to pool single page
-      router.push(
-        "/pools/CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX"
-      );
-    }
-
-    // End the tour after the last step
-    if (action === ACTIONS.NEXT && index === 11) {
-      appStore.setTourStep(10);
-      appStore.setTourRunning(false);
-      persistStore.setUserTourActive(false);
-      persistStore.skipUserTour();
-    }
-
-    if ([EVENTS.STEP_AFTER].includes(type)) {
-      // Update state to advance the tour
-      appStore.setTourStep(index + (action === ACTIONS.PREV ? -1 : 1));
-    } else if (action === ACTIONS.NEXT && type === EVENTS.TARGET_NOT_FOUND) {
-      // If target not found, stop!
-      appStore.setTourRunning(false);
-    } else if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
-      // Need to set our running state to false, so we can restart if we click start again.
-      appStore.setTourRunning(false);
-    }
-  };
-
-  // useEffect to set navigation state based on screen size
+  // useEffect to set navigation state based on screen size without animation on initial load
   useEffect(() => {
-    setNavOpen(largerThenMd);
-  }, [largerThenMd]);
+    if (navOpen !== largerThanMd) {
+      setNavOpen(largerThanMd);
+    }
+  }, [largerThanMd]);
 
-  // Use effect hook to prune the persist store on page load, when it is wallet-connect
-  // @todo: This should be moved to a more appropriate place and we need to keep sessions on reload on a long term
+  // Use effect hook to prune the persist store on page load if wallet-connect
   useEffect(() => {
     const appStorageValue = localStorage?.getItem("app-storage");
     if (appStorageValue !== null) {
@@ -122,62 +80,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Use effect hook to delay the joyride until the page has loaded and avoid hydration issues
-  // Also we check the local storage to see if the user has already completed the tour
-  // Or if the user already skipped the tour
   useEffect(() => {
-    // If the user has already skipped the tour or completed it, we don't need to show it again
-    if (persistStore.userTour.skipped && !persistStore.userTour.active) {
-      setInitialized(true);
-      appStore.setTourRunning(false);
-      return;
-    }
-
-    // If the user has started the tour, we need to resume it from the last step
-    if (persistStore.userTour.active) {
-      appStore.setTourRunning(true);
-      appStore.setTourStep(persistStore.userTour.step);
-    }
-
-    // If the user never started or skipped the tour, we need to start it from the beginning
-    // This means, from the modal, which then starts the tour
-    // Also we got to redirect the user to the home page
-
-    const appStorageValue = localStorage?.getItem("app-storage");
-
-    let skippedTour: boolean = false;
-
-    if (appStorageValue !== null) {
-      try {
-        const parsedValue = JSON.parse(appStorageValue);
-        skippedTour = parsedValue?.state?.userTour?.skipped;
-      } catch (error) {
-        console.error("Error parsing app-storage value:", error);
-      }
-    }
-
-    if (
-      !persistStore.userTour.active &&
-      !persistStore.userTour.skipped &&
-      persistStore.userTour.step === 0 &&
-      !skippedTour
-    ) {
-      setTourModalOpen(true);
-      router.push("/");
-    }
-
     if (!persistStore.disclaimer.accepted) {
       setDisclaimerModalOpen(true);
     }
-
-    // Delay the tour to avoid hydration issues
-    const timer = setTimeout(() => {
-      setInitialized(true);
-    }, 1000);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  }, [persistStore.disclaimer.accepted]);
+  /**
+   * Handles accepting or rejecting the disclaimer.
+   *
+   * @param {boolean} accepted - Whether the disclaimer was accepted.
+   */
   const onAcceptDisclaimer = (accepted: boolean) => {
     if (accepted) {
       persistStore.setDisclaimerAccepted(true);
@@ -187,7 +99,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     }
   };
 
-  // Style object for swap page background image
+  // Styles for different pages
   const swapPageStyle = {
     backgroundImage: `url("/swapBg.png")`,
     backgroundRepeat: "no-repeat",
@@ -197,42 +109,20 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     paddingBottom: "50px",
     width: {
       xs: "100vw",
-      md: largerThenMd
+      md: largerThanMd
         ? navOpen
           ? "calc(100% - 240px)"
           : "calc(100% - 60px)"
-        : navOpen
-        ? "0"
-        : "100%",
-    },
-  };
-
-  // Style object for swap page background image
-  const poolPageStyles = {
-    backgroundImage: `url("/BG.svg")`,
-    backgroundRepeat: "no-repeat",
-    backgroundAttachment: "fixed",
-    backgroundPosition: "center",
-    backgroundSize: "cover",
-    paddingBottom: "50px",
-    width: {
-      xs: "100vw",
-      md: largerThenMd
-        ? navOpen
-          ? "calc(100% - 240px)"
-          : "calc(100% - 60px)"
-        : navOpen
-        ? "0"
         : "100%",
     },
   };
 
   // Hacky way to avoid overflows
   const css = `
-    body {
-      overflow-x: hidden!important;
-    }
-  `;
+      body {
+        overflow-x: hidden!important;
+      }
+    `;
 
   return (
     <html lang="en">
@@ -271,72 +161,49 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Additional tags for responsiveness and browser compatibility */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <HiddenInputChecker />
       </head>
       {/* Wrap components with Providers for context availability */}
       <Providers>
         <body suppressHydrationWarning={true}>
-          <style>{css}</style>
+          <ToastProvider>
+            <RestoreModalProvider>
+              <style>{css}</style>
 
-          {/* Side Navigation Component */}
-          <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
-          {/* Top Navigation Bar */}
-          <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
-          {/* Joyride Tour */}
-          {initialized && persistStore.disclaimer.accepted && (
-            <>
-              <TourModal
-                open={tourModalOpen}
-                setOpen={(state) => {
-                  setTourModalOpen(state);
-                  appStore.setTourRunning(false);
-                  persistStore.skipUserTour();
-                }}
-                onClick={() => {
-                  setTourModalOpen(false);
-                  appStore.setTourRunning(true);
-                  persistStore.setUserTourActive(true);
-                  persistStore.setUserTourStep(0);
-                }}
+              {/* Side Navigation Component with smooth animation, disabled on initial load */}
+
+              <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
+
+              {/* Top Navigation Bar with motion */}
+              <motion.div
+                initial={{ y: -50 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
+                <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
+              </motion.div>
+
+              <DisclaimerModal
+                open={!persistStore.disclaimer.accepted}
+                onAccepted={onAcceptDisclaimer}
               />
-              <Joyride
-                // @ts-ignore
-                steps={joyride.steps}
-                continuous={true}
-                tooltipComponent={JoyRideTooltip}
-                run={appStore.tourRunning}
-                stepIndex={appStore.tourStep}
-                callback={handleJoyrideCallback}
-                disableScrolling={true}
-                disableOverlayClose={true}
-                keyboardNavigation={false}
-                styles={{
-                  options: {
-                    arrowColor: "#1F2123",
-                    zIndex: 1400,
-                  },
+
+              {/* Main Content Area */}
+              <Box
+                sx={{
+                  marginLeft: largerThanMd ? (navOpen ? "240px" : "60px") : "0",
+                  minHeight: "100vh",
+                  transition: "all 0.2s ease-in-out",
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "16px",
+                  ...swapPageStyle,
                 }}
-              />
-            </>
-          )}
-          <DisclaimerModal
-            open={!persistStore.disclaimer.accepted}
-            onAccepted={onAcceptDisclaimer}
-          />
-          {/* Main Content Area */}
-          <Box
-            sx={{
-              marginLeft: largerThenMd ? (navOpen ? "240px" : "60px") : "0",
-              minHeight: "100vh",
-              transition: "all 0.2s ease-in-out",
-              display: "flex",
-              justifyContent: "center",
-              padding: "16px",
-              ...(pathname === "/pools" ? poolPageStyles : swapPageStyle),
-            }}
-          >
-            {/* Child Components */}
-            {children}
-          </Box>
+              >
+                {children}
+              </Box>
+            </RestoreModalProvider>
+          </ToastProvider>
         </body>
       </Providers>
       <Analytics />

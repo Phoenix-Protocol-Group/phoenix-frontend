@@ -1,15 +1,5 @@
 import React, { useState } from "react";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Alert,
-  Box,
-  IconButton,
-  List,
-  ListItem,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, List, ListItem, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
 import { TokenBox } from "../TokenBox/TokenBox";
@@ -19,6 +9,7 @@ import { SwapContainerProps } from "@phoenix-protocol/types";
 const listItemContainer = {
   display: "flex",
   justifyContent: "space-between",
+  padding: "8px 0",
 };
 
 const listItemNameStyle = {
@@ -31,7 +22,6 @@ const listItemNameStyle = {
 const listItemContentStyle = {
   color: "#FFF",
   fontSize: "14px",
-  fontStyle: "normal",
   fontWeight: "700",
   lineHeight: "140%",
 };
@@ -53,17 +43,18 @@ const SwapAssetsButton = ({ onClick }: { onClick: () => void }) => {
       className="swap-assets-button"
       sx={{
         padding: "4px",
-        borderRadius: "8px",
+        borderRadius: "0.5rem",
         minWidth: 0,
-        top: "4px",
+        top: "25%",
         position: "absolute",
         background:
           "linear-gradient(137deg, #E2491A 0%, #E21B1B 17.08%, #E2491A 42.71%, #E2AA1B 100%), #E2491A",
         transform: "translate(-50%, -50%)",
         left: "50%",
+        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.25)",
         transition: "transform 0.3s ease-in-out", // Add smooth transition for transform
         "&:hover": {
-          transform: "translate(-50%, -50%) scale(1.1)", // Scale up on hover
+          transform: "translate(-50%, -50%) scale(1.15)", // Scale up on hover
         },
       }}
     >
@@ -87,8 +78,6 @@ const SwapContainer = ({
   exchangeRate,
   networkFee,
   route,
-  estSellPrice,
-  minSellPrice,
   slippageTolerance,
   fromTokenValue,
   toTokenValue,
@@ -104,8 +93,6 @@ const SwapContainer = ({
   trustlineButtonDisabled = false,
   trustlineAssetName,
 }: SwapContainerProps) => {
-  const [expanded, setExpanded] = useState(true);
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -115,15 +102,18 @@ const SwapContainer = ({
     >
       <Box
         sx={{
-          maxWidth: "600px",
           width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
         }}
       >
+        {/* Header Section */}
         <Box
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            marginBottom: "16px",
+            alignItems: "center",
           }}
         >
           <Typography
@@ -138,141 +128,146 @@ const SwapContainer = ({
             onClick={onOptionsClick}
             className="slippage-button"
             sx={{
-              borderRadius: "8px",
+              borderRadius: "50%",
               background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
-              marginTop: "8px",
+              padding: "10px",
             }}
           >
             <img src="/GearSix.svg" alt="Options" />
           </IconButton>
         </Box>
-        <div className="token-box">
-          <TokenBox
-            value={fromTokenValue}
-            token={fromToken}
-            onAssetClick={() => onTokenSelectorClick(true)}
-            onChange={(value) => onInputChange(true, value)}
-          />
-          <Box
-            sx={{
-              height: "8px", // Set fixed height for the square container
-              width: "36px", // Set fixed width for the square container
-              position: "relative",
-              margin: "0 auto", // Center the box horizontally
-            }}
-          >
-            <SwapAssetsButton onClick={onSwapTokensClick} />
-          </Box>
 
-          <TokenBox
-            value={toTokenValue}
-            token={toToken}
-            onAssetClick={() => onTokenSelectorClick(false)}
-            onChange={(value) => onInputChange(false, value)}
-            disabled={true}
-            loadingValues={loadingSimulate}
-          />
-        </div>
-        {trustlineButtonActive ? (
-          <>
-            <Button
-              onClick={onTrustlineButtonClick}
-              disabled={trustlineButtonDisabled}
-              type="primary"
-              label={
-                trustlineButtonDisabled
-                  ? `You need more than 0.5 XLM on your wallet`
-                  : `Add ${trustlineAssetName} trustline`
-              }
-              sx={{
-                marginTop: "16px",
-                width: "100%",
-              }}
-            />
-            <Alert severity="info" sx={{ mt: 2 }}>
-              To hold other tokens than XLM, you need to add a trustline first.
-              Trustlines are permissions to hold tokens on the Stellar network.
-              Setting the trustline reserves 0.5 XLM from your account.
-            </Alert>
-          </>
-        ) : (
-          <Button
-            onClick={onSwapButtonClick}
-            disabled={swapButtonDisabled}
-            type="primary"
-            label="Swap"
-            sx={{
-              marginTop: "16px",
-              width: "100%",
-            }}
-          />
-        )}
+        {/* Main Content Section */}
         <Box
           sx={{
-            marginTop: "24px",
-            borderRadius: "16px",
+            display: "flex",
+            gap: "24px",
+            flexDirection: { xs: "column", lg: "row" },
+            alignItems: "stretch", // Adjust to stretch both areas to full height
           }}
         >
-          <Accordion
-            onChange={(e, isExpanded) => setExpanded(isExpanded)}
-            disableGutters
-            expanded={expanded}
-            sx={{
-              background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
-            }}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon sx={{ maxWidth: "20px" }} />}
-            >
-              <Typography
-                sx={{
-                  fontWeight: "700",
-                }}
-              >
-                Swap details
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails
-              sx={{
-                borderTop: "1px solid rgba(255, 255, 255, 0.10)",
-                margin: 0,
-                padding: 0,
-                paddingBottom: "8px",
+          {/* Swap Form Section */}
+          <Box sx={{ flex: 1, position: "relative", width: "100%" }}>
+            <div
+              className="token-box"
+              style={{
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                gap: 5,
               }}
             >
-              <List
+              <TokenBox
+                value={fromTokenValue}
+                token={fromToken}
+                onAssetClick={() => onTokenSelectorClick(true)}
+                onChange={(value) => onInputChange(true, value)}
+              />
+              <Box
                 sx={{
-                  padding: 0,
-                  margin: 0,
+                  height: "36px", // Set fixed height for the ellipsis button
+                  width: "36px", // Set fixed width for the ellipsis button
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  zIndex: 1,
+                  marginTop: "8px", // Add slight margin to separate input boxes
                 }}
               >
-                <ListItem sx={listItemContainer}>
-                  <Typography sx={listItemNameStyle}>Exchange rate</Typography>
-                  <Typography sx={listItemContentStyle}>
-                    {exchangeRate}
-                  </Typography>
-                </ListItem>
-                <ListItem sx={listItemContainer}>
-                  <Typography sx={listItemNameStyle}>Protocol fee</Typography>
-                  <Typography sx={listItemContentStyle}>
-                    {networkFee}
-                  </Typography>
-                </ListItem>
-                <ListItem sx={listItemContainer}>
-                  <Typography sx={listItemNameStyle}>Route</Typography>
-                  <Typography sx={listItemContentStyle}>{route}</Typography>
-                </ListItem>
-                <ListItem sx={listItemContainer}>
-                  <Typography sx={listItemNameStyle}>
-                    Slippage tolerance
-                  </Typography>
-                  <Typography sx={listItemContentStyle}>
-                    {slippageTolerance}
-                  </Typography>
-                </ListItem>
-              </List>
-            </AccordionDetails>
-          </Accordion>
+                <SwapAssetsButton onClick={onSwapTokensClick} />
+              </Box>
+              <TokenBox
+                value={toTokenValue}
+                token={toToken}
+                onAssetClick={() => onTokenSelectorClick(false)}
+                onChange={(value) => onInputChange(false, value)}
+                disabled={true}
+                loadingValues={loadingSimulate}
+              />
+            </div>
+            {trustlineButtonActive ? (
+              <>
+                <Button
+                  onClick={onTrustlineButtonClick}
+                  disabled={trustlineButtonDisabled}
+                  type="primary"
+                  label={
+                    trustlineButtonDisabled
+                      ? `You need more than 0.5 XLM on your wallet`
+                      : `Add ${trustlineAssetName} trustline`
+                  }
+                  sx={{
+                    marginTop: "16px",
+                    width: "100%",
+                  }}
+                />
+              </>
+            ) : (
+              <Button
+                onClick={onSwapButtonClick}
+                disabled={swapButtonDisabled}
+                type="primary"
+                label="Swap"
+                sx={{
+                  marginTop: "16px",
+                  width: "100%",
+                }}
+              />
+            )}
+          </Box>
+
+          {/* Swap Details Section */}
+          <Box
+            sx={{
+              flex: 1,
+              width: "100%",
+              padding: "24px",
+              borderRadius: "12px",
+              border: "1px solid var(--Secondary-S4, #2C2C31)",
+              background:
+                "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+            }}
+          >
+            <Typography
+              sx={{
+                fontWeight: "700",
+                fontSize: "20px",
+                marginBottom: "16px",
+              }}
+            >
+              Swap Details
+            </Typography>
+            <List
+              sx={{
+                padding: 0,
+                margin: 0,
+              }}
+            >
+              <ListItem sx={listItemContainer}>
+                <Typography sx={listItemNameStyle}>Exchange rate</Typography>
+                <Typography sx={listItemContentStyle}>
+                  {exchangeRate}
+                </Typography>
+              </ListItem>
+              <ListItem sx={listItemContainer}>
+                <Typography sx={listItemNameStyle}>Protocol fee</Typography>
+                <Typography sx={listItemContentStyle}>{networkFee}</Typography>
+              </ListItem>
+              <ListItem sx={listItemContainer}>
+                <Typography sx={listItemNameStyle}>Route</Typography>
+                <Typography sx={listItemContentStyle}>{route}</Typography>
+              </ListItem>
+              <ListItem sx={listItemContainer}>
+                <Typography sx={listItemNameStyle}>
+                  Slippage tolerance
+                </Typography>
+                <Typography sx={listItemContentStyle}>
+                  {slippageTolerance}
+                </Typography>
+              </ListItem>
+            </List>
+          </Box>
         </Box>
       </Box>
     </motion.div>

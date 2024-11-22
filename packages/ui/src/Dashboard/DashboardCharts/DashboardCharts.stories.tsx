@@ -54,10 +54,31 @@ export const TwoItems: Story = {
     // The grid is a component that allows us to
     // easily organize the layout of our UI
     <Grid container spacing={2}>
-      <Grid item xs={12} md={2}>
+      <Grid item xs={12} md={3}>
         <DashboardPriceCharts {...args} />
       </Grid>
-      <Grid item xs={12} md={2}>
+      <Grid item xs={12} md={3}>
+        <DashboardPriceCharts
+          assetName="Fake"
+          icon={args.icon}
+          data={mockDataset2}
+        />
+      </Grid>
+    </Grid>
+  ),
+};
+
+export const Loading: Story = {
+  // This is the data that will be used by the component
+  args: {},
+  render: (args) => (
+    // The grid is a component that allows us to
+    // easily organize the layout of our UI
+    <Grid container spacing={2}>
+      <Grid item xs={12} md={3}>
+        <DashboardPriceCharts {...args} />
+      </Grid>
+      <Grid item xs={12} md={3}>
         <DashboardPriceCharts
           assetName="Fake"
           icon={args.icon}

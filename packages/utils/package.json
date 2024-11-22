@@ -25,14 +25,13 @@
   },
   "dependencies": {
     "@apollo/client": "^3.9.0",
+    "@creit.tech/xbull-wallet-connect": "0.3.0",
     "big.js": "^6.2.1",
     "bignumber.js": "^9.1.1",
     "date-fns": "^3.3.1",
     "graphql": "^16.8.1",
     "pocketbase": "^0.21.2",
-    "react-joyride": "^2.7.2",
     "soroban-client": "^1.0.0",
-    "toml": "^3.0.0",
-    "xBull-Wallet-Connect": "https://github.com/Creit-Tech/xBull-Wallet-Connect.git"
+    "toml": "^3.0.0"
   }
 }

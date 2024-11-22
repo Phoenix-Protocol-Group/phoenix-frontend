@@ -9,7 +9,7 @@ async function fetchTickers() {
     const response = await axios.get(`${BASE_URL}/tickers`);
     return response.data.map((ticker: any) => ticker.ticker_id);
   } catch (error) {
-    console.error("Error fetching tickers:", error);
+    console.log("Error fetching tickers:", error);
     throw error;
   }
 }
@@ -26,7 +26,7 @@ async function fetchTokenList() {
       return acc;
     }, {});
   } catch (error) {
-    console.error("Error fetching token list:", error);
+    console.log("Error fetching token list:", error);
     throw error;
   }
 }
@@ -133,7 +133,7 @@ export async function fetchAllTrades(appStore: any) {
       tradeList,
     };
   } catch (error) {
-    console.error("Error fetching all trades:", error);
+    console.log("Error fetching all trades:", error);
     throw error;
   }
 }

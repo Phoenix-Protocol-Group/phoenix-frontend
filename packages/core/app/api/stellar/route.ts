@@ -1,15 +1,15 @@
 import fs from "fs";
 import path from "path";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function GET() {
   const filePath = path.join(process.cwd(), "./stellar.toml");
   const fileContents = fs.readFileSync(filePath, "utf8");
 
-  return new NextResponse(fileContents, {
+  return NextResponse.json(fileContents, {
     status: 200,
-    headers: new Headers({
+    headers: {
       "Content-Type": "text/plain",
-    }),
+    },
   });
 }

@@ -134,28 +134,29 @@ export default function Overview() {
             ? "0"
             : "100%",
           transition: "all 0.2s ease-in-out",
+          mt: 5,
         }}
         container
         spacing={largerThenMd ? 3 : 1}
       >
-        <Grid item xs={12}>
-          <MainStats {...args.mainstatsArgs} />
+        <Grid item container md={9} spacing={3}>
+          <Grid item xs={12} md={12} mt={!largerThenMd ? 2 : undefined}>
+            <DashBoardStats {...args.dashboardStatsArgs} />
+          </Grid>
+          <Grid item xs={6} md={6} mt={!largerThenMd ? 2 : undefined}>
+            <DashboardPriceCharts {...args.dashboardArgs} />
+          </Grid>
+          <Grid item xs={6} md={6} mt={!largerThenMd ? 2 : undefined}>
+            <DashboardPriceCharts {...args.dashboardArgs} />
+          </Grid>
+
+          <Grid item xs={12} md={12} mt={!largerThenMd ? 2 : undefined}>
+            {/* @ts-ignore */}
+            <WalletBalanceTable {...args.walletBalanceArgs} />
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
-          <DashBoardStats {...args.dashboardStatsArgs} />
-        </Grid>
-        <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
-          <DashboardPriceCharts {...args.dashboardArgs} />
-        </Grid>
-        <Grid item xs={6} md={2} mt={!largerThenMd ? 2 : undefined}>
-          <DashboardPriceCharts {...args.dashboardArgs} />
-        </Grid>
-        <Grid item xs={12} md={4} mt={!largerThenMd ? 4 : undefined}>
+        <Grid item xs={12} md={3} mt={!largerThenMd ? 4 : undefined}>
           <CryptoCTA onClick={() => {}} />
-        </Grid>
-        <Grid item xs={12} md={8} mt={!largerThenMd ? 2 : undefined}>
-          {/* @ts-ignore */}
-          <WalletBalanceTable {...args.walletBalanceArgs} />
         </Grid>
       </Grid>
     </>

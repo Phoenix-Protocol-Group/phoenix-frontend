@@ -1,162 +1,122 @@
 import React from "react";
-import {
-  Box,
-  Grid,
-  IconButton,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
 import { StakingListEntry as Entry } from "@phoenix-protocol/types";
-import ConstructionIcon from "@mui/icons-material/Construction";
+import { motion } from "framer-motion";
+import { ArrowBack } from "@mui/icons-material";
 
-const typoStyle = {
-  fontSize: "0.875rem",
-  fontWeight: 700,
-  lineHeight: "140%",
-};
-
-const StakingEntry = ({ entry, mobile }: { entry: Entry; mobile: boolean }) => {
-  console.log(entry);
+/**
+ * StakingEntry Component
+ * Renders an individual staking entry.
+ */
+const StakingEntry = ({ entry }: { entry: Entry }) => {
   return (
-    <Grid
-      container
-      sx={{
-        borderRadius: "0.5rem",
-        background:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        padding: "1rem",
-        marginBottom: 1,
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
     >
-      <Grid item xs={8} md={3}>
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <Box
-            component="img"
-            width={32}
-            maxWidth={"100%"}
-            src="/cryptoIcons/poolIcon.png"
-          />
-          <Typography sx={typoStyle}>{entry.title}</Typography>
-        </Box>
-      </Grid>
-      <Grid item xs={4} md={2}>
-        <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
-          <Typography sx={typoStyle}>
-            {entry.apr} {mobile && "APR"}
-          </Typography>
-        </Box>
-      </Grid>
-      <Grid item xs={6} md={2}>
-        <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
-          <Typography sx={typoStyle}>
-            {mobile && "Locked: "}
-            {entry.lockedPeriod}
-          </Typography>
-        </Box>
-      </Grid>
-      <Grid item xs={6} md={4}>
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1,
-            alignItems: "center",
-            height: "100%",
-          }}
-        >
-          <Typography sx={typoStyle}>{entry.amount.tokenAmount}</Typography>
-          <Typography sx={{ ...typoStyle, fontWeight: 400 }}>
-            ${entry.amount.tokenValueInUsd}
-          </Typography>
-        </Box>
-      </Grid>
-      <Grid item xs={12} md={1} sx={{ display: "flex" }}>
-        <IconButton
-          aria-label="actions"
-          id="long-button"
-          aria-haspopup="true"
-          sx={{
-            background:
-              "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            mr: 2,
-          }}
-          onClick={entry.onClick}
-        >
-          <Box component="img" src="/sliders.svg" />
-          {mobile && (
-            <Typography sx={{ opacity: "0.7", fontSize: "0.75rem" }}>
-              Manage{" "}
+      <Box
+        sx={{
+          p: 2,
+          borderRadius: "12px",
+          background:
+            "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          mb: 2,
+        }}
+      >
+        <Grid container alignItems="center" spacing={2}>
+          <Grid item xs={6} md={3} display="flex" alignItems="center">
+            <Box
+              component="img"
+              src="/cryptoIcons/poolIcon.png"
+              alt="Pool Icon"
+              sx={{ width: "32px", height: "32px", mr: 2 }}
+            />
+            <Typography
+              sx={{ color: "#FFF", fontSize: "14px", fontWeight: 700 }}
+            >
+              {entry.title}
             </Typography>
-          )}
-        </IconButton>
-        <IconButton
-          aria-label="actions"
-          id="long-button"
-          aria-haspopup="true"
-          sx={{
-            background:
-              "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-          }}
-          onClick={entry.onClickFix}
-        >
-          <ConstructionIcon sx={{ height: "20px", width: "20px" }} />
-        </IconButton>
-      </Grid>
-    </Grid>
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <Typography sx={{ color: "#FFF", fontSize: "14px" }}>
+              {entry.apr} APR
+            </Typography>
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <Typography sx={{ color: "#FFF", fontSize: "14px" }}>
+              Locked: {entry.lockedPeriod}
+            </Typography>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Typography sx={{ color: "#FFF", fontSize: "14px" }}>
+              {entry.amount.tokenAmount} (${entry.amount.tokenValueInUsd})
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={2} display="flex" justifyContent="flex-end">
+            <IconButton
+              onClick={entry.onClick}
+              sx={{
+                color: "#FFF",
+                borderRadius: "12px",
+                background: "transparent",
+                transition: "all 0.2s",
+                "&:hover": {
+                  background: "rgba(226, 73, 27, 0.15)",
+                  color: "#E2621B",
+                },
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <ArrowBack />
+              <Typography
+                sx={{
+                  color: "inherit",
+                  fontSize: "14px",
+                }}
+              >
+                Unstake
+              </Typography>
+            </IconButton>
+          </Grid>
+        </Grid>
+      </Box>
+    </motion.div>
   );
 };
 
+/**
+ * StakingList Component
+ * Renders a list of staking entries with a header.
+ */
 const StakingList = ({ entries }: { entries: Entry[] }) => {
-  const theme = useTheme();
-  const largerThenSm = useMediaQuery(theme.breakpoints.up("sm"));
   return (
     <Box>
-      {largerThenSm && (
-        <Grid container sx={{ px: 2, pb: 1 }}>
-          <Grid item xs={3}>
-            <Typography sx={{ ...typoStyle, fontWeight: 400 }}>
-              Asset
-            </Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography sx={{ ...typoStyle, fontWeight: 400 }}>APR</Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography sx={{ ...typoStyle, fontWeight: 400 }}>
-              Days Staked
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography sx={{ ...typoStyle, fontWeight: 400 }}>
-              Amount
-            </Typography>
-          </Grid>
-          <Grid item xs={1}>
-            <Typography sx={{ ...typoStyle, fontWeight: 400 }}>
-              Unbond
-            </Typography>
-          </Grid>
-        </Grid>
-      )}
+      {/* Header */}
+      <Typography
+        sx={{
+          color: "#FFF",
+          fontSize: "24px",
+          fontWeight: 700,
+          mb: 2,
+        }}
+      >
+        Your Staked Assets
+      </Typography>
+      {/* List */}
       {entries.length > 0 ? (
         entries.map((entry, index) => (
-          <StakingEntry mobile={!largerThenSm} entry={entry} key={index} />
+          <StakingEntry entry={entry} key={index} />
         ))
       ) : (
         <Typography
           sx={{
             color: "#FFF",
             fontSize: "14px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            pt: 1,
+            textAlign: "center",
+            pt: 2,
           }}
         >
           It looks like you haven't staked yet.

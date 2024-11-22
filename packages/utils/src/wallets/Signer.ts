@@ -1,8 +1,11 @@
-import {lobstr} from "./lobstr";
-import {Wallet} from "./types";
-import {xBull} from "./xbull";
-import {WalletConnect as WalletClient, WalletConnectAllowedMethods,} from "./wallet-connect";
-import {NETWORK_PASSPHRASE} from "../constants";
+import { lobstr } from "./lobstr";
+import { Wallet } from "./types";
+import { xBull } from "./xbull";
+import {
+  WalletConnect as WalletClient,
+  WalletConnectAllowedMethods,
+} from "./wallet-connect";
+import { NETWORK_PASSPHRASE } from "../constants";
 
 const initializeWalletConnect = async () => {
   const walletConnectInstance = new WalletClient({
@@ -58,10 +61,10 @@ export default class Signer {
         const walletType = parsedValue?.state?.wallet?.walletType;
         return walletType;
       } catch (error) {
-        console.error("Error parsing app-storage value:", error);
+        console.log("Error parsing app-storage value:", error);
       }
     } else {
-      console.error("app-storage key not found in localStorage.");
+      console.log("app-storage key not found in localStorage.");
     }
     return "";
   }
@@ -80,7 +83,7 @@ export default class Signer {
     } else if (this.walletType === "wallet-connect") {
       this.wallet = await initializeWalletConnect();
     } else {
-      console.error("Wallet type not supported.");
+      console.log("Wallet type not supported.");
     }
   }
 

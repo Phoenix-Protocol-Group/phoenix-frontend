@@ -65,7 +65,7 @@ const classes = {
   },
 };
 
-const TransactionsTable: React.FC<TransactionsTableProps> = ({
+const TransactionsTable = ({
   activeView,
   setActiveView,
   loggedIn,
