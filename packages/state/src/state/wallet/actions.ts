@@ -156,9 +156,16 @@ export const createWalletActions = (
           })
         ).result;
 
-        if (tokenAddress == "") {
+        if (
+          tokenAddress ==
+          "CABCLZXGTOIZ75FFKDGVANUT665LO34DZM5LHHDNVEHDFTC5CY4UTIWQ"
+        ) {
           balance +=
-            (await getState().fetchTokenInfo(""))?.balance || BigInt(0);
+            (
+              await getState().fetchTokenInfo(
+                "CBSM6C6OZJN2CS27RFTTYZJNAGRZ4MFHWVSV6GKLMCOYTQXD6K7UEA2A"
+              )
+            )?.balance || BigInt(0);
         }
       } catch (e) {
         balance = BigInt(0);
