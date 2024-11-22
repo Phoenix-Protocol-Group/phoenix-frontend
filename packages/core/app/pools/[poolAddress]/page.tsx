@@ -182,7 +182,9 @@ export default function Page(props: PoolPageProps) {
         return client.withdraw_liquidity(
           {
             sender: storePersist.wallet.address!,
-            share_amount: BigInt(10),
+            share_amount: BigInt(
+              (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+            ),
             min_a: BigInt(1),
             min_b: BigInt(1),
             deadline: undefined,

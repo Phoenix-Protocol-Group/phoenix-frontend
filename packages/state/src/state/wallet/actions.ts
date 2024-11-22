@@ -105,7 +105,9 @@ export const createWalletActions = (
       const _tokens = getState()
         .tokens.filter(
           (token: Token) =>
-            token?.symbol !== "POOL" && token.isStakingToken !== true
+            token?.symbol !== "POOL" &&
+            token?.symbol !== "PUST" &&
+            token.isStakingToken !== true
         )
         .map(async (token: Token) => {
           return {
