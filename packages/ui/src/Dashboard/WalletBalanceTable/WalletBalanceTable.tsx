@@ -99,6 +99,7 @@ const FilterAndTabPanel = ({
           sx={{
             display: "flex",
             flexWrap: "nowrap",
+            flexDirection: isMobile ? "column" : "row",
             overflow: "hidden",
             gap: isMobile ? 2 : 3, // Increased gap between elements for larger screens
           }}
