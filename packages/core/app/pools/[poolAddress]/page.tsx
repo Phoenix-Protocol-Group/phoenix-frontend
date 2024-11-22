@@ -359,7 +359,7 @@ export default function Page(props: PoolPageProps) {
           },
           {
             // PHO/USDC
-            address: "CAZ6W4WHVGQBGURYTUOLCUOOHW6VQGAAPSPCD72VEDZMBBPY7H43AYEC",
+            address: "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA",
             amount: 18750,
           },
         ];
@@ -375,6 +375,8 @@ export default function Page(props: PoolPageProps) {
         const phoprice = await fetchPho();
         const apr =
           ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
+
+        console.log(poolIncentive?.amount, phoprice, valueStaked);
 
         const tokenPrice = valueStaked / (totalStaked / 10 ** 7);
         setLpTokenPrice(tokenPrice);

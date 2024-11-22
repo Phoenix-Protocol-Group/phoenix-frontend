@@ -155,6 +155,11 @@ export const createWalletActions = (
             id: usePersistStore.getState().wallet.address!,
           })
         ).result;
+
+        if (tokenAddress == "") {
+          balance +=
+            (await getState().fetchTokenInfo(""))?.balance || BigInt(0);
+        }
       } catch (e) {
         balance = BigInt(0);
       }

@@ -3,7 +3,7 @@ import { PhoenixPairContract } from ".";
 
 export const fetchPho = async (): Promise<number> => {
   const PairContract = new PhoenixPairContract.Client({
-    contractId: "CAZ6W4WHVGQBGURYTUOLCUOOHW6VQGAAPSPCD72VEDZMBBPY7H43AYEC",
+    contractId: "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA",
     networkPassphrase: constants.NETWORK_PASSPHRASE,
     rpcUrl: constants.RPC_URL,
   });
