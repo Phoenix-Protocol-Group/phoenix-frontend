@@ -163,7 +163,7 @@ export const Toast: FC<ToastProps> = ({
             <Button
               variant="text"
               color="primary"
-              href={`https://stellar.expert/explorer/public/tx/${transactionId}`}
+              href={`https://stellarchain.io/transactions/${transactionId}`}
               target="_blank"
               sx={{
                 textTransform: "none",
