@@ -117,7 +117,7 @@ export default function Page() {
             amount: 25000,
           },
           {
-            address: "CAZ6W4WHVGQBGURYTUOLCUOOHW6VQGAAPSPCD72VEDZMBBPY7H43AYEC",
+            address: "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA",
             amount: 18750,
           },
         ];
