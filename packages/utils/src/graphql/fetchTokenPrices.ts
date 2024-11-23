@@ -94,12 +94,14 @@ export async function fetchHistoricalPrices(
       return data.historicalPrices;
     }
 
-    const parsedPrices = data.historicalPrices.map((item: any) => [
+    const parsedPrices: any[] = data.historicalPrices.map((item: any) => [
       new Date(item.timestamp).getTime(),
       item.usdValue,
     ]);
 
-    return parsedPrices;
+    const sortedPrices = parsedPrices.sort((a, b) => a[0] - b[0]);
+
+    return sortedPrices;
   } catch (error) {
     console.log("Error fetching prices:", error);
     throw error;
