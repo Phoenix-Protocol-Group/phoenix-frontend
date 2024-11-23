@@ -174,7 +174,7 @@ const DashboardPriceCharts = ({
                 lineHeight: "140%",
               }}
             >
-              {assetName?.toUpperCase()}
+              {""}
             </Typography>
           )}
           <Box
@@ -230,7 +230,7 @@ const DashboardPriceCharts = ({
                     fontWeight: 700,
                   }}
                 >
-                  {assetName}
+                  {assetName == "XLM" ? "Stellar" : "Phoenix"}
                 </Typography>
                 <Typography
                   sx={{
@@ -241,7 +241,7 @@ const DashboardPriceCharts = ({
                     lineHeight: "140%",
                   }}
                 >
-                  XML
+                  {assetName}
                 </Typography>
               </>
             )}
