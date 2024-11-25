@@ -17,7 +17,7 @@ export interface LabTabProps {
   liquidityB: number;
   liquidityToken: Token;
   onAddLiquidity: (tokenAAmount: number, tokenBAmount: number) => void;
-  onRemoveLiquidity: (liquidityTokenAmount: number) => void;
+  onRemoveLiquidity: (liquidityTokenAmount: number, fix?: boolean) => void;
 }
 
 export interface PoolLiquidityProps {
@@ -28,5 +28,5 @@ export interface PoolLiquidityProps {
   liquidityA: number;
   liquidityB: number;
   onAddLiquidity: (tokenAAmount: number, tokenBAmount: number) => void;
-  onRemoveLiquidity: (liquidityTokenAmount: number) => void;
+  onRemoveLiquidity: (liquidityTokenAmount: number, fix?: boolean) => void;
 }

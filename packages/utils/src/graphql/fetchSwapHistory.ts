@@ -79,7 +79,7 @@ export async function fetchSwapHistory(
       }
     }
   `;
-  
+
   try {
     if (accountId) {
       const { data } = await client.query({
@@ -143,7 +143,7 @@ export async function fetchSwapHistory(
       return [];
     }
   } catch (error) {
-    console.error("Error fetching swaps:", error);
+    console.log("Error fetching swaps:", error);
     throw error;
   }
 }

@@ -54,3 +54,12 @@ export const Main: Story = {
     </Grid>
   ),
 };
+
+export const Loading: Story = {
+  args: {},
+  render: (args) => (
+    <Grid item xs={12} md={8}>
+      <DashboardStats {...args} />
+    </Grid>
+  ),
+};

@@ -4,15 +4,16 @@ import { HelpCenterArticle } from "@phoenix-protocol/types";
 import { ArticleCard, Skeleton } from "@phoenix-protocol/ui";
 import { HelpCenter } from "@phoenix-protocol/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 
 interface CategoryPageProps {
-  readonly params: {
+  readonly params: Promise<{
     readonly categoryID: string;
-  };
+  }>;
 }
 
-export default function Page({ params }: CategoryPageProps) {
+export default function Page(props: CategoryPageProps) {
+  const params = use(props.params);
   const [articles, setArticles] = useState<HelpCenterArticle[] | undefined>(
     undefined
   );
@@ -47,7 +48,7 @@ export default function Page({ params }: CategoryPageProps) {
       setFeaturedArticles(featuredArticles as HelpCenterArticle[]);
       setArticles(_articles);
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
   return (

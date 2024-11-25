@@ -1,4 +1,5 @@
 import type { StorybookConfig } from "@storybook/react-webpack5";
+
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: [
@@ -14,6 +15,24 @@ const config: StorybookConfig = {
   docs: {
     autodocs: "tag",
   },
-  staticDirs: ["../public"], //👈 Configures the static asset folder in Storybook
+  staticDirs: ["../public"], // Static asset folder configuration
+  webpackFinal: async (config) => {
+    // Ensure TypeScript loader is properly configured
+    config.module?.rules?.push({
+      test: /\.tsx?$/,
+      use: [
+        {
+          loader: "ts-loader",
+          options: {
+            transpileOnly: true,
+          },
+        },
+      ],
+      exclude: /node_modules/,
+    });
+
+    return config;
+  },
 };
+
 export default config;

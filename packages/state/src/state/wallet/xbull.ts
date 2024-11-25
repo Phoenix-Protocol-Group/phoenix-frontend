@@ -1,11 +1,11 @@
 import freighterApi from "@stellar/freighter-api";
-import {Connector, NetworkDetails} from "@phoenix-protocol/types";
+import { Connector, NetworkDetails } from "@phoenix-protocol/types";
 import { xBullWalletConnect } from "@creit.tech/xbull-wallet-connect";
 import { RPC_URL } from "../../constants";
 
 export function xbull(): Connector {
   return {
-    id: "xbull", 
+    id: "xbull",
     name: "xBull",
     iconUrl: "http://i.epvpimg.com/wYBJfab.png",
     iconBackground: "#fff",

@@ -14,7 +14,13 @@
     "typescript": "5.0.4"
   },
   "dependencies": {
-    "@mui/material": "^5.13.5",
+    "@mui/icons-material": "6.1.7",
+    "@mui/lab": "6.0.0-beta.15",
+    "@mui/material": "6.1.7",
+    "@mui/material-nextjs": "6.1.7",
+    "@mui/styled-engine-sc": "6.1.7",
+    "@mui/system": "6.1.7",
+    "@mui/utils": "6.1.7",
     "@stellar/stellar-sdk": "11.3.0"
   }
 }

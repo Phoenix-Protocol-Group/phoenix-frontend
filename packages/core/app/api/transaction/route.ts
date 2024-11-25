@@ -17,7 +17,8 @@ export async function POST(req: NextRequest) {
         }
       );
     }
-    const networkPassphrase: string = "Public Global Stellar Network ; September 2015";
+    const networkPassphrase: string =
+      "Public Global Stellar Network ; September 2015";
     const tx = new Transaction(transaction, networkPassphrase);
     for (const op of tx.operations as Operation[]) {
       if (op.type === "manageData" && op.name === "client_domain") {
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error processing transaction:", error);
+    console.log("Error processing transaction:", error);
     return new NextResponse(
       JSON.stringify({ message: "Internal Server Error" }),
       {

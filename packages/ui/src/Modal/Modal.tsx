@@ -22,7 +22,7 @@ const Modal = ({
   setOpen,
   onButtonClick,
   error,
-}: ModalProps): React.ReactNode => {
+}: ModalProps) => {
   const style = {
     position: "absolute" as "absolute",
     top: "50%",

@@ -8,4 +8,5 @@ export interface StakingListEntry {
     tokenValueInUsd: string;
   };
   onClick: () => void;
+  onClickFix: () => void;
 }

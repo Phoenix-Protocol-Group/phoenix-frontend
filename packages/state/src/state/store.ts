@@ -5,7 +5,6 @@ import { Horizon } from "@stellar/stellar-sdk";
 import { AppStore, AppStorePersist } from "@phoenix-protocol/types";
 import { createConnectWalletActions } from "./persist/createConnectWalletActions";
 import { createLayoutActions } from "./layout/actions";
-import { createUserTourActions } from "./persist/createUserTourActions";
 import { createDisclaimerAction } from "./persist/createDisclaimerActions";
 import { NETWORK_PASSPHRASE, RPC_URL } from "../constants";
 
@@ -43,9 +42,6 @@ export const usePersistStore = create<AppStorePersist>()(
       // Create a wallet with the given server and network passphrase.
       const walletPersist = createConnectWalletActions();
 
-      // Create a store for user tour
-      const userTour = createUserTourActions();
-
       //Create a store for disclaimer modal
       const disclaimer = createDisclaimerAction();
 
@@ -53,7 +49,6 @@ export const usePersistStore = create<AppStorePersist>()(
         server,
         networkPassphrase,
         ...walletPersist,
-        ...userTour,
         ...disclaimer,
       };
     },

@@ -14,61 +14,46 @@ import {
   fetchDataByTimeEpoch,
   fetchHistoricalPrices,
   fetchHistoryMetaData,
-  fetchSwapHistory,
+  fetchAllTrades,
 } from "@phoenix-protocol/utils";
 import { useEffect, useState } from "react";
 
 export default function Page() {
-  // Init AppStore
   const appStore = useAppStore();
   const appStorePersist = usePersistStore();
 
-  // Set Account Meta
   const [meta, setMeta] = useState({
     activeAccountsLast24h: 0,
     totalAccounts: 0,
     totalTrades: 0,
   });
-
-  // Set Volume Chart Data
   const [data, setData] = useState([]);
-
-  // Set Total Volume
   const [totalVolume, setTotalVolume] = useState(0);
-
   const [mostTradedAsset, setMostTradedAsset] = useState<any>({
     name: "XLM",
     icon: `cryptoIcons/xlm.svg`,
   });
-
-  // Set History
   const [history, setHistory] = useState<any>([]);
+  const [allTrades, setAllTrades] = useState<any[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
-
-  // Historical Prices
   const [historicalPrices, setHistoricalPrices] = useState<any[]>([]);
-
-  // Set Search Term
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Set History Table Pagination
   const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
-
-  // Set History Table Sorting
-  const [sortBy, setSortBy] = useState<"timestamp" | "fromAmount" | "usdValue">(
-    "timestamp"
-  ); // Default sorting field
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc"); // Default sorting order
-
-  // Set selected time epoch
+  const [sortBy, setSortBy] = useState<
+    | "tradeType"
+    | "asset"
+    | "tradeSize"
+    | "tradeValue"
+    | "date"
+    | "actions"
+    | undefined
+  >("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [selectedTimeEpoch, setSelectedTimeEpoch] = useState<"D" | "M" | "A">(
     "D"
   );
-
-  // Personal or all
   const [activeView, setActiveView] = useState<"personal" | "all">("all");
-
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>({
     dateRange: {
       from: undefined,
@@ -84,14 +69,6 @@ export default function Page() {
     },
   });
 
-  // Load Meta Data
-  const loadMetaData = async () => {
-    const { activeAccountsLast24h, totalAccounts, totalTrades } =
-      await fetchHistoryMetaData();
-    setMeta({ activeAccountsLast24h, totalAccounts, totalTrades });
-  };
-
-  // Load price data
   const loadPriceData = async () => {
     const result = await fetchHistoricalPrices(
       undefined,
@@ -103,7 +80,6 @@ export default function Page() {
     setHistoricalPrices(result);
   };
 
-  // Load Volume Data
   const loadVolumeData = async (epoch: "monthly" | "yearly" | "daily") => {
     const result = await fetchDataByTimeEpoch(epoch);
     const intervals = result[Object.keys(result)[0]].intervals;
@@ -117,194 +93,148 @@ export default function Page() {
     setTotalVolume(Number(Number(newTotalVolume).toFixed(5)));
   };
 
-  // Load more / pagination
-  const loadMore = () => {
-    setPageSize(pageSize + 10);
-  };
+  const loadAllTrades = async () => {
+    const { totalTradeCount, mostTradedAsset, tradeList, totalTradeCount24h } =
+      await fetchAllTrades(appStore);
 
-  // Load History
-  const loadHistory = async () => {
-    setHistoryLoading(true);
-    let result = [];
+    setMeta((prevMeta) => ({
+      ...prevMeta,
+      totalTrades: totalTradeCount,
+      activeAccountsLast24h: totalTradeCount24h,
+    }));
 
-    if (activeView === "personal" && appStorePersist.wallet.address) {
-      result = await fetchSwapHistory(
-        page,
-        pageSize,
-        sortBy,
-        sortOrder.toUpperCase(),
-        activeFilters,
-        appStorePersist.wallet.address
-      );
-    } else {
-      result = await fetchSwapHistory(
-        page,
-        pageSize,
-        sortBy,
-        sortOrder.toUpperCase(),
-        activeFilters
-      );
-    }
+    setMostTradedAsset({
+      name: mostTradedAsset,
+      icon: `cryptoIcons/${mostTradedAsset.toLowerCase()}.svg`,
+    });
 
-    if (!result.length) {
-      setHistoryLoading(false);
-      return setHistory([]);
-    }
-
-    const tradedAssets: any = {};
-    // Map Token Names
-    const _result = await Promise.all(
-      result.map(async (item) => {
-        const assetInfoPromises = item.assets.map(async (asset) => {
-          const offerAssetInfo = await appStore.fetchTokenInfo(
-            asset.offer_asset
-          );
-          const askAssetInfo = await appStore.fetchTokenInfo(asset.ask_asset);
-
-          return [offerAssetInfo, askAssetInfo];
-        });
-
-        const assets = await Promise.all(assetInfoPromises);
-
-        for (let i = 0; i < 2; i++) {
-          const assetId = assets.flat()[i]?.id;
-          const tradeVal = Number(item.tradeSize);
-
-          if (!assetId) continue;
-
-          if (!tradedAssets.hasOwnProperty(assetId)) {
-            tradedAssets[assetId] = tradeVal;
-          } else {
-            tradedAssets[assetId] += tradeVal;
-          }
-        }
-
-        return {
-          ...item,
-          // @ts-ignore
-          tradeSize: Number(item.tradeSize) / 10 ** assets.flat()[0].decimals,
-          tradeValue: Number(item.tradeValue).toFixed(2),
-          assets: assets.flat().map((asset) => {
-            return {
-              name: asset?.symbol,
-              icon: `cryptoIcons/${asset?.symbol.toLowerCase()}.svg`,
-              amount: 100,
-              category: "Stable",
-              usdValue: 0,
-            };
-          }),
-        };
-      })
-    );
-
-    const mtAsset = Object.keys(tradedAssets).reduce((a: any, b: any) =>
-      data[a] > data[b] ? a : b
-    );
-    const mtAssetInfo = await appStore.fetchTokenInfo(mtAsset);
-
-    if (mtAssetInfo) {
-      setMostTradedAsset({
-        name: mtAssetInfo?.symbol,
-        icon: `cryptoIcons/${mtAssetInfo?.symbol.toLowerCase()}.svg`,
-        amount: 100,
-        category: "Stable",
-        usdValue: 0,
-      });
-    }
-
-    setHistory(_result);
+    setAllTrades(tradeList);
+    setHistory(tradeList.slice(0, pageSize));
     setHistoryLoading(false);
   };
 
-  // Handle Sort Change
+  const applyFilters = () => {
+    const filteredTrades = allTrades.filter((trade) => {
+      const tradeTimestamp = new Date(trade.date * 1000).getTime() / 1000;
+
+      // Filter by date range
+      if (activeFilters.dateRange.from || activeFilters.dateRange.to) {
+        const from = activeFilters.dateRange.from
+          ? new Date(activeFilters.dateRange.from).setHours(0, 0, 0, 0) / 1000
+          : null;
+        const to = activeFilters.dateRange.to
+          ? new Date(activeFilters.dateRange.to).setHours(23, 59, 59, 999) /
+            1000
+          : null;
+
+        if (from && tradeTimestamp < from) return false;
+        if (to && tradeTimestamp > to) return false;
+      }
+
+      // Filter by trade size
+      if (
+        activeFilters.tradeSize.from &&
+        Number(trade.tradeSize) < activeFilters.tradeSize.from
+      )
+        return false;
+      if (
+        activeFilters.tradeSize.to &&
+        Number(trade.tradeSize) > activeFilters.tradeSize.to
+      )
+        return false;
+
+      // Filter by trade value
+      if (
+        activeFilters.tradeValue.from &&
+        Number(trade.tradeValue) < activeFilters.tradeValue.from
+      )
+        return false;
+      if (
+        activeFilters.tradeValue.to &&
+        Number(trade.tradeValue) > activeFilters.tradeValue.to
+      )
+        return false;
+
+      return true;
+    });
+
+    // Sort the filtered trades
+    const sortedTrades = filteredTrades.sort((a, b) => {
+      if (sortBy === "date") {
+        return sortOrder === "asc" ? a.date - b.date : b.date - a.date;
+      } else if (sortBy) {
+        return sortOrder === "asc"
+          ? a[sortBy] - b[sortBy]
+          : b[sortBy] - a[sortBy];
+      }
+      return 0;
+    });
+
+    // Update history with sorted and filtered trades
+    setHistory(sortedTrades.slice(0, pageSize));
+  };
+
+  const loadMore = () => {
+    const newPageSize = pageSize + 10;
+    setPageSize(newPageSize);
+    setHistory(history.slice(0, newPageSize));
+  };
+
   const handleSortChange = (
-    newSortBy: "timestamp" | "fromAmount" | "usdValue",
+    newSortBy:
+      | "tradeType"
+      | "asset"
+      | "tradeSize"
+      | "tradeValue"
+      | "date"
+      | "actions"
+      | undefined,
     newSortOrder: "asc" | "desc"
   ) => {
     setSortBy(newSortBy);
     setSortOrder(newSortOrder);
-    setPage(0); // Reset page to the first page
-    setHistory([]); // Reset history to clear previous entries
+    applyFilters();
   };
 
-  const mapToSwapField = (column: string) => {
-    switch (column) {
-      case "tradeType":
-        return "timestamp";
-      case "asset":
-        return "timestamp";
-      case "tradeSize":
-        return "fromAmount";
-      case "tradeValue":
-        return "usdValue";
-      case "date":
-        return "timestamp";
-      case "actions":
-        return "timestamp";
-      default:
-        throw new Error("Invalid column name");
-    }
-  };
-
-  const mapFromSwapField = (
-    swapField: "timestamp" | "fromAmount" | "usdValue"
-  ) => {
-    switch (swapField) {
-      case "timestamp":
-        return "tradeType";
-      case "fromAmount":
-        return "tradeSize";
-      case "usdValue":
-        return "tradeValue";
-      default:
-        throw new Error("Invalid Swap field");
-    }
-  };
-
-  // Use Effect to load volume on selected time epoch
   useEffect(() => {
-    const _selected = () => {
-      switch (selectedTimeEpoch) {
-        case "D":
-          return "daily";
-        case "M":
-          return "monthly";
-        case "A":
-          return "yearly";
-      }
-    };
+    if (allTrades.length > 0) {
+      applyFilters();
+    }
+  }, [pageSize, sortBy, sortOrder, activeFilters, allTrades]);
 
-    loadVolumeData(_selected());
+  useEffect(() => {
+    switch (selectedTimeEpoch) {
+      case "D":
+        loadVolumeData("daily");
+        break;
+
+      case "M":
+        loadVolumeData("monthly");
+        break;
+
+      case "A":
+        loadVolumeData("yearly");
+    }
   }, [selectedTimeEpoch]);
 
   useEffect(() => {
-    loadHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, sortBy, sortOrder, activeView, activeFilters]);
-
-  // Use Effect to Init Data
-  useEffect(() => {
-    loadMetaData();
     loadVolumeData("daily");
     loadPriceData();
+    loadAllTrades();
   }, []);
-
-  const asset = {
-    name: "USDT",
-    icon: "cryptoIcons/usdt.svg",
-    amount: 100,
-    category: "Stable",
-    usdValue: 1 * 100,
-  };
 
   return (
     <Box
       sx={{
+        maxWidth: "1440px",
         width: "100%",
         padding: { xs: 0, md: "2.5rem" },
         mt: { xs: "4.5rem", md: 0 },
       }}
     >
+      {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
+      <input type="hidden" value="Phoenix DeFi Hub - Transaction History" />
+
       <Typography
         sx={{
           color: "#FFF",
@@ -335,7 +265,7 @@ export default function Page() {
       </Grid>
       <TransactionsCards
         activeTraders={meta.activeAccountsLast24h.toString()}
-        totalTraders={meta.totalAccounts.toString()}
+        totalTraders={meta.activeAccountsLast24h.toString()}
         mostTradedAsset={mostTradedAsset}
         totalTrades={meta.totalTrades.toString()}
       />
@@ -346,22 +276,24 @@ export default function Page() {
           setSearchTerm={setSearchTerm}
           entries={history}
           activeSort={{
-            column: mapFromSwapField(sortBy),
+            column: sortBy,
             direction: sortOrder,
           }}
           activeView={activeView}
-          setActiveView={(a) => {
-            if (a === activeView) return;
+          setActiveView={(view) => {
             setHistory([]);
-            setActiveView(a);
+            setActiveView(view);
           }}
-          loggedIn={appStorePersist.wallet.address ? true : false}
+          loggedIn={!!appStorePersist.wallet.address}
           activeFilters={activeFilters}
           applyFilters={(newFilters: ActiveFilters) => {
             setActiveFilters(newFilters);
           }}
           handleSort={(column) =>
-            handleSortChange(mapToSwapField(column), "asc")
+            handleSortChange(
+              column as any,
+              sortOrder === "asc" ? "desc" : "asc"
+            )
           }
         />
       ) : (
@@ -369,7 +301,7 @@ export default function Page() {
       )}
 
       <Box sx={{ display: "flex", justifyContent: "end", mt: 3 }}>
-        <Button type="secondary" label="Load more" onClick={() => loadMore()} />
+        <Button type="secondary" label="Load more" onClick={loadMore} />
       </Box>
     </Box>
   );

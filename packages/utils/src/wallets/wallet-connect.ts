@@ -1,8 +1,8 @@
-import {WalletConnectModal} from "@walletconnect/modal";
-import {SignClient} from "@walletconnect/sign-client";
-import {ISignClient} from "@walletconnect/types/dist/types/sign-client/client";
-import {SessionTypes} from "@walletconnect/types/dist/types/sign-client/session";
-import {Wallet} from "./types";
+import { WalletConnectModal } from "@walletconnect/modal";
+import { SignClient } from "@walletconnect/sign-client";
+import { ISignClient } from "@walletconnect/types/dist/types/sign-client/client";
+import { SessionTypes } from "@walletconnect/types/dist/types/sign-client/session";
+import { Wallet } from "./types";
 
 const parseWalletConnectSession = (
   session: SessionTypes.Struct
@@ -67,7 +67,7 @@ export class WalletConnect implements Wallet {
           projectId: wcParams.projectId,
         });
       })
-      .catch(console.error);
+      .catch(console.log);
   }
 
   async isAllowed(): Promise<boolean> {
@@ -112,15 +112,14 @@ export class WalletConnect implements Wallet {
 
     const targetSession: IParsedWalletConnectSession =
       await this.getTargetSession({ publicKey: await this.getPublicKey() });
-    updatedXdr = await this.client
-      .request({
-        topic: targetSession.id,
-        chainId: "stellar:pubnet",
-        request: {
-          method: this.wcParams.method,
-          params: { xdr: tx },
-        },
-      })
+    updatedXdr = await this.client.request({
+      topic: targetSession.id,
+      chainId: "stellar:pubnet",
+      request: {
+        method: this.wcParams.method,
+        params: { xdr: tx },
+      },
+    });
 
     return updatedXdr;
   }
@@ -190,7 +189,7 @@ export class WalletConnect implements Wallet {
       return session;
     } catch (e: unknown) {
       this.qrModal.closeModal();
-      console.error(e);
+      console.log(e);
       throw new Error("There was an error when trying to connect");
     }
   }

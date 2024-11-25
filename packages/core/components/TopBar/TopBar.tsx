@@ -1,8 +1,15 @@
 "use client";
-import {NoSsr} from "@mui/material";
-import {freighter, lobstr, useAppStore, usePersistStore, WalletConnect, xbull,} from "@phoenix-protocol/state";
-import {AppBar, ConnectWallet} from "@phoenix-protocol/ui";
-import React, {useEffect} from "react";
+import { NoSsr } from "@mui/material";
+import {
+  freighter,
+  lobstr,
+  useAppStore,
+  usePersistStore,
+  WalletConnect,
+  xbull,
+} from "@phoenix-protocol/state";
+import { AppBar, ConnectWallet } from "@phoenix-protocol/ui";
+import React, { useEffect } from "react";
 
 const TopBar = ({
   navOpen,
@@ -42,18 +49,6 @@ const TopBar = ({
     fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storePersist.wallet.address]);
-
-  useEffect(() => {
-    if (!store.walletModalOpen) return;
-    if (!storePersist.userTour.active) return;
-    if (storePersist.userTour.skipped) return;
-    // Delay the tour start to allow the modal to open
-    setTimeout(() => {
-      store.setTourStep(1);
-      store.setTourRunning(true);
-    }, 500);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [store.walletModalOpen]);
 
   return (
     <NoSsr>
