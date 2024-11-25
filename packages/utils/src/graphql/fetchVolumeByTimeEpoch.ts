@@ -1,7 +1,7 @@
 import axios from "axios";
 import { format, subDays, subMonths, subYears } from "date-fns";
 
-const BASE_URL = "https://api-phoenix.decentrio.ventures";
+const BASE_URL = "/api/indexer";
 
 function mapTimeEpochToDateRange(timeEpoch: "monthly" | "daily" | "yearly") {
   const now = new Date();

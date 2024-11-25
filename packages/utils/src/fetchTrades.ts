@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://api-phoenix.decentrio.ventures";
+const BASE_URL = "/api/indexer";
 const TOKEN_LIST_URL =
   "https://raw.githubusercontent.com/decentrio/token-list/refs/heads/main/token_lists.json";
 
