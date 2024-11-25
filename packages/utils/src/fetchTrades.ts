@@ -101,7 +101,7 @@ export async function fetchAllTrades(appStore: any) {
       const assetBDetails = tokenInfoCache[assetB] || {};
 
       return {
-        type: "Success", // Static
+        type: trade.type,
         assets: [
           {
             name: assetADetails.symbol || "Unknown",

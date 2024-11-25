@@ -54,7 +54,7 @@ const cardArgs = {
 const tableArgs = {
   entries: [
     {
-      type: "Success",
+      type: "Buy",
       assets: [asset, asset],
       tradeSize: "1000",
       tradeValue: "2000",
@@ -62,7 +62,7 @@ const tableArgs = {
       txHash: "0x1234567890",
     },
     {
-      type: "Failed",
+      type: "Sell",
       assets: [asset, asset],
       tradeSize: "1000",
       tradeValue: "2000",
