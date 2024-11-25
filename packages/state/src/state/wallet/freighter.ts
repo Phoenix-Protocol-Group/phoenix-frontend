@@ -1,5 +1,5 @@
 import freighterApi from "@stellar/freighter-api";
-import {Connector, NetworkDetails} from "@phoenix-protocol/types";
+import { Connector, NetworkDetails } from "@phoenix-protocol/types";
 import { RPC_URL } from "../../constants";
 
 export function freighter(): Connector {
@@ -24,13 +24,13 @@ export function freighter(): Connector {
       };
     },
     async getPublicKey(): Promise<string> {
-      const address = await freighterApi.getAddress();
+      const address = await freighterApi.getPublicKey();
 
-      if(address.error) {
-        console.log("error getting public key", address.error);
+      if (!address) {
+        console.log("error getting public key");
         return "";
       } else {
-        return address.address;
+        return address;
       }
     },
     async signTransaction(
@@ -43,11 +43,11 @@ export function freighter(): Connector {
     ): Promise<string> {
       const res = await freighterApi.signTransaction(xdr, opts);
 
-      if(res.error) {
-        console.log("error signing transaction", res.error);
+      if (!res) {
+        console.log("error signing transaction", xdr);
         return "";
       } else {
-        return res.signedTxXdr;
+        return res;
       }
     },
   };

@@ -3,10 +3,14 @@
 import { Box, Typography } from "@mui/material";
 import { PhoenixNFTCollectionContract } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import { AuctionStatus, AuctionType, Currency, NftListingEntryProps, TextSelectItemProps } from "@phoenix-protocol/types";
 import {
-  CollectionSingle,
-} from "@phoenix-protocol/ui";
+  AuctionStatus,
+  AuctionType,
+  Currency,
+  NftListingEntryProps,
+  TextSelectItemProps,
+} from "@phoenix-protocol/types";
+import { CollectionSingle } from "@phoenix-protocol/ui";
 import { constants } from "@phoenix-protocol/utils";
 import { useEffect, useState } from "react";
 
@@ -16,8 +20,8 @@ const demoEntry: NftListingEntryProps = {
   collectionName: "Collection Name",
   nftName: "NFT Name",
   price: "0.00",
-  ownedBy: "You"
-}
+  ownedBy: "You",
+};
 
 const demoEntryOwned: NftListingEntryProps = {
   id: "2137",
@@ -27,20 +31,41 @@ const demoEntryOwned: NftListingEntryProps = {
   price: "0.00",
   ownedBy: "You",
   listForSale: true,
-}
+};
 
 interface CollectionPageProps {
-  readonly params: {
+  readonly params: Promise<{
     readonly collectionAddress: string;
-  };
+  }>;
 }
 
 export default function Page({ params }: CollectionPageProps) {
-  const store = useAppStore();
-  const storePersist = usePersistStore();
+  const [collectionAddress, setCollectionAddress] = useState<string | null>(
+    null
+  );
+  const [collectionContract, setCollectionContract] =
+    useState<PhoenixNFTCollectionContract.Client | null>(null);
+
+  useEffect(() => {
+    const fetchParams = async () => {
+      const resolvedParams = await params; // Resolve params
+      setCollectionAddress(resolvedParams.collectionAddress);
+
+      const contract = new PhoenixNFTCollectionContract.Client({
+        contractId: resolvedParams.collectionAddress,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+      setCollectionContract(contract);
+    };
+
+    fetchParams();
+  }, [params]);
 
   const [name, setName] = useState<string>("");
-  const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
+  const [previewImage, setPreviewImage] = useState<string | undefined>(
+    undefined
+  );
   const [creator, setCreator] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [likes, setLikes] = useState<number>(0);
@@ -58,45 +83,39 @@ export default function Page({ params }: CollectionPageProps) {
   const [orderItems, setOrderItems] = useState<TextSelectItemProps[]>([]);
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
-  const [status, setStatus] = useState<AuctionStatus>('ALL');
+  const [status, setStatus] = useState<AuctionStatus>("ALL");
   const [type, setType] = useState<AuctionType>("ALL");
 
-  const CollectionContract = new PhoenixNFTCollectionContract.Client({
-    contractId: params.collectionAddress,
-    networkPassphrase: constants.NETWORK_PASSPHRASE,
-    rpcUrl: constants.RPC_URL,
-  });
-
   const handleEntryClick = (id: string) => {
-    alert(id)
+    alert(id);
   };
 
   const handleShareClick = () => {
-    alert("share")
+    alert("share");
   };
 
   const handleCollectionOfferClick = () => {
-    alert("offer")
+    alert("offer");
   };
 
   const handleListForSaleClick = (id: string) => {
-    alert(`list for sale ${id}`)
+    alert(`list for sale ${id}`);
   };
 
   const fetchEntries = () => {
-    setEntries([demoEntry, demoEntry, demoEntry, demoEntry, demoEntryOwned])
-  }
+    setEntries([demoEntry, demoEntry, demoEntry, demoEntry, demoEntryOwned]);
+  };
 
   useEffect(() => {
     fetchEntries();
     const query = async () => {
-      const res = await CollectionContract.collection_uri();
+      const res = await collectionContract!.collection_uri();
 
       console.log(res);
     };
 
     query();
-  }, [])
+  }, [collectionContract]);
 
   return (
     <Box

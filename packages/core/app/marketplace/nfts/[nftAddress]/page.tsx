@@ -31,9 +31,9 @@ const demoEntryOwned: NftListingEntryProps = {
 };
 
 interface NftPageProps {
-  readonly params: {
+  readonly params: Promise<{
     readonly nftAddress: string;
-  };
+  }>;
 }
 
 export default function Page({ params }: NftPageProps) {
@@ -47,13 +47,18 @@ export default function Page({ params }: NftPageProps) {
   );
 
   const [previewImage, setPreviewImage] = useState<string>("/demo_nft.png");
-  const [collectionName, setCollectionName] = useState<string>("Collection Name");
+  const [collectionName, setCollectionName] =
+    useState<string>("Collection Name");
   const [nftName, setNftName] = useState<string>("NFT Name");
-  const [nftDescription, setNftDescription] = useState<string>("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+  const [nftDescription, setNftDescription] = useState<string>(
+    "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+  );
   const [lastSale, setLastSale] = useState<string>("103.1K PHO");
   const [bestOffer, setBestOffer] = useState<string>("162.5K PHO");
   const [floorPrice, setFloorPrice] = useState<string>("177.89K PHO");
-  const [owner, setOwner] = useState<string>("GARX7YOCGEIOA5YQXCHA6ZM7764KLCFRVTTQJQZMPLJPCZKHY4KATVM3");
+  const [owner, setOwner] = useState<string>(
+    "GARX7YOCGEIOA5YQXCHA6ZM7764KLCFRVTTQJQZMPLJPCZKHY4KATVM3"
+  );
   const [auctionEnds, setAuctionEnds] = useState<Date>(auctionEndTime);
   const [availableSupply, setAvailableSupply] = useState<string>("1");
   const [totalSupply, setTotalSupply] = useState<string>("20");
@@ -61,20 +66,18 @@ export default function Page({ params }: NftPageProps) {
   const [priceUsd, setPriceUsd] = useState<string>("2,407.04");
   const [listForSale, setListForSale] = useState<boolean>(false);
 
-  const fetchNftInfo = () => {
-    
-  };
+  const fetchNftInfo = () => {};
 
   const handleBuyNowClick = () => {
-    alert("buy now")
+    alert("buy now");
   };
 
   const handleMakeOfferClick = () => {
-    alert("make offer")
+    alert("make offer");
   };
 
   const handleListForSaleClick = () => {
-    alert("list for sale")
+    alert("list for sale");
   };
 
   useEffect(() => {

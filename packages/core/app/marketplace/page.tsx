@@ -59,28 +59,20 @@ const demoGettingStartedItem = {
 
 export default function page() {
   const fetchFeaturedCollections = () => {
-    const collectionContract = new PhoenixNFTCollectionContract.MockClient({
-      contractId: "",
-      networkPassphrase: constants.NETWORK_PASSPHRASE,
-      rpcUrl: constants.RPC_URL,
-    })
+    // const collectionContract = new PhoenixNFTCollectionContract.MockClient({
+    //  contractId: "",
+    //  networkPassphrase: constants.NETWORK_PASSPHRASE,
+    //  rpcUrl: constants.RPC_URL,
+    // })
   };
 
-  const fetchTopCollections = () => {
-    
-  };
+  const fetchTopCollections = () => {};
 
-  const fetchPopularNfts = () => {
-    
-  };
+  const fetchPopularNfts = () => {};
 
-  const fetchRisingStars = () => {
-    
-  };
+  const fetchRisingStars = () => {};
 
-  const fetchNftCategories = () => {
-    
-  };
+  const fetchNftCategories = () => {};
 
   return (
     <Box
