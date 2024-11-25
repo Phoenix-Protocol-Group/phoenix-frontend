@@ -1,24 +1,17 @@
-// app/api/proxy/[...endpoint]/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  request: Request,
-  context: { params: { endpoint: string[] } }
-) {
-  const { params } = context;
-
-  // Ensure params is awaited properly
-  const endpoint = (await params)?.endpoint || [];
-  const query = request.url.split("?")[1]
-    ? "?" + request.url.split("?")[1]
-    : "";
-  const targetUrl = `http://65.21.27.173:5050/${endpoint.join("/")}${query}`;
+export async function GET(request: NextRequest) {
+  // Extract dynamic route segments directly from the pathname
+  const pathname = request.nextUrl.pathname;
+  const endpoint = pathname.replace("/api/indexer/", ""); // Remove the base path
+  const query = request.nextUrl.search || ""; // Extract query parameters
+  const targetUrl = `http://65.21.27.173:5050/${endpoint}${query}`;
 
   const response = await fetch(targetUrl, {
     method: "GET",
     headers: {
-      ...request.headers,
-    } as HeadersInit,
+      ...Object.fromEntries(request.headers),
+    },
   });
 
   const data = await response.text();
@@ -31,24 +24,20 @@ export async function GET(
   });
 }
 
-export async function POST(
-  request: Request,
-  context: { params: { endpoint: string[] } }
-) {
-  const { params } = context;
-
-  // Ensure params is awaited properly
-  const endpoint = (await params)?.endpoint || [];
-  const targetUrl = `http://65.21.27.173:5050/${endpoint.join("/")}`;
+export async function POST(request: NextRequest) {
+  // Extract dynamic route segments directly from the pathname
+  const pathname = request.nextUrl.pathname;
+  const endpoint = pathname.replace("/api/indexer/", ""); // Remove the base path
+  const targetUrl = `http://65.21.27.173:5050/${endpoint}`;
 
   const body = await request.text();
 
   const response = await fetch(targetUrl, {
     method: "POST",
     headers: {
-      ...request.headers,
+      ...Object.fromEntries(request.headers),
       "Content-Type": "application/json",
-    } as HeadersInit,
+    },
     body,
   });
 
