@@ -13,8 +13,9 @@ import {
 } from "@stellar/stellar-sdk/lib/contract";
 import { useToast } from "@/hooks/useToast";
 import { constants, Signer } from "@phoenix-protocol/utils";
-import { usePersistStore } from "@phoenix-protocol/state";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { useRestoreModal } from "@/providers/RestoreModalProvider";
+import { AppStore, AppStorePersist } from "@phoenix-protocol/types";
 
 // Define Contract Types
 type ContractType =
@@ -61,15 +62,15 @@ interface ExecuteContractTransactionParams<T extends ContractType>
   contractType: T;
 }
 
-const getSigner = (storePersist: any) => {
+const getSigner = (storePersist: AppStorePersist, appStore: AppStore) => {
   return storePersist.wallet.walletType === "wallet-connect"
-    ? storePersist.walletConnectInstance
+    ? appStore.walletConnectInstance
     : new Signer();
 };
 
-const getSignerFunction = (signer: any) => {
+const getSignerFunction = (signer: any, storePersist: any) => {
   return (tx: string) =>
-    signer.walletType === "wallet-connect"
+    storePersist.wallet.walletType === "wallet-connect"
       ? signer.signTransaction(tx)
       : signer.sign(tx);
 };
@@ -80,9 +81,10 @@ const getContractClient = <T extends ContractType>(
   signer: any,
   networkPassphrase: string,
   rpcUrl: string,
-  publicKey: string
+  publicKey: string,
+  storePersist: any
 ): ContractClientType<T> => {
-  const signTransaction = getSignerFunction(signer);
+  const signTransaction = getSignerFunction(signer, storePersist);
   const commonOptions = {
     publicKey: publicKey,
     contractId: contractAddress,
@@ -98,6 +100,8 @@ const getContractClient = <T extends ContractType>(
 export const useContractTransaction = () => {
   const { addAsyncToast } = useToast();
   const storePersist = usePersistStore();
+  const appStore = useAppStore();
+
   const { openRestoreModal, closeRestoreModal } = useRestoreModal();
 
   const executeContractTransaction = useCallback(
@@ -106,7 +110,7 @@ export const useContractTransaction = () => {
       contractAddress,
       transactionFunction,
     }: ExecuteContractTransactionParams<T>) => {
-      const signer = getSigner(storePersist);
+      const signer = getSigner(storePersist, appStore);
       const networkPassphrase = constants.NETWORK_PASSPHRASE;
       const rpcUrl = constants.RPC_URL;
       const loadingMessage = "Transaction in progress...";
@@ -121,7 +125,8 @@ export const useContractTransaction = () => {
             signer,
             networkPassphrase,
             rpcUrl,
-            publicKey
+            publicKey,
+            storePersist
           );
 
           const transaction = await transactionFunction(
