@@ -54,3 +54,11 @@ export type TotalUsersResponse = {
   totalUsers: string;
   usersLast24h: string;
 };
+export interface RatioGraphEntry {
+  timeStamp: string; // Unix timestamp in uint64 format
+  price: number; // Price in double format
+}
+
+export interface RatioResponse {
+  graph: RatioGraphEntry[];
+}
