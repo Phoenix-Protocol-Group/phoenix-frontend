@@ -225,7 +225,7 @@ export default function Page() {
       case "W":
         graph = (
           await API.getRatioGraphLastWeek(
-            "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX"
+            "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA"
           )
         ).graph;
         break;
@@ -233,7 +233,7 @@ export default function Page() {
       case "M":
         graph = (
           await API.getRatioGraphLastMonth(
-            "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX"
+            "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA"
           )
         ).graph;
         break;
@@ -241,7 +241,7 @@ export default function Page() {
       case "Y":
         graph = (
           await API.getRatioGraphLastYear(
-            "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX"
+            "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA"
           )
         ).graph;
         break;
