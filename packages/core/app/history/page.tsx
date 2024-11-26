@@ -1,7 +1,7 @@
 "use client";
 import { Box, Grid, Typography } from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import { ActiveFilters } from "@phoenix-protocol/types";
+import { ActiveFilters, Token } from "@phoenix-protocol/types";
 import {
   Button,
   FinancialChart,
@@ -10,12 +10,10 @@ import {
   TransactionsTable,
   VolumeChart,
 } from "@phoenix-protocol/ui";
-import {
-  fetchDataByTimeEpoch,
-  fetchHistoricalPrices,
-  fetchHistoryMetaData,
-  fetchAllTrades,
-} from "@phoenix-protocol/utils";
+import { API } from "@phoenix-protocol/utils";
+import { fetchAllTrades, scaToToken } from "@phoenix-protocol/utils";
+
+import { TradingVolumeResponse } from "@phoenix-protocol/utils/build/api/types";
 import { useEffect, useState } from "react";
 
 export default function Page() {
@@ -23,12 +21,14 @@ export default function Page() {
   const appStorePersist = usePersistStore();
 
   const [meta, setMeta] = useState({
-    activeAccountsLast24h: 0,
-    totalAccounts: 0,
-    totalTrades: 0,
+    users24h: "0",
+    totalUsers: "0",
+    totalTrades: "0",
+    mostTradedAsset: {} as Token,
   });
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<{ timestamp: string; volume: number }[]>([]);
   const [totalVolume, setTotalVolume] = useState(0);
+  const [period, setPeriod] = useState<"W" | "M" | "Y">("W");
   const [mostTradedAsset, setMostTradedAsset] = useState<any>({
     name: "XLM",
     icon: `cryptoIcons/xlm.svg`,
@@ -69,115 +69,10 @@ export default function Page() {
     },
   });
 
-  const loadPriceData = async () => {
-    const result = await fetchHistoricalPrices(
-      undefined,
-      "PHO",
-      undefined,
-      undefined,
-      true
-    );
-    setHistoricalPrices(result);
-  };
-
-  const loadVolumeData = async (epoch: "monthly" | "yearly" | "daily") => {
-    const result = await fetchDataByTimeEpoch(epoch);
-    const intervals = result[Object.keys(result)[0]].intervals;
-
-    setData(intervals);
-
-    const newTotalVolume: number = intervals.reduce(
-      (total: string, currentValue: any) => total + currentValue.volume,
-      0
-    );
-    setTotalVolume(Number(Number(newTotalVolume).toFixed(5)));
-  };
-
-  const loadAllTrades = async () => {
-    const { totalTradeCount, mostTradedAsset, tradeList, totalTradeCount24h } =
-      await fetchAllTrades(appStore);
-
-    setMeta((prevMeta) => ({
-      ...prevMeta,
-      totalTrades: totalTradeCount,
-      activeAccountsLast24h: totalTradeCount24h,
-    }));
-
-    setMostTradedAsset({
-      name: mostTradedAsset,
-      icon: `cryptoIcons/${mostTradedAsset.toLowerCase()}.svg`,
-    });
-
-    setAllTrades(tradeList);
-    setHistory(tradeList.slice(0, pageSize));
-    setHistoryLoading(false);
-  };
-
-  const applyFilters = () => {
-    const filteredTrades = allTrades.filter((trade) => {
-      const tradeTimestamp = new Date(trade.date * 1000).getTime() / 1000;
-
-      // Filter by date range
-      if (activeFilters.dateRange.from || activeFilters.dateRange.to) {
-        const from = activeFilters.dateRange.from
-          ? new Date(activeFilters.dateRange.from).setHours(0, 0, 0, 0) / 1000
-          : null;
-        const to = activeFilters.dateRange.to
-          ? new Date(activeFilters.dateRange.to).setHours(23, 59, 59, 999) /
-            1000
-          : null;
-
-        if (from && tradeTimestamp < from) return false;
-        if (to && tradeTimestamp > to) return false;
-      }
-
-      // Filter by trade size
-      if (
-        activeFilters.tradeSize.from &&
-        Number(trade.tradeSize) < activeFilters.tradeSize.from
-      )
-        return false;
-      if (
-        activeFilters.tradeSize.to &&
-        Number(trade.tradeSize) > activeFilters.tradeSize.to
-      )
-        return false;
-
-      // Filter by trade value
-      if (
-        activeFilters.tradeValue.from &&
-        Number(trade.tradeValue) < activeFilters.tradeValue.from
-      )
-        return false;
-      if (
-        activeFilters.tradeValue.to &&
-        Number(trade.tradeValue) > activeFilters.tradeValue.to
-      )
-        return false;
-
-      return true;
-    });
-
-    // Sort the filtered trades
-    const sortedTrades = filteredTrades.sort((a, b) => {
-      if (sortBy === "date") {
-        return sortOrder === "asc" ? a.date - b.date : b.date - a.date;
-      } else if (sortBy) {
-        return sortOrder === "asc"
-          ? a[sortBy] - b[sortBy]
-          : b[sortBy] - a[sortBy];
-      }
-      return 0;
-    });
-
-    // Update history with sorted and filtered trades
-    setHistory(sortedTrades.slice(0, pageSize));
-  };
+  const applyFilters = () => {};
 
   const loadMore = () => {
-    const newPageSize = pageSize + 10;
-    setPageSize(newPageSize);
-    setHistory(history.slice(0, newPageSize));
+    setPageSize(pageSize + 10);
   };
 
   const handleSortChange = (
@@ -202,24 +97,181 @@ export default function Page() {
     }
   }, [pageSize, sortBy, sortOrder, activeFilters, allTrades]);
 
-  useEffect(() => {
-    switch (selectedTimeEpoch) {
-      case "D":
-        loadVolumeData("daily");
+  const loadVolumeData = async (timeEpoch: "D" | "M" | "A") => {
+    let volume: TradingVolumeResponse;
+
+    // Define start and end timestamps
+    const now = new Date();
+    let start: string, end: string;
+
+    switch (timeEpoch) {
+      case "D": // Hourly data for the last 24 hours
+        start = (
+          new Date(now.getTime() - 24 * 60 * 60 * 1000).getTime() / 1000
+        ).toFixed(0); // 24 hours ago
+        end = (now.getTime() / 1000).toFixed(0); // Current time
+        volume = await API.getAllTradingVolumePerHour(start, end);
+        break;
+
+      case "M": // Daily data for the last 30 days
+        start = (
+          new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).getTime() / 1000
+        ).toFixed(0); // 30 days ago
+        end = now.getTime().toString(); // Current time
+        volume = await API.getAllTradingVolumePerDay(start, end);
+        break;
+
+      case "A": // Monthly data for the last 12 months
+        const lastYear = new Date(now.getFullYear() - 1, now.getMonth(), 1); // First day of this month, last year
+        start = (lastYear.getTime() / 1000).toFixed(0);
+        end = (now.getTime() / 1000).toFixed(0);
+        volume = await API.getAllTradingVolumePerMonth(start, end);
+        break;
+    }
+
+    let volumeTotal = 0;
+
+    // Map volume data to [[timestamp, amount]] format
+    const _data: { timestamp: string; volume: number; time: number }[] =
+      volume.tradingVolume.map((entry) => {
+        let timestamp: number;
+
+        if (entry.time) {
+          timestamp = new Date(
+            entry.time.date.year,
+            entry.time.date.month - 1,
+            entry.time.date.day,
+            entry.time.hour
+          ).getTime();
+        } else if (entry.date) {
+          timestamp = new Date(
+            entry.date.year,
+            entry.date.month - 1,
+            entry.date.day
+          ).getTime();
+        } else if (entry.week) {
+          // Approximate the week's start timestamp (assuming week starts on Monday)
+          const firstDayOfYear = new Date(entry.week.year, 0, 1);
+          timestamp =
+            firstDayOfYear.getTime() +
+            ((entry.week.week - 1) * 7 - firstDayOfYear.getDay() + 1) *
+              24 *
+              60 *
+              60 *
+              1000;
+        } else if (entry.month) {
+          timestamp = new Date(
+            entry.month.year,
+            entry.month.month - 1,
+            1
+          ).getTime();
+        } else {
+          throw new Error("Invalid time bucket in response");
+        }
+
+        let formattedTimestamp: string = "";
+        if (timeEpoch === "D") {
+          formattedTimestamp = new Date(timestamp).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        } else if (timeEpoch === "M") {
+          formattedTimestamp = new Date(timestamp).toLocaleDateString();
+        } else if (timeEpoch === "A") {
+          formattedTimestamp = new Date(timestamp).toLocaleDateString([], {
+            month: "short",
+            year: "numeric",
+          });
+        }
+
+        volumeTotal += entry.usdVolume;
+        return {
+          time: timestamp,
+          timestamp: formattedTimestamp,
+          volume: parseFloat(entry.usdVolume.toFixed(2)),
+        };
+      });
+
+    setTotalVolume(volumeTotal);
+    setData(_data.sort((a, b) => a.time - b.time));
+  };
+
+  const loadMetaData = async () => {
+    const totalTrades = (await API.getTotalTrades()).totalTrades;
+    const _totalUsers = await API.getTotalUsers();
+    const _mostResult = (await API.getMostTraded()).asset;
+
+    const _mostTradedAsset = await scaToToken(_mostResult, appStore);
+    const mostTradedAsset = {
+      ..._mostTradedAsset,
+      icon: `/cryptoIcons/${_mostTradedAsset?.symbol.toLowerCase()}.svg`,
+      name: _mostTradedAsset?.symbol,
+    };
+
+    const users24h = _totalUsers.usersLast24h;
+    const totalUsers = _totalUsers.totalUsers;
+
+    setMeta({
+      totalTrades,
+      users24h,
+      totalUsers,
+      mostTradedAsset: mostTradedAsset as Token,
+    });
+  };
+
+  const loadPriceData = async (period: "W" | "M" | "Y") => {
+    let graph: any[] = [];
+    switch (period) {
+      case "W":
+        graph = (
+          await API.getRatioGraphLastWeek(
+            "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX"
+          )
+        ).graph;
         break;
 
       case "M":
-        loadVolumeData("monthly");
+        graph = (
+          await API.getRatioGraphLastMonth(
+            "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX"
+          )
+        ).graph;
         break;
 
-      case "A":
-        loadVolumeData("yearly");
+      case "Y":
+        graph = (
+          await API.getRatioGraphLastYear(
+            "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX"
+          )
+        ).graph;
+        break;
     }
+    setHistoricalPrices(graph);
+  };
+
+  const loadAllTrades = async () => {
+    const trades = await fetchAllTrades(appStore, pageSize);
+    setHistory(trades);
+    setHistoryLoading(false);
+  };
+
+  useEffect(() => {
+    loadAllTrades();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageSize]);
+
+  useEffect(() => {
+    loadVolumeData(selectedTimeEpoch);
   }, [selectedTimeEpoch]);
 
   useEffect(() => {
-    loadVolumeData("daily");
-    loadPriceData();
+    loadPriceData(period);
+  }, [period]);
+
+  useEffect(() => {
+    loadVolumeData("D");
+    loadMetaData();
+    loadPriceData("W");
     loadAllTrades();
   }, []);
 
@@ -259,15 +311,19 @@ export default function Page() {
         </Grid>
         <Grid item xs={12} md={6}>
           {historicalPrices.length > 0 && (
-            <FinancialChart historicalPrices={historicalPrices} />
+            <FinancialChart
+              setPeriod={setPeriod}
+              period={period}
+              historicalPrices={historicalPrices}
+            />
           )}
         </Grid>
       </Grid>
       <TransactionsCards
-        activeTraders={meta.activeAccountsLast24h.toString()}
-        totalTraders={meta.activeAccountsLast24h.toString()}
-        mostTradedAsset={mostTradedAsset}
-        totalTrades={meta.totalTrades.toString()}
+        activeTraders={meta.users24h}
+        totalTraders={meta.totalUsers}
+        totalTrades={meta.totalTrades}
+        mostTradedAsset={meta.mostTradedAsset}
       />
 
       {!historyLoading ? (

@@ -1,40 +1,18 @@
 import axios from "axios";
+import { API } from "./api";
+import { fetchTokenList } from "./fetchTokenList";
 
-const BASE_URL = "/api/indexer";
-const TOKEN_LIST_URL =
-  "https://raw.githubusercontent.com/decentrio/token-list/refs/heads/main/token_lists.json";
-
-async function fetchTickers() {
-  try {
-    const response = await axios.get(`${BASE_URL}/tickers`);
-    return response.data.map((ticker: any) => ticker.ticker_id);
-  } catch (error) {
-    console.log("Error fetching tickers:", error);
-    throw error;
-  }
-}
-
-async function fetchTokenList() {
-  try {
-    const response = await axios.get(TOKEN_LIST_URL);
-    return response.data.reduce((acc: Record<string, any>, token: any) => {
-      acc[token.token] = {
-        symbol: token.symbol,
-        soroban_contract: token.soroban_contract,
-        decimals: token.decimals,
-      };
-      return acc;
-    }, {});
-  } catch (error) {
-    console.log("Error fetching token list:", error);
-    throw error;
-  }
-}
-
-export async function fetchAllTrades(appStore: any) {
+export async function fetchAllTrades(
+  appStore: any,
+  limit: number = 14,
+  type?: string | undefined,
+  startTime?: string | undefined,
+  endTime?: string | undefined
+) {
   try {
     // Fetch tickers and token list
-    const tickers = await fetchTickers();
+    const tickers = (await API.getTickers()).map((e) => e.ticker_id);
+
     const tokenList = await fetchTokenList();
 
     // Collect all unique tokens across tickers
@@ -48,8 +26,8 @@ export async function fetchAllTrades(appStore: any) {
     // Pre-fetch token information for all unique tokens
     const tokenInfoCache: Record<string, any> = {};
     await Promise.all(
-      Array.from(uniqueTokens).map(async (token) => {
-        const tokenData = tokenList[token];
+      Array.from(uniqueTokens).map(async (token: any) => {
+        const tokenData = tokenList.find((tok) => tok.token == token);
         if (tokenData) {
           const sorobanContract = tokenData.soroban_contract;
           tokenInfoCache[token] = await appStore.fetchTokenInfo(
@@ -59,21 +37,14 @@ export async function fetchAllTrades(appStore: any) {
       })
     );
 
-    // Query all trades for each ticker
-    const trades = await Promise.all(
-      tickers.map(async (tickerId: string) => {
-        const response = await axios.get(`${BASE_URL}/historical_trades`, {
-          params: { tickerId, limit: 5000 },
-        });
-        return response.data.map((trade: any) => ({
-          ...trade,
-          tickerId,
-        }));
-      })
+    // Query all trades
+    const trades = await API.getTradeHistory(
+      undefined,
+      type,
+      limit,
+      startTime,
+      endTime
     );
-
-    // Flatten the trades array
-    const allTrades = trades.flat();
 
     // Current timestamp and 24 hours ago
     const now = Date.now();
@@ -83,14 +54,14 @@ export async function fetchAllTrades(appStore: any) {
     const assetTradeCount: Record<string, number> = {};
     let totalTradeCount24h = 0;
 
-    const tradeList = allTrades.map((trade: any) => {
+    const tradeList = trades.map((trade) => {
       const [assetA, assetB] = trade.ticker_id.split("_");
       assetTradeCount[assetA] = (assetTradeCount[assetA] || 0) + 1;
       assetTradeCount[assetB] = (assetTradeCount[assetB] || 0) + 1;
 
       // Check if trade is within the last 24 hours
       const tradeTimestamp =
-        new Date(trade.trade_timestamp * 1000).getTime() / 1000;
+        new Date(Number(trade.trade_timestamp) * 1000).getTime() / 1000;
 
       if (tradeTimestamp >= oneDayAgo) {
         totalTradeCount24h += 1;
@@ -121,17 +92,7 @@ export async function fetchAllTrades(appStore: any) {
       };
     });
 
-    const mostTradedAsset = Object.entries(assetTradeCount).reduce(
-      (max, [asset, count]) => (count > max.count ? { asset, count } : max),
-      { asset: "", count: 0 }
-    ).asset;
-
-    return {
-      totalTradeCount: allTrades.length,
-      totalTradeCount24h, // Count of trades in the last 24 hours
-      mostTradedAsset,
-      tradeList,
-    };
+    return tradeList;
   } catch (error) {
     console.log("Error fetching all trades:", error);
     throw error;
