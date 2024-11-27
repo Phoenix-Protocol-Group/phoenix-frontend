@@ -8,8 +8,10 @@ import {
   YAxis,
   CartesianGrid,
   Legend,
+  Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { motion } from "framer-motion";
 
 type Pool = {
   tokenA: { icon: string; symbol: string };
@@ -24,6 +26,28 @@ interface VolumeChartProps {
   pools: Pool[];
   selectedPoolForVolume: string | undefined;
   setSelectedPoolForVolume: (pool: string | undefined) => void;
+}
+
+function formatNumber(input: string | number): string {
+  let numberValue: number;
+
+  if (typeof input === "string") {
+    numberValue = parseFloat(input);
+    if (isNaN(numberValue)) return input; // Return the string as is if it's not a valid number
+  } else {
+    numberValue = input;
+  }
+
+  if (numberValue <= 10000) {
+    return numberValue.toFixed(0);
+  } else if (numberValue > 10000 && numberValue < 100000) {
+    return numberValue.toLocaleString("en-US", { useGrouping: true });
+  } else if (numberValue >= 1_000_000) {
+    const millionValue = (numberValue / 1_000_000).toFixed(2);
+    return `${millionValue.replace(".", ",")} Mio`;
+  }
+
+  return numberValue.toString(); // Fallback for edge cases
 }
 
 const getBarBackground = (value: number, max: number) => {
@@ -280,6 +304,48 @@ const VolumeChart = ({
           />
           <XAxis dataKey="timestamp" />
           <YAxis tickFormatter={renderCustomAxisTick} />
+          <Tooltip
+            content={({ active, payload, label }) => {
+              if (active && payload && payload.length) {
+                return (
+                  <div
+                    style={{
+                      background:
+                        "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
+                      border: "1px solid #292B2C",
+                      borderRadius: "0.5rem",
+                      padding: "10px",
+                      color: "white",
+                      boxShadow:
+                        "-3px 3px 10px 0px rgba(25, 13, 1, 0.10),-12px 13px 18px 0px rgba(25, 13, 1, 0.09),-26px 30px 24px 0px rgba(25, 13, 1, 0.05),-46px 53px 28px 0px rgba(25, 13, 1, 0.02),-73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "white",
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {label}
+                    </p>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "white",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      Volume: ${formatNumber(Number(payload[0].value))}
+                    </p>
+                  </div>
+                );
+              }
+              return null;
+            }}
+          />
+
           <Bar dataKey="volume" barSize={12} radius={[2, 2, 0, 0]}>
             {data.map((entry, index) => (
               <Cell
