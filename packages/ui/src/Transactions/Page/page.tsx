@@ -128,12 +128,7 @@ const HistoryPage = () => {
       >
         Transaction History
       </Typography>
-      <VolumeChart
-        totalVolume={900}
-        data={data}
-        selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
-      />
+
       <TransactionsCards {...cardArgs} />
       {/* @ts-ignore */}
       <TransactionsTable

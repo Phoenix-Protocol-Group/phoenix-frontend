@@ -39,8 +39,27 @@ const data = [
   { timestamp: "11 PM", volume: 1450000 },
 ];
 
+const pools = [
+  {
+    tokenA: { icon: "https://example.com/tokenA.png", symbol: "TokenA" },
+    tokenB: { icon: "https://example.com/tokenB.png", symbol: "TokenB" },
+    contractAddress: "0x12345",
+  },
+  {
+    tokenA: { icon: "https://example.com/tokenC.png", symbol: "TokenC" },
+    tokenB: { icon: "https://example.com/tokenD.png", symbol: "TokenD" },
+    contractAddress: "0x67890",
+  },
+];
+
 export const Primary: Story = {
   args: {
     data,
+    totalVolume: 22000000,
+    selectedTab: "D",
+    setSelectedTab: (tab) => console.log("Selected Tab:", tab),
+    pools,
+    selectedPoolForVolume: "All",
+    setSelectedPoolForVolume: (pool) => console.log("Selected Pool:", pool),
   },
 };

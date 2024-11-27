@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { Box, Grid, Typography } from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
@@ -54,6 +55,7 @@ export default function Page() {
     "D"
   );
   const [activeView, setActiveView] = useState<"personal" | "all">("all");
+  const [pools, setPools] = useState<any[]>([]);
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>({
     dateRange: {
       from: undefined,
@@ -68,8 +70,14 @@ export default function Page() {
       to: undefined,
     },
   });
+  const [selectedPoolForVolume, setSelectedPoolForVolume] = useState<
+    string | undefined
+  >();
 
-  const applyFilters = () => {};
+  const applyFilters = (newFilters: ActiveFilters) => {
+    setActiveFilters(newFilters);
+    loadAllTrades(newFilters);
+  };
 
   const loadMore = () => {
     setPageSize(pageSize + 10);
@@ -88,14 +96,8 @@ export default function Page() {
   ) => {
     setSortBy(newSortBy);
     setSortOrder(newSortOrder);
-    applyFilters();
+    applyFilters(activeFilters);
   };
-
-  useEffect(() => {
-    if (allTrades.length > 0) {
-      applyFilters();
-    }
-  }, [pageSize, sortBy, sortOrder, activeFilters, allTrades]);
 
   const loadVolumeData = async (timeEpoch: "D" | "M" | "A") => {
     let volume: TradingVolumeResponse;
@@ -110,7 +112,15 @@ export default function Page() {
           new Date(now.getTime() - 24 * 60 * 60 * 1000).getTime() / 1000
         ).toFixed(0); // 24 hours ago
         end = (now.getTime() / 1000).toFixed(0); // Current time
-        volume = await API.getAllTradingVolumePerHour(start, end);
+        if (selectedPoolForVolume) {
+          volume = await API.getTradingVolumePerHour(
+            selectedPoolForVolume,
+            start,
+            end
+          );
+        } else {
+          volume = await API.getAllTradingVolumePerHour(start, end);
+        }
         break;
 
       case "M": // Daily data for the last 30 days
@@ -118,14 +128,30 @@ export default function Page() {
           new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).getTime() / 1000
         ).toFixed(0); // 30 days ago
         end = now.getTime().toString(); // Current time
-        volume = await API.getAllTradingVolumePerDay(start, end);
+        if (selectedPoolForVolume) {
+          volume = await API.getTradingVolumePerDay(
+            selectedPoolForVolume,
+            start,
+            end
+          );
+        } else {
+          volume = await API.getAllTradingVolumePerDay(start, end);
+        }
         break;
 
       case "A": // Monthly data for the last 12 months
         const lastYear = new Date(now.getFullYear() - 1, now.getMonth(), 1); // First day of this month, last year
         start = (lastYear.getTime() / 1000).toFixed(0);
         end = (now.getTime() / 1000).toFixed(0);
-        volume = await API.getAllTradingVolumePerMonth(start, end);
+        if (selectedPoolForVolume) {
+          volume = await API.getTradingVolumePerMonth(
+            selectedPoolForVolume,
+            start,
+            end
+          );
+        } else {
+          volume = await API.getAllTradingVolumePerMonth(start, end);
+        }
         break;
     }
 
@@ -219,6 +245,28 @@ export default function Page() {
     });
   };
 
+  const loadPools = async () => {
+    const tickers = await API.getTickers();
+    const _pools = await Promise.all(
+      tickers.map(async (ticker) => {
+        const tokenA = await scaToToken(ticker.base_currency, appStore);
+        const tokenB = await scaToToken(ticker.target_currency, appStore);
+        return {
+          contractAddress: ticker.pool_id,
+          tokenA: {
+            ...tokenA,
+            icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
+          },
+          tokenB: {
+            ...tokenB,
+            icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
+          },
+        };
+      })
+    );
+    setPools(_pools);
+  };
+
   const loadPriceData = async (period: "W" | "M" | "Y") => {
     let graph: any[] = [];
     switch (period) {
@@ -249,8 +297,21 @@ export default function Page() {
     setHistoricalPrices(graph);
   };
 
-  const loadAllTrades = async () => {
-    const trades = await fetchAllTrades(appStore, pageSize);
+  const loadAllTrades = async (newFilters: ActiveFilters = activeFilters) => {
+    let from, to;
+    if (newFilters.dateRange.from) {
+      from = (newFilters.dateRange.from.getTime() / 1000).toFixed(0);
+    }
+    if (newFilters.dateRange.to) {
+      to = (newFilters.dateRange.to.getTime() / 1000).toFixed(0);
+    }
+    const trades = await fetchAllTrades(
+      appStore,
+      pageSize,
+      undefined,
+      from,
+      to
+    );
     setHistory(trades);
     setHistoryLoading(false);
   };
@@ -262,7 +323,7 @@ export default function Page() {
 
   useEffect(() => {
     loadVolumeData(selectedTimeEpoch);
-  }, [selectedTimeEpoch]);
+  }, [selectedTimeEpoch, selectedPoolForVolume]);
 
   useEffect(() => {
     loadPriceData(period);
@@ -273,6 +334,7 @@ export default function Page() {
     loadMetaData();
     loadPriceData("W");
     loadAllTrades();
+    loadPools();
   }, []);
 
   return (
@@ -303,6 +365,9 @@ export default function Page() {
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <VolumeChart
+            pools={pools}
+            selectedPoolForVolume={selectedPoolForVolume}
+            setSelectedPoolForVolume={setSelectedPoolForVolume}
             data={data}
             setSelectedTab={(e) => setSelectedTimeEpoch(e)}
             selectedTab={selectedTimeEpoch}
@@ -342,9 +407,7 @@ export default function Page() {
           }}
           loggedIn={!!appStorePersist.wallet.address}
           activeFilters={activeFilters}
-          applyFilters={(newFilters: ActiveFilters) => {
-            setActiveFilters(newFilters);
-          }}
+          applyFilters={(newFilters: ActiveFilters) => applyFilters(newFilters)}
           handleSort={(column) =>
             handleSortChange(
               column as any,
