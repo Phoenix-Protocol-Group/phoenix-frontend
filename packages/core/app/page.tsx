@@ -12,14 +12,18 @@ import {
   CryptoCTA,
   DashboardPriceCharts,
   DashboardStats,
+  Tile,
   WalletBalanceTable,
 } from "@phoenix-protocol/ui";
 import { useRouter } from "next/navigation";
 import {
+  API,
   constants,
   fetchBiggestWinnerAndLoser,
   fetchHistoricalPrices,
   formatCurrency,
+  formatCurrencyStatic,
+  TradingVolumeResponse,
 } from "@phoenix-protocol/utils";
 import { getAllAnchors } from "@phoenix-protocol/utils/build/sep24";
 import { useAppStore } from "@phoenix-protocol/state";
@@ -53,12 +57,48 @@ export default function Page() {
   const [selectedTokenForInfo, setSelectedTokenForInfo] =
     useState<AssetInfo | null>(null);
   const [tokenInfoOpen, setTokenInfoOpen] = useState(false);
+  const [tvl, setTVL] = useState<number>(0);
+  const [dailyVolume, setDailyVolume] = useState<number>(0);
+
+  const get24hVolume = async () => {
+    // Define start and end timestamps
+    const now = new Date();
+
+    const start = (
+      new Date(now.getTime() - 24 * 60 * 60 * 1000).getTime() / 1000
+    ).toFixed(0); // 24 hours ago
+    const end = (now.getTime() / 1000).toFixed(0); // Current time
+
+    const volume = await API.getAllTradingVolumePerHour(start, end);
+
+    let volumeTotal = 0;
+
+    volume.tradingVolume.map((entry) => {
+      volumeTotal += entry.usdVolume;
+    });
+
+    setDailyVolume(volumeTotal);
+  };
+
+  const getTVL = async () => {
+    const allTickers = await API.getTickers();
+    const _tvl = allTickers.reduce((total, ticker) => {
+      return total + ticker.liquidity_in_usd;
+    }, 0);
+    setTVL(_tvl);
+  };
 
   // Fetch and initialize data
   useEffect(() => {
     const initData = async () => {
       try {
         setLoadingDashboard(true);
+
+        // Fetch TVL
+        getTVL();
+
+        // Fetch 24h volume
+        get24hVolume();
 
         // Fetch anchors
         const anchors = await getAllAnchors();
@@ -340,9 +380,23 @@ export default function Page() {
             <NftCarouselPlaceholder />
           </Grid>
         </Grid>
-        <Grid item container lg={3} spacing={3}>
+        <Grid item container lg={3}>
           {/* Crypto CTA */}
-          <Grid item xs={12}>
+          <Grid
+            item
+            xs={12}
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
+            <Tile
+              value={formatCurrencyStatic.format(dailyVolume)}
+              title="Volume (24h)"
+              link=""
+            />
+            <Tile
+              value={formatCurrencyStatic.format(tvl)}
+              title="Total Value Locked"
+              link=""
+            />
             <CryptoCTA onClick={() => window.open("https://app.kado.money")} />
           </Grid>
         </Grid>

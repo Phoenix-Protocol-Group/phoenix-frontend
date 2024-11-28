@@ -2,7 +2,6 @@ import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
 import { SidebarNavigation } from "../../SidebarNavigation/SidebarNavigation";
 import { mockDataset } from "../DashboardCharts/mockdata";
 import { testTokens } from "../WalletBalanceTable/WalletBalanceTable.stories";
-import MainStats from "../MainStats/MainStats";
 import DashboardPriceCharts from "../DashboardCharts/DashboardCharts";
 import CryptoCTA from "../CryptoCTA/CryptoCTA";
 import WalletBalanceTable from "../WalletBalanceTable/WalletBalanceTable";

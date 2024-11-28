@@ -12,6 +12,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
+import { formatCurrencyStatic } from "@phoenix-protocol/utils";
 
 type Pool = {
   tokenA: { icon: string; symbol: string };
@@ -26,28 +27,6 @@ interface VolumeChartProps {
   pools: Pool[];
   selectedPoolForVolume: string | undefined;
   setSelectedPoolForVolume: (pool: string | undefined) => void;
-}
-
-function formatNumber(input: string | number): string {
-  let numberValue: number;
-
-  if (typeof input === "string") {
-    numberValue = parseFloat(input);
-    if (isNaN(numberValue)) return input; // Return the string as is if it's not a valid number
-  } else {
-    numberValue = input;
-  }
-
-  if (numberValue <= 10000) {
-    return numberValue.toFixed(0);
-  } else if (numberValue > 10000 && numberValue < 100000) {
-    return numberValue.toLocaleString("en-US", { useGrouping: true });
-  } else if (numberValue >= 1_000_000) {
-    const millionValue = (numberValue / 1_000_000).toFixed(2);
-    return `${millionValue.replace(".", ",")} Mio`;
-  }
-
-  return numberValue.toString(); // Fallback for edge cases
 }
 
 const getBarBackground = (value: number, max: number) => {
@@ -238,7 +217,7 @@ const VolumeChart = ({
               fontWeight: 700,
             }}
           >
-            ${totalVolume.toFixed(2)}
+            {formatCurrencyStatic.format(totalVolume)}
           </Typography>
         </Box>
 
@@ -337,7 +316,8 @@ const VolumeChart = ({
                         fontSize: "0.875rem",
                       }}
                     >
-                      Volume: ${formatNumber(Number(payload[0].value))}
+                      Volume:
+                      {formatCurrencyStatic.format(Number(payload[0].value))}
                     </p>
                   </div>
                 );
