@@ -33,9 +33,7 @@ export class Freighter implements Wallet {
       accountToSign?: string;
     }
   ): Promise<XDR_BASE64> {
-    const res = await signTransaction(tx, opts);
-
-    console.log("SIGN", res);
+    const res = await signTransaction(tx);
 
     return res.error ? "" : res.signedTxXdr;
   }

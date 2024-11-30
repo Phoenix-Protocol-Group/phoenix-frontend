@@ -102,7 +102,7 @@ export default class Signer {
     }
     return this.wallet.signTransaction(message, {
       network: constants.RPC_URL,
-      networkPassphrase: constants.NETWORK_PASSPHRASE,
+      networkPassphrase: constants.NETWORK_PASSPHRASE
     });
   }
 }

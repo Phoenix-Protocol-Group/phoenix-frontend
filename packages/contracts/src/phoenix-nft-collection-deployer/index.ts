@@ -33,7 +33,7 @@ if (typeof window !== 'undefined') {
 export const networks = {
   testnet: {
     networkPassphrase: "Test SDF Network ; September 2015",
-    contractId: "0",
+    contractId: "CDNOSHSUZ5UIYUPZI665Z7LXMJ4H4IZX3TUCWRDT5Q6XO7XBFLZLD3TX",
   }
 } as const
 
@@ -46,9 +46,7 @@ export interface CollectionByCreatorResponse {
 export type DataKey = {tag: "IsInitialized", values: void} | {tag: "CollectionsWasmHash", values: void} | {tag: "AllCollections", values: void} | {tag: "Creator", values: readonly [string]};
 
 export const Errors = {
-  0: {message:"NoCollectionsSaved"},
 
-  1: {message:"CreatorHasNoCollections"}
 }
 
 export interface Client {
@@ -110,7 +108,7 @@ export interface Client {
      * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
      */
     simulate?: boolean;
-  }) => Promise<AssembledTransaction<Result<Array<string>>>>
+  }) => Promise<AssembledTransaction<Array<string>>>
 
   /**
    * Construct and simulate a query_collection_by_creator transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
@@ -130,7 +128,7 @@ export interface Client {
      * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
      */
     simulate?: boolean;
-  }) => Promise<AssembledTransaction<Result<Array<CollectionByCreatorResponse>>>>
+  }) => Promise<AssembledTransaction<Array<CollectionByCreatorResponse>>>
 
 }
 export class Client extends ContractClient {
@@ -138,18 +136,17 @@ export class Client extends ContractClient {
     super(
       new ContractSpec([ "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAQAAAAAAAAAVY29sbGVjdGlvbnNfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
         "AAAAAAAAAAAAAAAVZGVwbG95X25ld19jb2xsZWN0aW9uAAAAAAAABAAAAAAAAAAEc2FsdAAAA+4AAAAgAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAABG5hbWUAAAAQAAAAAAAAAAZzeW1ib2wAAAAAABAAAAABAAAAEw==",
-        "AAAAAAAAAAAAAAAVcXVlcnlfYWxsX2NvbGxlY3Rpb25zAAAAAAAAAAAAAAEAAAPpAAAD6gAAABAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
-        "AAAAAAAAAAAAAAAbcXVlcnlfY29sbGVjdGlvbl9ieV9jcmVhdG9yAAAAAAEAAAAAAAAAB2NyZWF0b3IAAAAAEwAAAAEAAAPpAAAD6gAAB9AAAAAbQ29sbGVjdGlvbkJ5Q3JlYXRvclJlc3BvbnNlAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+        "AAAAAAAAAAAAAAAVcXVlcnlfYWxsX2NvbGxlY3Rpb25zAAAAAAAAAAAAAAEAAAPqAAAAEA==",
+        "AAAAAAAAAAAAAAAbcXVlcnlfY29sbGVjdGlvbl9ieV9jcmVhdG9yAAAAAAEAAAAAAAAAB2NyZWF0b3IAAAAAEwAAAAEAAAPqAAAH0AAAABtDb2xsZWN0aW9uQnlDcmVhdG9yUmVzcG9uc2UA",
         "AAAAAQAAAAAAAAAAAAAAG0NvbGxlY3Rpb25CeUNyZWF0b3JSZXNwb25zZQAAAAACAAAAAAAAAApjb2xsZWN0aW9uAAAAAAATAAAAAAAAAARuYW1lAAAAEA==",
-        "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAABAAAAAAAAAAAAAAADUlzSW5pdGlhbGl6ZWQAAAAAAAAAAAAAAAAAABNDb2xsZWN0aW9uc1dhc21IYXNoAAAAAAAAAAAAAAAADkFsbENvbGxlY3Rpb25zAAAAAAABAAAAAAAAAAdDcmVhdG9yAAAAAAEAAAAT",
-        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAACAAAAAAAAABJOb0NvbGxlY3Rpb25zU2F2ZWQAAAAAAAAAAAAAAAAAF0NyZWF0b3JIYXNOb0NvbGxlY3Rpb25zAAAAAAE=" ]),
+        "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAABAAAAAAAAAAAAAAADUlzSW5pdGlhbGl6ZWQAAAAAAAAAAAAAAAAAABNDb2xsZWN0aW9uc1dhc21IYXNoAAAAAAAAAAAAAAAADkFsbENvbGxlY3Rpb25zAAAAAAABAAAAAAAAAAdDcmVhdG9yAAAAAAEAAAAT" ]),
       options
     )
   }
   public readonly fromJSON = {
     initialize: this.txFromJSON<null>,
         deploy_new_collection: this.txFromJSON<string>,
-        query_all_collections: this.txFromJSON<Result<Array<string>>>,
-        query_collection_by_creator: this.txFromJSON<Result<Array<CollectionByCreatorResponse>>>
+        query_all_collections: this.txFromJSON<Array<string>>,
+        query_collection_by_creator: this.txFromJSON<Array<CollectionByCreatorResponse>>
   }
 }

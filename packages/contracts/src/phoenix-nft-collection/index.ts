@@ -33,7 +33,7 @@ if (typeof window !== 'undefined') {
 export const networks = {
   testnet: {
     networkPassphrase: "Test SDF Network ; September 2015",
-    contractId: "0",
+    contractId: "CD7T3HSTNNCZVYP6JSNO2JNC2LUPXGYNRIEFZKTLIXEGPAXO3HDTDYMA",
   }
 } as const
 
@@ -460,6 +460,46 @@ export interface Client {
     simulate?: boolean;
   }) => Promise<AssembledTransaction<Result<void>>>
 
+  /**
+   * Construct and simulate a show_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  show_admin: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<string>>>
+
+  /**
+   * Construct and simulate a show_config transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  show_config: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<Config>>>
+
 }
 export class Client extends ContractClient {
   constructor(public readonly options: ContractClientOptions) {
@@ -482,6 +522,8 @@ export class Client extends ContractClient {
         "AAAAAAAAAAAAAAADdXJpAAAAAAEAAAAAAAAAAmlkAAAAAAAGAAAAAQAAA+kAAAfQAAAACFVSSVZhbHVlAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
         "AAAAAAAAAAAAAAAOY29sbGVjdGlvbl91cmkAAAAAAAAAAAABAAAD6QAAB9AAAAAIVVJJVmFsdWUAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
         "AAAAAAAAAAAAAAAHdXBncmFkZQAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAABAAAD6QAAA+0AAAAAAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+        "AAAAAAAAAAAAAAAKc2hvd19hZG1pbgAAAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+        "AAAAAAAAAAAAAAALc2hvd19jb25maWcAAAAAAAAAAAEAAAPpAAAH0AAAAAZDb25maWcAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
         "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAANAAAAAAAAABpBY2NvdW50c0lkc0xlbmd0aE1pc3NtYXRjaAAAAAAAAAAAAAAAAAARQ2Fubm90QXBwcm92ZVNlbGYAAAAAAAABAAAAAAAAABNJbnN1ZmZpY2llbnRCYWxhbmNlAAAAAAIAAAAAAAAAGElkc0Ftb3VudHNMZW5ndGhNaXNtYXRjaAAAAAMAAAAAAAAACE5vVXJpU2V0AAAABAAAAAAAAAALQWRtaW5Ob3RTZXQAAAAABQAAAAAAAAAOQ29uZmlnTm90Rm91bmQAAAAAAAYAAAAAAAAADFVuYXV0aG9yaXplZAAAAAcAAAAAAAAAE0ludmFsaWRBY2NvdW50SW5kZXgAAAAACAAAAAAAAAAOSW52YWxpZElkSW5kZXgAAAAAAAkAAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAAACgAAAAAAAAASSW52YWxpZEFtb3VudEluZGV4AAAAAAALAAAAAAAAAAlJbnZhbGlkSWQAAAAAAAAM",
         "AAAAAQAAAAAAAAAAAAAAE09wZXJhdG9yQXBwcm92YWxLZXkAAAAAAgAAAAAAAAAIb3BlcmF0b3IAAAATAAAAAAAAAAVvd25lcgAAAAAAABM=",
         "AAAAAQAAAN1TdHJ1Y3QgdGhhdCByZXByZXNlbnRzIHRoZSBUcmFuc2ZlciBhcHByb3ZhbCBzdGF0dXMKRGVzY3JpcHRpb24uCgoqIGBvd25lcmAgLSBUaGUgYEFkZHJlc3NgIG9mIHRoZSBvd25lciBvZiB0aGUgY29sbGVjdGlvbi4KKiBgb3BlcmF0b3JgIC0gVGhlIGBBZGRyZXNzYCBvZiB0aGUgb3BlcmF0b3IgdGhhdCB3ZSB3aWxsIGF1dGhvcml6ZSB0byBkbyB0cmFuc2Zlci9iYXRjaAp0cmFuc2ZlcgAAAAAAAAAAAAATVHJhbnNmZXJBcHByb3ZhbEtleQAAAAADAAAAAAAAAAZuZnRfaWQAAAAAAAYAAAAAAAAACG9wZXJhdG9yAAAAEwAAAAAAAAAFb3duZXIAAAAAAAAT",
@@ -509,6 +551,8 @@ export class Client extends ContractClient {
         set_collection_uri: this.txFromJSON<Result<void>>,
         uri: this.txFromJSON<Result<URIValue>>,
         collection_uri: this.txFromJSON<Result<URIValue>>,
-        upgrade: this.txFromJSON<Result<void>>
+        upgrade: this.txFromJSON<Result<void>>,
+        show_admin: this.txFromJSON<Result<string>>,
+        show_config: this.txFromJSON<Result<Config>>
   }
 }

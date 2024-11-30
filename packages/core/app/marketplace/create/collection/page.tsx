@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { PhoenixNFTCollectionContract } from "@phoenix-protocol/contracts";
+import { Keypair, TransactionBuilder } from "@stellar/stellar-sdk";
 
 export default function Page() {
   const store = useAppStore();
@@ -61,7 +62,7 @@ export default function Page() {
   const handleSubmitClick = async () => {
     if (!storePersist) return;
 
-    console.log("handle")
+    console.log("handle");
 
     const randomBytes = new Uint8Array(32);
     const random = crypto.getRandomValues(randomBytes);
@@ -74,30 +75,40 @@ export default function Page() {
           ? store.walletConnectInstance
           : new Signer();
 
+      const stellarPrivateKey = "SCI3J73THH7QIRSBGIGUCYEJWJVEQASIM624LWVEWEQRKZTREAGZY6J7";
+
+      const keypair = Keypair.fromSecret(stellarPrivateKey);
+
+      // Extract the public key
+      const publicKey = keypair.publicKey();
+
       const CollectionDeployerContract =
         new PhoenixNFTCollectionDeployerContract.Client({
-          publicKey: storePersist.wallet.address!,
+          publicKey: publicKey,
           contractId: constants.COLLECTION_DEPLOYER_ADDRESS,
           networkPassphrase: constants.NETWORK_PASSPHRASE,
           rpcUrl: constants.RPC_URL,
           // @ts-ignore
-          signTransaction: (tx: string) =>
-            storePersist.wallet.walletType === "wallet-connect"
-              ? signer.signTransaction(tx)
-              : // @ts-ignore
-                signer.sign(tx),
-        });
-          
-      console.log("foo")
+          signTransaction: async (tx: string) => {
+            const transaction = TransactionBuilder.fromXDR(
+              tx,
+              constants.NETWORK_PASSPHRASE
+            );
 
-      const tx = await CollectionDeployerContract.deploy_new_collection(
-        {
-          salt,
-          admin: storePersist.wallet.address!,
-          name,
-          symbol,
-        }
-      );
+            transaction.sign(keypair);
+
+            return transaction.toXDR();
+          },
+        });
+
+      console.log("foo");
+
+      const tx = await CollectionDeployerContract.deploy_new_collection({
+        salt,
+        admin: publicKey,
+        name,
+        symbol,
+      });
 
       console.log("tx", tx);
 
@@ -105,6 +116,7 @@ export default function Page() {
 
       console.log("res", res);
 
+      /*
       if (res.result) {
         const previewImageUrl = await uploadPreviewImage();
 
@@ -131,7 +143,7 @@ export default function Page() {
         }
 
         //router.push(`/marketplace/collections/${res.result}`)
-      }
+      }*/
     } catch (e) {
       console.error(e);
     }

@@ -3790,7 +3790,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/phoenix-frontend@workspace:."
   dependencies:
-    "@stellar/freighter-api": ^3.0.0
+    "@stellar/freighter-api": 3.0.0
     "@stellar/stellar-sdk": 13.0.0
     "@tsconfig/recommended": ^1.0.2
     "@types/jest": ^29.5.2
@@ -4950,7 +4950,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stellar/freighter-api@npm:^3.0.0":
+"@stellar/freighter-api@npm:3.0.0":
   version: 3.0.0
   resolution: "@stellar/freighter-api@npm:3.0.0"
   checksum: 218b32066c0c70af7e1bb616e7a42539eba3e79878026c2357917cb07a5790eb9923fd10df78fcd05422b9a6dc12775a8a46303ddd3ebdd51064e076ddd1d8da
