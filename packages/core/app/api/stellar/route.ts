@@ -10,6 +10,7 @@ export async function GET() {
     status: 200,
     headers: {
       "Content-Type": "text/plain",
+      "Access-Control-Allow-Origin": "*",
     },
   });
 }
