@@ -101,7 +101,6 @@ const SlippageSettings = ({
               <FormControlLabel
                 key={index}
                 value={option.charAt(0)}
-                disabled={index !== 0}
                 control={
                   <Radio
                     color="primary"
@@ -142,7 +141,6 @@ const SlippageSettings = ({
                   value={customInputValue}
                   onChange={handleCustomInputChange}
                   placeholder="Custom option"
-                  disabled={true}
                   type="number"
                   inputProps={{ min: 0, max: 30 }}
                   InputLabelProps={{
