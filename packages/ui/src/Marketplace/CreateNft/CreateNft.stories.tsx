@@ -14,5 +14,26 @@ export default meta;
 type Story = StoryObj<typeof CreateNft>;
 
 export const Primary: Story = {
-  args: {},
+  args: {
+    onBackButtonClick: () => {},
+    onSubmitClick: () => {},
+    onCreateCollectionClick: () => {},
+    categories: [
+      { label: '1', value: 'Art' },
+      { label: '2', value: 'Photography' },
+      { label: '3', value: 'Music' },
+    ],
+    category: 'Art',
+    setCategory: (category: string) => {},
+    setFile: (file: File) => {},
+    name: 'My NFT',
+    setName: (name: string) => {},
+    supply: '1',
+    setSupply: (supply: string) => {},
+    description: 'This is a demo NFT description.',
+    setDescription: (description: string) => {},
+    externalLink: 'https://example.com',
+    setExternalLink: (externalLink: string) => {},
+    previewImage: undefined,
+  },
 };

@@ -14,7 +14,7 @@ export interface CreateNftProps {
   setSupply: (name: string) => void;
   description: string;
   setDescription: (name: string) => void;
-  externalLink: string;
-  setExternalLink: (name: string) => void;
+  code: string;
+  setCode: (name: string) => void;
   previewImage: string | undefined;
 }

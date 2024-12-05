@@ -1,4 +1,4 @@
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Tooltip, Typography } from "@mui/material";
 import {
   BackButton,
   ImageUpload,
@@ -11,6 +11,11 @@ import {
 import React from "react";
 import { Button } from "../../Button/Button";
 import { CreateNftProps } from "@phoenix-protocol/types";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+
+import CodeMirror from "@uiw/react-codemirror";
+import { vscodeDark } from "@uiw/codemirror-theme-vscode";
+import { json } from "@codemirror/lang-json";
 
 const h2Style = {
   fontSize: "32px",
@@ -138,11 +143,34 @@ const CreateNft = (props: CreateNftProps) => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextInput
-                    label="EXTERNAL LINK"
-                    placeholder="https://www.yoursite.io/item/2137"
-                    value={props.externalLink}
-                    onChange={props.setExternalLink}
+                  <Typography
+                    sx={{
+                      fontSize: "12px",
+                      lineHeight: "17px",
+                      mb: 1.5,
+                      color: "#BFBFBF",
+                    }}
+                  >
+                    ADDITIONAL ATTRIBUTES
+                    <Tooltip title="">
+                      <HelpOutlineIcon
+                        sx={{
+                          ml: 1,
+                          fontSize: "16px",
+                          position: "relative",
+                          top: 3,
+                          "&:hover": { color: "#FFF" },
+                        }}
+                      />
+                    </Tooltip>
+                  </Typography>
+                  <CodeMirror
+                    value={props.code}
+                    onChange={props.setCode}
+                    height="300px"
+                    theme={vscodeDark}
+                    extensions={[json()]}
+                    style={{ fontSize: "14px" }}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -171,7 +199,11 @@ const CreateNft = (props: CreateNftProps) => {
             label="Create Item"
             onClick={props.onSubmitClick}
           />
-          <Button type="secondary" label="Back" onClick={props.onBackButtonClick} />
+          <Button
+            type="secondary"
+            label="Back"
+            onClick={props.onBackButtonClick}
+          />
         </Grid>
       </Grid>
     </Box>
