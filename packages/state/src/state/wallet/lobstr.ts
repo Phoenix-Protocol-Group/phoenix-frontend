@@ -4,6 +4,7 @@ import {
   signTransaction,
 } from "@lobstrco/signer-extension-api";
 import { Connector, NetworkDetails } from "@phoenix-protocol/types";
+import { NETWORK_PASSPHRASE } from "../../constants";
 
 export function lobstr(): Connector {
   return {
@@ -25,7 +26,7 @@ export function lobstr(): Connector {
       return {
         network: "public",
         networkUrl: "https://horizon.stellar.org",
-        networkPassphrase: "Public Global Stellar Network ; September 2015",
+        networkPassphrase: NETWORK_PASSPHRASE,
       };
     },
     getPublicKey(): Promise<string> {
