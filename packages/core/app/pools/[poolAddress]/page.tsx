@@ -9,6 +9,7 @@ import {
   PoolStats,
   Skeleton as PhoenixSkeleton,
   StakingList,
+  UnstakeInfoModal,
 } from "@phoenix-protocol/ui";
 import { useContractTransaction } from "@/hooks/useContractTransaction";
 import { Token } from "@phoenix-protocol/types";
@@ -103,6 +104,11 @@ export default function Page(props: PoolPageProps) {
   // Stakes
   const [userStakes, setUserStakes] = useState<Entry[] | undefined>(undefined);
   const [stakeContractAddress, setStakeContractAddress] = useState<string>("");
+
+  const [unstakeModalOpen, setUnstakeModalOpen] = useState<boolean>(false);
+  const [isFixUnstake, setIsFixUnstake] = useState<boolean>(false);
+  const [unstakeAmount, setUnstakeAmount] = useState<number>(0);
+  const [unstakeTimestamp, setUnstakeTimestamp] = useState<number>(0);
 
   const PairContract = new PhoenixPairContract.Client({
     contractId: params.poolAddress,
@@ -470,14 +476,16 @@ export default function Page(props: PoolPageProps) {
                 ).toFixed(2),
               },
               onClick: () => {
-                unstake(Number(stake.stake) / 10 ** 7, stake.stake_timestamp);
+                setIsFixUnstake(false);
+                setUnstakeAmount(Number(stake.stake) / 10 ** 7)
+                setUnstakeTimestamp(stake.stake_timestamp);
+                setUnstakeModalOpen(true);
               },
               onClickFix: () => {
-                unstake(
-                  Number(stake.stake) / 10 ** 7,
-                  stake.stake_timestamp,
-                  true
-                );
+                setIsFixUnstake(true);
+                setUnstakeAmount(Number(stake.stake) / 10 ** 7)
+                setUnstakeTimestamp(stake.stake_timestamp);
+                setUnstakeModalOpen(true);
               },
             };
           });
@@ -666,6 +674,17 @@ export default function Page(props: PoolPageProps) {
           )}
         </Grid>
       </Grid>
+      <UnstakeInfoModal
+        open={unstakeModalOpen}
+        onConfirm={() => {
+          if(isFixUnstake) {
+            unstake(unstakeAmount, unstakeTimestamp, true);
+          } else {
+            unstake(unstakeAmount, unstakeTimestamp);
+          }
+        }}
+        onClose={() => setUnstakeModalOpen(false)}
+      />
     </Box>
   );
 }

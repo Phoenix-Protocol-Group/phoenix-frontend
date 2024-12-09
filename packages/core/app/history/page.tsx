@@ -11,7 +11,7 @@ import {
   TransactionsTable,
   VolumeChart,
 } from "@phoenix-protocol/ui";
-import { API } from "@phoenix-protocol/utils";
+import { API, symbolToToken } from "@phoenix-protocol/utils";
 import { fetchAllTrades, scaToToken } from "@phoenix-protocol/utils";
 
 import { TradingVolumeResponse } from "@phoenix-protocol/utils/build/api/types";
@@ -227,7 +227,9 @@ export default function Page() {
     const _totalUsers = await API.getTotalUsers();
     const _mostResult = (await API.getMostTraded()).asset;
 
-    const _mostTradedAsset = await scaToToken(_mostResult, appStore);
+    const _mostTradedAsset = await symbolToToken(_mostResult, appStore);
+
+    console.log(_mostTradedAsset)
     const mostTradedAsset = {
       ..._mostTradedAsset,
       icon: `/cryptoIcons/${_mostTradedAsset?.symbol.toLowerCase()}.svg`,
@@ -243,6 +245,8 @@ export default function Page() {
       totalUsers,
       mostTradedAsset: mostTradedAsset as Token,
     });
+
+    console.log("meta",meta)
   };
 
   const loadPools = async () => {
