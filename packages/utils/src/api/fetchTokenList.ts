@@ -33,3 +33,15 @@ export async function scaToToken(scaAddress: string, appStore: AppStore) {
 
   return appStore.fetchTokenInfo(contractAddress);
 }
+
+export async function symbolToToken(symbol: string, appStore: AppStore) {
+  const tokenList = await fetchTokenList();
+  const contractAddress = tokenList.find(
+    (token) => token.symbol == symbol
+  )?.soroban_contract;
+  if (!contractAddress) {
+    throw new Error("No token with given address found!");
+  }
+
+  return appStore.fetchTokenInfo(contractAddress);
+}
