@@ -229,7 +229,6 @@ export default function Page() {
 
     const _mostTradedAsset = await symbolToToken(_mostResult, appStore);
 
-    console.log(_mostTradedAsset)
     const mostTradedAsset = {
       ..._mostTradedAsset,
       icon: `/cryptoIcons/${_mostTradedAsset?.symbol.toLowerCase()}.svg`,
@@ -245,8 +244,6 @@ export default function Page() {
       totalUsers,
       mostTradedAsset: mostTradedAsset as Token,
     });
-
-    console.log("meta",meta)
   };
 
   const loadPools = async () => {
