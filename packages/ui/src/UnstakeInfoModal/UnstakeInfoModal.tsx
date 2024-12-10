@@ -78,10 +78,10 @@ const UnstakeInfoModal = ({
                 fontWeight: 700,
               }}
             >
-              Disclaimer
+              Warning
             </Typography>
 
-            <Box>
+            <Box sx={{ px: 3 }}>
               <Typography
                 sx={{
                   color:
@@ -96,7 +96,7 @@ const UnstakeInfoModal = ({
                   overflowY: "auto",
                 }}
               >
-                You are about to unstake. By doing so, you will lose the APR
+                You{"'"}re about to unstake. By doing so, you will lose the APR
                 progress you've accumulated. Remember, your APR increases daily
                 up to 60 days. If you unstake now, you'll need to start over
                 from day one.

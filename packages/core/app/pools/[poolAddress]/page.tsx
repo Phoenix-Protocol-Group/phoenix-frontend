@@ -477,13 +477,13 @@ export default function Page(props: PoolPageProps) {
               },
               onClick: () => {
                 setIsFixUnstake(false);
-                setUnstakeAmount(Number(stake.stake) / 10 ** 7)
+                setUnstakeAmount(Number(stake.stake) / 10 ** 7);
                 setUnstakeTimestamp(stake.stake_timestamp);
                 setUnstakeModalOpen(true);
               },
               onClickFix: () => {
                 setIsFixUnstake(true);
-                setUnstakeAmount(Number(stake.stake) / 10 ** 7)
+                setUnstakeAmount(Number(stake.stake) / 10 ** 7);
                 setUnstakeTimestamp(stake.stake_timestamp);
                 setUnstakeModalOpen(true);
               },
@@ -676,11 +676,13 @@ export default function Page(props: PoolPageProps) {
       </Grid>
       <UnstakeInfoModal
         open={unstakeModalOpen}
-        onConfirm={() => {
-          if(isFixUnstake) {
-            unstake(unstakeAmount, unstakeTimestamp, true);
+        onConfirm={async () => {
+          if (isFixUnstake) {
+            setUnstakeModalOpen(false);
+            await unstake(unstakeAmount, unstakeTimestamp, true);
           } else {
-            unstake(unstakeAmount, unstakeTimestamp);
+            setUnstakeModalOpen(false);
+            await unstake(unstakeAmount, unstakeTimestamp);
           }
         }}
         onClose={() => setUnstakeModalOpen(false)}
