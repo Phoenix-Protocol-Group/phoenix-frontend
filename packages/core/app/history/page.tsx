@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import { Box, Grid, Typography } from "@mui/material";
+import { Alert, Box, Grid, Typography } from "@mui/material";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { ActiveFilters, Token } from "@phoenix-protocol/types";
 import {
@@ -363,6 +363,16 @@ export default function Page() {
       >
         Transaction History
       </Typography>
+      <Alert
+        severity="info"
+        sx={{
+          mb: 3
+        }}
+      >
+        We are currently experiencing issues with the indexer due to a version
+        change in the Stellar SDK. <br/>Our team is actively working on a fix
+        to resolve this as soon as possible.
+      </Alert>
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <VolumeChart
