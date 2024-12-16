@@ -32,8 +32,6 @@ export const Primary: Story = {
     setSupply: (supply: string) => {},
     description: 'This is a demo NFT description.',
     setDescription: (description: string) => {},
-    externalLink: 'https://example.com',
-    setExternalLink: (externalLink: string) => {},
     previewImage: undefined,
   },
 };
