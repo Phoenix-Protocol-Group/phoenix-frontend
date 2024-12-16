@@ -2,7 +2,7 @@ import {
   Asset,
   Horizon,
   Operation,
-  SorobanRpc,
+  rpc,
   StrKey,
   TransactionBuilder,
 } from "@stellar/stellar-sdk";
@@ -130,7 +130,7 @@ export async function fetchAndIssueTrustline(
 
   // If trustline does not exist, issue trustline
   if (!trustlineExists) {
-    const server = new SorobanRpc.Server(constants.RPC_URL);
+    const server = new rpc.Server(constants.RPC_URL);
 
     // Find asset name and issuer
 
