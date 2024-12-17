@@ -3680,7 +3680,7 @@ __metadata:
   resolution: "@phoenix-protocol/contracts@workspace:packages/contracts"
   dependencies:
     "@phoenix-protocol/utils": "workspace:^"
-    "@stellar/freighter-api": 1.7.1
+    "@stellar/freighter-api": 3.0.0
     bigint-conversion: 2.4.1
     buffer: 6.0.3
     typescript: 5.0.4
@@ -3730,7 +3730,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/phoenix-frontend@workspace:."
   dependencies:
-    "@stellar/stellar-sdk": ^12.1.0
+    "@stellar/stellar-sdk": ^13.0.0
     "@tsconfig/recommended": ^1.0.2
     "@types/jest": ^29.5.2
     "@walletconnect/modal": ^2.6.2
@@ -3748,7 +3748,7 @@ __metadata:
     "@lobstrco/signer-extension-api": ^1.0.0-beta.0
     "@phoenix-protocol/contracts": "workspace:^"
     "@phoenix-protocol/types": "workspace:^"
-    "@stellar/freighter-api": 1.7.1
+    "@stellar/freighter-api": 3.0.0
     "@types/glob": ^7.1.3
     "@types/urijs": ^1.19.19
     react-query: ^3.39.3
@@ -3769,7 +3769,7 @@ __metadata:
     "@mui/styled-engine-sc": 6.1.7
     "@mui/system": 6.1.7
     "@mui/utils": 6.1.7
-    "@stellar/stellar-sdk": 11.3.0
+    "@stellar/stellar-sdk": 13.0.0
     typescript: 5.0.4
   languageName: unknown
   linkType: soft
@@ -4880,83 +4880,51 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stellar/freighter-api@npm:1.7.1":
-  version: 1.7.1
-  resolution: "@stellar/freighter-api@npm:1.7.1"
-  checksum: 02ff598d67e57bbadf24ab807b61045a8d6bbaa6d82dd25168793716eb960911a3fbbeac9cc59f610336a31d19a41de3fef8dd6a6d02826a241fed1615b36847
+"@stellar/freighter-api@npm:3.0.0":
+  version: 3.0.0
+  resolution: "@stellar/freighter-api@npm:3.0.0"
+  checksum: 218b32066c0c70af7e1bb616e7a42539eba3e79878026c2357917cb07a5790eb9923fd10df78fcd05422b9a6dc12775a8a46303ddd3ebdd51064e076ddd1d8da
   languageName: node
   linkType: hard
 
-"@stellar/js-xdr@npm:^3.0.1, @stellar/js-xdr@npm:^3.1.1, @stellar/js-xdr@npm:^3.1.2":
+"@stellar/js-xdr@npm:^3.0.1, @stellar/js-xdr@npm:^3.1.2":
   version: 3.1.2
   resolution: "@stellar/js-xdr@npm:3.1.2"
   checksum: 6ecc52402603a1c9e64536bcd5b6348e247655aa662ac383967f48c1c6ac46e84cc48ebdbf3ada416d2c2d75898d1ab28dab6ba65d9018e3eb126ea1b2099f04
   languageName: node
   linkType: hard
 
-"@stellar/stellar-base@npm:^11.0.1":
-  version: 11.0.1
-  resolution: "@stellar/stellar-base@npm:11.0.1"
-  dependencies:
-    "@stellar/js-xdr": ^3.1.1
-    base32.js: ^0.1.0
-    bignumber.js: ^9.1.2
-    buffer: ^6.0.3
-    sha.js: ^2.3.6
-    sodium-native: ^4.0.10
-    tweetnacl: ^1.0.3
-  dependenciesMeta:
-    sodium-native:
-      optional: true
-  checksum: 1653dcf59e47d71d8eb0a6fd226b50ecef7134414611d5cf62875394f0d54497ff247b42dd2aee5b45eca36364757c4ae44422e03e51a032ab023c5db772ece5
-  languageName: node
-  linkType: hard
-
-"@stellar/stellar-base@npm:^12.1.1":
-  version: 12.1.1
-  resolution: "@stellar/stellar-base@npm:12.1.1"
+"@stellar/stellar-base@npm:^13.0.1":
+  version: 13.0.1
+  resolution: "@stellar/stellar-base@npm:13.0.1"
   dependencies:
     "@stellar/js-xdr": ^3.1.2
     base32.js: ^0.1.0
     bignumber.js: ^9.1.2
     buffer: ^6.0.3
     sha.js: ^2.3.6
-    sodium-native: ^4.1.1
+    sodium-native: ^4.3.0
     tweetnacl: ^1.0.3
   dependenciesMeta:
     sodium-native:
       optional: true
-  checksum: c2819bcf73e3411a7259726242f645450f130654b8abbcd608bb033baf896ccfaf563b29bfd7f9c0186af4a766c61f3c2881d7d4ab6c2af404e87b9d2362ac96
+  checksum: b4a4d049c332ab63aa112c183ffed706dac4236b369a1b53eac86e8efcbba228693be5550e39762bc3c13c9c2e56dc76f611454191d54a1c740832059adb52bd
   languageName: node
   linkType: hard
 
-"@stellar/stellar-sdk@npm:11.3.0":
-  version: 11.3.0
-  resolution: "@stellar/stellar-sdk@npm:11.3.0"
+"@stellar/stellar-sdk@npm:13.0.0, @stellar/stellar-sdk@npm:^13.0.0":
+  version: 13.0.0
+  resolution: "@stellar/stellar-sdk@npm:13.0.0"
   dependencies:
-    "@stellar/stellar-base": ^11.0.1
-    axios: ^1.6.8
-    bignumber.js: ^9.1.2
-    eventsource: ^2.0.2
-    randombytes: ^2.1.0
-    toml: ^3.0.0
-    urijs: ^1.19.1
-  checksum: 3ef7429ba0938d076b807d11f0c461da1afb4eff371160f04375b4d9443b4d805ab08002e81d8a3fd86aacd7b72fef70b9106757b55ceff5ebcd2e0e9a3bc766
-  languageName: node
-  linkType: hard
-
-"@stellar/stellar-sdk@npm:^12.1.0":
-  version: 12.3.0
-  resolution: "@stellar/stellar-sdk@npm:12.3.0"
-  dependencies:
-    "@stellar/stellar-base": ^12.1.1
+    "@stellar/stellar-base": ^13.0.1
     axios: ^1.7.7
     bignumber.js: ^9.1.2
     eventsource: ^2.0.2
+    feaxios: ^0.0.20
     randombytes: ^2.1.0
     toml: ^3.0.0
     urijs: ^1.19.1
-  checksum: 5e7b9a62335135d04688a8f9cf7a34c69ef1ae1e87d011e0acb2ec04740b5335b85860588460279ff01d49b8c6fb4341e17538471e8ba951322d7c350a30873e
+  checksum: fb3e3c5db9ab43882947b0e19b6a49bea421096e57271a4a2e7eafe3b1fbc79c8b69cbe3281c386050dd04d6825ca6a63641a534b2fe97b108e86722bd4eea35
   languageName: node
   linkType: hard
 
@@ -7424,7 +7392,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.0, axios@npm:^1.6.8, axios@npm:^1.7.7":
+"axios@npm:^1.6.0, axios@npm:^1.7.7":
   version: 1.7.7
   resolution: "axios@npm:1.7.7"
   dependencies:
@@ -10051,6 +10019,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"feaxios@npm:^0.0.20":
+  version: 0.0.20
+  resolution: "feaxios@npm:0.0.20"
+  dependencies:
+    is-retry-allowed: ^3.0.0
+  checksum: 73ff5dc8b8a814bdd79f55521aa0cb9160f06afcbe36402a891d457d0085bff8cffba08a02878c838f5826c62e240fdefddd01bf931cb38bd89050c4de9f3c9a
+  languageName: node
+  linkType: hard
+
 "file-entry-cache@npm:^6.0.1":
   version: 6.0.1
   resolution: "file-entry-cache@npm:6.0.1"
@@ -11297,6 +11274,13 @@ __metadata:
     call-bind: ^1.0.2
     has-tostringtag: ^1.0.0
   checksum: 362399b33535bc8f386d96c45c9feb04cf7f8b41c182f54174c1a45c9abbbe5e31290bbad09a458583ff6bf3b2048672cdb1881b13289569a7c548370856a652
+  languageName: node
+  linkType: hard
+
+"is-retry-allowed@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "is-retry-allowed@npm:3.0.0"
+  checksum: 12d17b44410484c6b0292ca38127b2ad026b65d1c1ead40f055effb2498c1a65b28ac5bc8f0383d0d091f84c1f791c3e09da32219fc3a745c3b1bab106db6cfb
   languageName: node
   linkType: hard
 
@@ -15542,7 +15526,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sodium-native@npm:^4.0.1, sodium-native@npm:^4.0.10, sodium-native@npm:^4.1.1":
+"sodium-native@npm:^4.0.1, sodium-native@npm:^4.3.0":
   version: 4.3.1
   resolution: "sodium-native@npm:4.3.1"
   dependencies:
