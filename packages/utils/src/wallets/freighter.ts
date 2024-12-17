@@ -1,5 +1,6 @@
 import { XDR_BASE64 } from "@stellar/stellar-sdk/lib/contract";
 import { Wallet } from "./types";
+import { NETWORK_PASSPHRASE } from '../constants';
 
 import {
   getAddress,
@@ -8,6 +9,7 @@ import {
   signAuthEntry,
   signTransaction,
 } from "@stellar/freighter-api";
+import { constants } from "..";
 
 export class Freighter implements Wallet {
   async isConnected(): Promise<boolean> {

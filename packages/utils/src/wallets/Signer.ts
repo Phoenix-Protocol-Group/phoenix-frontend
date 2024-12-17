@@ -1,5 +1,4 @@
 import { lobstr } from "./lobstr";
-import { Wallet } from "./types";
 import { xBull } from "./xbull";
 import {
   WalletConnect as WalletClient,
@@ -8,6 +7,7 @@ import {
 import { NETWORK_PASSPHRASE } from "../constants";
 import { constants } from "..";
 import { Freighter } from "./freighter";
+import { Wallet } from "./types";
 
 const initializeWalletConnect = async () => {
   const walletConnectInstance = new WalletClient({
@@ -77,15 +77,7 @@ export default class Signer {
   async getWallet() {
     if (this.walletType === "freighter") {
       this.wallet = new Freighter();
-    } else if (this.walletType === "xbull") {
-      this.wallet = new xBull();
-    } else if (this.walletType === "lobstr") {
-      this.wallet = new lobstr();
-    } else if (this.walletType === "wallet-connect") {
-      this.wallet = await initializeWalletConnect();
-    } else {
-      console.log("Wallet type not supported.");
-    }
+    } 
   }
 
   /**

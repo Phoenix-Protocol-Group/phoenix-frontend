@@ -163,7 +163,7 @@ export async function fetchAndIssueTrustline(
         ? new xBull()
         : walletType === "lobstr"
         ? new lobstr()
-        : new Freighter()
+        : new Freighter();
 
     const signature = await wallet.signTransaction(transaction.toXDR());
 

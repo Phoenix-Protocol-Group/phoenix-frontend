@@ -22,10 +22,17 @@ export function freighter(): Connector {
         networkUrl: "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
       };
     },
-    getPublicKey(): Promise<string> {
-      return freighterApi.getPublicKey();
+    async getPublicKey(): Promise<string> {
+      const address = await freighterApi.getAddress();
+
+      if (address.error) {
+        console.log("error getting public key");
+        return "";
+      } else {
+        return address.address;
+      }
     },
-    signTransaction(
+    async signTransaction(
       xdr: string,
       opts?: {
         network?: string;
@@ -33,7 +40,14 @@ export function freighter(): Connector {
         accountToSign?: string;
       }
     ): Promise<string> {
-      return freighterApi.signTransaction(xdr, opts);
+      const res = await freighterApi.signTransaction(xdr, opts);
+
+      if (res.error) {
+        console.log("error signing transaction", xdr);
+        return "";
+      } else {
+        return res.signedTxXdr;
+      }
     },
   };
 }
