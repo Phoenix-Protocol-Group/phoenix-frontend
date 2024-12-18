@@ -85,7 +85,7 @@ export interface TransferApprovalKey {
   owner: string;
 }
 
-export type DataKey = {tag: "Admin", values: void} | {tag: "Balance", values: readonly [string]} | {tag: "OperatorApproval", values: readonly [OperatorApprovalKey]} | {tag: "TransferApproval", values: readonly [TransferApprovalKey]} | {tag: "Uri", values: readonly [NftId]} | {tag: "CollectionUri", values: void} | {tag: "Config", values: void} | {tag: "IsInitialized", values: void};
+export type DataKey = {tag: "Admin", values: void} | {tag: "Balance", values: readonly [string]} | {tag: "OperatorApproval", values: readonly [OperatorApprovalKey]} | {tag: "TransferApproval", values: readonly [TransferApprovalKey]} | {tag: "Uri", values: readonly [u64]} | {tag: "CollectionUri", values: void} | {tag: "Config", values: void} | {tag: "IsInitialized", values: void};
 
 
 export interface URIValue {
