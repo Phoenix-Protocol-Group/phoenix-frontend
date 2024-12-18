@@ -1,11 +1,13 @@
 import { lobstr } from "./lobstr";
-import { Wallet } from "./types";
 import { xBull } from "./xbull";
 import {
   WalletConnect as WalletClient,
   WalletConnectAllowedMethods,
 } from "./wallet-connect";
 import { NETWORK_PASSPHRASE } from "../constants";
+import { constants } from "..";
+import { Freighter } from "./freighter";
+import { Wallet } from "./types";
 
 const initializeWalletConnect = async () => {
   const walletConnectInstance = new WalletClient({
@@ -74,8 +76,7 @@ export default class Signer {
    */
   async getWallet() {
     if (this.walletType === "freighter") {
-      const freighter = await import("@stellar/freighter-api");
-      this.wallet = freighter;
+      this.wallet = new Freighter();
     } else if (this.walletType === "xbull") {
       this.wallet = new xBull();
     } else if (this.walletType === "lobstr") {
@@ -99,6 +100,9 @@ export default class Signer {
     if (this.wallet === undefined) {
       throw new Error("Wallet not found or not connected.");
     }
-    return this.wallet.signTransaction(message);
+    return this.wallet.signTransaction(message, {
+      network: constants.RPC_URL,
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
+    });
   }
 }
