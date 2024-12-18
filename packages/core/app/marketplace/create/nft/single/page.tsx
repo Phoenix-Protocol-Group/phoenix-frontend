@@ -9,10 +9,15 @@ import { constants, Signer } from "@phoenix-protocol/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+// TX Hook
+import { useContractTransaction } from "@/hooks/useContractTransaction";
+
 export default function Page() {
   const store = useAppStore();
   const storePersist = usePersistStore();
   const router = useRouter();
+
+  const { executeContractTransaction } = useContractTransaction();
 
   const [name, setName] = useState<string>("");
   const [supply, setSupply] = useState<string>("");
