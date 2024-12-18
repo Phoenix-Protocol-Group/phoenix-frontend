@@ -33,7 +33,7 @@ if (typeof window !== 'undefined') {
 export const networks = {
   testnet: {
     networkPassphrase: "Test SDF Network ; September 2015",
-    contractId: "CD7T3HSTNNCZVYP6JSNO2JNC2LUPXGYNRIEFZKTLIXEGPAXO3HDTDYMA",
+    contractId: "CBINW6JEZLATL3OTJSDAVKBUYWSGADTCNVCJBXAKXVMIKZ75EWUTNB7L",
   }
 } as const
 
@@ -85,7 +85,7 @@ export interface TransferApprovalKey {
   owner: string;
 }
 
-export type DataKey = {tag: "Admin", values: void} | {tag: "Balance", values: readonly [string]} | {tag: "OperatorApproval", values: readonly [OperatorApprovalKey]} | {tag: "TransferApproval", values: readonly [TransferApprovalKey]} | {tag: "Uri", values: readonly [u64]} | {tag: "CollectionUri", values: void} | {tag: "Config", values: void} | {tag: "IsInitialized", values: void};
+export type DataKey = {tag: "Admin", values: void} | {tag: "Balance", values: readonly [string]} | {tag: "OperatorApproval", values: readonly [OperatorApprovalKey]} | {tag: "TransferApproval", values: readonly [TransferApprovalKey]} | {tag: "Uri", values: readonly [NftId]} | {tag: "CollectionUri", values: void} | {tag: "Config", values: void} | {tag: "IsInitialized", values: void};
 
 
 export interface URIValue {
@@ -461,6 +461,26 @@ export interface Client {
   }) => Promise<AssembledTransaction<Result<void>>>
 
   /**
+   * Construct and simulate a migrate_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  migrate_admin: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<void>>>
+
+  /**
    * Construct and simulate a show_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
   show_admin: (options?: {
@@ -522,6 +542,7 @@ export class Client extends ContractClient {
         "AAAAAAAAAAAAAAADdXJpAAAAAAEAAAAAAAAAAmlkAAAAAAAGAAAAAQAAA+kAAAfQAAAACFVSSVZhbHVlAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
         "AAAAAAAAAAAAAAAOY29sbGVjdGlvbl91cmkAAAAAAAAAAAABAAAD6QAAB9AAAAAIVVJJVmFsdWUAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
         "AAAAAAAAAAAAAAAHdXBncmFkZQAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAABAAAD6QAAA+0AAAAAAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+        "AAAAAAAAAAAAAAANbWlncmF0ZV9hZG1pbgAAAAAAAAAAAAABAAAD6QAAA+0AAAAAAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
         "AAAAAAAAAAAAAAAKc2hvd19hZG1pbgAAAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
         "AAAAAAAAAAAAAAALc2hvd19jb25maWcAAAAAAAAAAAEAAAPpAAAH0AAAAAZDb25maWcAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
         "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAANAAAAAAAAABpBY2NvdW50c0lkc0xlbmd0aE1pc3NtYXRjaAAAAAAAAAAAAAAAAAARQ2Fubm90QXBwcm92ZVNlbGYAAAAAAAABAAAAAAAAABNJbnN1ZmZpY2llbnRCYWxhbmNlAAAAAAIAAAAAAAAAGElkc0Ftb3VudHNMZW5ndGhNaXNtYXRjaAAAAAMAAAAAAAAACE5vVXJpU2V0AAAABAAAAAAAAAALQWRtaW5Ob3RTZXQAAAAABQAAAAAAAAAOQ29uZmlnTm90Rm91bmQAAAAAAAYAAAAAAAAADFVuYXV0aG9yaXplZAAAAAcAAAAAAAAAE0ludmFsaWRBY2NvdW50SW5kZXgAAAAACAAAAAAAAAAOSW52YWxpZElkSW5kZXgAAAAAAAkAAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAAACgAAAAAAAAASSW52YWxpZEFtb3VudEluZGV4AAAAAAALAAAAAAAAAAlJbnZhbGlkSWQAAAAAAAAM",
@@ -552,6 +573,7 @@ export class Client extends ContractClient {
         uri: this.txFromJSON<Result<URIValue>>,
         collection_uri: this.txFromJSON<Result<URIValue>>,
         upgrade: this.txFromJSON<Result<void>>,
+        migrate_admin: this.txFromJSON<Result<void>>,
         show_admin: this.txFromJSON<Result<string>>,
         show_config: this.txFromJSON<Result<Config>>
   }
