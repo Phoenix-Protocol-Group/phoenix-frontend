@@ -1,7 +1,7 @@
 import { Token } from "../general";
 
 export interface TransactionTableEntryProps {
-  type: "Success" | "Failed";
+  type: "Buy" | "Sell";
   assets: Token[];
   tradeSize: string;
   tradeValue: string;

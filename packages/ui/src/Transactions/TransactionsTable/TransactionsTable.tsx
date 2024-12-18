@@ -156,10 +156,11 @@ const TransactionsTable = ({
             borderRadius: "8px",
             background:
               "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+            boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
           }}
         >
           <Grid container>
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <TransactionHeader
                 handleSort={handleSort}
                 label="Trade type"
@@ -173,7 +174,7 @@ const TransactionsTable = ({
             <Grid item xs={3}>
               <TransactionHeader
                 handleSort={handleSort}
-                label="Asset"
+                label="Assets"
                 active={
                   activeSort.column === "asset" ? activeSort.direction : false
                 }
@@ -190,7 +191,7 @@ const TransactionsTable = ({
                 }
               />
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <TransactionHeader
                 handleSort={handleSort}
                 label="Trade Value"
@@ -201,7 +202,7 @@ const TransactionsTable = ({
                 }
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={1}>
               <TransactionHeader
                 handleSort={handleSort}
                 label="Date"

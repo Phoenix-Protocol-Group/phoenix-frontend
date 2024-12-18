@@ -145,7 +145,14 @@ export const useContractTransaction = () => {
                   await transaction.simulate({ restore: true });
                   resolve({});
                 } else {
-                  const sentTransaction = await transaction.signAndSend();
+                  const signTransaction = getSignerFunction(signer, storePersist);
+
+                  const sentTransaction = await transaction.signAndSend({
+                    signTransaction: async (xdr) => {
+                      const res = await signTransaction(xdr);
+                      return { signedTxXdr: res, signerAddress: storePersist.wallet.address };
+                    }
+                  });
                   resolve({
                     transactionId:
                       sentTransaction.sendTransactionResponse?.hash,

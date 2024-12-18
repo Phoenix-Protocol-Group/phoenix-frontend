@@ -1,5 +1,5 @@
-import { Box, Typography } from "@mui/material";
-import React from "react";
+import { Box, Typography, MenuItem, Select } from "@mui/material";
+import React, { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -8,14 +8,25 @@ import {
   YAxis,
   CartesianGrid,
   Legend,
+  Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { motion } from "framer-motion";
+import { formatCurrencyStatic } from "@phoenix-protocol/utils";
 
+type Pool = {
+  tokenA: { icon: string; symbol: string };
+  tokenB: { icon: string; symbol: string };
+  contractAddress: string;
+};
 interface VolumeChartProps {
   data: { timestamp: string; volume: number }[];
   selectedTab: "D" | "M" | "A";
   setSelectedTab: (tab: "D" | "M" | "A") => void;
   totalVolume: number;
+  pools: Pool[];
+  selectedPoolForVolume: string | undefined;
+  setSelectedPoolForVolume: (pool: string | undefined) => void;
 }
 
 const getBarBackground = (value: number, max: number) => {
@@ -86,6 +97,9 @@ const VolumeChart = ({
   totalVolume,
   selectedTab,
   setSelectedTab,
+  setSelectedPoolForVolume,
+  selectedPoolForVolume,
+  pools,
 }: VolumeChartProps) => {
   // Find the maximum value in the data array
   const maxValue = Math.max(...data.map((item) => item.volume));
@@ -114,17 +128,87 @@ const VolumeChart = ({
         }}
       >
         <Box>
-          <Typography
+          <Box
             sx={{
-              color: "white",
-              fontFamily: "Ubuntu",
-              fontSize: "0.75rem",
-              fontWeight: 400,
-              opacity: 0.6,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              justifyContent: "space-between",
             }}
           >
-            Volume {resolveSelectedVolume(selectedTab)} (USD)
-          </Typography>
+            <Typography
+              sx={{
+                color: "white",
+                fontFamily: "Ubuntu",
+                fontSize: "0.75rem",
+                fontWeight: 400,
+                opacity: 0.6,
+              }}
+            >
+              Volume {resolveSelectedVolume(selectedTab)} (USD)
+            </Typography>
+            <Select
+              value={selectedPoolForVolume}
+              onChange={(e) => setSelectedPoolForVolume(e.target.value)}
+              displayEmpty
+              sx={{
+                color: "white",
+                fontFamily: "Ubuntu",
+                background: "rgba(255, 255, 255, 0.1)",
+                borderRadius: "16px",
+                fontSize: "0.75rem",
+                fontWeight: 400,
+                ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                ".MuiSelect-icon": { color: "white" },
+                ".MuiSelect-select": {
+                  padding: "8px 8px",
+                },
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    background:
+                      "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
+                    border: "1px solid #292B2C",
+                    borderRadius: "0.5rem",
+                    boxShadow:
+                      "-3px 3px 10px 0px rgba(25, 13, 1, 0.10),-12px 13px 18px 0px rgba(25, 13, 1, 0.09),-26px 30px 24px 0px rgba(25, 13, 1, 0.05),-46px 53px 28px 0px rgba(25, 13, 1, 0.02),-73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
+                  },
+                },
+              }}
+              renderValue={(selected) => {
+                if (selected === "All" || !selected) {
+                  return "All Pools";
+                }
+                const pool = pools.find((p) => p.contractAddress === selected);
+                return `${pool?.tokenA.symbol} / ${pool?.tokenB.symbol}`;
+              }}
+            >
+              <MenuItem value={undefined}>All</MenuItem>
+              {pools.map((pool) => (
+                <MenuItem
+                  key={pool.contractAddress}
+                  value={pool.contractAddress}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <img
+                      src={pool.tokenA.icon}
+                      alt={pool.tokenA.symbol}
+                      width={20}
+                    />
+                    <Typography>{pool.tokenA.symbol}</Typography>
+                    <Typography>/</Typography>
+                    <img
+                      src={pool.tokenB.icon}
+                      alt={pool.tokenB.symbol}
+                      width={20}
+                    />
+                    <Typography>{pool.tokenB.symbol}</Typography>
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
           <Typography
             sx={{
               color: "white",
@@ -133,10 +217,11 @@ const VolumeChart = ({
               fontWeight: 700,
             }}
           >
-            ${totalVolume.toFixed(2)}
+            {formatCurrencyStatic.format(totalVolume)}
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
+
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           <Box
             sx={
               selectedTab === "D"
@@ -198,6 +283,49 @@ const VolumeChart = ({
           />
           <XAxis dataKey="timestamp" />
           <YAxis tickFormatter={renderCustomAxisTick} />
+          <Tooltip
+            content={({ active, payload, label }) => {
+              if (active && payload && payload.length) {
+                return (
+                  <div
+                    style={{
+                      background:
+                        "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
+                      border: "1px solid #292B2C",
+                      borderRadius: "0.5rem",
+                      padding: "10px",
+                      color: "white",
+                      boxShadow:
+                        "-3px 3px 10px 0px rgba(25, 13, 1, 0.10),-12px 13px 18px 0px rgba(25, 13, 1, 0.09),-26px 30px 24px 0px rgba(25, 13, 1, 0.05),-46px 53px 28px 0px rgba(25, 13, 1, 0.02),-73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "white",
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {label}
+                    </p>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "white",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      Volume:
+                      {formatCurrencyStatic.format(Number(payload[0].value))}
+                    </p>
+                  </div>
+                );
+              }
+              return null;
+            }}
+          />
+
           <Bar dataKey="volume" barSize={12} radius={[2, 2, 0, 0]}>
             {data.map((entry, index) => (
               <Cell

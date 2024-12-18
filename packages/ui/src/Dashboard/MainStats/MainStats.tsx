@@ -12,31 +12,41 @@ const Tile = ({ title, value, link, isMobile }: TileProps) => {
   return (
     <Box
       sx={{
-        borderRadius: "24px",
+        display: "flex",
+        padding: "24px",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: "12px",
+        position: "relative",
+        borderRadius: "12px",
+        border: "1px solid var(--Secondary-S4, #2C2C31)",
         background:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%) ",
-        padding: "1rem 1.5rem",
+          "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+        overflow: "hidden",
       }}
     >
       <Box display="flex" justifyContent="space-between">
         <Typography
           sx={{
-            fontSize: "1.5rem",
+            color: "var(--Secondary-S2-2, #BDBEBE)",
+            fontFamily: "Ubuntu",
+            fontSize: "12px",
             fontWeight: 700,
-            letterSpacing: "-0.0625rem",
+            lineHeight: "140%",
           }}
         >
-          {value}
+          {title}
         </Typography>
-        <Box
-          sx={{ ml: isMobile ? "1rem" : "3.4rem", cursor: "pointer" }}
-          component="img"
-          src="arrow4.svg"
-          onClick={() => openInNewTab()}
-        />
       </Box>
-      <Typography sx={{ fontSize: "0.875rem", opacity: 0.4 }}>
-        {title}
+      <Typography
+        sx={{
+          color: "var(--Secondary-S2, #FFF)",
+          fontFamily: "Ubuntu",
+          fontSize: "24px",
+          fontWeight: 700,
+        }}
+      >
+        {value}
       </Typography>
     </Box>
   );
@@ -84,4 +94,4 @@ const MainStats = ({ stats }: MainStatsProps) => {
   }
 };
 
-export default MainStats;
+export { MainStats, Tile };

@@ -71,10 +71,6 @@ const SlippageSettings = ({
           Settings
         </Typography>
       </Box>
-      <Alert sx={{ mt: 2 }} severity="info">
-        In the ongoing Phase 1 of the launch, there's a maximum allowed slippage
-        of 1%. This will be increased as we progress through the launch phases.
-      </Alert>
       <Box
         sx={{
           borderRadius: "16px",
@@ -105,7 +101,6 @@ const SlippageSettings = ({
               <FormControlLabel
                 key={index}
                 value={option.charAt(0)}
-                disabled={index !== 0}
                 control={
                   <Radio
                     color="primary"
@@ -131,7 +126,6 @@ const SlippageSettings = ({
             ))}
             <FormControlLabel
               value="custom"
-              disabled={true}
               control={
                 <Radio
                   color="primary"
@@ -147,7 +141,6 @@ const SlippageSettings = ({
                   value={customInputValue}
                   onChange={handleCustomInputChange}
                   placeholder="Custom option"
-                  disabled={true}
                   type="number"
                   inputProps={{ min: 0, max: 30 }}
                   InputLabelProps={{

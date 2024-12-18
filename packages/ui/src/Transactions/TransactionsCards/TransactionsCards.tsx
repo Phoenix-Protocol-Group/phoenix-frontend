@@ -61,11 +61,8 @@ const TransactionsCards = (props: TransactionsCardsProps) => {
         flexDirection: { lg: "row", xs: "column" },
       }}
     >
-      <TransactionCard
-        title="Trades Today (24h)"
-        content={props.totalTraders}
-      />
       <TransactionCard title="Total Trades" content={props.totalTrades} />
+      <TransactionCard title="Total Users" content={props.totalTraders} />
       {props.mostTradedAsset && (
         <TransactionCard
           title="Most Traded Asset"

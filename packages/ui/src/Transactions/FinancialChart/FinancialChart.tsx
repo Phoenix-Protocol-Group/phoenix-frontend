@@ -1,18 +1,23 @@
-import React, {useState} from "react";
-import {Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
-import {Box, Typography} from "@mui/material";
-import {format} from "date-fns";
+import React, { useState } from "react";
+import {
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { Box, Typography } from "@mui/material";
+import { format } from "date-fns";
 
 type HistoricalPrice = {
-  tokenId: string;
-  symbol: string;
-  usdValue: number;
-  timestamp: string;
+  price: number;
+  timeStamp: number;
 };
 
 type DataPoint = {
-  usdValue: number;
-  timestamp: number;
+  price: number;
+  timeStamp: number;
 };
 
 const tabUnselectedStyles = {
@@ -35,40 +40,14 @@ const tabSelectedStyles = {
   background: "rgba(226, 73, 26, 0.10)",
 };
 
-// Helper function to filter data based on period
-const filterDataByPeriod = (
-  data: HistoricalPrice[],
-  period: string
-): HistoricalPrice[] => {
-  const now = new Date();
-  let filteredData;
-
-  switch (period) {
-    case "1d":
-      filteredData = data.filter((item) => {
-        const timeDiff = now.getTime() - new Date(item.timestamp).getTime();
-        return timeDiff <= 24 * 60 * 60 * 1000;
-      });
-      break;
-    case "1m":
-      filteredData = data.filter((item) => {
-        const timeDiff = now.getTime() - new Date(item.timestamp).getTime();
-        return timeDiff <= 30 * 24 * 60 * 60 * 1000;
-      });
-      break;
-    default:
-      filteredData = data;
-      break;
-  }
-  return filteredData;
-};
-
 // Helper function to format data
 const formatData = (data: HistoricalPrice[]): DataPoint[] => {
-  return data.map((item) => ({
-    usdValue: item.usdValue,
-    timestamp: new Date(item.timestamp).getTime(),
-  }));
+  return data.map((item) => {
+    return {
+      price: item.price,
+      timeStamp: new Date(Number(item.timeStamp) * 1000).getTime(),
+    };
+  });
 };
 
 const GlowingChart = ({
@@ -117,7 +96,7 @@ const GlowingChart = ({
             sx={{ height: "1rem", width: "1rem" }}
             src="/cryptoIcons/pho.svg"
           />{" "}
-          Current Price (USD)
+          Current Price (USDC)
         </Typography>
         <Typography
           sx={{
@@ -127,39 +106,39 @@ const GlowingChart = ({
             fontWeight: 700,
           }}
         >
-          ${data[data.length - 1].usdValue.toFixed(2)}
+          ${data[data.length - 1].price.toFixed(2)}
         </Typography>
       </Box>
       <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
         <Box
           sx={
-            selected === "1d"
+            selected === "W"
               ? { ...tabUnselectedStyles, ...tabSelectedStyles }
               : tabUnselectedStyles
           }
-          onClick={() => setSelected("1d")}
+          onClick={() => setSelected("W")}
         >
-          D
+          W
         </Box>
         <Box
           sx={
-            selected === "1m"
+            selected === "M"
               ? { ...tabUnselectedStyles, ...tabSelectedStyles }
               : tabUnselectedStyles
           }
-          onClick={() => setSelected("1m")}
+          onClick={() => setSelected("M")}
         >
           M
         </Box>
         <Box
           sx={
-            selected === "A"
+            selected === "Y"
               ? { ...tabUnselectedStyles, ...tabSelectedStyles }
               : tabUnselectedStyles
           }
-          onClick={() => setSelected("A")}
+          onClick={() => setSelected("Y")}
         >
-          A
+          Y
         </Box>
       </Box>
     </Box>
@@ -174,18 +153,22 @@ const GlowingChart = ({
             <stop offset="95%" stopColor="#E2491A" stopOpacity={0.02} />
           </linearGradient>
         </defs>
-        <YAxis hide={false} dataKey="usdValue" domain={["dataMin - 0.2", "dataMax + 0.1"]}
-               tickFormatter={(tick) => tick.toFixed(2)}/>
+        <YAxis
+          hide={false}
+          dataKey="price"
+          domain={["dataMin - 0.2", "dataMax + 0.1"]}
+          tickFormatter={(tick) => tick.toFixed(2)}
+        />
         <XAxis
           hide={false}
-          dataKey="timestamp"
+          dataKey="timeStamp"
           interval={Math.ceil(data.length / 5)}
           domain={["dataMin", "dataMax"]}
           tickFormatter={(tick) => format(new Date(tick), "MM/dd/yy")}
         />
         <Area
           type="monotone"
-          dataKey="usdValue"
+          dataKey="price"
           stroke="#E2491A"
           strokeWidth={2}
           isAnimationActive={true}
@@ -206,10 +189,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           2
         )}`}</Typography>
         <Typography variant="body2">{`Date: ${new Date(
-          payload[0].payload.timestamp
+          payload[0].payload.timeStamp
         ).toLocaleDateString()}`}</Typography>
         <Typography variant="body2">{`Time: ${new Date(
-          payload[0].payload.timestamp
+          payload[0].payload.timeStamp
         ).toLocaleTimeString()}`}</Typography>
       </Box>
     );
@@ -219,20 +202,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 const FinancialChart = ({
   historicalPrices,
+  period,
+  setPeriod,
 }: {
   historicalPrices: HistoricalPrice[];
+  period: string;
+  setPeriod: (period: "W" | "M" | "Y") => void;
 }) => {
-  const [period, setPeriod] = useState("1d");
-
-  const handlePeriodChange = (
-    event: React.ChangeEvent<{}>,
-    newPeriod: string
-  ) => {
-    setPeriod(newPeriod);
-  };
-
-  const filteredData = filterDataByPeriod(historicalPrices, period);
-  const formattedData = formatData(filteredData);
+  const formattedData = formatData(historicalPrices);
 
   return (
     <Box>

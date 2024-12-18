@@ -201,15 +201,21 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
               From
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]} sx={{
-                "& .MuiTextField-root": {
-                  minWidth: "0 !important"
-                }
-              }}>
+              <DemoContainer
+                components={["DatePicker"]}
+                sx={{
+                  "& .MuiTextField-root": {
+                    minWidth: "0 !important",
+                  },
+                }}
+              >
                 <DatePicker
                   value={dateRange.from ? dayjs(dateRange.from) : undefined}
                   onChange={(newValue) =>
-                    setDateRange({ ...dateRange, from: newValue.toDate() })
+                    setDateRange({
+                      ...dateRange,
+                      from: newValue ? newValue.toDate() : undefined,
+                    })
                   }
                   slotProps={{
                     field: { clearable: true },
@@ -230,7 +236,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "1px solid #2D303A",
-                      top: "-2px"
+                      top: "-2px",
                     },
                   }}
                 />
@@ -252,11 +258,14 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
               To
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]} sx={{
-                "& .MuiTextField-root": {
-                  minWidth: "0 !important"
-                }
-              }}>
+              <DemoContainer
+                components={["DatePicker"]}
+                sx={{
+                  "& .MuiTextField-root": {
+                    minWidth: "0 !important",
+                  },
+                }}
+              >
                 <DatePicker
                   value={dateRange.to ? dayjs(dateRange.to) : undefined}
                   onChange={(newValue: dayjs.Dayjs | null) =>
@@ -279,17 +288,17 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                       fontStyle: "normal",
                       fontWeight: 400,
                       borderRadius: "1rem",
-                      minWidth: "unset"
+                      minWidth: "unset",
                     },
                     "& .MuiTextField-root": {
-                      minWidth: "0 !important"
+                      minWidth: "0 !important",
                     },
                     "& legend": {
                       display: "none",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "1px solid #2D303A",
-                      top: "-2px"
+                      top: "-2px",
                     },
                   }}
                 />

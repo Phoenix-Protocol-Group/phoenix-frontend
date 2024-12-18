@@ -3741,6 +3741,7 @@ __metadata:
   resolution: "@phoenix-protocol/contracts@workspace:packages/contracts"
   dependencies:
     "@phoenix-protocol/utils": "workspace:^"
+    "@stellar/freighter-api": 3.0.0
     bigint-conversion: 2.4.1
     buffer: 6.0.3
     typescript: 5.0.4
@@ -3790,8 +3791,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/phoenix-frontend@workspace:."
   dependencies:
-    "@stellar/freighter-api": 3.0.0
-    "@stellar/stellar-sdk": 13.0.0
+    "@stellar/stellar-sdk": ^13.0.0
     "@tsconfig/recommended": ^1.0.2
     "@types/jest": ^29.5.2
     "@walletconnect/modal": ^2.6.2
@@ -3811,7 +3811,7 @@ __metadata:
     "@lobstrco/signer-extension-api": ^1.0.0-beta.0
     "@phoenix-protocol/contracts": "workspace:^"
     "@phoenix-protocol/types": "workspace:^"
-    "@stellar/freighter-api": 1.7.1
+    "@stellar/freighter-api": 3.0.0
     "@types/glob": ^7.1.3
     "@types/urijs": ^1.19.19
     react-query: ^3.39.3
@@ -3832,7 +3832,7 @@ __metadata:
     "@mui/styled-engine-sc": 6.1.7
     "@mui/system": 6.1.7
     "@mui/utils": 6.1.7
-    "@stellar/stellar-sdk": 11.3.0
+    "@stellar/stellar-sdk": 13.0.0
     typescript: 5.0.4
   languageName: unknown
   linkType: soft
@@ -4943,10 +4943,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stellar/freighter-api@npm:1.7.1":
-  version: 1.7.1
-  resolution: "@stellar/freighter-api@npm:1.7.1"
-  checksum: 02ff598d67e57bbadf24ab807b61045a8d6bbaa6d82dd25168793716eb960911a3fbbeac9cc59f610336a31d19a41de3fef8dd6a6d02826a241fed1615b36847
+"@stellar/freighter-api@npm:3.0.0":
+  version: 3.0.0
+  resolution: "@stellar/freighter-api@npm:3.0.0"
+  checksum: 218b32066c0c70af7e1bb616e7a42539eba3e79878026c2357917cb07a5790eb9923fd10df78fcd05422b9a6dc12775a8a46303ddd3ebdd51064e076ddd1d8da
   languageName: node
   linkType: hard
 
@@ -4961,24 +4961,6 @@ __metadata:
   version: 3.1.2
   resolution: "@stellar/js-xdr@npm:3.1.2"
   checksum: 6ecc52402603a1c9e64536bcd5b6348e247655aa662ac383967f48c1c6ac46e84cc48ebdbf3ada416d2c2d75898d1ab28dab6ba65d9018e3eb126ea1b2099f04
-  languageName: node
-  linkType: hard
-
-"@stellar/stellar-base@npm:^11.0.1":
-  version: 11.0.1
-  resolution: "@stellar/stellar-base@npm:11.0.1"
-  dependencies:
-    "@stellar/js-xdr": ^3.1.1
-    base32.js: ^0.1.0
-    bignumber.js: ^9.1.2
-    buffer: ^6.0.3
-    sha.js: ^2.3.6
-    sodium-native: ^4.0.10
-    tweetnacl: ^1.0.3
-  dependenciesMeta:
-    sodium-native:
-      optional: true
-  checksum: 1653dcf59e47d71d8eb0a6fd226b50ecef7134414611d5cf62875394f0d54497ff247b42dd2aee5b45eca36364757c4ae44422e03e51a032ab023c5db772ece5
   languageName: node
   linkType: hard
 
@@ -5000,22 +4982,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stellar/stellar-sdk@npm:11.3.0":
-  version: 11.3.0
-  resolution: "@stellar/stellar-sdk@npm:11.3.0"
-  dependencies:
-    "@stellar/stellar-base": ^11.0.1
-    axios: ^1.6.8
-    bignumber.js: ^9.1.2
-    eventsource: ^2.0.2
-    randombytes: ^2.1.0
-    toml: ^3.0.0
-    urijs: ^1.19.1
-  checksum: 3ef7429ba0938d076b807d11f0c461da1afb4eff371160f04375b4d9443b4d805ab08002e81d8a3fd86aacd7b72fef70b9106757b55ceff5ebcd2e0e9a3bc766
-  languageName: node
-  linkType: hard
-
-"@stellar/stellar-sdk@npm:13.0.0":
+"@stellar/stellar-sdk@npm:13.0.0, @stellar/stellar-sdk@npm:^13.0.0":
   version: 13.0.0
   resolution: "@stellar/stellar-sdk@npm:13.0.0"
   dependencies:
@@ -7504,7 +7471,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.0, axios@npm:^1.6.8, axios@npm:^1.7.7":
+"axios@npm:^1.6.0, axios@npm:^1.7.7":
   version: 1.7.7
   resolution: "axios@npm:1.7.7"
   dependencies:
@@ -10151,6 +10118,15 @@ __metadata:
   dependencies:
     bser: 2.1.1
   checksum: b15a124cef28916fe07b400eb87cbc73ca082c142abf7ca8e8de6af43eca79ca7bd13eb4d4d48240b3bd3136eaac40d16e42d6edf87a8e5d1dd8070626860c78
+  languageName: node
+  linkType: hard
+
+"feaxios@npm:^0.0.20":
+  version: 0.0.20
+  resolution: "feaxios@npm:0.0.20"
+  dependencies:
+    is-retry-allowed: ^3.0.0
+  checksum: 73ff5dc8b8a814bdd79f55521aa0cb9160f06afcbe36402a891d457d0085bff8cffba08a02878c838f5826c62e240fdefddd01bf931cb38bd89050c4de9f3c9a
   languageName: node
   linkType: hard
 
