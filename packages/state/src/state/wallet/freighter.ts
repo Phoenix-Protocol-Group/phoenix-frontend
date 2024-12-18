@@ -1,5 +1,6 @@
 import freighterApi from "@stellar/freighter-api";
 import {Connector, NetworkDetails} from "@phoenix-protocol/types";
+import { RPC_URL } from "../../constants";
 
 export function freighter(): Connector {
   return {
@@ -19,7 +20,7 @@ export function freighter(): Connector {
       // !TODO - find a better solution here
       return {
         ...(await freighterApi.getNetworkDetails()),
-        networkUrl: "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
+        networkUrl: RPC_URL,
       };
     },
     async getPublicKey(): Promise<string> {
