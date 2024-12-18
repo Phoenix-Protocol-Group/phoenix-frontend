@@ -28,6 +28,12 @@ export const FACTORY_ADDRESS: string =
  */
 export const MULTIHOP_ADDRESS: string =
   "CCLZRD4E72T7JCZCN3P7KNPYNXFYKQCL64ECLX7WP5GNVYPYJGU2IO2G";
+  
+/**
+ * NFT collection deployer address
+ */
+export const COLLECTION_DEPLOYER_ADDRESS: string =
+  "CDPTJ4JCWK2LZO23IUAPNQZM2K6CAIIX4B6VH7DROTMAWENH7GQOSXYG";
 
 /**
  * Phoenix History Indexer
