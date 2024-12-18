@@ -77,7 +77,15 @@ export default class Signer {
   async getWallet() {
     if (this.walletType === "freighter") {
       this.wallet = new Freighter();
-    } 
+    } else if (this.walletType === "xbull") {
+      this.wallet = new xBull();
+    } else if (this.walletType === "lobstr") {
+      this.wallet = new lobstr();
+    } else if (this.walletType === "wallet-connect") {
+      this.wallet = await initializeWalletConnect();
+    } else {
+      console.log("Wallet type not supported.");
+    }
   }
 
   /**
@@ -92,9 +100,9 @@ export default class Signer {
     if (this.wallet === undefined) {
       throw new Error("Wallet not found or not connected.");
     }
-    return this.wallet.signTransaction(message,  {
+    return this.wallet.signTransaction(message, {
       network: constants.RPC_URL,
-      networkPassphrase: constants.NETWORK_PASSPHRASE
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
     });
   }
 }
