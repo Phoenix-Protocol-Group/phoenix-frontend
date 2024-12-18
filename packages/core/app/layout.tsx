@@ -2,19 +2,12 @@
 
 import React, { ReactNode, useEffect, useState, useCallback } from "react";
 import { useTheme } from "@mui/material/styles";
-import {
-  Box,
-  Grid,
-  List,
-  ListItem,
-  Typography,
-  useMediaQuery,
-} from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import Providers from "../providers";
 import TopBar from "@/components/TopBar/TopBar";
 import SideNav from "@/components/SideNav/SideNav";
-import { usePathname, useRouter } from "next/navigation";
-import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
+import { usePathname } from "next/navigation";
+import { usePersistStore } from "@phoenix-protocol/state";
 import { DisclaimerModal } from "@phoenix-protocol/ui";
 import { Analytics } from "@vercel/analytics/react";
 import { motion } from "framer-motion";
@@ -68,7 +61,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     }
   }, [largerThanMd]);
 
-  // Use effect hook to prune the persist store on page load if wallet-connect
+  // Use effect hook to prune the persist store on page load, when it is wallet-connect
+  // @todo: This should be moved to a more appropriate place and we need to keep sessions on reload on a long term
   useEffect(() => {
     const appStorageValue = localStorage?.getItem("app-storage");
     if (appStorageValue !== null) {
