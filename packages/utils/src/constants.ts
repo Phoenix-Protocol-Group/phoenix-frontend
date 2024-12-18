@@ -9,13 +9,13 @@ export const TESTING_SOURCE: Account = new Account(
  * The Soroban network passphrase used to initialize this library.
  */
 export const NETWORK_PASSPHRASE: string =
-  "Test SDF Network ; September 2015";
+  "Public Global Stellar Network ; September 2015";
 
 /**
  * The Soroban RPC endpoint used to initialize this library.
  */
 export const RPC_URL: string =
-  "https://soroban-testnet.stellar.org";
+  "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0";
 
 /**
  * Factory contract address
@@ -30,15 +30,12 @@ export const MULTIHOP_ADDRESS: string =
   "CCLZRD4E72T7JCZCN3P7KNPYNXFYKQCL64ECLX7WP5GNVYPYJGU2IO2G";
 
 /**
- * NFT collection deployer address
- */
-export const COLLECTION_DEPLOYER_ADDRESS: string =
-  "CDNOSHSUZ5UIYUPZI665Z7LXMJ4H4IZX3TUCWRDT5Q6XO7XBFLZLD3TX";
-
-/**
  * Phoenix History Indexer
  */
 export const PHOENIX_HISTORY_INDEXER: string = "https://graphql.phoenix-hub.io";
+
+export const DECENTRIO_API_URL: string =
+  "https://api-phoenix-v2.decentrio.ventures";
 
 /**
  * Airdrop program

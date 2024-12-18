@@ -1,12 +1,11 @@
-import { Horizon } from "@stellar/stellar-sdk";
-import { AppStore, AppStorePersist } from "@phoenix-protocol/types";
-import { freighter } from "../wallet/freighter";
-import { allChains, networkToActiveChain } from "../wallet/chains";
-import { useAppStore, usePersistStore } from "../store";
-import { xbull } from "../wallet/xbull";
-import { lobstr } from "../wallet/lobstr";
-import { WalletConnect } from "../wallet/wallet-connect";
-import { NETWORK, NETWORK_PASSPHRASE, RPC_URL } from "../../constants";
+import {Horizon} from "@stellar/stellar-sdk";
+import {AppStore, AppStorePersist} from "@phoenix-protocol/types";
+import {freighter} from "../wallet/freighter";
+import {allChains, networkToActiveChain} from "../wallet/chains";
+import {useAppStore, usePersistStore} from "../store";
+import {xbull} from "../wallet/xbull";
+import {lobstr} from "../wallet/lobstr";
+import {WalletConnect} from "../wallet/wallet-connect";
 
 // Maintain a single WalletConnect instance
 let walletConnectInstance: WalletConnect | null = null;
@@ -55,10 +54,12 @@ export const createConnectWalletActions = () => {
       // Get the network details from the user's wallet.
       // TODO: Make this dynamic
       const networkDetails = {
-        network: NETWORK,
-        networkPassphrase: NETWORK_PASSPHRASE,
-        networkUrl: RPC_URL,
-        sorobanRpcUrl: RPC_URL,
+        network: "STANDALONE",
+        networkPassphrase: "Public Global Stellar Network ; September 2015",
+        networkUrl:
+          "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
+        sorobanRpcUrl:
+          "https://bitter-alpha-layer.stellar-mainnet.quiknode.pro/54b50c548864e1470fd52dbd629b647d556b983e",
       };
 
       // Throw an error if the network is not supported.
@@ -100,8 +101,8 @@ export const createConnectWalletActions = () => {
       // Create a server object to connect to the blockchain.
       let server =
         networkDetails &&
-        new Horizon.Server(networkDetails.networkUrl!, {
-          allowHttp: networkDetails.networkUrl!.startsWith("http://"),
+        new Horizon.Server(networkDetails.networkUrl, {
+          allowHttp: networkDetails.networkUrl.startsWith("http://"),
         });
 
       // Update the state to store the wallet address and server.

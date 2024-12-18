@@ -1,7 +1,6 @@
 import freighterApi from "@stellar/freighter-api";
 import { Connector, NetworkDetails } from "@phoenix-protocol/types";
 import { xBullWalletConnect } from "@creit.tech/xbull-wallet-connect";
-import { RPC_URL } from "../../constants";
 
 export function xbull(): Connector {
   return {
@@ -22,7 +21,8 @@ export function xbull(): Connector {
       // !TODO - find a better solution here
       return {
         ...(await freighterApi.getNetworkDetails()),
-        networkUrl: RPC_URL,
+        networkUrl:
+          "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
       };
     },
     async getPublicKey(): Promise<string> {
