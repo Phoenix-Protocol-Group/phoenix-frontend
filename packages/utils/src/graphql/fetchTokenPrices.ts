@@ -32,7 +32,7 @@ export async function fetchTokenPrices(symbol?: string, tokenId?: string) {
     });
 
     if ((symbol || tokenId) && data) {
-      return data.prices[0].usdValue;
+      return data.prices[0]?.usdValue || 0;
     }
 
     return data.prices;
@@ -168,7 +168,7 @@ export async function fetchTokenPrices2(
     );
     const recentAverage =
       recentPrices.reduce(
-        (sum: number, entry: any) => sum + (entry.usdValue || 0),
+        (sum: number, entry: any) => sum + (entry?.usdValue || 0),
         0
       ) / recentPrices.length;
 
@@ -179,7 +179,7 @@ export async function fetchTokenPrices2(
     );
     const oldAverage =
       oldPrices.reduce(
-        (sum: number, entry: any) => sum + (entry.usdValue || 0),
+        (sum: number, entry: any) => sum + (entry?.usdValue || 0),
         0
       ) / oldPrices.length;
 
