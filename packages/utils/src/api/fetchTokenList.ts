@@ -23,7 +23,6 @@ export async function fetchTokenList(): Promise<apiToken[]> {
 
 export async function scaToToken(scaAddress: string, appStore: AppStore) {
   const tokenList = await fetchTokenList();
-  console.log(tokenList);
   const contractAddress = tokenList.find(
     (token) => token.token == scaAddress
   )?.soroban_contract;

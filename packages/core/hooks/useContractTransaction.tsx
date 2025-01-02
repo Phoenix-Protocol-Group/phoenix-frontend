@@ -84,6 +84,7 @@ const getContractClient = <T extends ContractType>(
   publicKey: string,
   storePersist: any
 ): ContractClientType<T> => {
+  console.log(1);
   const signTransaction = getSignerFunction(signer, storePersist);
   const commonOptions = {
     publicKey: publicKey,

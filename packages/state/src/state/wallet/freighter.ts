@@ -1,5 +1,5 @@
 import freighterApi from "@stellar/freighter-api";
-import {Connector, NetworkDetails} from "@phoenix-protocol/types";
+import { Connector, NetworkDetails } from "@phoenix-protocol/types";
 
 export function freighter(): Connector {
   return {
@@ -19,11 +19,12 @@ export function freighter(): Connector {
       // !TODO - find a better solution here
       return {
         ...(await freighterApi.getNetworkDetails()),
-        networkUrl: "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
+        networkUrl:
+          "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
       };
     },
-    getPublicKey(): Promise<string> {
-      return freighterApi.getPublicKey();
+    async getPublicKey(): Promise<string> {
+      return (await freighterApi.getAddress()).address;
     },
     signTransaction(
       xdr: string,
@@ -32,7 +33,7 @@ export function freighter(): Connector {
         networkPassphrase?: string;
         accountToSign?: string;
       }
-    ): Promise<string> {
+    ): Promise<any> {
       return freighterApi.signTransaction(xdr, opts);
     },
   };

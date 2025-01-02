@@ -1,7 +1,7 @@
-import {Connector, NetworkDetails} from "@phoenix-protocol/types";
-import {WalletConnect as WalletClient} from "@phoenix-protocol/utils";
-import {WalletConnectAllowedMethods} from "@phoenix-protocol/utils/build/wallets/wallet-connect";
-import {NETWORK_PASSPHRASE} from "@phoenix-protocol/utils/build/constants";
+import { Connector, NetworkDetails } from "@phoenix-protocol/types";
+import { WalletConnect as WalletClient } from "@phoenix-protocol/utils";
+import { WalletConnectAllowedMethods } from "@phoenix-protocol/utils/build/wallets/wallet-connect";
+import { NETWORK_PASSPHRASE } from "@phoenix-protocol/utils/build/constants";
 
 export class WalletConnect implements Connector {
   id: string;
@@ -23,7 +23,7 @@ export class WalletConnect implements Connector {
     this.installed = true;
     this.downloadUrls = {
       browserExtension:
-          "https://chrome.google.com/webstore/detail/freighter/bcacfldlkkdogcmkkibnjlakofdplcbk?hl=en",
+        "https://chrome.google.com/webstore/detail/freighter/bcacfldlkkdogcmkkibnjlakofdplcbk?hl=en",
     };
     if (ignoreClient) return;
     this.client = new WalletClient({
@@ -38,7 +38,7 @@ export class WalletConnect implements Connector {
   }
 
   async isConnected(): Promise<boolean> {
-    console.log(this.client)
+    console.log(this.client);
     return !!this.client;
   }
 
@@ -47,7 +47,7 @@ export class WalletConnect implements Connector {
       network: "public",
       networkPassphrase: NETWORK_PASSPHRASE,
       networkUrl:
-          "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
+        "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
     };
   }
 
@@ -56,14 +56,13 @@ export class WalletConnect implements Connector {
   }
 
   signTransaction(
-      xdr: string,
-      opts?: {
-        network?: string;
-        networkPassphrase?: string;
-        accountToSign?: string;
-      }
-  ): Promise<string> {
+    xdr: string,
+    opts?: {
+      network?: string;
+      networkPassphrase?: string;
+      accountToSign?: string;
+    }
+  ): Promise<any> {
     return this.client!.signTransaction(xdr, opts);
   }
 }
-

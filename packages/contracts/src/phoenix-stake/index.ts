@@ -4,6 +4,7 @@ import {
   AssembledTransaction,
   Client as ContractClient,
   ClientOptions as ContractClientOptions,
+  MethodOptions,
   Result,
   Spec as ContractSpec,
 } from "@stellar/stellar-sdk/contract";
@@ -29,31 +30,38 @@ if (typeof window !== "undefined") {
   window.Buffer = window.Buffer || Buffer;
 }
 
-export const networks = {
-  testnet: {
-    networkPassphrase: "Test SDF Network ; September 2015",
-    contractId: "0",
-  },
-} as const;
-
 export type DistributionDataKey =
   | { tag: "RewardHistory"; values: readonly [string] }
   | { tag: "TotalStakedHistory"; values: void };
 
 export const Errors = {
-  1: { message: "" },
-  2: { message: "" },
-  3: { message: "" },
-  4: { message: "" },
-  5: { message: "" },
-  6: { message: "" },
-  7: { message: "" },
-  8: { message: "" },
-  9: { message: "" },
-  10: { message: "" },
-  11: { message: "" },
-  12: { message: "" },
-  13: { message: "" },
+  1: { message: "AlreadyInitialized" },
+
+  2: { message: "InvalidMinBond" },
+
+  3: { message: "InvalidMinReward" },
+
+  4: { message: "InvalidBond" },
+
+  5: { message: "Unauthorized" },
+
+  6: { message: "MinRewardNotEnough" },
+
+  7: { message: "RewardsInvalid" },
+
+  8: { message: "StakeNotFound" },
+
+  9: { message: "InvalidTime" },
+
+  10: { message: "DistributionExists" },
+
+  11: { message: "InvalidRewardAmount" },
+
+  12: { message: "InvalidMaxComplexity" },
+
+  13: { message: "DistributionNotFound" },
+
+  14: { message: "AdminNotSet" },
 };
 
 export interface ConfigResponse {
@@ -428,6 +436,26 @@ export interface Client {
   ) => Promise<AssembledTransaction<WithdrawableRewardsResponse>>;
 
   /**
+   * Construct and simulate a migrate_admin_key transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  migrate_admin_key: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<void>>>;
+
+  /**
    * Construct and simulate a update transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
   update: (
@@ -451,6 +479,20 @@ export interface Client {
   ) => Promise<AssembledTransaction<null>>;
 }
 export class Client extends ContractClient {
+  static async deploy<T = Client>(
+    /** Options for initalizing a Client as well as for calling a method, with extras specific to deploying. */
+    options: MethodOptions &
+      Omit<ContractClientOptions, "contractId"> & {
+        /** The hash of the Wasm blob, which must already be installed on-chain. */
+        wasmHash: Buffer | string;
+        /** Salt used to generate the contract's ID. Passed through to {@link Operation.createCustomContract}. Default: random. */
+        salt?: Buffer | Uint8Array;
+        /** The format used to decode `wasmHash`, if it's provided as a string. */
+        format?: "hex" | "base64";
+      }
+  ): Promise<AssembledTransaction<T>> {
+    return ContractClient.deploy(null, options);
+  }
   constructor(public readonly options: ContractClientOptions) {
     super(
       new ContractSpec([
@@ -465,9 +507,10 @@ export class Client extends ContractClient {
         "AAAAAAAAAAAAAAAMcXVlcnlfc3Rha2VkAAAAAQAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAQAAB9AAAAAOU3Rha2VkUmVzcG9uc2UAAA==",
         "AAAAAAAAAAAAAAAScXVlcnlfdG90YWxfc3Rha2VkAAAAAAAAAAAAAQAAAAs=",
         "AAAAAAAAAAAAAAAacXVlcnlfd2l0aGRyYXdhYmxlX3Jld2FyZHMAAAAAAAEAAAAAAAAABHVzZXIAAAATAAAAAQAAB9AAAAAbV2l0aGRyYXdhYmxlUmV3YXJkc1Jlc3BvbnNlAA==",
+        "AAAAAAAAAAAAAAARbWlncmF0ZV9hZG1pbl9rZXkAAAAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
         "AAAAAAAAAAAAAAAGdXBkYXRlAAAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
         "AAAAAgAAAAAAAAAAAAAAE0Rpc3RyaWJ1dGlvbkRhdGFLZXkAAAAAAgAAAAEAAAAAAAAADVJld2FyZEhpc3RvcnkAAAAAAAABAAAAEwAAAAAAAAAAAAAAElRvdGFsU3Rha2VkSGlzdG9yeQAA",
-        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAANAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAEAAAAAAAAADkludmFsaWRNaW5Cb25kAAAAAAACAAAAAAAAABBJbnZhbGlkTWluUmV3YXJkAAAAAwAAAAAAAAALSW52YWxpZEJvbmQAAAAABAAAAAAAAAAMVW5hdXRob3JpemVkAAAABQAAAAAAAAASTWluUmV3YXJkTm90RW5vdWdoAAAAAAAGAAAAAAAAAA5SZXdhcmRzSW52YWxpZAAAAAAABwAAAAAAAAANU3Rha2VOb3RGb3VuZAAAAAAAAAgAAAAAAAAAC0ludmFsaWRUaW1lAAAAAAkAAAAAAAAAEkRpc3RyaWJ1dGlvbkV4aXN0cwAAAAAACgAAAAAAAAATSW52YWxpZFJld2FyZEFtb3VudAAAAAALAAAAAAAAABRJbnZhbGlkTWF4Q29tcGxleGl0eQAAAAwAAAAAAAAAFERpc3RyaWJ1dGlvbk5vdEZvdW5kAAAADQ==",
+        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAOAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAEAAAAAAAAADkludmFsaWRNaW5Cb25kAAAAAAACAAAAAAAAABBJbnZhbGlkTWluUmV3YXJkAAAAAwAAAAAAAAALSW52YWxpZEJvbmQAAAAABAAAAAAAAAAMVW5hdXRob3JpemVkAAAABQAAAAAAAAASTWluUmV3YXJkTm90RW5vdWdoAAAAAAAGAAAAAAAAAA5SZXdhcmRzSW52YWxpZAAAAAAABwAAAAAAAAANU3Rha2VOb3RGb3VuZAAAAAAAAAgAAAAAAAAAC0ludmFsaWRUaW1lAAAAAAkAAAAAAAAAEkRpc3RyaWJ1dGlvbkV4aXN0cwAAAAAACgAAAAAAAAATSW52YWxpZFJld2FyZEFtb3VudAAAAAALAAAAAAAAABRJbnZhbGlkTWF4Q29tcGxleGl0eQAAAAwAAAAAAAAAFERpc3RyaWJ1dGlvbk5vdEZvdW5kAAAADQAAAAAAAAALQWRtaW5Ob3RTZXQAAAAADg==",
         "AAAAAQAAAAAAAAAAAAAADkNvbmZpZ1Jlc3BvbnNlAAAAAAABAAAAAAAAAAZjb25maWcAAAAAB9AAAAAGQ29uZmlnAAA=",
         "AAAAAQAAAAAAAAAAAAAADlN0YWtlZFJlc3BvbnNlAAAAAAADAAAAAAAAABBsYXN0X3Jld2FyZF90aW1lAAAABgAAAAAAAAAGc3Rha2VzAAAAAAPqAAAH0AAAAAVTdGFrZQAAAAAAAAAAAAALdG90YWxfc3Rha2UAAAAACw==",
         "AAAAAQAAAAAAAAAAAAAAEEFubnVhbGl6ZWRSZXdhcmQAAAACAAAAAAAAAAZhbW91bnQAAAAAABAAAAAAAAAABWFzc2V0AAAAAAAAEw==",
@@ -497,6 +540,7 @@ export class Client extends ContractClient {
     query_staked: this.txFromJSON<StakedResponse>,
     query_total_staked: this.txFromJSON<i128>,
     query_withdrawable_rewards: this.txFromJSON<WithdrawableRewardsResponse>,
+    migrate_admin_key: this.txFromJSON<Result<void>>,
     update: this.txFromJSON<null>,
   };
 }

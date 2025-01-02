@@ -2,7 +2,7 @@ import {
   Asset,
   Horizon,
   Operation,
-  SorobanRpc,
+  rpc as SorobanRpc,
   StrKey,
   TransactionBuilder,
 } from "@stellar/stellar-sdk";
@@ -167,7 +167,7 @@ export async function fetchAndIssueTrustline(
     const signature = await wallet.signTransaction(transaction.toXDR());
 
     const signed = TransactionBuilder.fromXDR(
-      signature,
+      signature.toString(),
       constants.NETWORK_PASSPHRASE
     );
 

@@ -2,7 +2,7 @@ import freighter from "@stellar/freighter-api";
 import { Account } from "@stellar/stellar-sdk";
 import { Server } from "./server";
 // working around ESM compatibility issues
-const { isConnected, isAllowed, getUserInfo } = freighter;
+const { isConnected, isAllowed, getAddress } = freighter;
 
 /**
  * Get account details from the Soroban network for the publicKey currently
@@ -12,7 +12,7 @@ export async function getAccount(): Promise<Account | null> {
   if (!(await isConnected()) || !(await isAllowed())) {
     return null;
   }
-  const { publicKey } = await getUserInfo();
+  const { address: publicKey } = await getAddress();
   if (!publicKey) {
     return null;
   }

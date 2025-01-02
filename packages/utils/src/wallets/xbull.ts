@@ -37,11 +37,11 @@ export class xBull implements Wallet {
    * @memberof xBull
    * @instance getUserInfo
    */
-  async getUserInfo(): Promise<{ publicKey?: string }> {
+  async getAddress(): Promise<{ address?: string }> {
     const bridge: xBullWalletConnect = new xBullWalletConnect();
     const publicKey: string = await bridge.connect();
     bridge.closeConnections();
-    return { publicKey };
+    return { address: publicKey };
   }
 
   /**
@@ -59,7 +59,10 @@ export class xBull implements Wallet {
       networkPassphrase?: string;
       accountToSign?: string;
     }
-  ): Promise<string> {
+  ): Promise<{
+    signedTxXdr: string;
+    signerAddress: string;
+  }> {
     const bridge: xBullWalletConnect = new xBullWalletConnect();
 
     let updatedXdr: string = tx;
@@ -71,7 +74,10 @@ export class xBull implements Wallet {
     });
 
     bridge.closeConnections();
-    return updatedXdr;
+    return {
+      signedTxXdr: updatedXdr,
+      signerAddress: (await this.getAddress()).address!,
+    };
   }
 
   /**
@@ -84,8 +90,16 @@ export class xBull implements Wallet {
    */
   async signAuthEntry(
     entryXdr: string,
-    opts?: { accountToSign?: string }
-  ): Promise<string> {
+    opts?:
+      | {
+          networkPassphrase?: string | undefined;
+          address?: string | undefined;
+        }
+      | undefined
+  ): Promise<{
+    signedAuthEntry: Buffer | null;
+    signerAddress: string;
+  }> {
     throw new Error("xBull does not support signing authorization entries");
   }
 }

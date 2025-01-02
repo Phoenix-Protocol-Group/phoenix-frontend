@@ -4,6 +4,7 @@ import {
   AssembledTransaction,
   Client as ContractClient,
   ClientOptions as ContractClientOptions,
+  MethodOptions,
   Result,
   Spec as ContractSpec,
 } from "@stellar/stellar-sdk/contract";
@@ -29,41 +30,62 @@ if (typeof window !== "undefined") {
   window.Buffer = window.Buffer || Buffer;
 }
 
-export const networks = {
-  testnet: {
-    networkPassphrase: "Test SDF Network ; September 2015",
-    contractId: "0",
-  },
-} as const;
-
 export const Errors = {
-  1: { message: "" },
-  2: { message: "" },
-  3: { message: "" },
-  4: { message: "" },
-  5: { message: "" },
-  6: { message: "" },
-  7: { message: "" },
-  8: { message: "" },
-  9: { message: "" },
-  10: { message: "" },
-  11: { message: "" },
-  12: { message: "" },
-  13: { message: "" },
-  14: { message: "" },
-  15: { message: "" },
-  16: { message: "" },
-  17: { message: "" },
-  18: { message: "" },
-  19: { message: "" },
-  20: { message: "" },
-  21: { message: "" },
-  22: { message: "" },
-  23: { message: "" },
-  24: { message: "" },
-  25: { message: "" },
-  26: { message: "" },
-  27: { message: "" },
+  1: { message: "SpreadExceedsLimit" },
+
+  2: { message: "ProvideLiquiditySlippageToleranceTooHigh" },
+
+  3: { message: "ProvideLiquidityAtLeastOneTokenMustBeBiggerThenZero" },
+
+  4: { message: "WithdrawLiquidityMinimumAmountOfAOrBIsNotSatisfied" },
+
+  5: { message: "SplitDepositBothPoolsAndDepositMustBePositive" },
+
+  6: { message: "ValidateFeeBpsTotalFeesCantBeGreaterThan100" },
+
+  7: { message: "GetDepositAmountsMinABiggerThenDesiredA" },
+
+  8: { message: "GetDepositAmountsMinBBiggerThenDesiredB" },
+
+  9: { message: "GetDepositAmountsAmountABiggerThenDesiredA" },
+
+  10: { message: "GetDepositAmountsAmountALessThenMinA" },
+
+  11: { message: "GetDepositAmountsAmountBBiggerThenDesiredB" },
+
+  12: { message: "GetDepositAmountsAmountBLessThenMinB" },
+
+  13: { message: "TotalSharesEqualZero" },
+
+  14: { message: "DesiredAmountsBelowOrEqualZero" },
+
+  15: { message: "MinAmountsBelowZero" },
+
+  16: { message: "AssetNotInPool" },
+
+  17: { message: "AlreadyInitialized" },
+
+  18: { message: "TokenABiggerThanTokenB" },
+
+  19: { message: "InvalidBps" },
+
+  20: { message: "SlippageInvalid" },
+
+  21: { message: "SwapMinReceivedBiggerThanReturn" },
+
+  22: { message: "TransactionAfterTimestampDeadline" },
+
+  23: { message: "CannotConvertU256ToI128" },
+
+  24: { message: "UserDeclinesPoolFee" },
+
+  25: { message: "SwapFeeBpsOverLimit" },
+
+  26: { message: "NotEnoughSharesToBeMinted" },
+
+  27: { message: "NotEnoughLiquidityProvided" },
+
+  28: { message: "AdminNotSet" },
 };
 export enum PairType {
   Xyk = 0,
@@ -618,6 +640,26 @@ export interface Client {
   }) => Promise<AssembledTransaction<i128>>;
 
   /**
+   * Construct and simulate a migrate_admin_key transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  migrate_admin_key: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<void>>>;
+
+  /**
    * Construct and simulate a update transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
   update: (
@@ -641,6 +683,20 @@ export interface Client {
   ) => Promise<AssembledTransaction<null>>;
 }
 export class Client extends ContractClient {
+  static async deploy<T = Client>(
+    /** Options for initalizing a Client as well as for calling a method, with extras specific to deploying. */
+    options: MethodOptions &
+      Omit<ContractClientOptions, "contractId"> & {
+        /** The hash of the Wasm blob, which must already be installed on-chain. */
+        wasmHash: Buffer | string;
+        /** Salt used to generate the contract's ID. Passed through to {@link Operation.createCustomContract}. Default: random. */
+        salt?: Buffer | Uint8Array;
+        /** The format used to decode `wasmHash`, if it's provided as a string. */
+        format?: "hex" | "base64";
+      }
+  ): Promise<AssembledTransaction<T>> {
+    return ContractClient.deploy(null, options);
+  }
   constructor(public readonly options: ContractClientOptions) {
     super(
       new ContractSpec([
@@ -659,8 +715,9 @@ export class Client extends ContractClient {
         "AAAAAAAAAAAAAAAVc2ltdWxhdGVfcmV2ZXJzZV9zd2FwAAAAAAAAAgAAAAAAAAAJYXNrX2Fzc2V0AAAAAAAAEwAAAAAAAAAKYXNrX2Ftb3VudAAAAAAACwAAAAEAAAfQAAAAG1NpbXVsYXRlUmV2ZXJzZVN3YXBSZXNwb25zZQA=",
         "AAAAAAAAAAAAAAALcXVlcnlfc2hhcmUAAAAAAQAAAAAAAAAGYW1vdW50AAAAAAALAAAAAQAAA+0AAAACAAAH0AAAAAVBc3NldAAAAAAAB9AAAAAFQXNzZXQAAAA=",
         "AAAAAAAAAAAAAAAVcXVlcnlfdG90YWxfaXNzdWVkX2xwAAAAAAAAAAAAAAEAAAAL",
+        "AAAAAAAAAAAAAAARbWlncmF0ZV9hZG1pbl9rZXkAAAAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
         "AAAAAAAAAAAAAAAGdXBkYXRlAAAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
-        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAbAAAAAAAAABJTcHJlYWRFeGNlZWRzTGltaXQAAAAAAAEAAAAAAAAAKFByb3ZpZGVMaXF1aWRpdHlTbGlwcGFnZVRvbGVyYW5jZVRvb0hpZ2gAAAACAAAAAAAAADNQcm92aWRlTGlxdWlkaXR5QXRMZWFzdE9uZVRva2VuTXVzdEJlQmlnZ2VyVGhlblplcm8AAAAAAwAAAAAAAAAyV2l0aGRyYXdMaXF1aWRpdHlNaW5pbXVtQW1vdW50T2ZBT3JCSXNOb3RTYXRpc2ZpZWQAAAAAAAQAAAAAAAAALVNwbGl0RGVwb3NpdEJvdGhQb29sc0FuZERlcG9zaXRNdXN0QmVQb3NpdGl2ZQAAAAAAAAUAAAAAAAAAK1ZhbGlkYXRlRmVlQnBzVG90YWxGZWVzQ2FudEJlR3JlYXRlclRoYW4xMDAAAAAABgAAAAAAAAAnR2V0RGVwb3NpdEFtb3VudHNNaW5BQmlnZ2VyVGhlbkRlc2lyZWRBAAAAAAcAAAAAAAAAJ0dldERlcG9zaXRBbW91bnRzTWluQkJpZ2dlclRoZW5EZXNpcmVkQgAAAAAIAAAAAAAAACpHZXREZXBvc2l0QW1vdW50c0Ftb3VudEFCaWdnZXJUaGVuRGVzaXJlZEEAAAAAAAkAAAAAAAAAJEdldERlcG9zaXRBbW91bnRzQW1vdW50QUxlc3NUaGVuTWluQQAAAAoAAAAAAAAAKkdldERlcG9zaXRBbW91bnRzQW1vdW50QkJpZ2dlclRoZW5EZXNpcmVkQgAAAAAACwAAAAAAAAAkR2V0RGVwb3NpdEFtb3VudHNBbW91bnRCTGVzc1RoZW5NaW5CAAAADAAAAAAAAAAUVG90YWxTaGFyZXNFcXVhbFplcm8AAAANAAAAAAAAAB5EZXNpcmVkQW1vdW50c0JlbG93T3JFcXVhbFplcm8AAAAAAA4AAAAAAAAAE01pbkFtb3VudHNCZWxvd1plcm8AAAAADwAAAAAAAAAOQXNzZXROb3RJblBvb2wAAAAAABAAAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAAAEQAAAAAAAAAWVG9rZW5BQmlnZ2VyVGhhblRva2VuQgAAAAAAEgAAAAAAAAAKSW52YWxpZEJwcwAAAAAAEwAAAAAAAAAPU2xpcHBhZ2VJbnZhbGlkAAAAABQAAAAAAAAAH1N3YXBNaW5SZWNlaXZlZEJpZ2dlclRoYW5SZXR1cm4AAAAAFQAAAAAAAAAhVHJhbnNhY3Rpb25BZnRlclRpbWVzdGFtcERlYWRsaW5lAAAAAAAAFgAAAAAAAAAXQ2Fubm90Q29udmVydFUyNTZUb0kxMjgAAAAAFwAAAAAAAAATVXNlckRlY2xpbmVzUG9vbEZlZQAAAAAYAAAAAAAAABNTd2FwRmVlQnBzT3ZlckxpbWl0AAAAABkAAAAAAAAAGU5vdEVub3VnaFNoYXJlc1RvQmVNaW50ZWQAAAAAAAAaAAAAAAAAABpOb3RFbm91Z2hMaXF1aWRpdHlQcm92aWRlZAAAAAAAGw==",
+        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAcAAAAAAAAABJTcHJlYWRFeGNlZWRzTGltaXQAAAAAAAEAAAAAAAAAKFByb3ZpZGVMaXF1aWRpdHlTbGlwcGFnZVRvbGVyYW5jZVRvb0hpZ2gAAAACAAAAAAAAADNQcm92aWRlTGlxdWlkaXR5QXRMZWFzdE9uZVRva2VuTXVzdEJlQmlnZ2VyVGhlblplcm8AAAAAAwAAAAAAAAAyV2l0aGRyYXdMaXF1aWRpdHlNaW5pbXVtQW1vdW50T2ZBT3JCSXNOb3RTYXRpc2ZpZWQAAAAAAAQAAAAAAAAALVNwbGl0RGVwb3NpdEJvdGhQb29sc0FuZERlcG9zaXRNdXN0QmVQb3NpdGl2ZQAAAAAAAAUAAAAAAAAAK1ZhbGlkYXRlRmVlQnBzVG90YWxGZWVzQ2FudEJlR3JlYXRlclRoYW4xMDAAAAAABgAAAAAAAAAnR2V0RGVwb3NpdEFtb3VudHNNaW5BQmlnZ2VyVGhlbkRlc2lyZWRBAAAAAAcAAAAAAAAAJ0dldERlcG9zaXRBbW91bnRzTWluQkJpZ2dlclRoZW5EZXNpcmVkQgAAAAAIAAAAAAAAACpHZXREZXBvc2l0QW1vdW50c0Ftb3VudEFCaWdnZXJUaGVuRGVzaXJlZEEAAAAAAAkAAAAAAAAAJEdldERlcG9zaXRBbW91bnRzQW1vdW50QUxlc3NUaGVuTWluQQAAAAoAAAAAAAAAKkdldERlcG9zaXRBbW91bnRzQW1vdW50QkJpZ2dlclRoZW5EZXNpcmVkQgAAAAAACwAAAAAAAAAkR2V0RGVwb3NpdEFtb3VudHNBbW91bnRCTGVzc1RoZW5NaW5CAAAADAAAAAAAAAAUVG90YWxTaGFyZXNFcXVhbFplcm8AAAANAAAAAAAAAB5EZXNpcmVkQW1vdW50c0JlbG93T3JFcXVhbFplcm8AAAAAAA4AAAAAAAAAE01pbkFtb3VudHNCZWxvd1plcm8AAAAADwAAAAAAAAAOQXNzZXROb3RJblBvb2wAAAAAABAAAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAAAEQAAAAAAAAAWVG9rZW5BQmlnZ2VyVGhhblRva2VuQgAAAAAAEgAAAAAAAAAKSW52YWxpZEJwcwAAAAAAEwAAAAAAAAAPU2xpcHBhZ2VJbnZhbGlkAAAAABQAAAAAAAAAH1N3YXBNaW5SZWNlaXZlZEJpZ2dlclRoYW5SZXR1cm4AAAAAFQAAAAAAAAAhVHJhbnNhY3Rpb25BZnRlclRpbWVzdGFtcERlYWRsaW5lAAAAAAAAFgAAAAAAAAAXQ2Fubm90Q29udmVydFUyNTZUb0kxMjgAAAAAFwAAAAAAAAATVXNlckRlY2xpbmVzUG9vbEZlZQAAAAAYAAAAAAAAABNTd2FwRmVlQnBzT3ZlckxpbWl0AAAAABkAAAAAAAAAGU5vdEVub3VnaFNoYXJlc1RvQmVNaW50ZWQAAAAAAAAaAAAAAAAAABpOb3RFbm91Z2hMaXF1aWRpdHlQcm92aWRlZAAAAAAAGwAAAAAAAAALQWRtaW5Ob3RTZXQAAAAAHA==",
         "AAAAAwAAAAAAAAAAAAAACFBhaXJUeXBlAAAAAQAAAAAAAAADWHlrAAAAAAA=",
         "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAACgAAAAAAAAANZmVlX3JlY2lwaWVudAAAAAAAABMAAABUVGhlIG1heGltdW0gYW1vdW50IG9mIHNsaXBwYWdlIChpbiBicHMpIHRoYXQgaXMgdG9sZXJhdGVkIGR1cmluZyBwcm92aWRpbmcgbGlxdWlkaXR5AAAAGG1heF9hbGxvd2VkX3NsaXBwYWdlX2JwcwAAAAcAAABDVGhlIG1heGltdW0gYW1vdW50IG9mIHNwcmVhZCAoaW4gYnBzKSB0aGF0IGlzIHRvbGVyYXRlZCBkdXJpbmcgc3dhcAAAAAAWbWF4X2FsbG93ZWRfc3ByZWFkX2JwcwAAAAAABwAAADhUaGUgbWF4aW11bSBhbGxvd2VkIHBlcmNlbnRhZ2UgKGluIGJwcykgZm9yIHJlZmVycmFsIGZlZQAAABBtYXhfcmVmZXJyYWxfYnBzAAAABwAAAAAAAAAJcG9vbF90eXBlAAAAAAAH0AAAAAhQYWlyVHlwZQAAAAAAAAALc2hhcmVfdG9rZW4AAAAAEwAAAAAAAAAOc3Rha2VfY29udHJhY3QAAAAAABMAAAAAAAAAB3Rva2VuX2EAAAAAEwAAAAAAAAAHdG9rZW5fYgAAAAATAAAAZFRoZSB0b3RhbCBmZWVzIChpbiBicHMpIGNoYXJnZWQgYnkgYSBwb29sIG9mIHRoaXMgdHlwZS4KSW4gcmVsYXRpb24gdG8gdGhlIHJldHVybmVkIGFtb3VudCBvZiB0b2tlbnMAAAANdG90YWxfZmVlX2JwcwAAAAAAAAc=",
         "AAAAAQAAAAAAAAAAAAAABUFzc2V0AAAAAAAAAgAAABRBZGRyZXNzIG9mIHRoZSBhc3NldAAAAAdhZGRyZXNzAAAAABMAAAAsVGhlIHRvdGFsIGFtb3VudCBvZiB0aG9zZSB0b2tlbnMgaW4gdGhlIHBvb2wAAAAGYW1vdW50AAAAAAAL",
@@ -694,6 +751,7 @@ export class Client extends ContractClient {
     simulate_reverse_swap: this.txFromJSON<SimulateReverseSwapResponse>,
     query_share: this.txFromJSON<readonly [Asset, Asset]>,
     query_total_issued_lp: this.txFromJSON<i128>,
+    migrate_admin_key: this.txFromJSON<Result<void>>,
     update: this.txFromJSON<null>,
   };
 }
