@@ -39,14 +39,14 @@ export class lobstr implements Wallet {
    * @memberof lobstr
    * @instance getUserInfo
    */
-  async getUserInfo(): Promise<{ publicKey?: string }> {
+  async getAddress(): Promise<{ address?: string }> {
     if (!(await isConnected())) {
       throw new Error(`Lobstr is not connected`);
     }
 
     const pubKey =
       getAddressFromLocalStorageByKey("app-storage") || (await getPublicKey());
-    return { publicKey: pubKey };
+    return { address: pubKey };
   }
 
   /**
@@ -64,12 +64,15 @@ export class lobstr implements Wallet {
       networkPassphrase?: string;
       accountToSign?: string;
     }
-  ): Promise<string> {
+  ): Promise<{ signedTxXdr: string; signerAddress: string }> {
     if (!(await isConnected())) {
       throw new Error(`Lobstr is not connected`);
     }
 
-    return await signTransaction(tx);
+    return {
+      signedTxXdr: await signTransaction(tx),
+      signerAddress: (await this.getAddress()).address!,
+    };
   }
 
   /**
@@ -83,8 +86,16 @@ export class lobstr implements Wallet {
    */
   async signAuthEntry(
     entryXdr: string,
-    opts?: { accountToSign?: string }
-  ): Promise<string> {
+    opts?:
+      | {
+          networkPassphrase?: string | undefined;
+          address?: string | undefined;
+        }
+      | undefined
+  ): Promise<{
+    signedAuthEntry: Buffer | null;
+    signerAddress: string;
+  }> {
     throw new Error("Lobstr does not support signing authorization entries");
   }
 }

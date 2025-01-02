@@ -48,7 +48,7 @@ export function lobstr(): Connector {
         networkPassphrase?: string;
         accountToSign?: string;
       }
-    ): Promise<string> {
+    ): Promise<any> {
       return signTransaction(xdr);
     },
   };

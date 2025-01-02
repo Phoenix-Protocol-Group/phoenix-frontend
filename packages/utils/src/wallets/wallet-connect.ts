@@ -82,8 +82,8 @@ export class WalletConnect implements Wallet {
     return !!this.client;
   }
 
-  async getUserInfo(): Promise<{ publicKey?: string }> {
-    return { publicKey: await this.getPublicKey() };
+  async getAddress(): Promise<{ address?: string }> {
+    return { address: await this.getPublicKey() };
   }
 
   async getPublicKey(): Promise<string> {
@@ -103,7 +103,10 @@ export class WalletConnect implements Wallet {
       networkPassphrase?: string;
       accountToSign?: string;
     }
-  ): Promise<string> {
+  ): Promise<{
+    signedTxXdr: string;
+    signerAddress: string;
+  }> {
     if (!this.client) {
       throw new Error("WalletConnect is not running yet");
     }
@@ -121,7 +124,10 @@ export class WalletConnect implements Wallet {
       },
     });
 
-    return updatedXdr;
+    return {
+      signedTxXdr: updatedXdr,
+      signerAddress: (await this.getAddress()).address!,
+    };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -218,8 +224,16 @@ export class WalletConnect implements Wallet {
 
   async signAuthEntry(
     entryXdr: string,
-    opts?: { accountToSign?: string }
-  ): Promise<string> {
+    opts?:
+      | {
+          networkPassphrase?: string | undefined;
+          address?: string | undefined;
+        }
+      | undefined
+  ): Promise<{
+    signedAuthEntry: Buffer | null;
+    signerAddress: string;
+  }> {
     throw new Error(
       "Wallet Connect does not support signing authorization entries"
     );

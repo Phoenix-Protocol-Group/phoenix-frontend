@@ -6,7 +6,7 @@
   ],
   "dependencies": {
     "@phoenix-protocol/utils": "workspace:^",
-    "@stellar/freighter-api": "1.7.1",
+    "@stellar/freighter-api": "3.0.0",
     "bigint-conversion": "2.4.1",
     "buffer": "6.0.3"
   },

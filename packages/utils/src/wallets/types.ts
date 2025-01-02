@@ -12,21 +12,29 @@ type XDR_BASE64 = string;
  * import { xBull } from "./wallets/xbull";
  */
 export interface Wallet {
-  isConnected: () => Promise<boolean>;
-  isAllowed: () => Promise<boolean>;
-  getUserInfo: () => Promise<{ publicKey?: string }>;
+  getAddress: () => Promise<{ address?: string }>;
   signTransaction: (
-    tx: XDR_BASE64,
-    opts?: {
-      network?: string;
-      networkPassphrase?: string;
-      accountToSign?: string;
-    }
-  ) => Promise<XDR_BASE64>;
+    transactionXdr: string,
+    opts?:
+      | {
+          networkPassphrase?: string | undefined;
+          address?: string | undefined;
+        }
+      | undefined
+  ) => Promise<{
+    signedTxXdr: string;
+    signerAddress: string;
+  }>;
   signAuthEntry: (
-    entryXdr: XDR_BASE64,
-    opts?: {
-      accountToSign?: string;
-    }
-  ) => Promise<XDR_BASE64>;
+    entryXdr: string,
+    opts?:
+      | {
+          networkPassphrase?: string | undefined;
+          address?: string | undefined;
+        }
+      | undefined
+  ) => Promise<{
+    signedAuthEntry: Buffer | null;
+    signerAddress: string;
+  }>;
 }

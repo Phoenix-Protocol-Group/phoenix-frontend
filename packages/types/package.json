@@ -21,6 +21,6 @@
     "@mui/styled-engine-sc": "6.1.7",
     "@mui/system": "6.1.7",
     "@mui/utils": "6.1.7",
-    "@stellar/stellar-sdk": "11.3.0"
+    "@stellar/stellar-sdk": "13.1.0"
   }
 }

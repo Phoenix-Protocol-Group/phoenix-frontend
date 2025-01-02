@@ -26,6 +26,7 @@
   "dependencies": {
     "@apollo/client": "^3.9.0",
     "@creit.tech/xbull-wallet-connect": "0.3.0",
+    "@stellar/stellar-sdk": "^13.1.0",
     "big.js": "^6.2.1",
     "bignumber.js": "^9.1.1",
     "date-fns": "^3.3.1",
