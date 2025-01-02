@@ -107,6 +107,10 @@ export const createWalletActions = (
           (token: Token) =>
             token?.symbol !== "POOL" &&
             token?.symbol !== "PUST" &&
+            token?.symbol !== "EXUT" &&
+            token?.symbol !== "XEXT" &&
+            token?.symbol !== "XGXT" &&
+            token?.symbol !== "GXUT" &&
             token.isStakingToken !== true
         )
         .map(async (token: Token) => {
