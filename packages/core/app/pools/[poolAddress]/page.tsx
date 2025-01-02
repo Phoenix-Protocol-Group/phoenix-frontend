@@ -384,8 +384,6 @@ export default function Page(props: PoolPageProps) {
         const apr =
           ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
 
-        console.log(poolIncentive?.amount, phoprice, valueStaked);
-
         const tokenPrice = valueStaked / (totalStaked / 10 ** 7);
         setLpTokenPrice(tokenPrice);
 
