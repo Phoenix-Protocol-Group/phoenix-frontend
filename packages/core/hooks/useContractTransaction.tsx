@@ -6,6 +6,7 @@ import {
   PhoenixFactoryContract,
   PhoenixVestingContract,
   SorobanTokenContract,
+  PhoenixNFTCollectionDeployerContract,
 } from "@phoenix-protocol/contracts";
 import {
   AssembledTransaction,
@@ -16,6 +17,7 @@ import { constants, Signer } from "@phoenix-protocol/utils";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { useRestoreModal } from "@/providers/RestoreModalProvider";
 import { AppStore, AppStorePersist } from "@phoenix-protocol/types";
+import { PhoenixNFTCollectionContract } from '@phoenix-protocol/contracts';
 
 // Define Contract Types
 type ContractType =
@@ -24,7 +26,9 @@ type ContractType =
   | "stake"
   | "factory"
   | "vesting"
-  | "token";
+  | "token"
+  | "collectionDeployer"
+  | "collection";
 
 const contractClients = {
   pair: PhoenixPairContract.Client,
@@ -33,6 +37,8 @@ const contractClients = {
   factory: PhoenixFactoryContract.Client,
   vesting: PhoenixVestingContract.Client,
   token: SorobanTokenContract.Client,
+  collectionDeployer: PhoenixNFTCollectionDeployerContract.Client,
+  collection: PhoenixNFTCollectionContract.Client,
 };
 
 type ContractClientType<T extends ContractType> = T extends "pair"
@@ -47,6 +53,10 @@ type ContractClientType<T extends ContractType> = T extends "pair"
   ? PhoenixVestingContract.Client
   : T extends "token"
   ? SorobanTokenContract.Client
+  : T extends "collectionDeployer"
+  ? PhoenixNFTCollectionDeployerContract.Client
+  : T extends "collection"
+  ? PhoenixNFTCollectionContract.Client
   : never;
 
 interface BaseExecuteContractTransactionParams<T extends ContractType> {
@@ -145,7 +155,14 @@ export const useContractTransaction = () => {
                   await transaction.simulate({ restore: true });
                   resolve({});
                 } else {
-                  const sentTransaction = await transaction.signAndSend();
+                  const signTransaction = getSignerFunction(signer, storePersist);
+
+                  const sentTransaction = await transaction.signAndSend({
+                    signTransaction: async (xdr) => {
+                      const res = await signTransaction(xdr);
+                      return { signedTxXdr: res, signerAddress: storePersist.wallet.address };
+                    }
+                  });
                   resolve({
                     transactionId:
                       sentTransaction.sendTransactionResponse?.hash,

@@ -1,12 +1,12 @@
 import { Buffer } from "buffer";
-import { Address } from "@stellar/stellar-sdk";
+import { Address } from '@stellar/stellar-sdk';
 import {
   AssembledTransaction,
   Client as ContractClient,
   ClientOptions as ContractClientOptions,
   Result,
   Spec as ContractSpec,
-} from "@stellar/stellar-sdk/contract";
+} from '@stellar/stellar-sdk/contract';
 import type {
   u32,
   i32,
@@ -19,29 +19,33 @@ import type {
   Option,
   Typepoint,
   Duration,
-} from "@stellar/stellar-sdk/contract";
-export * from "@stellar/stellar-sdk";
-export * as contract from "@stellar/stellar-sdk/contract";
-export * as rpc from "@stellar/stellar-sdk/rpc";
+} from '@stellar/stellar-sdk/contract';
+export * from '@stellar/stellar-sdk'
+export * as contract from '@stellar/stellar-sdk/contract'
+export * as rpc from '@stellar/stellar-sdk/rpc'
 
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   //@ts-ignore Buffer exists
   window.Buffer = window.Buffer || Buffer;
 }
 
+
 export const networks = {
   testnet: {
     networkPassphrase: "Test SDF Network ; September 2015",
-    contractId: "0",
-  },
-} as const;
+    contractId: "CDBYYCEVYPK2IJLNMDC2HSJNDGOQWYMVIZT74ZYBXY5GFJPCMDXWPXHZ",
+  }
+} as const
 
 export const Errors = {
-  1: { message: "" },
-  2: { message: "" },
-  3: { message: "" },
-  4: { message: "" },
-};
+  1: {message:"AlreadyInitialized"},
+
+  2: {message:"OperationsEmpty"},
+
+  3: {message:"IncorrectAssetSwap"},
+
+  4: {message:"AdminNotSet"}
+}
 
 export interface Swap {
   ask_asset: string;
@@ -49,68 +53,71 @@ export interface Swap {
   offer_asset: string;
 }
 
+
 export interface Pair {
   token_a: string;
   token_b: string;
 }
 
-export type DataKey =
-  | { tag: "PairKey"; values: readonly [Pair] }
-  | { tag: "FactoryKey"; values: void }
-  | { tag: "Admin"; values: void }
-  | { tag: "Initialized"; values: void };
+export type DataKey = {tag: "PairKey", values: readonly [Pair]} | {tag: "FactoryKey", values: void} | {tag: "Admin", values: void} | {tag: "Initialized", values: void};
+
 
 export interface Asset {
   /**
-   * Address of the asset
-   */
-  address: string;
+ * Address of the asset
+ */
+address: string;
   /**
-   * The total amount of those tokens in the pool
-   */
-  amount: i128;
+ * The total amount of those tokens in the pool
+ */
+amount: i128;
 }
+
 
 export interface SimulateSwapResponse {
   ask_amount: i128;
   /**
-   * tuple of ask_asset denom and commission amount for the swap
-   */
-  commission_amounts: Array<readonly [string, i128]>;
+ * tuple of ask_asset denom and commission amount for the swap
+ */
+commission_amounts: Array<readonly [string, i128]>;
   spread_amount: Array<i128>;
 }
 
+
 export interface SimulateReverseSwapResponse {
   /**
-   * tuple of offer_asset denom and commission amount for the swap
-   */
-  commission_amounts: Array<readonly [string, i128]>;
+ * tuple of offer_asset denom and commission amount for the swap
+ */
+commission_amounts: Array<readonly [string, i128]>;
   offer_amount: i128;
   spread_amount: Array<i128>;
 }
+
 
 /**
  * This struct is used to return a query result with the total amount of LP tokens and assets in a specific pool.
  */
 export interface PoolResponse {
   /**
-   * The asset A in the pool together with asset amounts
-   */
-  asset_a: Asset;
+ * The asset A in the pool together with asset amounts
+ */
+asset_a: Asset;
   /**
-   * The asset B in the pool together with asset amounts
-   */
-  asset_b: Asset;
+ * The asset B in the pool together with asset amounts
+ */
+asset_b: Asset;
   /**
-   * The total amount of LP tokens currently issued
-   */
-  asset_lp_share: Asset;
+ * The total amount of LP tokens currently issued
+ */
+asset_lp_share: Asset;
 }
+
 
 export interface TokenInitInfo {
   token_a: string;
   token_b: string;
 }
+
 
 export interface StakeInitInfo {
   manager: string;
@@ -118,6 +125,7 @@ export interface StakeInitInfo {
   min_bond: i128;
   min_reward: i128;
 }
+
 
 export interface LiquidityPoolInitInfo {
   admin: string;
@@ -136,151 +144,113 @@ export enum PoolType {
   Stable = 1,
 }
 
+
 export interface Client {
   /**
    * Construct and simulate a initialize transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
-  initialize: (
-    { admin, factory }: { admin: string; factory: string },
-    options?: {
-      /**
-       * The fee to pay for the transaction. Default: BASE_FEE
-       */
-      fee?: number;
+  initialize: ({admin, factory}: {admin: string, factory: string}, options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
 
-      /**
-       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
-       */
-      timeoutInSeconds?: number;
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
 
-      /**
-       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
-       */
-      simulate?: boolean;
-    }
-  ) => Promise<AssembledTransaction<null>>;
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<null>>
 
   /**
    * Construct and simulate a swap transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
-  swap: (
-    {
-      recipient,
-      operations,
-      max_spread_bps,
-      amount,
-      pool_type,
-      deadline,
-      max_allowed_fee_bps,
-    }: {
-      recipient: string;
-      operations: Array<Swap>;
-      max_spread_bps: Option<i64>;
-      amount: i128;
-      pool_type: PoolType;
-      deadline: Option<u64>;
-      max_allowed_fee_bps: Option<i64>;
-    },
-    options?: {
-      /**
-       * The fee to pay for the transaction. Default: BASE_FEE
-       */
-      fee?: number;
+  swap: ({recipient, operations, max_spread_bps, amount, pool_type, deadline, max_allowed_fee_bps}: {recipient: string, operations: Array<Swap>, max_spread_bps: Option<i64>, amount: i128, pool_type: PoolType, deadline: Option<u64>, max_allowed_fee_bps: Option<i64>}, options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
 
-      /**
-       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
-       */
-      timeoutInSeconds?: number;
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
 
-      /**
-       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
-       */
-      simulate?: boolean;
-    }
-  ) => Promise<AssembledTransaction<null>>;
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<null>>
 
   /**
    * Construct and simulate a simulate_swap transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
-  simulate_swap: (
-    {
-      operations,
-      amount,
-      pool_type,
-    }: { operations: Array<Swap>; amount: i128; pool_type: PoolType },
-    options?: {
-      /**
-       * The fee to pay for the transaction. Default: BASE_FEE
-       */
-      fee?: number;
+  simulate_swap: ({operations, amount, pool_type}: {operations: Array<Swap>, amount: i128, pool_type: PoolType}, options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
 
-      /**
-       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
-       */
-      timeoutInSeconds?: number;
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
 
-      /**
-       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
-       */
-      simulate?: boolean;
-    }
-  ) => Promise<AssembledTransaction<SimulateSwapResponse>>;
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<SimulateSwapResponse>>
 
   /**
    * Construct and simulate a simulate_reverse_swap transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
-  simulate_reverse_swap: (
-    {
-      operations,
-      amount,
-      pool_type,
-    }: { operations: Array<Swap>; amount: i128; pool_type: PoolType },
-    options?: {
-      /**
-       * The fee to pay for the transaction. Default: BASE_FEE
-       */
-      fee?: number;
+  simulate_reverse_swap: ({operations, amount, pool_type}: {operations: Array<Swap>, amount: i128, pool_type: PoolType}, options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
 
-      /**
-       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
-       */
-      timeoutInSeconds?: number;
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
 
-      /**
-       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
-       */
-      simulate?: boolean;
-    }
-  ) => Promise<AssembledTransaction<SimulateReverseSwapResponse>>;
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<SimulateReverseSwapResponse>>
 
   /**
    * Construct and simulate a update transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
-  update: (
-    { new_wasm_hash }: { new_wasm_hash: Buffer },
-    options?: {
-      /**
-       * The fee to pay for the transaction. Default: BASE_FEE
-       */
-      fee?: number;
+  update: ({new_wasm_hash}: {new_wasm_hash: Buffer}, options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
 
-      /**
-       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
-       */
-      timeoutInSeconds?: number;
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
 
-      /**
-       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
-       */
-      simulate?: boolean;
-    }
-  ) => Promise<AssembledTransaction<null>>;
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<null>>
+
 }
 export class Client extends ContractClient {
   constructor(public readonly options: ContractClientOptions) {
     super(
-      new ContractSpec([
-        "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAdmYWN0b3J5AAAAABMAAAAA",
+      new ContractSpec([ "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAdmYWN0b3J5AAAAABMAAAAA",
         "AAAAAAAAAAAAAAAEc3dhcAAAAAcAAAAAAAAACXJlY2lwaWVudAAAAAAAABMAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAADm1heF9zcHJlYWRfYnBzAAAAAAPoAAAABwAAAAAAAAAGYW1vdW50AAAAAAALAAAAAAAAAAlwb29sX3R5cGUAAAAAAAfQAAAACFBvb2xUeXBlAAAAAAAAAAhkZWFkbGluZQAAA+gAAAAGAAAAAAAAABNtYXhfYWxsb3dlZF9mZWVfYnBzAAAAA+gAAAAHAAAAAA==",
         "AAAAAAAAAAAAAAANc2ltdWxhdGVfc3dhcAAAAAAAAAMAAAAAAAAACm9wZXJhdGlvbnMAAAAAA+oAAAfQAAAABFN3YXAAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAJcG9vbF90eXBlAAAAAAAH0AAAAAhQb29sVHlwZQAAAAEAAAfQAAAAFFNpbXVsYXRlU3dhcFJlc3BvbnNl",
         "AAAAAAAAAAAAAAAVc2ltdWxhdGVfcmV2ZXJzZV9zd2FwAAAAAAAAAwAAAAAAAAAKb3BlcmF0aW9ucwAAAAAD6gAAB9AAAAAEU3dhcAAAAAAAAAAGYW1vdW50AAAAAAALAAAAAAAAAAlwb29sX3R5cGUAAAAAAAfQAAAACFBvb2xUeXBlAAAAAQAAB9AAAAAbU2ltdWxhdGVSZXZlcnNlU3dhcFJlc3BvbnNlAA==",
@@ -296,16 +266,15 @@ export class Client extends ContractClient {
         "AAAAAQAAAAAAAAAAAAAADVRva2VuSW5pdEluZm8AAAAAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
         "AAAAAQAAAAAAAAAAAAAADVN0YWtlSW5pdEluZm8AAAAAAAAEAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAADm1heF9jb21wbGV4aXR5AAAAAAAEAAAAAAAAAAhtaW5fYm9uZAAAAAsAAAAAAAAACm1pbl9yZXdhcmQAAAAAAAs=",
         "AAAAAQAAAAAAAAAAAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAkAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAUZGVmYXVsdF9zbGlwcGFnZV9icHMAAAAHAAAAAAAAAA1mZWVfcmVjaXBpZW50AAAAAAAAEwAAAAAAAAAYbWF4X2FsbG93ZWRfc2xpcHBhZ2VfYnBzAAAABwAAAAAAAAAWbWF4X2FsbG93ZWRfc3ByZWFkX2JwcwAAAAAABwAAAAAAAAAQbWF4X3JlZmVycmFsX2JwcwAAAAcAAAAAAAAAD3N0YWtlX2luaXRfaW5mbwAAAAfQAAAADVN0YWtlSW5pdEluZm8AAAAAAAAAAAAADHN3YXBfZmVlX2JwcwAAAAcAAAAAAAAAD3Rva2VuX2luaXRfaW5mbwAAAAfQAAAADVRva2VuSW5pdEluZm8AAAA=",
-        "AAAAAwAAAAAAAAAAAAAACFBvb2xUeXBlAAAAAgAAAAAAAAADWHlrAAAAAAAAAAAAAAAABlN0YWJsZQAAAAAAAQ==",
-      ]),
+        "AAAAAwAAAAAAAAAAAAAACFBvb2xUeXBlAAAAAgAAAAAAAAADWHlrAAAAAAAAAAAAAAAABlN0YWJsZQAAAAAAAQ==" ]),
       options
-    );
+    )
   }
   public readonly fromJSON = {
     initialize: this.txFromJSON<null>,
-    swap: this.txFromJSON<null>,
-    simulate_swap: this.txFromJSON<SimulateSwapResponse>,
-    simulate_reverse_swap: this.txFromJSON<SimulateReverseSwapResponse>,
-    update: this.txFromJSON<null>,
-  };
+        swap: this.txFromJSON<null>,
+        simulate_swap: this.txFromJSON<SimulateSwapResponse>,
+        simulate_reverse_swap: this.txFromJSON<SimulateReverseSwapResponse>,
+        update: this.txFromJSON<null>
+  }
 }
