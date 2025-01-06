@@ -24,10 +24,12 @@ export async function fetchTokenList(): Promise<apiToken[]> {
 export async function scaToToken(scaAddress: string, appStore: AppStore) {
   const tokenList = await fetchTokenList();
   const contractAddress = tokenList.find(
-    (token) => token.token == scaAddress
+    (token) =>
+      token.token.toUpperCase() == scaAddress.toUpperCase() ||
+      token.symbol.toUpperCase() == scaAddress.toUpperCase()
   )?.soroban_contract;
   if (!contractAddress) {
-    throw new Error("No token with given address found!");
+    throw new Error(`No token with given address ${scaAddress} found!`);
   }
 
   return appStore.fetchTokenInfo(contractAddress);

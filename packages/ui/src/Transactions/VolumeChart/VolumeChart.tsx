@@ -1,5 +1,5 @@
-import { Box, Typography, MenuItem, Select } from "@mui/material";
-import React, { useState } from "react";
+import { Box, Typography, MenuItem, Select, TextField } from "@mui/material";
+import React, { useMemo, useRef, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { motion } from "framer-motion";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils";
+import { SettingsInputComponent } from "@mui/icons-material";
 
 type Pool = {
   tokenA: { icon: string; symbol: string };
@@ -103,7 +104,25 @@ const VolumeChart = ({
 }: VolumeChartProps) => {
   // Find the maximum value in the data array
   const maxValue = Math.max(...data.map((item) => item.volume));
+  const [searchTerm, setSearchTerm] = useState("");
 
+  const filteredPools = useMemo(() => {
+    if (!searchTerm) return pools;
+    return pools.filter(
+      (pool) =>
+        pool.tokenA.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pool.tokenB.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [pools, searchTerm]);
+  const [open, setOpen] = useState(false);
+  const searchRef = useRef(null);
+
+  const handleClose = (e: any) => {
+    if (searchRef.current?.contains(e.target)) {
+      return; // keep it open if the click is inside the search
+    }
+    setOpen(false);
+  };
   return (
     <Box
       sx={{
@@ -149,9 +168,18 @@ const VolumeChart = ({
             </Typography>
             <Select
               value={selectedPoolForVolume}
-              onChange={(e) => setSelectedPoolForVolume(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value != "12342") {
+                  setSelectedPoolForVolume(e.target.value);
+                }
+              }}
               displayEmpty
+              open={open}
+              onOpen={() => setOpen(true)}
+              onClose={handleClose}
+              fullWidth
               sx={{
+                width: { xs: "100%", sm: "auto" },
                 color: "white",
                 fontFamily: "Ubuntu",
                 background: "rgba(255, 255, 255, 0.1)",
@@ -173,6 +201,8 @@ const VolumeChart = ({
                     borderRadius: "0.5rem",
                     boxShadow:
                       "-3px 3px 10px 0px rgba(25, 13, 1, 0.10),-12px 13px 18px 0px rgba(25, 13, 1, 0.09),-26px 30px 24px 0px rgba(25, 13, 1, 0.05),-46px 53px 28px 0px rgba(25, 13, 1, 0.02),-73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
+                    maxHeight: 300,
+                    overflowY: "auto",
                   },
                 },
               }}
@@ -184,8 +214,43 @@ const VolumeChart = ({
                 return `${pool?.tokenA.symbol} / ${pool?.tokenB.symbol}`;
               }}
             >
-              <MenuItem value={undefined}>All</MenuItem>
-              {pools.map((pool) => (
+              <MenuItem
+                disabled
+                disableRipple
+                onClick={(e) => e.stopPropagation()}
+                style={{ pointerEvents: "none" }}
+              >
+                <Box
+                  sx={{ pointerEvents: "auto" }}
+                  onKeyDown={(e) => {
+                    e.stopPropagation();
+                    e.nativeEvent.stopImmediatePropagation();
+                  }}
+                >
+                  <TextField
+                    inputRef={searchRef}
+                    placeholder="Search Pools"
+                    variant="standard"
+                    fullWidth
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                      disableUnderline: true,
+                      style: { color: "white" },
+                    }}
+                    sx={{
+                      mb: 1,
+                      "& .MuiInputBase-input": {
+                        padding: 0,
+                      },
+                    }}
+                  />
+                </Box>
+              </MenuItem>
+              <MenuItem value={undefined} sx={{ textAlign: "center" }}>
+                All
+              </MenuItem>
+              {filteredPools.map((pool) => (
                 <MenuItem
                   key={pool.contractAddress}
                   value={pool.contractAddress}
