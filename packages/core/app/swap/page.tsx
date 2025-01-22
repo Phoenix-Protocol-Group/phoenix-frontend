@@ -71,6 +71,8 @@ export default function SwapPage(): JSX.Element {
   const [trustlineButtonActive, setTrustlineButtonActive] =
     useState<boolean>(false);
   const [trustlineTokenName, setTrustlineTokenName] = useState<string>("");
+  const [trustlineTokenSymbol, setTrustlineTokenSymbol] = useState<string>("");
+
   const [trustlineAssetAmount, setTrustlineAssetAmount] = useState<number>(0);
   const [allPools, setAllPools] = useState<any[]>([]);
 
@@ -310,7 +312,7 @@ export default function SwapPage(): JSX.Element {
         tokenAddress
       );
       setTrustlineButtonActive(!trust.exists);
-      setTrustlineTokenName(trust.asset?.code || "");
+      setTrustlineTokenSymbol(trust.asset?.code || "");
       const tlAsset = await appStore.fetchTokenInfo(
         "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA"
       );
@@ -396,7 +398,7 @@ export default function SwapPage(): JSX.Element {
                     storePersist.wallet.address === undefined
                   }
                   trustlineButtonActive={trustlineButtonActive}
-                  trustlineAssetName={trustlineTokenName}
+                  trustlineAssetName={trustlineTokenSymbol}
                   trustlineButtonDisabled={trustlineAssetAmount < 0.5}
                   onTrustlineButtonClick={() => addTrustLine()}
                 />

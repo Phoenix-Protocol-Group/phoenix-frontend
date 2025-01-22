@@ -167,7 +167,7 @@ export async function fetchAndIssueTrustline(
     const signature = await wallet.signTransaction(transaction.toXDR());
 
     const signed = TransactionBuilder.fromXDR(
-      signature.toString(),
+      signature.signedTxXdr.toString(),
       constants.NETWORK_PASSPHRASE
     );
 
