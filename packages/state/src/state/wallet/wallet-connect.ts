@@ -38,7 +38,6 @@ export class WalletConnect implements Connector {
   }
 
   async isConnected(): Promise<boolean> {
-    console.log(this.client);
     return !!this.client;
   }
 

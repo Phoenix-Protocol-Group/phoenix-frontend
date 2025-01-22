@@ -132,16 +132,6 @@ export async function fetchDataByTimeEpoch(
       a.timestamp.localeCompare(b.timestamp)
     );
 
-    console.log({
-      [`volume${
-        timeEpoch === "monthly"
-          ? "Month"
-          : timeEpoch === "daily"
-          ? "24h"
-          : "Year"
-      }`]: aggregatedResult,
-    });
-
     return {
       [`volume${
         timeEpoch === "monthly"
