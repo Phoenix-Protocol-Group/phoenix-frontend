@@ -298,6 +298,11 @@ export default function Page() {
     setHistoricalPrices(graph);
   };
 
+  /**
+   * Load all trades with optional filters
+   * @param newFilters Optional filters to apply
+   * @returns void
+   */
   const loadAllTrades = async (newFilters: ActiveFilters = activeFilters) => {
     let from, to;
     if (newFilters.dateRange.from) {
@@ -311,8 +316,10 @@ export default function Page() {
       pageSize,
       undefined,
       from,
-      to
+      to,
+      activeView === "personal" ? appStorePersist.wallet.address : undefined
     );
+
     setHistory(trades);
     setHistoryLoading(false);
   };
@@ -320,7 +327,7 @@ export default function Page() {
   useEffect(() => {
     loadAllTrades();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize]);
+  }, [pageSize, activeView]);
 
   useEffect(() => {
     loadVolumeData(selectedTimeEpoch);

@@ -118,11 +118,22 @@ export const API = {
     type?: string,
     limit?: number,
     startTime?: string,
-    endTime?: string
+    endTime?: string,
+    userAddress?: string
   ): Promise<TradeHistoryResponse> {
     const params = { tickerId, type, limit, startTime, endTime };
-    const { data } = await apiClient.get(`/trades`, { params });
-    return data;
+    const { data } = await apiClient.get(
+      userAddress ? `/trade-history/${userAddress}` : `/trades`,
+      { params }
+    );
+
+    // If data is array, return it as is.
+    if (Array.isArray(data)) {
+      return data;
+    } else {
+      // If data is object, return the trades array.
+      return data.trades;
+    }
   },
   async getTotalTrades(): Promise<TotalTradesResponse> {
     const { data } = await apiClient.get(`/trades/total`);

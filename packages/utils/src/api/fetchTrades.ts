@@ -7,7 +7,8 @@ export async function fetchAllTrades(
   limit: number = 14,
   type?: string | undefined,
   startTime?: string | undefined,
-  endTime?: string | undefined
+  endTime?: string | undefined,
+  personal: string | undefined = undefined
 ) {
   try {
     // Fetch tickers and token list
@@ -43,7 +44,8 @@ export async function fetchAllTrades(
       type,
       limit,
       startTime,
-      endTime
+      endTime,
+      personal
     );
 
     // Current timestamp and 24 hours ago
