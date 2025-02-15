@@ -5,7 +5,7 @@ export function freighter(): Connector {
   return {
     id: "freighter",
     name: "Freighter",
-    iconUrl: "http://i.epvpimg.com/o9f6fab.png",
+    iconUrl: "https://app.phoenix-hub.io/freighter.png",
     iconBackground: "#fff",
     installed: true,
     downloadUrls: {
@@ -24,6 +24,7 @@ export function freighter(): Connector {
       };
     },
     async getPublicKey(): Promise<string> {
+      await freighterApi.requestAccess();
       return (await freighterApi.getAddress()).address;
     },
     signTransaction(
