@@ -136,6 +136,8 @@ export default function Page(props: PoolPageProps) {
               contractId: pairConfig.result.stake_contract.toString(),
               networkPassphrase: constants.NETWORK_PASSPHRASE,
               rpcUrl: constants.RPC_URL,
+              publicKey: storePersist.wallet.address,
+              signTransaction: (tx: string) => new Signer().sign(tx),
             }),
           ]);
         return pairConfig.result.stake_contract.toString();
@@ -291,6 +293,8 @@ export default function Page(props: PoolPageProps) {
               contractId: pairConfig.result.stake_contract.toString(),
               networkPassphrase: constants.NETWORK_PASSPHRASE,
               rpcUrl: constants.RPC_URL,
+              signTransaction: (tx: string) => new Signer().sign(tx),
+              publicKey: storePersist.wallet.address,
             }),
           ]);
         setStakeContractAddress(pairConfig.result.stake_contract.toString());
@@ -371,7 +375,11 @@ export default function Page(props: PoolPageProps) {
             amount: 18750,
           },
         ];
-        const stakingInfo = await stakeContractAddress.query_total_staked();
+
+        const stakingInfoA = await stakeContractAddress.query_total_staked({
+          simulate: false,
+        });
+        const stakingInfo = await stakingInfoA.simulate({ restore: true });
         const totalStaked = Number(stakingInfo?.result);
 
         const ratioStaked =
@@ -386,14 +394,12 @@ export default function Page(props: PoolPageProps) {
 
         const tokenPrice = valueStaked / (totalStaked / 10 ** 7);
         setLpTokenPrice(tokenPrice);
-
         const stakes = await fetchStakes(
           _lpToken?.symbol,
           stakeContractAddress,
           apr,
           tokenPrice
         );
-
         // Get user share
         if (storePersist.wallet.address) {
           if (pairInfo.result) {
@@ -401,7 +407,6 @@ export default function Page(props: PoolPageProps) {
             const info = pairInfo.result;
 
             const lpShareAmount = Number(info.asset_lp_share.amount);
-
             const lpShareAmountDec =
               Number(lpShareAmount) / 10 ** (_lpToken?.decimals || 7);
 
@@ -441,10 +446,14 @@ export default function Page(props: PoolPageProps) {
   ) => {
     if (storePersist.wallet.address) {
       // Get user stakes
-      const stakes = await stakeContract?.query_staked({
-        address: storePersist.wallet.address!,
-      });
+      const stakesA = await stakeContract?.query_staked(
+        {
+          address: storePersist.wallet.address!,
+        },
+        { simulate: false }
+      );
 
+      const stakes = await stakesA.simulate({ restore: true });
       // If stakes are okay
       if (stakes?.result) {
         // If filled
