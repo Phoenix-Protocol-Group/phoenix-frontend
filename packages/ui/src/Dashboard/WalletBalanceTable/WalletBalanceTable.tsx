@@ -383,13 +383,13 @@ const ListItem = ({
                       transition: { duration: 0.2 },
                     }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={onVestingClick}
                   >
                     <Lock
                       sx={{
                         color: "#E2621B",
                         fontSize: "20px",
                       }}
-                      onClick={onVestingClick}
                     />
                     <Typography sx={{ color: "#E2621B", fontSize: "12px" }}>
                       Vesting

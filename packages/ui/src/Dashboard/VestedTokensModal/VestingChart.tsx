@@ -35,11 +35,21 @@ const getTimeFormatter = (data: DataPoint[]) => {
   const totalMonths = differenceInMonths(endDate, startDate);
   const totalYears = differenceInYears(endDate, startDate);
 
-  if (totalYears > 1) return (tick: number) => format(new Date(tick), "yyyy");
-  if (totalMonths > 2)
-    return (tick: number) => format(new Date(tick), "MMM yyyy");
-  if (totalDays > 10) return (tick: number) => format(new Date(tick), "MMM d");
-  return (tick: number) => format(new Date(tick), "MM/dd");
+  let formatter: (tick: number) => string;
+  let tickInterval = Math.ceil(data.length / 5); // Ensure a max of 5 labels
+
+  if (totalYears > 1) {
+    formatter = (tick) => format(new Date(tick), "yyyy");
+  } else if (totalMonths > 2) {
+    formatter = (tick) => format(new Date(tick), "MMM yyyy");
+  } else if (totalDays > 10) {
+    formatter = (tick) => format(new Date(tick), "MMM d");
+  } else {
+    formatter = (tick) => format(new Date(tick), "MM/dd");
+  }
+
+  return (tick: number, index: number) =>
+    index % tickInterval === 0 ? formatter(tick) : "";
 };
 
 export const VestingChart = ({ data }: { data: DataPoint[] }) => {
@@ -103,10 +113,10 @@ export const VestingChart = ({ data }: { data: DataPoint[] }) => {
           </Typography>
         </Box>
       </Box>
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer width="100%" height={300}>
         <AreaChart
           data={data}
-          margin={{ top: 0, right: -10, left: -10, bottom: 0 }}
+          margin={{ top: 0, right: 30, left: 30, bottom: 0 }}
         >
           <defs>
             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -145,7 +155,10 @@ export const VestingChart = ({ data }: { data: DataPoint[] }) => {
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     return (
-      <Box p={2} border={1} borderColor="grey.300">
+      <Box
+        p={2}
+        sx={{ background: "rgba(255, 255, 255, 0.1)", borderRadius: "1rem" }}
+      >
         <Typography variant="body2">{`Value: ${Number(payload[0].value).toFixed(
           2
         )}`}</Typography>

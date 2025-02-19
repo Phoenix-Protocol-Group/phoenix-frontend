@@ -45,7 +45,8 @@ export default function Page() {
   const router = useRouter();
   const appStore = useAppStore();
   const persistStore = usePersistStore();
-  const walletAddress = persistStore.wallet.address;
+  const walletAddress =
+    "GA5EBZK3HWRG4F2AJ3JC5LOCLIIKWILV5OBTWDPCENU5YCJVUTKJA5AS";
   const { executeContractTransaction } = useContractTransaction();
 
   // State management
