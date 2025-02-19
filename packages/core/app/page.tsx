@@ -13,6 +13,7 @@ import {
   DashboardPriceCharts,
   DashboardStats,
   Tile,
+  VestingTokensModal,
   WalletBalanceTable,
 } from "@phoenix-protocol/ui";
 import { useRouter } from "next/navigation";
@@ -26,19 +27,26 @@ import {
   TradingVolumeResponse,
 } from "@phoenix-protocol/utils";
 import { getAllAnchors } from "@phoenix-protocol/utils/build/sep24";
-import { useAppStore } from "@phoenix-protocol/state";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
   Anchor,
   AssetInfo,
   GainerOrLooserAsset,
 } from "@phoenix-protocol/types";
 import NftCarouselPlaceholder from "@/components/_preview";
-import { SorobanTokenContract } from "@phoenix-protocol/contracts";
+import {
+  PhoenixVestingContract,
+  SorobanTokenContract,
+} from "@phoenix-protocol/contracts";
+import { useContractTransaction } from "@/hooks/useContractTransaction";
 
 export default function Page() {
   const theme = useTheme();
   const router = useRouter();
   const appStore = useAppStore();
+  const persistStore = usePersistStore();
+  const walletAddress = persistStore.wallet.address;
+  const { executeContractTransaction } = useContractTransaction();
 
   // State management
   const [anchors, setAnchors] = useState<Anchor[]>([]);
@@ -59,6 +67,8 @@ export default function Page() {
   const [tokenInfoOpen, setTokenInfoOpen] = useState(false);
   const [tvl, setTVL] = useState<number>(0);
   const [dailyVolume, setDailyVolume] = useState<number>(0);
+  const [vestingModalOpen, setVestingModalOpen] = useState(false);
+  const [vestingInfo, setVestingInfo] = useState<any>([]);
 
   const get24hVolume = async () => {
     // Define start and end timestamps
@@ -86,6 +96,56 @@ export default function Page() {
       return total + ticker.liquidity_in_usd;
     }, 0);
     setTVL(_tvl);
+  };
+
+  const queryAvailableToClaim = async (index: bigint) => {
+    const vestingContract = new PhoenixVestingContract.Client({
+      contractId: constants.VESTING_ADDRESS,
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
+      rpcUrl: constants.RPC_URL,
+    });
+
+    const res = await vestingContract.query_available_to_claim({
+      index: index,
+      address: walletAddress!,
+    });
+
+    return res.result;
+  };
+
+  const queryVestingInfo = async () => {
+    const vestingContract = new PhoenixVestingContract.Client({
+      contractId: constants.VESTING_ADDRESS,
+      networkPassphrase: constants.NETWORK_PASSPHRASE,
+      rpcUrl: constants.RPC_URL,
+    });
+
+    const _vestingInfo = await vestingContract.query_all_vesting_info({
+      address: walletAddress!,
+    });
+
+    setVestingInfo(_vestingInfo.result);
+  };
+
+  const claim = async (index: bigint) => {
+    try {
+      // Execute the transaction using the hook
+      await executeContractTransaction({
+        contractType: "vesting",
+        contractAddress: constants.VESTING_ADDRESS,
+        transactionFunction: async (client, restore) => {
+          return client.claim(
+            {
+              index: index,
+              sender: walletAddress!,
+            },
+            { simulate: !restore }
+          );
+        },
+      });
+    } catch (error) {
+      console.log("Error during claim transaction", error);
+    }
   };
 
   // Fetch and initialize data
@@ -163,6 +223,13 @@ export default function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (walletAddress) {
+      queryVestingInfo();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walletAddress]);
+
   // Memoized props for child components
   const args = useMemo(
     () => ({
@@ -177,6 +244,8 @@ export default function Page() {
         onTokenClick: (token: string) => {
           fetchTokenInfo(token);
         },
+        hasVesting: vestingInfo.length > 0,
+        onVestingClick: () => setVestingModalOpen(true),
       },
       dashboardArgs1: {
         data: xlmPriceChart,
@@ -195,7 +264,14 @@ export default function Page() {
         assetName: "PHO",
       },
     }),
-    [gainerAsset, loserAsset, allTokens, xlmPriceChart, phoPriceChart]
+    [
+      gainerAsset,
+      loserAsset,
+      allTokens,
+      xlmPriceChart,
+      phoPriceChart,
+      vestingInfo,
+    ]
   );
 
   const fetchTokenInfo = async (tokenId: string) => {
@@ -305,7 +381,6 @@ export default function Page() {
               <DashboardStats {...args.dashboardStatsArgs} />
             )}
           </Grid>
-
           {/* Price Charts */}
           <Grid item xs={12} lg={6}>
             {loadingDashboard ? (
@@ -343,7 +418,6 @@ export default function Page() {
               <DashboardPriceCharts {...args.dashboardArgs2} />
             )}
           </Grid>
-
           {/* Wallet Balance Table */}
           <Grid item xs={12} sx={{ mt: 3 }}>
             {loadingBalances ? (
@@ -407,6 +481,17 @@ export default function Page() {
           open={tokenInfoOpen}
           onClose={() => setTokenInfoOpen(false)}
           asset={selectedTokenForInfo}
+        />
+      )}
+
+      {/* Vesting Modal */}
+      {vestingInfo.length > 0 && (
+        <VestingTokensModal
+          open={vestingModalOpen}
+          onClose={() => setVestingModalOpen(false)}
+          vestingInfo={vestingInfo}
+          queryAvailableToClaim={(index) => queryAvailableToClaim(index)}
+          claim={(index) => claim(index)}
         />
       )}
     </Box>

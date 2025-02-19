@@ -96,6 +96,8 @@ export const Errors = {
   31: { message: "AlreadyInitialized" },
 
   32: { message: "AdminNotFound" },
+
+  33: { message: "ContractMathError" },
 };
 
 export interface VestingTokenInfo {
@@ -116,6 +118,10 @@ export interface VestingInfo {
   schedule: Curve;
 }
 
+export interface VestingCounterKey {
+  recipient: string;
+}
+
 export interface MinterInfo {
   address: string;
   mint_capacity: u128;
@@ -124,6 +130,13 @@ export interface MinterInfo {
 export interface VestingInfoKey {
   index: u64;
   recipient: string;
+}
+
+export interface VestingInfoResponse {
+  balance: u128;
+  index: u64;
+  recipient: string;
+  schedule: Curve;
 }
 
 /**
@@ -458,7 +471,7 @@ export interface Client {
        */
       simulate?: boolean;
     }
-  ) => Promise<AssembledTransaction<VestingInfo>>;
+  ) => Promise<AssembledTransaction<VestingInfoResponse>>;
 
   /**
    * Construct and simulate a query_all_vesting_info transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
@@ -481,7 +494,7 @@ export interface Client {
        */
       simulate?: boolean;
     }
-  ) => Promise<AssembledTransaction<Array<VestingInfo>>>;
+  ) => Promise<AssembledTransaction<Array<VestingInfoResponse>>>;
 
   /**
    * Construct and simulate a query_token_info transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
@@ -608,6 +621,26 @@ export interface Client {
      */
     simulate?: boolean;
   }) => Promise<AssembledTransaction<Result<void>>>;
+
+  /**
+   * Construct and simulate a add_new_key_to_storage transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  add_new_key_to_storage: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<void>>>;
 }
 export class Client extends ContractClient {
   static async deploy<T = Client>(
@@ -636,20 +669,23 @@ export class Client extends ContractClient {
         "AAAAAAAAAAAAAAANdXBkYXRlX21pbnRlcgAAAAAAAAIAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAKbmV3X21pbnRlcgAAAAAAEwAAAAA=",
         "AAAAAAAAAAAAAAAWdXBkYXRlX21pbnRlcl9jYXBhY2l0eQAAAAAAAgAAAAAAAAAGc2VuZGVyAAAAAAATAAAAAAAAAAxuZXdfY2FwYWNpdHkAAAAKAAAAAA==",
         "AAAAAAAAAAAAAAANcXVlcnlfYmFsYW5jZQAAAAAAAAEAAAAAAAAAB2FkZHJlc3MAAAAAEwAAAAEAAAAL",
-        "AAAAAAAAAAAAAAAScXVlcnlfdmVzdGluZ19pbmZvAAAAAAACAAAAAAAAAAdhZGRyZXNzAAAAABMAAAAAAAAABWluZGV4AAAAAAAABgAAAAEAAAfQAAAAC1Zlc3RpbmdJbmZvAA==",
-        "AAAAAAAAAAAAAAAWcXVlcnlfYWxsX3Zlc3RpbmdfaW5mbwAAAAAAAQAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAQAAA+oAAAfQAAAAC1Zlc3RpbmdJbmZvAA==",
+        "AAAAAAAAAAAAAAAScXVlcnlfdmVzdGluZ19pbmZvAAAAAAACAAAAAAAAAAdhZGRyZXNzAAAAABMAAAAAAAAABWluZGV4AAAAAAAABgAAAAEAAAfQAAAAE1Zlc3RpbmdJbmZvUmVzcG9uc2UA",
+        "AAAAAAAAAAAAAAAWcXVlcnlfYWxsX3Zlc3RpbmdfaW5mbwAAAAAAAQAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAQAAA+oAAAfQAAAAE1Zlc3RpbmdJbmZvUmVzcG9uc2UA",
         "AAAAAAAAAAAAAAAQcXVlcnlfdG9rZW5faW5mbwAAAAAAAAABAAAH0AAAABBWZXN0aW5nVG9rZW5JbmZv",
         "AAAAAAAAAAAAAAAMcXVlcnlfbWludGVyAAAAAAAAAAEAAAfQAAAACk1pbnRlckluZm8AAA==",
         "AAAAAAAAAAAAAAAecXVlcnlfdmVzdGluZ19jb250cmFjdF9iYWxhbmNlAAAAAAAAAAAAAQAAAAs=",
         "AAAAAAAAAAAAAAAYcXVlcnlfYXZhaWxhYmxlX3RvX2NsYWltAAAAAgAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAAAAAAVpbmRleAAAAAAAAAYAAAABAAAACw==",
         "AAAAAAAAAAAAAAAGdXBkYXRlAAAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
         "AAAAAAAAAAAAAAARbWlncmF0ZV9hZG1pbl9rZXkAAAAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
-        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAhAAAAAAAAAANTdGQAAAAAAAAAAAAAAAAZVmVzdGluZ05vdEZvdW5kRm9yQWRkcmVzcwAAAAAAAAEAAAAAAAAAHUFsbG93YW5jZU5vdEZvdW5kRm9yR2l2ZW5QYWlyAAAAAAAAAgAAAAAAAAAOTWludGVyTm90Rm91bmQAAAAAAAMAAAAAAAAAGE5vQmFsYW5jZUZvdW5kRm9yQWRkcmVzcwAAAAQAAAAAAAAADU5vQ29uZmlnRm91bmQAAAAAAAAFAAAAAAAAAAxOb0FkbWluRm91bmQAAAAGAAAAAAAAAA5NaXNzaW5nQmFsYW5jZQAAAAAABwAAAAAAAAAYVmVzdGluZ0NvbXBsZXhpdHlUb29IaWdoAAAACAAAAAAAAAAXVG90YWxWZXN0ZWRPdmVyQ2FwYWNpdHkAAAAACQAAAAAAAAAVSW52YWxpZFRyYW5zZmVyQW1vdW50AAAAAAAACgAAAAAAAAAVQ2FudE1vdmVWZXN0aW5nVG9rZW5zAAAAAAAACwAAAAAAAAARTm90RW5vdWdoQ2FwYWNpdHkAAAAAAAAMAAAAAAAAAA1Ob3RBdXRob3JpemVkAAAAAAAADQAAAAAAAAAQTmV2ZXJGdWxseVZlc3RlZAAAAA4AAAAAAAAAEVZlc3RzTW9yZVRoYW5TZW50AAAAAAAADwAAAAAAAAARSW52YWxpZEJ1cm5BbW91bnQAAAAAAAAQAAAAAAAAABFJbnZhbGlkTWludEFtb3VudAAAAAAAABEAAAAAAAAAFkludmFsaWRBbGxvd2FuY2VBbW91bnQAAAAAABIAAAAAAAAAIER1cGxpY2F0ZUluaXRpYWxCYWxhbmNlQWRkcmVzc2VzAAAAEwAAAAAAAAAKQ3VydmVFcnJvcgAAAAAAFAAAAAAAAAAQTm9XaGl0ZWxpc3RGb3VuZAAAABUAAAAAAAAAEE5vVG9rZW5JbmZvRm91bmQAAAAWAAAAAAAAAB1Ob1Zlc3RpbmdDb21wbGV4aXR5VmFsdWVGb3VuZAAAAAAAABcAAAAAAAAAEE5vQWRkcmVzc2VzVG9BZGQAAAAYAAAAAAAAABZOb0Vub3VnaHRUb2tlbnNUb1N0YXJ0AAAAAAAZAAAAAAAAABBOb3RFbm91Z2hCYWxhbmNlAAAAGgAAAAAAAAASVmVzdGluZ0JvdGhQcmVzZW50AAAAAAAbAAAAAAAAABJWZXN0aW5nTm9uZVByZXNlbnQAAAAAABwAAAAAAAAADUN1cnZlQ29uc3RhbnQAAAAAAAAdAAAAAAAAABRDdXJ2ZVNMTm90RGVjcmVhc2luZwAAAB4AAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAAAHwAAAAAAAAANQWRtaW5Ob3RGb3VuZAAAAAAAACA=",
+        "AAAAAAAAAAAAAAAWYWRkX25ld19rZXlfdG9fc3RvcmFnZQAAAAAAAAAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
+        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAiAAAAAAAAAANTdGQAAAAAAAAAAAAAAAAZVmVzdGluZ05vdEZvdW5kRm9yQWRkcmVzcwAAAAAAAAEAAAAAAAAAHUFsbG93YW5jZU5vdEZvdW5kRm9yR2l2ZW5QYWlyAAAAAAAAAgAAAAAAAAAOTWludGVyTm90Rm91bmQAAAAAAAMAAAAAAAAAGE5vQmFsYW5jZUZvdW5kRm9yQWRkcmVzcwAAAAQAAAAAAAAADU5vQ29uZmlnRm91bmQAAAAAAAAFAAAAAAAAAAxOb0FkbWluRm91bmQAAAAGAAAAAAAAAA5NaXNzaW5nQmFsYW5jZQAAAAAABwAAAAAAAAAYVmVzdGluZ0NvbXBsZXhpdHlUb29IaWdoAAAACAAAAAAAAAAXVG90YWxWZXN0ZWRPdmVyQ2FwYWNpdHkAAAAACQAAAAAAAAAVSW52YWxpZFRyYW5zZmVyQW1vdW50AAAAAAAACgAAAAAAAAAVQ2FudE1vdmVWZXN0aW5nVG9rZW5zAAAAAAAACwAAAAAAAAARTm90RW5vdWdoQ2FwYWNpdHkAAAAAAAAMAAAAAAAAAA1Ob3RBdXRob3JpemVkAAAAAAAADQAAAAAAAAAQTmV2ZXJGdWxseVZlc3RlZAAAAA4AAAAAAAAAEVZlc3RzTW9yZVRoYW5TZW50AAAAAAAADwAAAAAAAAARSW52YWxpZEJ1cm5BbW91bnQAAAAAAAAQAAAAAAAAABFJbnZhbGlkTWludEFtb3VudAAAAAAAABEAAAAAAAAAFkludmFsaWRBbGxvd2FuY2VBbW91bnQAAAAAABIAAAAAAAAAIER1cGxpY2F0ZUluaXRpYWxCYWxhbmNlQWRkcmVzc2VzAAAAEwAAAAAAAAAKQ3VydmVFcnJvcgAAAAAAFAAAAAAAAAAQTm9XaGl0ZWxpc3RGb3VuZAAAABUAAAAAAAAAEE5vVG9rZW5JbmZvRm91bmQAAAAWAAAAAAAAAB1Ob1Zlc3RpbmdDb21wbGV4aXR5VmFsdWVGb3VuZAAAAAAAABcAAAAAAAAAEE5vQWRkcmVzc2VzVG9BZGQAAAAYAAAAAAAAABZOb0Vub3VnaHRUb2tlbnNUb1N0YXJ0AAAAAAAZAAAAAAAAABBOb3RFbm91Z2hCYWxhbmNlAAAAGgAAAAAAAAASVmVzdGluZ0JvdGhQcmVzZW50AAAAAAAbAAAAAAAAABJWZXN0aW5nTm9uZVByZXNlbnQAAAAAABwAAAAAAAAADUN1cnZlQ29uc3RhbnQAAAAAAAAdAAAAAAAAABRDdXJ2ZVNMTm90RGVjcmVhc2luZwAAAB4AAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAAAHwAAAAAAAAANQWRtaW5Ob3RGb3VuZAAAAAAAACAAAAAAAAAAEUNvbnRyYWN0TWF0aEVycm9yAAAAAAAAIQ==",
         "AAAAAQAAAAAAAAAAAAAAEFZlc3RpbmdUb2tlbkluZm8AAAAEAAAAAAAAAAdhZGRyZXNzAAAAABMAAAAAAAAACGRlY2ltYWxzAAAABAAAAAAAAAAEbmFtZQAAABAAAAAAAAAABnN5bWJvbAAAAAAAEA==",
         "AAAAAQAAAAAAAAAAAAAAD1Zlc3RpbmdTY2hlZHVsZQAAAAACAAAAAAAAAAVjdXJ2ZQAAAAAAB9AAAAAFQ3VydmUAAAAAAAAAAAAACXJlY2lwaWVudAAAAAAAABM=",
         "AAAAAQAAAAAAAAAAAAAAC1Zlc3RpbmdJbmZvAAAAAAMAAAAAAAAAB2JhbGFuY2UAAAAACgAAAAAAAAAJcmVjaXBpZW50AAAAAAAAEwAAAAAAAAAIc2NoZWR1bGUAAAfQAAAABUN1cnZlAAAA",
+        "AAAAAQAAAAAAAAAAAAAAEVZlc3RpbmdDb3VudGVyS2V5AAAAAAAAAQAAAAAAAAAJcmVjaXBpZW50AAAAAAAAEw==",
         "AAAAAQAAAAAAAAAAAAAACk1pbnRlckluZm8AAAAAAAIAAAAAAAAAB2FkZHJlc3MAAAAAEwAAAAAAAAANbWludF9jYXBhY2l0eQAAAAAAAAo=",
         "AAAAAQAAAAAAAAAAAAAADlZlc3RpbmdJbmZvS2V5AAAAAAACAAAAAAAAAAVpbmRleAAAAAAAAAYAAAAAAAAACXJlY2lwaWVudAAAAAAAABM=",
+        "AAAAAQAAAAAAAAAAAAAAE1Zlc3RpbmdJbmZvUmVzcG9uc2UAAAAABAAAAAAAAAAHYmFsYW5jZQAAAAAKAAAAAAAAAAVpbmRleAAAAAAAAAYAAAAAAAAACXJlY2lwaWVudAAAAAAAABMAAAAAAAAACHNjaGVkdWxlAAAH0AAAAAVDdXJ2ZQAAAA==",
         "AAAAAgAAAAtDdXJ2ZSB0eXBlcwAAAAAAAAAABUN1cnZlAAAAAAAAAwAAAAEAAAAxQ29uc3RhbiBjdXJ2ZSwgaXQgd2lsbCBhbHdheXMgaGF2ZSB0aGUgc2FtZSB2YWx1ZQAAAAAAAAhDb25zdGFudAAAAAEAAAAKAAAAAQAAAE5MaW5lYXIgY3VydmUgdGhhdCBncm93IGxpbmVhcmx5IGJ1dCBsYXRlcgp0ZW5kcyB0byBhIGNvbnN0YW50IHNhdHVyYXRlZCB2YWx1ZS4AAAAAABBTYXR1cmF0aW5nTGluZWFyAAAAAQAAB9AAAAAQU2F0dXJhdGluZ0xpbmVhcgAAAAEAAAAbQ3VydmUgd2l0aCBkaWZmZXJlbnQgc2xvcGVzAAAAAA9QaWVjZXdpc2VMaW5lYXIAAAAAAQAAB9AAAAAPUGllY2V3aXNlTGluZWFyAA==",
         "AAAAAQAAAQ1TYXR1cmF0aW5nIExpbmVhcgokJGYoeCk9XGJlZ2lue2Nhc2VzfQpbbWluKHkpICogYW1vdW50XSwgICYgXHRleHR7aWYgeCA8PSAkeF8xJCB9IFxcXFwKW3kgKiBhbW91bnRdLCAgJiBcdGV4dHtpZiAkeF8xJCA+PSB4IDw9ICR4XzIkIH0gXFxcXApbbWF4KHkpICogYW1vdW50XSwgICYgXHRleHR7aWYgeCA+PSAkeF8yJCB9ClxlbmR7Y2FzZXN9JCQKCm1pbl95IGZvciBhbGwgeCA8PSBtaW5feCwgbWF4X3kgZm9yIGFsbCB4ID49IG1heF94LCBsaW5lYXIgaW4gYmV0d2VlbgAAAAAAAAAAAAAQU2F0dXJhdGluZ0xpbmVhcgAAAAQAAAAjdGltZSB3aGVuIGN1cnZlIGhhcyBmdWxseSBzYXR1cmF0ZWQAAAAABW1heF94AAAAAAAABgAAABttYXggdmFsdWUgYXQgc2F0dXJhdGVkIHRpbWUAAAAABW1heF95AAAAAAAACgAAABV0aW1lIHdoZW4gY3VydmUgc3RhcnQAAAAAAAAFbWluX3gAAAAAAAAGAAAAF21pbiB2YWx1ZSBhdCBzdGFydCB0aW1lAAAAAAVtaW5feQAAAAAAAAo=",
         "AAAAAQAAAVlUaGlzIGlzIGEgZ2VuZXJhbGl6YXRpb24gb2YgU2F0dXJhdGluZ0xpbmVhciwgc3RlcHMgbXVzdCBiZSBhcnJhbmdlZCB3aXRoIGluY3JlYXNpbmcgdGltZSBbYHU2NGBdLgpBbnkgcG9pbnQgYmVmb3JlIGZpcnN0IHN0ZXAgZ2V0cyB0aGUgZmlyc3QgdmFsdWUsIGFmdGVyIGxhc3Qgc3RlcCB0aGUgbGFzdCB2YWx1ZS4KT3RoZXJ3aXNlLCBpdCBpcyBhIGxpbmVhciBpbnRlcnBvbGF0aW9uIGJldHdlZW4gdGhlIHR3byBjbG9zZXN0IHBvaW50cy4KVmVjIG9mIGxlbmd0aCAxIC0+IFtgQ29uc3RhbnRgXShDdXJ2ZTo6Q29uc3RhbnQpIC4KVmVjIG9mIGxlbmd0aCAyIC0+IFtgU2F0dXJhdGluZ0xpbmVhcmBdIC4AAAAAAAAAAAAABFN0ZXAAAAACAAAAAAAAAAR0aW1lAAAABgAAAAAAAAAFdmFsdWUAAAAAAAAK",
@@ -672,13 +708,14 @@ export class Client extends ContractClient {
     update_minter: this.txFromJSON<null>,
     update_minter_capacity: this.txFromJSON<null>,
     query_balance: this.txFromJSON<i128>,
-    query_vesting_info: this.txFromJSON<VestingInfo>,
-    query_all_vesting_info: this.txFromJSON<Array<VestingInfo>>,
+    query_vesting_info: this.txFromJSON<VestingInfoResponse>,
+    query_all_vesting_info: this.txFromJSON<Array<VestingInfoResponse>>,
     query_token_info: this.txFromJSON<VestingTokenInfo>,
     query_minter: this.txFromJSON<MinterInfo>,
     query_vesting_contract_balance: this.txFromJSON<i128>,
     query_available_to_claim: this.txFromJSON<i128>,
     update: this.txFromJSON<null>,
     migrate_admin_key: this.txFromJSON<Result<void>>,
+    add_new_key_to_storage: this.txFromJSON<Result<void>>,
   };
 }
