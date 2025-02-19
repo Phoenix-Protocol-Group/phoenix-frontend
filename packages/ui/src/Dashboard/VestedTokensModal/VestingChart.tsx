@@ -52,7 +52,13 @@ const getTimeFormatter = (data: DataPoint[]) => {
     index % tickInterval === 0 ? formatter(tick) : "";
 };
 
-export const VestingChart = ({ data }: { data: DataPoint[] }) => {
+export const VestingChart = ({
+  data,
+  balance,
+}: {
+  data: DataPoint[];
+  balance: bigint;
+}) => {
   const tickFormatter = getTimeFormatter(data);
 
   return (
@@ -88,12 +94,7 @@ export const VestingChart = ({ data }: { data: DataPoint[] }) => {
               opacity: 0.6,
             }}
           >
-            <Box
-              component="img"
-              sx={{ height: "1rem", width: "1rem" }}
-              src="/cryptoIcons/pho.svg"
-            />{" "}
-            Total Vesting (PHO)
+            Remaining Locked (PHO)
           </Typography>
           <Typography
             sx={{
@@ -103,13 +104,75 @@ export const VestingChart = ({ data }: { data: DataPoint[] }) => {
               fontWeight: 700,
             }}
           >
-            {data[0].amount.toFixed(2)}
+            <Box
+              component="img"
+              sx={{ height: "1rem", width: "1rem" }}
+              src="/cryptoIcons/pho.svg"
+            />{" "}
+            {Number(balance) / 10 ** 7} PHO
+          </Typography>
+        </Box>
+        <Box
+          sx={{ display: "flex", flexDirection: "column", alignItems: "end" }}
+        >
+          <Typography
+            sx={{
+              color: "white",
+              fontFamily: "Ubuntu",
+              fontSize: "0.75rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontWeight: 700,
+            }}
+          >
+            Initially Locked:
           </Typography>
           <Typography
-            sx={{ color: "white", fontFamily: "Ubuntu", fontSize: "0.75rem" }}
+            sx={{
+              color: "white",
+              fontFamily: "Ubuntu",
+              fontSize: "0.75rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
           >
-            Fully unlocked{" "}
-            {new Date(data[data.length - 1].timeStamp).toLocaleDateString()}
+            <Box>
+              <Box
+                component="img"
+                sx={{ height: "1rem", width: "1rem" }}
+                src="/cryptoIcons/pho.svg"
+              />{" "}
+              {data[0].amount.toFixed(2)} PHO
+            </Box>
+          </Typography>
+          <Typography
+            sx={{
+              color: "white",
+              fontFamily: "Ubuntu",
+              fontSize: "0.75rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontWeight: 700,
+              mt: 2,
+            }}
+          >
+            Fully unlocked:
+          </Typography>
+          <Typography
+            sx={{
+              color: "white",
+              fontFamily: "Ubuntu",
+              fontSize: "0.75rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            {new Date(data[data.length - 1].timeStamp).toLocaleDateString()}{" "}
+            {new Date(data[data.length - 1].timeStamp).toLocaleTimeString()}
           </Typography>
         </Box>
       </Box>

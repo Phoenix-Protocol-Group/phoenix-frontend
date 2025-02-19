@@ -211,10 +211,6 @@ export default function Page() {
 
         // Load all token balances
         setAllTokens(allTokens);
-
-        if (walletAddress) {
-          queryVestingInfo();
-        }
       } catch (error) {
         console.log("Failed to initialize data:", error);
       } finally {
@@ -226,6 +222,13 @@ export default function Page() {
     initData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (walletAddress) {
+      queryVestingInfo();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walletAddress]);
 
   // Memoized props for child components
   const args = useMemo(

@@ -192,7 +192,7 @@ const VestingTokensModal = ({
 
         {vestingInfo.map((a, index) => (
           <CustomTabPanel value={tabValue} index={index} key={index}>
-            <VestingChart data={chartData} />
+            <VestingChart data={chartData} balance={vestingData.balance} />
 
             {/* Claimable Info */}
             <Box
