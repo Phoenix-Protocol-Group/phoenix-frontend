@@ -132,7 +132,7 @@ export default function Page() {
       // Execute the transaction using the hook
       await executeContractTransaction({
         contractType: "vesting",
-        contractAddress: constants.MULTIHOP_ADDRESS,
+        contractAddress: constants.VESTING_ADDRESS,
         transactionFunction: async (client, restore) => {
           return client.claim(
             {
