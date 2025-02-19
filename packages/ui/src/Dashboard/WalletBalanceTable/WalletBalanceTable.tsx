@@ -27,6 +27,7 @@ import {
   ArrowRightAlt,
   HelpCenterOutlined,
   InfoOutlined,
+  Lock,
 } from "@mui/icons-material";
 import { useMediaQuery } from "@mui/system";
 
@@ -264,6 +265,8 @@ const FilterAndTabPanel = ({
 const ListItem = ({
   token: { name, icon, usdValue, amount, contractId },
   onTokenClick,
+  hasVesting,
+  onVestingClick,
 }: ListItemProps) => {
   const [favorites, setFavorites] = useState<string[]>([]);
 
@@ -348,6 +351,53 @@ const ListItem = ({
                 </Tooltip>
               </Box>
             )}
+            {/* If Name = PHO and has vesting, show a lock button */}
+            {name === "PHO" && hasVesting && (
+              <Box
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  marginLeft: "8px",
+                }}
+              >
+                <Tooltip
+                  title="Vesting Schedule"
+                  arrow
+                  placement="top"
+                  sx={{
+                    "& .MuiTooltip-arrow": {
+                      color: "#E2491A",
+                    },
+                    "& .MuiTooltip-tooltip": {
+                      backgroundColor: "#1D1F21",
+                      color: "#FFF",
+                      fontSize: "12px",
+                    },
+                  }}
+                >
+                  <motion.div
+                    whileHover={{
+                      scale: 1.2,
+                      rotate: 15,
+                      transition: { duration: 0.2 },
+                    }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <Lock
+                      sx={{
+                        color: "#E2621B",
+                        fontSize: "20px",
+                      }}
+                      onClick={onVestingClick}
+                    />
+                    <Typography sx={{ color: "#E2621B", fontSize: "12px" }}>
+                      Vesting
+                    </Typography>
+                  </motion.div>
+                </Tooltip>
+              </Box>
+            )}
           </Grid>
           <Grid item xs={6} md={3}>
             <Typography sx={{ color: "#FFF", fontSize: "14px" }}>
@@ -390,6 +440,8 @@ const ListItem = ({
 const WalletBalanceTable = ({
   tokens,
   onTokenClick,
+  hasVesting,
+  onVestingClick,
 }: WalletBalanceTableProps) => {
   const [sort, setSort] = useState("highest" as "highest" | "lowest");
   const [searchTerm, setSearchTerm] = useState("");
@@ -455,7 +507,13 @@ const WalletBalanceTable = ({
       >
         {filteredTokens.length ? (
           filteredTokens.map((token, index) => (
-            <ListItem token={token} onTokenClick={onTokenClick} key={index} />
+            <ListItem
+              token={token}
+              onTokenClick={onTokenClick}
+              key={index}
+              hasVesting={hasVesting}
+              onVestingClick={onVestingClick}
+            />
           ))
         ) : (
           <Typography
