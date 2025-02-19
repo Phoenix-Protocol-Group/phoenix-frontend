@@ -45,8 +45,7 @@ export default function Page() {
   const router = useRouter();
   const appStore = useAppStore();
   const persistStore = usePersistStore();
-  const walletAddress =
-    "GA5EBZK3HWRG4F2AJ3JC5LOCLIIKWILV5OBTWDPCENU5YCJVUTKJA5AS";
+  const walletAddress = persistStore.wallet.address;
   const { executeContractTransaction } = useContractTransaction();
 
   // State management
@@ -124,6 +123,7 @@ export default function Page() {
     const _vestingInfo = await vestingContract.query_all_vesting_info({
       address: walletAddress!,
     });
+
     setVestingInfo(_vestingInfo.result);
   };
 
