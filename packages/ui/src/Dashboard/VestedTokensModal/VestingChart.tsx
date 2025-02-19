@@ -179,7 +179,7 @@ export const VestingChart = ({
       <ResponsiveContainer width="100%" height={300}>
         <AreaChart
           data={data}
-          margin={{ top: 0, right: 30, left: 30, bottom: 0 }}
+          margin={{ top: 0, right: 30, left: 20, bottom: 0 }}
         >
           <defs>
             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -191,7 +191,7 @@ export const VestingChart = ({
             hide={false}
             dataKey="amount"
             domain={["dataMin", "dataMax"]}
-            tickFormatter={(tick) => tick.toFixed(2)}
+            tickFormatter={(tick) => tick.toFixed(0)}
           />
           <XAxis
             hide={false}
