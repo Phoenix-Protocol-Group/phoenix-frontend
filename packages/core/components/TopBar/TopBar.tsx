@@ -63,11 +63,7 @@ const TopBar = ({
       <ConnectWallet
         open={store.walletModalOpen}
         // @ts-ignore
-        connectors={[
-          freighter(),
-          /* xbull(), temp. disable xbull */ lobstr(),
-          new WalletConnect(true),
-        ]}
+        connectors={[freighter(), xbull(), lobstr(), new WalletConnect(true)]}
         setOpen={() => store.setWalletModalOpen(!store.walletModalOpen)}
         connect={connect}
       />
