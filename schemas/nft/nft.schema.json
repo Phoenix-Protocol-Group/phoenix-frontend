@@ -1,0 +1,158 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NFT",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the NFT"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the NFT"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the NFT"
+    },
+    "media": {
+      "type": "object",
+      "description": "Media associated with the NFT",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "image",
+            "video",
+            "audio",
+            "3D",
+            "document",
+            "ticket",
+            "other"
+          ],
+          "description": "Type of media the NFT represents"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the media file"
+        },
+        "thumbnail": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the thumbnail image (if applicable)"
+        },
+        "mime_type": {
+          "type": "string",
+          "description": "MIME type of the media (e.g., image/png, video/mp4)"
+        }
+      },
+      "required": ["type", "url"]
+    },
+    "attributes": {
+      "type": "array",
+      "description": "List of attributes specific to this NFT",
+      "items": {
+        "type": "object",
+        "properties": {
+          "trait_type": {
+            "type": "string",
+            "description": "Name of the attribute"
+          },
+          "value": {
+            "type": ["string", "number", "boolean"],
+            "description": "Value of the attribute"
+          }
+        },
+        "required": ["trait_type", "value"]
+      }
+    },
+    "creator": {
+      "type": "string",
+      "description": "Blockchain address of the creator"
+    },
+    "contract": {
+      "type": "object",
+      "description": "Smart contract details",
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "Smart contract address"
+        }
+      },
+      "required": ["address"]
+    },
+    "utility": {
+      "type": "object",
+      "description": "Special utility for the NFT",
+      "properties": {
+        "ticket": {
+          "type": "object",
+          "description": "Details if the NFT represents a ticket",
+          "properties": {
+            "event": {
+              "type": "string",
+              "description": "Name of the event"
+            },
+            "date": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Date and time of the event"
+            },
+            "venue": {
+              "type": "string",
+              "description": "Venue of the event"
+            },
+            "seat": {
+              "type": "string",
+              "description": "Seat number (if applicable)"
+            }
+          }
+        },
+        "membership": {
+          "type": "object",
+          "description": "Details if the NFT represents a membership or access pass",
+          "properties": {
+            "organization": {
+              "type": "string",
+              "description": "Name of the organization or group"
+            },
+            "expiry_date": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Expiration date of the membership"
+            },
+            "benefits": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of benefits associated with the membership"
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "properties": {
+        "external_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "External URL related to the NFT"
+        },
+        "background_color": {
+          "type": "string",
+          "description": "Background color in hexadecimal"
+        }
+      }
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of when the NFT was minted"
+    }
+  },
+  "required": ["id", "name", "media", "creator", "contract", "timestamp"]
+}

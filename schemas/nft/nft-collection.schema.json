@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NFT Collection",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the NFT collection."
+    },
+    "description": {
+      "type": "string",
+      "description": "A detailed description of the NFT collection."
+    },
+    "image": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the main image or logo of the collection."
+    },
+    "external_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "An external URL where users can find more information about the collection."
+    },
+    "seller_fee_basis_points": {
+      "type": "integer",
+      "description": "The royalty percentage (in basis points) that the creator earns on secondary sales. For example, 500 means 5% royalties.",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "fee_recipient": {
+      "type": "string",
+      "description": "The blockchain address where royalties are sent."
+    },
+    "categories": {
+      "type": "array",
+      "description": "Categories or tags associated with the collection (e.g., Art, Gaming, Music).",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date and time when the collection was created."
+    },
+    "total_supply": {
+      "type": "integer",
+      "description": "The total number of NFTs in the collection.",
+      "minimum": 0
+    },
+    "attributes": {
+      "type": "array",
+      "description": "List of attributes specific to the collection.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "trait_type": {
+            "type": "string",
+            "description": "Name of the attribute."
+          },
+          "value": {
+            "type": ["string", "number", "boolean"],
+            "description": "Value of the attribute."
+          }
+        },
+        "required": ["trait_type", "value"]
+      }
+    },
+    "social_links": {
+      "type": "object",
+      "description": "Links to social media profiles or communities related to the collection.",
+      "properties": {
+        "twitter": {
+          "type": "string",
+          "format": "uri",
+          "description": "Twitter profile URL."
+        },
+        "discord": {
+          "type": "string",
+          "format": "uri",
+          "description": "Discord server invite link."
+        },
+        "website": {
+          "type": "string",
+          "format": "uri",
+          "description": "Official website URL."
+        }
+      }
+    },
+    "banner_image_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the banner image for the collection."
+    },
+    "background_color": {
+      "type": "string",
+      "description": "Background color for the collection in hexadecimal format (e.g., #FFFFFF)."
+    }
+  },
+  "required": [
+    "name",
+    "description",
+    "image",
+    "seller_fee_basis_points",
+    "fee_recipient"
+  ]
+}
