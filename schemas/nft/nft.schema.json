@@ -21,7 +21,15 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["image", "video", "audio", "3D", "document", "ticket", "other"],
+          "enum": [
+            "image",
+            "video",
+            "audio",
+            "3D",
+            "document",
+            "ticket",
+            "other"
+          ],
           "description": "Type of media the NFT represents"
         },
         "url": {
@@ -70,7 +78,7 @@
         "address": {
           "type": "string",
           "description": "Smart contract address"
-        },
+        }
       },
       "required": ["address"]
     },
