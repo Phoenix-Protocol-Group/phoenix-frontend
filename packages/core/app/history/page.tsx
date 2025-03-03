@@ -14,7 +14,10 @@ import {
 import { API, symbolToToken } from "@phoenix-protocol/utils";
 import { fetchAllTrades, scaToToken } from "@phoenix-protocol/utils";
 
-import { TradingVolumeResponse } from "@phoenix-protocol/utils/build/api/types";
+import {
+  PriceHistoryResponse,
+  TradingVolumeResponse,
+} from "@phoenix-protocol/utils/build/api/types";
 import { useEffect, useState } from "react";
 
 export default function Page() {
@@ -37,7 +40,8 @@ export default function Page() {
   const [history, setHistory] = useState<any>([]);
   const [allTrades, setAllTrades] = useState<any[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
-  const [historicalPrices, setHistoricalPrices] = useState<any[]>([]);
+  const [historicalPrices, setHistoricalPrices] =
+    useState<PriceHistoryResponse>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -270,29 +274,35 @@ export default function Page() {
 
   const loadPriceData = async (period: "W" | "M" | "Y") => {
     let graph: any[] = [];
+    const now = new Date();
     switch (period) {
       case "W":
-        graph = (
-          await API.getRatioGraphLastWeek(
-            "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA"
-          )
-        ).graph;
-        break;
+        // Calculate from and to timestamps for the last week
 
+        const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        graph = await API.getHistoricalPrices(
+          "PHO-GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
+          (lastWeek.getTime() / 1000).toFixed(0),
+          (now.getTime() / 1000).toFixed(0)
+        );
+        break;
       case "M":
-        graph = (
-          await API.getRatioGraphLastMonth(
-            "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA"
-          )
-        ).graph;
+        // Calculate from and to timestamps for the last month
+        const lastMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        graph = await API.getHistoricalPrices(
+          "PHO-GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
+          (lastMonth.getTime() / 1000).toFixed(0),
+          (now.getTime() / 1000).toFixed(0)
+        );
         break;
-
       case "Y":
-        graph = (
-          await API.getRatioGraphLastYear(
-            "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA"
-          )
-        ).graph;
+        // Calculate from and to timestamps for the last year
+        const lastYear = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+        graph = await API.getHistoricalPrices(
+          "PHO-GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
+          (lastYear.getTime() / 1000).toFixed(0),
+          (now.getTime() / 1000).toFixed(0)
+        );
         break;
     }
     setHistoricalPrices(graph);

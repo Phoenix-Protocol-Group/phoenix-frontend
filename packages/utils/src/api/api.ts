@@ -10,6 +10,7 @@ import {
   MostTradedResponse,
   TradeHistoryResponse,
   RatioResponse,
+  PriceHistoryResponse,
 } from "./types";
 import { constants } from "..";
 
@@ -104,6 +105,33 @@ export const API = {
   async getPrice(name: string): Promise<PriceResponse> {
     const { data } = await apiClient.get(`/price/${name}`);
     return data;
+  },
+  /**
+   * Fetches the historical prices for a given item name within a specified date range.
+   * @param {string} name - The name of the item to fetch historical prices for.
+   * @param {string} from - The start date of the date range in ISO 8601 format.
+   * @param {string} to - The end date of the date range in ISO 8601 format.
+   * @returns {Promise<Array<Record<string, any>>} A promise that resolves to the historical prices.
+   * @throws {Error} If the API request fails.
+   */
+  async getHistoricalPrices(
+    name: string,
+    from?: string,
+    to?: string
+  ): Promise<PriceHistoryResponse> {
+    try {
+      const params: Record<string, string | undefined> = {};
+      if (from) params.from = from;
+      if (to) params.to = to;
+
+      const { data } = await apiClient.get(`/assets/price/${name}`, {
+        params,
+      });
+      return data.prices;
+    } catch (e) {
+      console.error(`Error fetching historical prices for ${name}:`, e);
+      return [];
+    }
   },
   async getTickers(): Promise<TickersResponse> {
     const { data } = await apiClient.get(`/tickers`);

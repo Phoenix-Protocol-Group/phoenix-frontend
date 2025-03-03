@@ -9,6 +9,7 @@ import {
 } from "recharts";
 import { Box, Typography } from "@mui/material";
 import { format } from "date-fns";
+import { PriceHistoryResponse } from "@phoenix-protocol/utils";
 
 type HistoricalPrice = {
   price: number;
@@ -41,11 +42,11 @@ const tabSelectedStyles = {
 };
 
 // Helper function to format data
-const formatData = (data: HistoricalPrice[]): DataPoint[] => {
+const formatData = (data: PriceHistoryResponse): DataPoint[] => {
   return data.map((item) => {
     return {
       price: item.price,
-      timeStamp: new Date(Number(item.timeStamp) * 1000).getTime(),
+      timeStamp: new Date(Number(item.txTime) * 1000).getTime(),
     };
   });
 };
@@ -138,7 +139,7 @@ const GlowingChart = ({
           }
           onClick={() => setSelected("Y")}
         >
-          Y
+          3M
         </Box>
       </Box>
     </Box>
@@ -205,7 +206,7 @@ const FinancialChart = ({
   period,
   setPeriod,
 }: {
-  historicalPrices: HistoricalPrice[];
+  historicalPrices: PriceHistoryResponse;
   period: string;
   setPeriod: (period: "W" | "M" | "Y") => void;
 }) => {

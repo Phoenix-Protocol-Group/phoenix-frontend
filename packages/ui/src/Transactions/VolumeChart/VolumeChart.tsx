@@ -7,13 +7,10 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Legend,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { motion } from "framer-motion";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils";
-import { SettingsInputComponent } from "@mui/icons-material";
 
 type Pool = {
   tokenA: { icon: string; symbol: string };
@@ -315,7 +312,7 @@ const VolumeChart = ({
             }
             onClick={() => setSelectedTab("A")}
           >
-            A
+            3M
           </Box>
         </Box>
       </Box>

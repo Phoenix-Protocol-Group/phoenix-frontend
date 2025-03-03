@@ -18,6 +18,12 @@ export type TickerInfo = {
 };
 export type TickersResponse = TickerInfo[];
 export type PriceResponse = number;
+export type PriceHistoryResponse = {
+  id: string;
+  price: number;
+  txHash: string;
+  txTime: string;
+}[];
 export type MostTradedResponse = { asset: string; usdVolume: number };
 export type TradeResponse = {
   trade_id: number;
