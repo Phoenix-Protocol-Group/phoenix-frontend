@@ -12,6 +12,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
+import { useAppStore } from "@phoenix-protocol/state";
 import { HelpCenterArticle } from "@phoenix-protocol/types";
 import { ArticleCard, CategoryCard, Skeleton } from "@phoenix-protocol/ui";
 import { HelpCenter } from "@phoenix-protocol/utils";
@@ -42,6 +43,7 @@ const scrollbarStyles = {
 
 export default function Page() {
   const router = useRouter();
+  const appStore = useAppStore();
   const [categories, setCategories] = React.useState<
     {
       name: string;
@@ -103,6 +105,8 @@ export default function Page() {
       setFeaturedArticles(_featuredCategories as HelpCenterArticle[]);
     } catch (error) {
       console.log(error);
+    } finally {
+      appStore.setLoading(false);
     }
   };
 
@@ -123,6 +127,8 @@ export default function Page() {
           );
         } catch (error) {
           console.log(error);
+        } finally {
+          appStore.setLoading(false);
         }
       };
       fetchResults();

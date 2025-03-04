@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Container, Typography } from "@mui/material";
+import { useAppStore } from "@phoenix-protocol/state";
 import { HelpCenterArticle } from "@phoenix-protocol/types";
 import { HelpCenter } from "@phoenix-protocol/utils";
 import { useEffect, useState, use } from "react";
@@ -16,11 +17,18 @@ export default function Page(props: ArticlePageProps) {
   const [article, setArticle] = useState<HelpCenterArticle | undefined>(
     undefined
   );
+  const appStore = useAppStore();
 
   const init = async () => {
-    const article = await HelpCenter.getArticleById(params.articleID);
-    // @ts-ignore
-    setArticle(article as HelpCenterArticle);
+    try {
+      const article = await HelpCenter.getArticleById(params.articleID);
+      // @ts-ignore
+      setArticle(article as HelpCenterArticle);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      appStore.setLoading(false);
+    }
   };
 
   useEffect(() => {

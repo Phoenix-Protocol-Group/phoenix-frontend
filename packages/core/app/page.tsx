@@ -216,6 +216,7 @@ export default function Page() {
       } finally {
         setLoadingDashboard(false);
         setLoadingBalances(false);
+        appStore.setLoading(false);
       }
     };
 

@@ -20,6 +20,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { motion } from "framer-motion";
 import { ToastProvider } from "@/providers/ToastProvider";
 import { RestoreModalProvider } from "@/providers/RestoreModalProvider";
+import Loader from "@/components/Loader/Loader";
 
 const HiddenInputChecker = () => {
   const [value, setValue] = useState("Phoenix DeFi Hub");
@@ -52,8 +53,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const largerThanMd = useMediaQuery(theme.breakpoints.up("md"));
   // State to manage navigation open/close status, initializing based on screen size
   const [navOpen, setNavOpen] = useState<boolean>(largerThanMd);
-  // Retrieve the current pathname
+  // Layout store
+  const appStore = useAppStore();
+
+  // Pathname
   const pathname = usePathname();
+
   // Get PersistStore
   const persistStore = usePersistStore();
   // State to handle disclaimer modal
@@ -66,7 +71,27 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     if (navOpen !== largerThanMd) {
       setNavOpen(largerThanMd);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [largerThanMd]);
+
+  // Disable Scrolling while loading
+  useEffect(() => {
+    if (appStore.loading) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [appStore.loading]);
+
+  // Use effect to handle route changes and set loading state
+  useEffect(() => {
+    appStore.setLoading(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   // Use effect hook to prune the persist store on page load if wallet-connect
   useEffect(() => {
@@ -101,11 +126,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
   // Styles for different pages
   const swapPageStyle = {
-    backgroundImage: `url("/swapBg.png")`,
-    backgroundRepeat: "no-repeat",
-    backgroundAttachment: "fixed",
-    backgroundPosition: "center",
-    backgroundSize: { xs: "cover", md: "50% 100%" },
+    //backgroundImage: `url("/swapBg.png")`,
+    //backgroundRepeat: "no-repeat",
+    //backgroundAttachment: "fixed",
+    //backgroundPosition: "center",
+    //backgroundSize: { xs: "cover", md: "50% 100%" },
+    background: "linear-gradient(to bottom, #1F2123, #131517)",
+
     paddingBottom: "50px",
     width: {
       xs: "100vw",
@@ -173,6 +200,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               {/* Side Navigation Component with smooth animation, disabled on initial load */}
 
               <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
+              {/* If loading */}
 
               {/* Top Navigation Bar with motion */}
               <motion.div
@@ -200,6 +228,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   ...swapPageStyle,
                 }}
               >
+                {appStore.loading && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      background:
+                        "linear-gradient(to bottom, #1F2123, #131517)",
+
+                      zIndex: 10, // Ensure it's on top
+                    }}
+                  >
+                    <Loader />
+                  </Box>
+                )}
                 {children}
               </Box>
             </RestoreModalProvider>

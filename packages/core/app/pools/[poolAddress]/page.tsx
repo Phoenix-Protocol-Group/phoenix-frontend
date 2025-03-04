@@ -115,6 +115,7 @@ export default function Page(props: PoolPageProps) {
     networkPassphrase: constants.NETWORK_PASSPHRASE,
     rpcUrl: constants.RPC_URL,
   });
+  const appStore = useAppStore();
 
   const fetchStakingAddress = async (): Promise<string | undefined> => {
     try {
@@ -435,6 +436,9 @@ export default function Page(props: PoolPageProps) {
       // If pool not found, set poolNotFound to true
       console.log(e);
       setPoolNotFound(true);
+      appStore.setLoading(false);
+    } finally {
+      appStore.setLoading(false);
     }
   };
 
