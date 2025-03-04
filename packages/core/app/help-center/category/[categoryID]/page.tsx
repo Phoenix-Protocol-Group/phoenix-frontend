@@ -1,5 +1,6 @@
 "use client";
 import { Box, Container, Grid, Typography } from "@mui/material";
+import { useAppStore } from "@phoenix-protocol/state";
 import { HelpCenterArticle } from "@phoenix-protocol/types";
 import { ArticleCard, Skeleton } from "@phoenix-protocol/ui";
 import { HelpCenter } from "@phoenix-protocol/utils";
@@ -24,6 +25,7 @@ export default function Page(props: CategoryPageProps) {
   const [categoryName, setCategoryName] = useState<string>("");
 
   const router = useRouter();
+  const appStore = useAppStore();
 
   useEffect(() => {
     init();
@@ -49,6 +51,8 @@ export default function Page(props: CategoryPageProps) {
       setArticles(_articles);
     } catch (error) {
       console.log(error);
+    } finally {
+      appStore.setLoading(false);
     }
   };
   return (

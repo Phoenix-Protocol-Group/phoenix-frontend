@@ -12,9 +12,15 @@ export const createLayoutActions = (
   return {
     walletModalOpen: false,
     tourRunning: false,
+    loading: true,
     setTourRunning: (running: boolean) => {
       setState((state: AppStore) => {
         return { ...state, tourRunning: running };
+      });
+    },
+    setLoading: (loading: boolean) => {
+      setState((state: AppStore) => {
+        return { ...state, loading };
       });
     },
     tourStep: 0,

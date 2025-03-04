@@ -251,25 +251,32 @@ export default function Page() {
   };
 
   const loadPools = async () => {
-    const tickers = await API.getTickers();
-    const _pools = await Promise.all(
-      tickers.map(async (ticker) => {
-        const tokenA = await scaToToken(ticker.base_currency, appStore);
-        const tokenB = await scaToToken(ticker.target_currency, appStore);
-        return {
-          contractAddress: ticker.pool_id,
-          tokenA: {
-            ...tokenA,
-            icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
-          },
-          tokenB: {
-            ...tokenB,
-            icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
-          },
-        };
-      })
-    );
-    setPools(_pools);
+    try {
+      const tickers = await API.getTickers();
+      const _pools = await Promise.all(
+        tickers.map(async (ticker) => {
+          const tokenA = await scaToToken(ticker.base_currency, appStore);
+          const tokenB = await scaToToken(ticker.target_currency, appStore);
+          return {
+            contractAddress: ticker.pool_id,
+            tokenA: {
+              ...tokenA,
+              icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
+            },
+            tokenB: {
+              ...tokenB,
+              icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
+            },
+          };
+        })
+      );
+      setPools(_pools);
+    } catch (e) {
+      console.log(e);
+      appStore.setLoading(false);
+    } finally {
+      appStore.setLoading(false);
+    }
   };
 
   const loadPriceData = async (period: "W" | "M" | "Y") => {

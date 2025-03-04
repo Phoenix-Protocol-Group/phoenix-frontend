@@ -232,25 +232,31 @@ export default function SwapPage(): JSX.Element {
   useEffect(() => {
     const getAllTokens = async (): Promise<void> => {
       setIsLoading(true);
-      const allTokens = await appStore.getAllTokens();
-      setTokens(allTokens.slice(2));
-      setFromToken(allTokens[0]);
-      setToToken(allTokens[1]);
-      setIsLoading(false);
+      try {
+        const allTokens = await appStore.getAllTokens();
+        setTokens(allTokens.slice(2));
+        setFromToken(allTokens[0]);
+        setToToken(allTokens[1]);
+        setIsLoading(false);
 
-      // Get all pools
-      const factoryContract = new PhoenixFactoryContract.Client({
-        contractId: constants.FACTORY_ADDRESS,
-        networkPassphrase: constants.NETWORK_PASSPHRASE,
-        rpcUrl: constants.RPC_URL,
-      });
-      const { result } = await factoryContract.query_all_pools_details();
+        // Get all pools
+        const factoryContract = new PhoenixFactoryContract.Client({
+          contractId: constants.FACTORY_ADDRESS,
+          networkPassphrase: constants.NETWORK_PASSPHRASE,
+          rpcUrl: constants.RPC_URL,
+        });
+        const { result } = await factoryContract.query_all_pools_details();
 
-      const allPairs = result.map((pool: any) => ({
-        asset_a: pool.pool_response.asset_a.address,
-        asset_b: pool.pool_response.asset_b.address,
-      }));
-      setAllPools(allPairs);
+        const allPairs = result.map((pool: any) => ({
+          asset_a: pool.pool_response.asset_a.address,
+          asset_b: pool.pool_response.asset_b.address,
+        }));
+        setAllPools(allPairs);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        appStore.setLoading(false);
+      }
     };
     getAllTokens();
   }, []);

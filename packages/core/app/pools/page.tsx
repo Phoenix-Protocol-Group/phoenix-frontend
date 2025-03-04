@@ -39,6 +39,7 @@ export default function Page() {
   const [poolFilter, setPoolFilter] = useState<PoolsFilter>("ALL");
   const [sortBy, setSortBy] = useState<string>("HighAPR");
   const isInitialMount = useRef(true); // To track the initial component mount
+  const appStore = useAppStore();
 
   /**
    * Fetch pool information by its address.
@@ -173,32 +174,39 @@ export default function Page() {
    * @function fetchPools
    */
   const fetchPools = useCallback(async () => {
-    const FactoryContract = new PhoenixFactoryContract.Client({
-      contractId: constants.FACTORY_ADDRESS,
-      networkPassphrase: constants.NETWORK_PASSPHRASE,
-      rpcUrl: constants.RPC_URL,
-    });
+    try {
+      const FactoryContract = new PhoenixFactoryContract.Client({
+        contractId: constants.FACTORY_ADDRESS,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
 
-    const pools = await FactoryContract.query_pools({});
+      const pools = await FactoryContract.query_pools({});
 
-    const poolWithData =
-      pools && Array.isArray(pools.result)
-        ? await Promise.all(
-            pools.result.map(async (pool: string) => {
-              return await fetchPool(pool);
-            })
-          )
-        : [];
+      const poolWithData =
+        pools && Array.isArray(pools.result)
+          ? await Promise.all(
+              pools.result.map(async (pool: string) => {
+                return await fetchPool(pool);
+              })
+            )
+          : [];
 
-    const poolsFiltered: Pool[] = poolWithData.filter(
-      (el: any) =>
-        el !== undefined &&
-        el.tokens.length >= 2 &&
-        el.poolAddress !==
-          "CBXBKAB6QIRUGTG77OQZHC46BIIPA5WDKIKZKPA2H7Q7CPKQ555W3EVB"
-    );
-    setAllPools(poolsFiltered as Pool[]);
-    setLoading(false);
+      const poolsFiltered: Pool[] = poolWithData.filter(
+        (el: any) =>
+          el !== undefined &&
+          el.tokens.length >= 2 &&
+          el.poolAddress !==
+            "CBXBKAB6QIRUGTG77OQZHC46BIIPA5WDKIKZKPA2H7Q7CPKQ555W3EVB"
+      );
+      setAllPools(poolsFiltered as Pool[]);
+      setLoading(false);
+    } catch (e) {
+      console.error(e);
+      appStore.setLoading(false);
+    } finally {
+      appStore.setLoading(false);
+    }
   }, [fetchPool]);
 
   // On component mount, fetch pools

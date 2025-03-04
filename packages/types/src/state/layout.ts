@@ -5,4 +5,6 @@ export interface LayoutActions {
   setTourRunning: (running: boolean) => void;
   tourStep: number;
   setTourStep: (step: number) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
 }
