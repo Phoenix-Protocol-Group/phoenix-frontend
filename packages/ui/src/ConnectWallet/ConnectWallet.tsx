@@ -1,13 +1,14 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Connector,
   ConnectWalletProps,
   OptionComponentProps,
 } from "@phoenix-protocol/types";
-import { Box, Modal, Typography } from "@mui/material";
+import { Box, Modal, Typography, Grid, Skeleton } from "@mui/material";
 import { motion } from "framer-motion";
 import { Button as PhoenixButton } from "../Button/Button";
 import Colors from "../Theme/colors";
+import { Carousel } from "./Carousel"; // Correct the import path
 
 /**
  * OptionComponent
@@ -20,7 +21,8 @@ const OptionComponent = ({
   connector,
   onClick,
   selected,
-}: OptionComponentProps) => {
+  allowed,
+}: OptionComponentProps & { allowed: boolean }) => {
   const hoverStyles = {
     background:
       "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
@@ -31,23 +33,26 @@ const OptionComponent = ({
 
   const baseStyles = {
     display: "flex",
-    padding: "1.125rem 1.5rem",
+    flexDirection: { xs: "column", md: "row" },
+    padding: { md: "1.125rem 1.5rem", xs: "1rem" },
     alignItems: "center",
-    gap: "1rem",
+    gap: "0.25rem",
     background:
       "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
     border: "2px solid transparent",
-    width: "100%",
-    marginTop: "1.5rem",
+    width: { xs: "auto", md: "100%" },
+    marginTop: "1.25rem",
     borderRadius: "8px",
     transition: "all 0.2s ease-in-out",
+    opacity: allowed ? 1 : 0.5,
+    marginRight: { xs: "1rem", md: 0 },
     "&:hover": hoverStyles,
   };
 
   return (
-    <motion.div whileHover={{ scale: 1.05 }}>
+    <motion.div whileHover={{ scale: allowed ? 1.05 : 1 }}>
       <Box
-        onClick={onClick}
+        onClick={allowed ? onClick : undefined}
         sx={selected ? { ...baseStyles, ...hoverStyles } : baseStyles}
       >
         <img
@@ -56,7 +61,31 @@ const OptionComponent = ({
           height="37"
           alt={connector.name}
         />
-        <Typography>{connector.name}</Typography>
+        <Typography
+          sx={{
+            fontSize: {
+              md: "1.1428571428571428rem",
+              xs: "12px",
+            },
+            textAlign: "center",
+            lineHeight: { xs: "1.2rem", md: "auto" },
+            height: { xs: "2.4rem", md: "auto" },
+          }}
+        >
+          {connector.name}
+        </Typography>
+        {!allowed && (
+          <Typography
+            sx={{
+              fontSize: { md: 12, xs: 8 },
+              display: { md: "block", xs: "none" },
+              opacity: 0.6,
+              marginLeft: { md: "0.5rem", xs: 0 },
+            }}
+          >
+            Not installed
+          </Typography>
+        )}
       </Box>
     </motion.div>
   );
@@ -77,6 +106,31 @@ const ConnectWallet = ({
 }: ConnectWalletProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<Connector | undefined>(undefined);
+  const [allowedConnectors, setAllowedConnectors] = useState<Connector[]>([]);
+  const [disallowedConnectors, setDisallowedConnectors] = useState<Connector[]>(
+    []
+  );
+  const [loadingConnectors, setLoadingConnectors] = useState(true);
+
+  useEffect(() => {
+    const checkConnectors = async () => {
+      setLoadingConnectors(true);
+      const allowed: Connector[] = [];
+      const disallowed: Connector[] = [];
+      for (const connector of connectors) {
+        const isAllowed = await connector.isConnected();
+        if (isAllowed) {
+          allowed.push(connector);
+        } else {
+          disallowed.push(connector);
+        }
+      }
+      setAllowedConnectors(allowed);
+      setDisallowedConnectors(disallowed);
+      setLoadingConnectors(false);
+    };
+    checkConnectors();
+  }, [connectors]);
 
   /**
    * Handles wallet connection.
@@ -107,20 +161,48 @@ const ConnectWallet = ({
     setSelected(undefined);
   }, []);
 
-  const modalStyle = useMemo(
-    () => ({
-      position: "absolute" as "absolute",
-      top: "50%",
-      transform: "translate(-50%, -50%)",
-      width: { md: 512, xs: "96vw" },
-      background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
-      borderRadius: "16px",
-      display: "flex",
-      flexDirection: "column",
-      padding: "1.5rem",
-    }),
-    []
-  );
+  const modalStyle = {
+    position: "absolute" as "absolute",
+    alignItems: { xs: "center", md: "flex-start" },
+    top: { md: "50%", xs: "0" },
+    left: "50%",
+    transform: { md: "translate(-50%, -50%)", xs: "translate(-50%, 0)" },
+    width: { xs: "96vh", md: 800 },
+    maxWidth: "calc(100vw - 16px)",
+    background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
+    borderRadius: "16px",
+    flexDirection: { xs: "row", md: "column" },
+    minHeight: "50vh",
+    maxHeight: { md: "530px", xs: "100vh" },
+  };
+
+  const carouselItems = [
+    {
+      image: "/pho-wallets.png",
+      title: "What are wallets?",
+      text: "Wallets are used to send, receive, and access all your digital assets like PHO and XLM.",
+    },
+    {
+      image: "/pho-wallets.png",
+      title: "No accounts. No passwords.",
+      text: "Use your wallet to sign into many different platforms. No unique accounts or passwords.",
+    },
+    {
+      image: "/pho-wallets.png",
+      title: "Your wallet, your keys.",
+      text: "Your wallet is your key to the Stellar network. Keep it safe and secure. Phoenix Protocol never has access to your funds.",
+    },
+  ];
+
+  const skeletonStyles = {
+    display: "flex",
+    padding: { md: "1.125rem 1.5rem", xs: "1rem" },
+    alignItems: "center",
+    gap: "0.25rem",
+    width: "100%",
+    marginTop: "1.25rem",
+    borderRadius: "8px",
+  };
 
   return (
     <Modal
@@ -129,76 +211,118 @@ const ConnectWallet = ({
       aria-labelledby="connectwallet-modal"
       aria-describedby="connect your wallet to the app"
     >
-      <motion.div
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -50 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "100%",
-        }}
+      <Grid
+        container
+        spacing={0}
+        sx={{ marginTop: "1.5rem", height: "100%", ...modalStyle }}
       >
-        <Box sx={modalStyle}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{
+            overflowY: "auto",
+            padding: "1.5rem 1rem",
+            height: { md: "100%", xs: "auto" },
+            flexGrow: { xs: 1, md: 0 }, // Adjust flexGrow for mobile
+            "&::-webkit-scrollbar": {
+              width: "4px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#E2491A",
+              borderRadius: "8px",
+            },
+            // Styles for Firefox
+            scrollbarWidth: "thin", // Thin scrollbar width
+            scrollbarColor: "#E2491A #2C2C31", // Thumb color and track color
+            flexBasis: { md: "100%!important", xs: "auto" },
+          }}
+        >
+          <Typography
+            sx={{ fontSize: 24, fontWeight: 700 }}
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
           >
-            <Typography
-              sx={{ fontSize: 24, fontWeight: 700 }}
-              id="modal-modal-title"
-              variant="h6"
-              component="h2"
-            >
-              Connect Wallet
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                padding: "0.25rem",
-                backgroundColor: Colors.inputsHover,
-                borderRadius: "8px",
-                cursor: "pointer",
-              }}
-              onClick={() => setOpen(false)}
-            >
-              <img
-                src="/x.svg"
-                alt="Close"
-                style={{ width: "1.5rem", height: "1.5rem" }}
-              />
-            </Box>
-          </Box>
-          {!loading ? (
+            Connect Wallet
+          </Typography>
+          {!loadingConnectors ? (
             <>
               <Typography
-                sx={{ fontSize: 14, opacity: 0.4, marginTop: "1.5rem" }}
+                sx={{ fontSize: 14, opacity: 0.4, marginBottom: "1.5rem" }}
               >
                 Start by connecting with one of the wallets below.
               </Typography>
-              {connectors.map((connector) => (
-                <OptionComponent
-                  key={connector.id}
-                  connector={connector}
-                  selected={selected === connector}
-                  onClick={() => setSelected(connector)}
-                />
-              ))}
-              <PhoenixButton
-                disabled={!selected}
-                sx={{ marginTop: "1.5rem", width: "100%" }}
-                onClick={() => selected && handleConnect(selected)}
+              <Box
+                sx={{
+                  display: {
+                    xs: "flex",
+                    md: "block",
+                  },
+                  maxWidth: "100%",
+                  overflowX: { xs: "scroll", md: "visible" },
+                }}
               >
-                Continue
-              </PhoenixButton>
+                {allowedConnectors.map((connector) => (
+                  <OptionComponent
+                    key={connector.id}
+                    connector={connector}
+                    selected={selected === connector}
+                    onClick={() => {
+                      setSelected(connector);
+                      handleConnect(connector);
+                    }}
+                    allowed={true}
+                  />
+                ))}
+                {disallowedConnectors.map((connector) => (
+                  <OptionComponent
+                    key={connector.id}
+                    connector={connector}
+                    selected={selected === connector}
+                    onClick={() => setSelected(connector)}
+                    allowed={false}
+                  />
+                ))}
+              </Box>
             </>
           ) : (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+                padding: { md: "1.5rem", xs: "1rem" },
+              }}
+            >
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height={60}
+                sx={skeletonStyles}
+              />
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height={60}
+                sx={skeletonStyles}
+              />
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height={60}
+                sx={skeletonStyles}
+              />
+            </Box>
+          )}
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{ padding: "1.5rem 1rem", flexBasis: "100%!important" }}
+        >
+          {loading ? (
             <motion.div
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
@@ -210,9 +334,7 @@ const ConnectWallet = ({
                   padding: "1.5rem",
                   flexDirection: "column",
                   alignItems: "center",
-                  background: "#2C2C31",
                   borderRadius: "16px",
-                  marginTop: "1.5rem",
                 }}
               >
                 <img
@@ -222,7 +344,7 @@ const ConnectWallet = ({
                       : selected?.iconUrl || ""
                   }
                   alt="Loading Wallet"
-                  style={{ width: "100%" }}
+                  style={{ width: "180px" }}
                 />
                 <Typography sx={{ fontSize: "1.5rem", fontWeight: 700 }}>
                   Opening {selected?.name}
@@ -239,9 +361,58 @@ const ConnectWallet = ({
                 </PhoenixButton>
               </Box>
             </motion.div>
+          ) : (
+            <>
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 12,
+                  right: 12,
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "1rem",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    padding: "0.25rem",
+                    backgroundColor: Colors.inputsHover,
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setOpen(false)}
+                >
+                  <img
+                    src="/x.svg"
+                    alt="Close"
+                    style={{ width: "1.5rem", height: "1.5rem" }}
+                  />
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography
+                  sx={{ fontSize: { md: 24, xs: 14 }, fontWeight: 700 }}
+                  id="modal-modal-title"
+                  variant="h6"
+                  component="h2"
+                >
+                  Getting Started
+                </Typography>
+                <Carousel items={carouselItems} />
+              </Box>
+            </>
           )}
-        </Box>
-      </motion.div>
+        </Grid>
+      </Grid>
     </Modal>
   );
 };

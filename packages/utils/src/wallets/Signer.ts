@@ -1,6 +1,7 @@
 import { lobstr } from "./lobstr";
 import { Wallet } from "./types";
 import { xBull } from "./xbull";
+import { hana } from "./hana";
 import {
   WalletConnect as WalletClient,
   WalletConnectAllowedMethods,
@@ -80,6 +81,8 @@ export default class Signer {
       this.wallet = new xBull();
     } else if (this.walletType === "lobstr") {
       this.wallet = new lobstr();
+    } else if (this.walletType === "hana") {
+      this.wallet = new hana();
     } else if (this.walletType === "wallet-connect") {
       this.wallet = await initializeWalletConnect();
     } else {

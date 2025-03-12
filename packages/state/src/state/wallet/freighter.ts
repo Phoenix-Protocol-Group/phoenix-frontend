@@ -27,6 +27,12 @@ export function freighter(): Connector {
       await freighterApi.requestAccess();
       return (await freighterApi.getAddress()).address;
     },
+    async isAvailable(): Promise<boolean> {
+      return freighterApi
+        .isConnected()
+        .then(({ isConnected, error }) => !error && isConnected)
+        .catch((): boolean => false);
+    },
     signTransaction(
       xdr: string,
       opts?: {

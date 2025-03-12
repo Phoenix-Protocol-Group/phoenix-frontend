@@ -1,4 +1,4 @@
-import {Horizon} from "@stellar/stellar-sdk";
+import { Horizon } from "@stellar/stellar-sdk";
 
 export type StateToken = {
   id: string;
@@ -12,7 +12,13 @@ export type Wallet = {
   address: string | undefined;
   activeChain: WalletChain | undefined;
   server: Horizon.Server | undefined;
-  walletType: "freighter" | "xbull" | "lobstr" | "wallet-connect" | undefined;
+  walletType:
+    | "freighter"
+    | "xbull"
+    | "lobstr"
+    | "wallet-connect"
+    | "hana"
+    | undefined;
 };
 
 export interface WalletActions {
@@ -59,16 +65,17 @@ export interface Connector {
 
   getPublicKey(): Promise<string>;
 
+  isAvailable(): Promise<boolean>;
+
   signTransaction(
-      xdr: string,
-      opts?: {
-        network?: string;
-        networkPassphrase?: string;
-        accountToSign?: string;
-      }
+    xdr: string,
+    opts?: {
+      network?: string;
+      networkPassphrase?: string;
+      accountToSign?: string;
+    }
   ): Promise<string>;
 }
-
 
 // Sourced from https://github.com/tmm/wagmi/blob/main/packages/core/src/constants/chains.ts
 // This is just so we can clearly see which of wagmi's first-class chains we provide metadata for

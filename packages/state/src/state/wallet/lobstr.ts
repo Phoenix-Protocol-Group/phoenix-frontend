@@ -28,6 +28,9 @@ export function lobstr(): Connector {
         networkPassphrase: "Public Global Stellar Network ; September 2015",
       };
     },
+    async isAvailable(): Promise<boolean> {
+      return isConnected();
+    },
     getPublicKey(): Promise<string> {
       const pubKey: Promise<string> = getAddressFromLocalStorageByKey(
         "app-storage"
