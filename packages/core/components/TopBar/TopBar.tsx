@@ -7,6 +7,7 @@ import {
   usePersistStore,
   WalletConnect,
   xbull,
+  hana,
 } from "@phoenix-protocol/state";
 import { AppBar, ConnectWallet } from "@phoenix-protocol/ui";
 import React, { useEffect } from "react";
@@ -63,7 +64,13 @@ const TopBar = ({
       <ConnectWallet
         open={store.walletModalOpen}
         // @ts-ignore
-        connectors={[freighter(), xbull(), lobstr(), new WalletConnect(true)]}
+        connectors={[
+          freighter(),
+          xbull(),
+          lobstr(),
+          hana(),
+          new WalletConnect(true),
+        ]}
         setOpen={() => store.setWalletModalOpen(!store.walletModalOpen)}
         connect={connect}
       />

@@ -1,11 +1,12 @@
-import {Horizon} from "@stellar/stellar-sdk";
-import {AppStore, AppStorePersist} from "@phoenix-protocol/types";
-import {freighter} from "../wallet/freighter";
-import {allChains, networkToActiveChain} from "../wallet/chains";
-import {useAppStore, usePersistStore} from "../store";
-import {xbull} from "../wallet/xbull";
-import {lobstr} from "../wallet/lobstr";
-import {WalletConnect} from "../wallet/wallet-connect";
+import { Horizon } from "@stellar/stellar-sdk";
+import { AppStore, AppStorePersist } from "@phoenix-protocol/types";
+import { freighter } from "../wallet/freighter";
+import { allChains, networkToActiveChain } from "../wallet/chains";
+import { useAppStore, usePersistStore } from "../store";
+import { xbull } from "../wallet/xbull";
+import { lobstr } from "../wallet/lobstr";
+import { WalletConnect } from "../wallet/wallet-connect";
+import { hana } from "../wallet/hana";
 
 // Maintain a single WalletConnect instance
 let walletConnectInstance: WalletConnect | null = null;
@@ -89,6 +90,9 @@ export const createConnectWalletActions = () => {
           break;
         case "lobstr":
           address = await lobstr().getPublicKey();
+          break;
+        case "hana":
+          address = await hana().getPublicKey();
           break;
         case "wallet-connect":
           const Client = await initializeWalletConnect();

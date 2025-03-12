@@ -25,6 +25,9 @@ export function xbull(): Connector {
           "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
       };
     },
+    async isAvailable(): Promise<boolean> {
+      return true;
+    },
     async getPublicKey(): Promise<string> {
       const bridge: xBullWalletConnect = new xBullWalletConnect();
       const publicKey: string = await bridge.connect();
