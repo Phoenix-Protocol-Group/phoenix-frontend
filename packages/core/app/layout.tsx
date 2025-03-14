@@ -21,6 +21,7 @@ import { motion } from "framer-motion";
 import { ToastProvider } from "@/providers/ToastProvider";
 import { RestoreModalProvider } from "@/providers/RestoreModalProvider";
 import Loader from "@/components/Loader/Loader";
+import TemporaryWarningBar from "@/components/TemporaryWarningBar";
 
 const HiddenInputChecker = () => {
   const [value, setValue] = useState("Phoenix DeFi Hub");
@@ -252,6 +253,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               </Box>
             </RestoreModalProvider>
           </ToastProvider>
+          <TemporaryWarningBar />
         </body>
       </Providers>
       <Analytics />

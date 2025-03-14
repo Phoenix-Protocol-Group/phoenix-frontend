@@ -35,7 +35,7 @@ export const MULTIHOP_ADDRESS: string =
 export const PHOENIX_HISTORY_INDEXER: string = "https://graphql.phoenix-hub.io";
 
 export const DECENTRIO_API_URL: string =
-  "https://api-phoenix-v2.decentrio.ventures";
+  "https://api-phoenix-test.decentrio.ventures";
 
 /**
  * Airdrop program
