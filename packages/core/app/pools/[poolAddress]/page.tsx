@@ -16,6 +16,7 @@ import { Token } from "@phoenix-protocol/types";
 import { Loading } from "../../../components/Modal/Modal";
 
 import {
+  API,
   constants,
   fetchTokenPrices,
   formatCurrency,
@@ -299,10 +300,11 @@ export default function Page(props: PoolPageProps) {
             }),
           ]);
         setStakeContractAddress(pairConfig.result.stake_contract.toString());
+
         // Fetch prices and calculate TVL
         const [priceA, priceB] = await Promise.all([
-          await fetchTokenPrices(_tokenA?.symbol || ""),
-          await fetchTokenPrices(_tokenB?.symbol || ""),
+          API.getPrice(_tokenA?.symbol || ""),
+          API.getPrice(_tokenB?.symbol || ""),
         ]);
 
         const tvl =
