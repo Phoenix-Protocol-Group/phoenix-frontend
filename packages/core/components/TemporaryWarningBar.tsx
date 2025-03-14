@@ -37,8 +37,7 @@ export default function TemporaryWarningBar() {
             We{"'"}re experiencing some technical difficulties with our indexer.
           </Typography>
           <Typography variant="body2">
-            Please bear with us as we work to resolve them. Numbers and
-            statistics shown may not be accurate. Thank you for your patience.
+            Please bear with us as we work to resolve them. Statistics shown may not be accurate. Swaps, Staking and other Core Functionalities are not affected. Thank you for your patience.
           </Typography>
         </Box>
       </Box>
