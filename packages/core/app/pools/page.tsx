@@ -9,6 +9,7 @@ import {
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Pools, Skeleton } from "@phoenix-protocol/ui";
 import {
+  API,
   constants,
   fetchTokenPrices,
   formatCurrency,
@@ -70,8 +71,8 @@ export default function Page() {
 
         // Fetch prices and calculate TVL
         const [priceA, priceB] = await Promise.all([
-          fetchTokenPrices(tokenA?.symbol || ""),
-          fetchTokenPrices(tokenB?.symbol || ""),
+          API.getPrice(tokenA?.symbol || ""),
+          API.getPrice(tokenB?.symbol || ""),
         ]);
 
         const tvl =
