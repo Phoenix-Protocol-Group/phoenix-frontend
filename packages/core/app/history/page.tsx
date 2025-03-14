@@ -336,7 +336,7 @@ export default function Page() {
       to,
       activeView === "personal" ? appStorePersist.wallet.address : undefined
     );
-
+    console.log(trades);
     setHistory(trades);
     setHistoryLoading(false);
   };

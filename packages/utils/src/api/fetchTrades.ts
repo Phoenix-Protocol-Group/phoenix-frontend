@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API } from "./api";
-import { fetchTokenList } from "./fetchTokenList";
+import { fetchTokenList, scaToToken } from "./fetchTokenList";
 
 export async function fetchAllTrades(
   appStore: any,
@@ -14,8 +14,6 @@ export async function fetchAllTrades(
     // Fetch tickers and token list
     const tickers = (await API.getTickers()).map((e) => e.ticker_id);
 
-    const tokenList = await fetchTokenList();
-
     // Collect all unique tokens across tickers
     const uniqueTokens = new Set<string>();
     tickers.forEach((tickerId: string) => {
@@ -28,13 +26,7 @@ export async function fetchAllTrades(
     const tokenInfoCache: Record<string, any> = {};
     await Promise.all(
       Array.from(uniqueTokens).map(async (token: any) => {
-        const tokenData = tokenList.find((tok) => tok.token == token);
-        if (tokenData) {
-          const sorobanContract = tokenData.soroban_contract;
-          tokenInfoCache[token] = await appStore.fetchTokenInfo(
-            sorobanContract
-          );
-        }
+        tokenInfoCache[token] = await scaToToken(token, appStore);
       })
     );
 
