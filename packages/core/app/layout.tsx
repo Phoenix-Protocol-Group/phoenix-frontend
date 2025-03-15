@@ -257,6 +257,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               </Box>
             </RestoreModalProvider>
           </ToastProvider>
+          <TemporaryWarningBar />
         </body>
       </Providers>
       <Analytics />
