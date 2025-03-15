@@ -65,7 +65,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   // State to handle disclaimer modal
   const [disclaimerModalOpen, setDisclaimerModalOpen] =
     useState<boolean>(false);
-  // Router
+  const [version, setVersion] = useState(0);
 
   // useEffect to set navigation state based on screen size without animation on initial load
   useEffect(() => {
@@ -74,6 +74,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [largerThanMd]);
+
+  useEffect(() => {
+    setVersion((prev) => prev + 1);
+  }, [persistStore.wallet.address]);
 
   // Disable Scrolling while loading
   useEffect(() => {
@@ -193,7 +197,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       {/* Wrap components with Providers for context availability */}
       <Providers>
-        <body suppressHydrationWarning={true}>
+        <body suppressHydrationWarning={true} key={version}>
           <ToastProvider>
             <RestoreModalProvider>
               <style>{css}</style>
