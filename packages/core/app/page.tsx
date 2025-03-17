@@ -39,6 +39,7 @@ import {
   SorobanTokenContract,
 } from "@phoenix-protocol/contracts";
 import { useContractTransaction } from "@/hooks/useContractTransaction";
+import { API as TradeAPI } from "@phoenix-protocol/utils/build/trade_api";
 
 export default function Page() {
   const theme = useTheme();
@@ -70,6 +71,8 @@ export default function Page() {
   const [vestingModalOpen, setVestingModalOpen] = useState(false);
   const [vestingInfo, setVestingInfo] = useState<any>([]);
 
+  const tradeApi = new TradeAPI(constants.TRADING_API_URL);
+
   const get24hVolume = async () => {
     // Define start and end timestamps
     const now = new Date();
@@ -79,7 +82,10 @@ export default function Page() {
     ).toFixed(0); // 24 hours ago
     const end = (now.getTime() / 1000).toFixed(0); // Current time
 
-    const volume = await API.getAllTradingVolumePerHour(start, end);
+    const volume = await tradeApi.getAllTradingVolumePerHour(
+      Number(start),
+      Number(end)
+    );
 
     let volumeTotal = 0;
 

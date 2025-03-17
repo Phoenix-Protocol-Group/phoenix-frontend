@@ -1,6 +1,8 @@
 import axios from "axios";
-import { API } from "./api";
+import { API } from "../trade_api/trade_api";
+import { API as API2 } from "../api/api";
 import { fetchTokenList, scaToToken } from "./fetchTokenList";
+import { constants } from "..";
 
 export async function fetchAllTrades(
   appStore: any,
@@ -11,8 +13,9 @@ export async function fetchAllTrades(
   personal: string | undefined = undefined
 ) {
   try {
+    const tradeApi = new API(constants.TRADING_API_URL);
     // Fetch tickers and token list
-    const tickers = (await API.getTickers()).map((e) => e.ticker_id);
+    const tickers = (await API2.getTickers()).map((e) => e.ticker_id);
 
     // Collect all unique tokens across tickers
     const uniqueTokens = new Set<string>();
@@ -26,19 +29,19 @@ export async function fetchAllTrades(
     const tokenInfoCache: Record<string, any> = {};
     await Promise.all(
       Array.from(uniqueTokens).map(async (token: any) => {
-        tokenInfoCache[token] = await scaToToken(token, appStore);
+        const _token = await scaToToken(token, appStore);
+        tokenInfoCache[_token?.id!] = _token;
       })
     );
 
     // Query all trades
-    const trades = await API.getTradeHistory(
-      undefined,
-      type,
-      limit,
-      startTime,
-      endTime,
-      personal
-    );
+    const trades = await tradeApi.getAdvancedTrades({
+      poolId: undefined,
+      address: personal,
+      limit: limit,
+      startTime: startTime ? Number(startTime) : undefined,
+      endTime: endTime ? Number(endTime) : undefined,
+    });
 
     // Current timestamp and 24 hours ago
     const now = Date.now();
@@ -49,13 +52,14 @@ export async function fetchAllTrades(
     let totalTradeCount24h = 0;
 
     const tradeList = trades.map((trade) => {
-      const [assetA, assetB] = trade.ticker_id.split("_");
+      const assetA = trade.fromToken;
+      const assetB = trade.toToken;
       assetTradeCount[assetA] = (assetTradeCount[assetA] || 0) + 1;
       assetTradeCount[assetB] = (assetTradeCount[assetB] || 0) + 1;
 
       // Check if trade is within the last 24 hours
       const tradeTimestamp =
-        new Date(Number(trade.trade_timestamp) * 1000).getTime() / 1000;
+        new Date(Number(trade.closedAt) * 1000).getTime() / 1000;
 
       if (tradeTimestamp >= oneDayAgo) {
         totalTradeCount24h += 1;
@@ -66,23 +70,21 @@ export async function fetchAllTrades(
       const assetBDetails = tokenInfoCache[assetB] || {};
 
       return {
-        type: trade.type,
-        assets: [
-          {
-            name: assetADetails.symbol || "Unknown",
-            address: assetA,
-            icon: `/cryptoIcons/${assetADetails.symbol?.toLowerCase()}.svg`,
-          },
-          {
-            name: assetBDetails.symbol || "Unknown",
-            address: assetB,
-            icon: `/cryptoIcons/${assetBDetails.symbol?.toLowerCase()}.svg`,
-          },
-        ],
-        tradeSize: trade.base_volume.toString(), // Trade size in token amount
-        tradeValue: (trade.price * trade.base_volume).toString(), // Trade value in USD
-        date: trade.trade_timestamp, // Timestamp
-        txHash: null, // Ignored for now
+        fromAsset: {
+          name: assetADetails.symbol || "Unknown",
+          address: assetA,
+          icon: `/cryptoIcons/${assetADetails.symbol?.toLowerCase()}.svg`,
+        },
+        toAsset: {
+          name: assetBDetails.symbol || "Unknown",
+          address: assetB,
+          icon: `/cryptoIcons/${assetBDetails.symbol?.toLowerCase()}.svg`,
+        },
+        fromAmount: trade.fromAmount / 10 ** 7, // Trade size in token amount
+        toAmount: trade.toAmount / 10 ** 7, // Trade size in token amount
+        tradeValue: (trade.usdcValue / 10 ** 7).toFixed(2),
+        date: trade.closedAt * 1000,
+        txHash: trade.txHash,
       };
     });
 

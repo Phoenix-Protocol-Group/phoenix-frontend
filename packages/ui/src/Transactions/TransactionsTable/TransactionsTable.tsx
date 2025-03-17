@@ -160,10 +160,10 @@ const TransactionsTable = ({
           }}
         >
           <Grid container>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <TransactionHeader
                 handleSort={handleSort}
-                label="Trade type"
+                label="Date"
                 active={
                   activeSort.column === "tradeType"
                     ? activeSort.direction
@@ -171,10 +171,10 @@ const TransactionsTable = ({
                 }
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={5}>
               <TransactionHeader
                 handleSort={handleSort}
-                label="Assets"
+                label="Swap Details"
                 active={
                   activeSort.column === "asset" ? activeSort.direction : false
                 }
@@ -183,9 +183,9 @@ const TransactionsTable = ({
             <Grid item xs={2}>
               <TransactionHeader
                 handleSort={handleSort}
-                label="Trade Size"
+                label="Trade Value (USD)"
                 active={
-                  activeSort.column === "tradeSize"
+                  activeSort.column === "tradeValue"
                     ? activeSort.direction
                     : false
                 }
@@ -194,18 +194,7 @@ const TransactionsTable = ({
             <Grid item xs={3}>
               <TransactionHeader
                 handleSort={handleSort}
-                label="Trade Value"
-                active={
-                  activeSort.column === "tradeValue"
-                    ? activeSort.direction
-                    : false
-                }
-              />
-            </Grid>
-            <Grid item xs={1}>
-              <TransactionHeader
-                handleSort={handleSort}
-                label="Date"
+                label="Transaction ID"
                 active={
                   activeSort.column === "date" ? activeSort.direction : false
                 }
@@ -222,18 +211,7 @@ const TransactionsTable = ({
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.4, delay: index * 0.1 }} // Delay each entry animation
             >
-              <TransactionEntry
-                type={entry.type}
-                assets={entry.assets}
-                tradeSize={entry.tradeSize}
-                tradeValue={entry.tradeValue}
-                date={
-                  new Date(Number(entry.date)).toLocaleDateString() +
-                  " " +
-                  new Date(Number(entry.date)).toLocaleTimeString()
-                }
-                txHash={entry.txHash}
-              />
+              <TransactionEntry {...entry} />
             </motion.div>
           ))}
           {entries.length === 0 && (

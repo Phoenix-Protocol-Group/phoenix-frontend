@@ -1,11 +1,17 @@
 import { Token } from "../general";
 
+type assetDisplay = {
+  name: string;
+  address: string;
+  icon: string;
+};
 export interface TransactionTableEntryProps {
-  type: "Buy" | "Sell";
-  assets: Token[];
-  tradeSize: string;
+  fromAsset: assetDisplay;
+  toAsset: assetDisplay;
+  fromAmount: number;
+  toAmount: number;
   tradeValue: string;
-  date: string;
+  date: number;
   txHash: string;
 }
 

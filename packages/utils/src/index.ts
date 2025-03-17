@@ -11,6 +11,7 @@ export * from "./prices";
 export * from "./errorResolver";
 export * from "./trustlines";
 export * from "./api";
+export * as TradeAPi from "./trade_api";
 import Signer from "./wallets/Signer";
 
 export { WalletConnect } from "./wallets/wallet-connect";

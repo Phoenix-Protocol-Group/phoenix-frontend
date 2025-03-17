@@ -37,6 +37,7 @@ export const PHOENIX_HISTORY_INDEXER: string = "https://graphql.phoenix-hub.io";
 export const DECENTRIO_API_URL: string =
   "https://api-phoenix-v2.decentrio.ventures";
 
+export const TRADING_API_URL: string = "https://trades.phoenix-hub.io";
 /**
  * Airdrop program
  */
