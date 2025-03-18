@@ -27,11 +27,12 @@ const TransactionEntry = (
         sx={{
           position: "absolute",
           top: "50%",
-          left: isMobile ? -20 : -40,
-          width: isMobile ? "12%" : "20%",
+
+          width: "20%",
           height: "auto",
           opacity: 0.1,
           transform: "translateY(-50%)",
+          ...(isMobile ? { right: 80 } : { left: -40 }),
         }}
       />
 
@@ -42,8 +43,8 @@ const TransactionEntry = (
         sx={{
           position: "absolute",
           top: "50%",
-          right: isMobile ? -20 : -40,
-          width: isMobile ? "12%" : "20%",
+          right: isMobile ? 0 : -40,
+          width: "20%",
           height: "auto",
           opacity: 0.1,
           transform: "translateY(-50%)",
@@ -56,7 +57,7 @@ const TransactionEntry = (
         spacing={isMobile ? 1 : 3}
         sx={{ position: "relative", zIndex: 2 }}
       >
-        <Grid item xs={12} sm={2}>
+        <Grid item xs={12} md={2}>
           {isMobile && (
             <Typography
               sx={{
@@ -81,7 +82,7 @@ const TransactionEntry = (
           </Typography>
         </Grid>
 
-        <Grid item xs={12} sm={5}>
+        <Grid item xs={12} md={5}>
           {isMobile && (
             <Typography
               sx={{

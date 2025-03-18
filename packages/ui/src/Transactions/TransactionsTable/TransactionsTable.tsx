@@ -5,6 +5,7 @@ import FilterMenu from "./FilterMenu";
 import { TransactionsTableProps } from "@phoenix-protocol/types";
 import TransactionEntry from "./TransactionEntry";
 import TransactionHeader from "./TransactionsHeader";
+import { maxWidth } from "@mui/system";
 
 const customSpacing = {
   xs: "8px",
@@ -76,7 +77,7 @@ const TransactionsTable = ({
   entries,
 }: TransactionsTableProps) => {
   const [renderedEntries, setRenderedEntries] = React.useState<number>(0);
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm")); // Check if the device is mobile
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md")); // Check if the device is mobile
 
   // Render entries one by one with a delay
   React.useEffect(() => {
@@ -101,10 +102,10 @@ const TransactionsTable = ({
       {/* @ts-ignore */}
       <Box sx={classes.root}>
         <Box
-          style={{
+          sx={{
             display: "flex",
             marginBottom: customSpacing.md,
-            minWidth: "700px",
+            minWidth: { md: "700px", xs: "100%" },
             justifyContent: "space-between",
           }}
         >
@@ -205,7 +206,7 @@ const TransactionsTable = ({
             </Grid>
           </Box>
         )}
-        <Box style={{ minWidth: "700px" }}>
+        <Box sx={{ minWidth: { md: "700px", xs: "100%" } }}>
           {entries.map((entry, index) => (
             <motion.div
               key={index}
