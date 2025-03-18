@@ -12,20 +12,22 @@ export default meta;
 // The story type for the component https://storybook.js.org/docs/react/api/csf#named-story-exports
 type Story = StoryObj<typeof TransactionsTable>;
 
-const asset = {
-  name: "USDT",
-  icon: "cryptoIcons/usdt.svg",
-  amount: 100,
-  category: "Stable",
-  usdValue: 1 * 100,
-};
-
-const assetB = {
-  name: "USDC",
-  icon: "cryptoIcons/usdc.svg",
-  amount: 200,
-  category: "Stable",
-  usdValue: 1 * 200,
+const entry = {
+  fromAsset: {
+    name: "XLM",
+    address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
+    icon: "/cryptoIcons/xlm.svg",
+  },
+  toAsset: {
+    name: "USDC",
+    address: "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
+    icon: "/cryptoIcons/usdc.svg",
+  },
+  fromAmount: 22,
+  toAmount: 5.9936094,
+  tradeValue: "5.99",
+  date: 1742238985000,
+  txHash: "241358169691193344",
 };
 
 export const Primary: Story = {
@@ -36,24 +38,7 @@ export const Primary: Story = {
       tradeSize: { from: null, to: null },
       tradeValue: { from: null, to: null },
     },
-    entries: [
-      {
-        type: "Buy",
-        assets: [assetB, asset],
-        tradeSize: "1000",
-        tradeValue: "2000",
-        date: "1.1.2024",
-        txHash: "0x1234567890",
-      },
-      {
-        type: "Sell",
-        assets: [assetB, asset],
-        tradeSize: "1000",
-        tradeValue: "2000",
-        date: "1.1.2024",
-        txHash: "0x1234567890",
-      },
-    ],
+    entries: [entry, entry, entry, entry, entry],
   },
 };
 

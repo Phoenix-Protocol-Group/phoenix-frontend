@@ -60,9 +60,9 @@ const renderCustomAxisTick = (value: number) => {
 const resolveSelectedVolume = (selectedTab: string) => {
   switch (selectedTab) {
     case "D":
-      return "Today";
+      return "last 24h";
     case "M":
-      return "This Month";
+      return "last 30days";
     case "A":
       return "All Time";
     default:
@@ -312,7 +312,7 @@ const VolumeChart = ({
             }
             onClick={() => setSelectedTab("A")}
           >
-            3M
+            A
           </Box>
         </Box>
       </Box>

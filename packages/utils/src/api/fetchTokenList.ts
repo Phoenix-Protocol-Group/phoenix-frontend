@@ -39,11 +39,15 @@ export async function scaToToken(scaAddress: string, appStore: AppStore) {
 
 export async function symbolToToken(symbol: string, appStore: AppStore) {
   const tokenList = await fetchTokenList();
+  // If symbol is a contractAddress, return token info directly. A contract address always starts with uppercase C
+  if (symbol[0] === "C" && symbol.length > 6) {
+    return appStore.fetchTokenInfo(symbol);
+  }
   const contractAddress = tokenList.find(
     (token) => token.symbol == symbol
   )?.soroban_contract;
   if (!contractAddress) {
-    throw new Error("No token with given address found!");
+    throw new Error(`No token with given address ${symbol} found!`);
   }
 
   return appStore.fetchTokenInfo(contractAddress);

@@ -11,18 +11,20 @@ import {
   TransactionsTable,
   VolumeChart,
 } from "@phoenix-protocol/ui";
-import { API, symbolToToken } from "@phoenix-protocol/utils";
+import { API, constants, TradeAPi } from "@phoenix-protocol/utils";
 import { fetchAllTrades, scaToToken } from "@phoenix-protocol/utils";
 
 import {
   PriceHistoryResponse,
   TradingVolumeResponse,
 } from "@phoenix-protocol/utils/build/api/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export default function Page() {
   const appStore = useAppStore();
   const appStorePersist = usePersistStore();
+
+  const tradeApi = new TradeAPi.API(constants.TRADING_API_URL);
 
   const [meta, setMeta] = useState({
     users24h: "0",
@@ -33,17 +35,11 @@ export default function Page() {
   const [data, setData] = useState<{ timestamp: string; volume: number }[]>([]);
   const [totalVolume, setTotalVolume] = useState(0);
   const [period, setPeriod] = useState<"W" | "M" | "Y">("W");
-  const [mostTradedAsset, setMostTradedAsset] = useState<any>({
-    name: "XLM",
-    icon: `cryptoIcons/xlm.svg`,
-  });
   const [history, setHistory] = useState<any>([]);
-  const [allTrades, setAllTrades] = useState<any[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [historicalPrices, setHistoricalPrices] =
     useState<PriceHistoryResponse>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [sortBy, setSortBy] = useState<
     | "tradeType"
@@ -61,30 +57,21 @@ export default function Page() {
   const [activeView, setActiveView] = useState<"personal" | "all">("all");
   const [pools, setPools] = useState<any[]>([]);
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>({
-    dateRange: {
-      from: undefined,
-      to: undefined,
-    },
-    tradeSize: {
-      from: undefined,
-      to: undefined,
-    },
-    tradeValue: {
-      from: undefined,
-      to: undefined,
-    },
+    dateRange: { from: undefined, to: undefined },
+    tradeSize: { from: undefined, to: undefined },
+    tradeValue: { from: undefined, to: undefined },
   });
   const [selectedPoolForVolume, setSelectedPoolForVolume] = useState<
     string | undefined
   >();
 
-  const applyFilters = (newFilters: ActiveFilters) => {
+  const applyFilters = useCallback((newFilters: ActiveFilters) => {
     setActiveFilters(newFilters);
     loadAllTrades(newFilters);
-  };
+  }, []);
 
   const loadMore = () => {
-    setPageSize(pageSize + 10);
+    setPageSize((prev) => prev + 10);
   };
 
   const handleSortChange = (
@@ -104,148 +91,131 @@ export default function Page() {
   };
 
   const loadVolumeData = async (timeEpoch: "D" | "M" | "A") => {
-    let volume: TradingVolumeResponse;
-
-    // Define start and end timestamps
+    let volume: TradeAPi.TradingVolumeResponse;
     const now = new Date();
     let start: string, end: string;
 
     switch (timeEpoch) {
-      case "D": // Hourly data for the last 24 hours
+      case "D":
         start = (
           new Date(now.getTime() - 24 * 60 * 60 * 1000).getTime() / 1000
-        ).toFixed(0); // 24 hours ago
-        end = (now.getTime() / 1000).toFixed(0); // Current time
-        if (selectedPoolForVolume) {
-          volume = await API.getTradingVolumePerHour(
-            selectedPoolForVolume,
-            start,
-            end
-          );
-        } else {
-          volume = await API.getAllTradingVolumePerHour(start, end);
-        }
+        ).toFixed(0);
+        end = (now.getTime() / 1000).toFixed(0);
+        volume = selectedPoolForVolume
+          ? await tradeApi.getTradingVolumePerHour(
+              selectedPoolForVolume,
+              Number(start),
+              Number(end)
+            )
+          : await tradeApi.getAllTradingVolumePerHour(
+              Number(start),
+              Number(end)
+            );
         break;
-
-      case "M": // Daily data for the last 30 days
+      case "M":
         start = (
           new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).getTime() / 1000
-        ).toFixed(0); // 30 days ago
-        end = now.getTime().toString(); // Current time
-        if (selectedPoolForVolume) {
-          volume = await API.getTradingVolumePerDay(
-            selectedPoolForVolume,
-            start,
-            end
-          );
-        } else {
-          volume = await API.getAllTradingVolumePerDay(start, end);
-        }
+        ).toFixed(0);
+        end = now.getTime().toString();
+        volume = selectedPoolForVolume
+          ? await tradeApi.getTradingVolumePerDay(
+              selectedPoolForVolume,
+              Number(start),
+              Number(end)
+            )
+          : await tradeApi.getAllTradingVolumePerDay(
+              Number(start),
+              Number(end)
+            );
         break;
-
-      case "A": // Monthly data for the last 12 months
-        const lastYear = new Date(now.getFullYear() - 1, now.getMonth(), 1); // First day of this month, last year
+      case "A":
+        const lastYear = new Date(now.getFullYear() - 1, now.getMonth(), 1);
         start = (lastYear.getTime() / 1000).toFixed(0);
         end = (now.getTime() / 1000).toFixed(0);
-        if (selectedPoolForVolume) {
-          volume = await API.getTradingVolumePerMonth(
-            selectedPoolForVolume,
-            start,
-            end
-          );
-        } else {
-          volume = await API.getAllTradingVolumePerMonth(start, end);
-        }
+        volume = selectedPoolForVolume
+          ? await tradeApi.getTradingVolumePerMonth(
+              selectedPoolForVolume,
+              Number(start),
+              Number(end)
+            )
+          : await tradeApi.getAllTradingVolumePerMonth(
+              Number(start),
+              Number(end)
+            );
         break;
     }
 
     let volumeTotal = 0;
-
-    // Map volume data to [[timestamp, amount]] format
-    const _data: { timestamp: string; volume: number; time: number }[] =
-      volume.tradingVolume.map((entry) => {
-        let timestamp: number;
-
-        if (entry.time) {
-          timestamp = new Date(
-            entry.time.date.year,
-            entry.time.date.month - 1,
-            entry.time.date.day,
-            entry.time.hour
-          ).getTime();
-        } else if (entry.date) {
-          timestamp = new Date(
+    const mappedData = volume.tradingVolume.map((entry) => {
+      let ts: number;
+      if (entry.time) {
+        const { year, month, day } = entry.time.date;
+        ts = new Date(year, month! - 1, day, entry.time.hour).getTime();
+      } else if (entry.date) {
+        if (entry.date.day !== undefined && entry.date.month !== undefined) {
+          ts = new Date(
             entry.date.year,
             entry.date.month - 1,
             entry.date.day
           ).getTime();
-        } else if (entry.week) {
-          // Approximate the week's start timestamp (assuming week starts on Monday)
-          const firstDayOfYear = new Date(entry.week.year, 0, 1);
-          timestamp =
+        } else if (entry.date.week !== undefined) {
+          const firstDayOfYear = new Date(entry.date.year, 0, 1);
+          ts =
             firstDayOfYear.getTime() +
-            ((entry.week.week - 1) * 7 - firstDayOfYear.getDay() + 1) *
+            ((entry.date.week - 1) * 7 - firstDayOfYear.getDay() + 1) *
               24 *
               60 *
               60 *
               1000;
-        } else if (entry.month) {
-          timestamp = new Date(
-            entry.month.year,
-            entry.month.month - 1,
-            1
-          ).getTime();
+        } else if (entry.date.month !== undefined) {
+          ts = new Date(entry.date.year, entry.date.month - 1, 1).getTime();
         } else {
-          throw new Error("Invalid time bucket in response");
+          throw new Error("Invalid date bucket in response");
         }
+      } else {
+        throw new Error("Invalid time bucket in response");
+      }
 
-        let formattedTimestamp: string = "";
-        if (timeEpoch === "D") {
-          formattedTimestamp = new Date(timestamp).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-        } else if (timeEpoch === "M") {
-          formattedTimestamp = new Date(timestamp).toLocaleDateString();
-        } else if (timeEpoch === "A") {
-          formattedTimestamp = new Date(timestamp).toLocaleDateString([], {
-            month: "short",
-            year: "numeric",
-          });
-        }
-
-        volumeTotal += entry.usdVolume;
-        return {
-          time: timestamp,
-          timestamp: formattedTimestamp,
-          volume: parseFloat(entry.usdVolume.toFixed(2)),
-        };
-      });
+      let formattedTimestamp = "";
+      if (timeEpoch === "D") {
+        formattedTimestamp = new Date(ts).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      } else if (timeEpoch === "M") {
+        formattedTimestamp = new Date(ts).toLocaleDateString();
+      } else if (timeEpoch === "A") {
+        formattedTimestamp = new Date(ts).toLocaleDateString([], {
+          month: "short",
+          year: "numeric",
+        });
+      }
+      volumeTotal += entry.usdVolume;
+      return {
+        time: ts,
+        timestamp: formattedTimestamp,
+        volume: parseFloat(entry.usdVolume.toFixed(2)),
+      };
+    });
 
     setTotalVolume(volumeTotal);
-    setData(_data.sort((a, b) => a.time - b.time));
+    setData(mappedData.sort((a, b) => a.time - b.time));
   };
 
   const loadMetaData = async () => {
-    const totalTrades = (await API.getTotalTrades()).totalTrades;
-    const _totalUsers = await API.getTotalUsers();
-    const _mostResult = (await API.getMostTraded()).asset;
-
-    const _mostTradedAsset = await symbolToToken(_mostResult, appStore);
-
+    const totalTrades = (await tradeApi.getTotalTrades()).totalTrades;
+    const _totalUsers = await tradeApi.getTotalUsers();
+    const _mostResult = (await tradeApi.getMostTraded()).asset;
+    const _mostTradedAsset = await appStore.fetchTokenInfo(_mostResult);
     const mostTradedAsset = {
       ..._mostTradedAsset,
       icon: `/cryptoIcons/${_mostTradedAsset?.symbol.toLowerCase()}.svg`,
       name: _mostTradedAsset?.symbol,
     };
-
-    const users24h = _totalUsers.usersLast24h;
-    const totalUsers = _totalUsers.totalUsers;
-
     setMeta({
       totalTrades,
-      users24h,
-      totalUsers,
+      users24h: _totalUsers.usersLast24h,
+      totalUsers: _totalUsers.totalUsers,
       mostTradedAsset: mostTradedAsset as Token,
     });
   };
@@ -284,42 +254,39 @@ export default function Page() {
     const now = new Date();
     switch (period) {
       case "W":
-        // Calculate from and to timestamps for the last week
-
         const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        graph = await API.getHistoricalPrices(
-          "PHO-GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
-          (lastWeek.getTime() / 1000).toFixed(0),
-          (now.getTime() / 1000).toFixed(0)
-        );
+        graph = (
+          await tradeApi.getTokenPrices(
+            "CBZ7M5B3Y4WWBZ5XK5UZCAFOEZ23KSSZXYECYX3IXM6E2JOLQC52DK32",
+            Number((lastWeek.getTime() / 1000).toFixed(0)),
+            Number((now.getTime() / 1000).toFixed(0))
+          )
+        ).prices;
         break;
       case "M":
-        // Calculate from and to timestamps for the last month
         const lastMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        graph = await API.getHistoricalPrices(
-          "PHO-GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
-          (lastMonth.getTime() / 1000).toFixed(0),
-          (now.getTime() / 1000).toFixed(0)
-        );
+        graph = (
+          await tradeApi.getTokenPrices(
+            "CBZ7M5B3Y4WWBZ5XK5UZCAFOEZ23KSSZXYECYX3IXM6E2JOLQC52DK32",
+            Number((lastMonth.getTime() / 1000).toFixed(0)),
+            Number((now.getTime() / 1000).toFixed(0))
+          )
+        ).prices;
         break;
       case "Y":
-        // Calculate from and to timestamps for the last year
         const lastYear = new Date(now.getFullYear() - 1, now.getMonth(), 1);
-        graph = await API.getHistoricalPrices(
-          "PHO-GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO",
-          (lastYear.getTime() / 1000).toFixed(0),
-          (now.getTime() / 1000).toFixed(0)
-        );
+        graph = (
+          await tradeApi.getTokenPrices(
+            "CBZ7M5B3Y4WWBZ5XK5UZCAFOEZ23KSSZXYECYX3IXM6E2JOLQC52DK32",
+            Number((lastYear.getTime() / 1000).toFixed(0)),
+            Number((now.getTime() / 1000).toFixed(0))
+          )
+        ).prices;
         break;
     }
     setHistoricalPrices(graph);
   };
 
-  /**
-   * Load all trades with optional filters
-   * @param newFilters Optional filters to apply
-   * @returns void
-   */
   const loadAllTrades = async (newFilters: ActiveFilters = activeFilters) => {
     let from, to;
     if (newFilters.dateRange.from) {
@@ -336,14 +303,13 @@ export default function Page() {
       to,
       activeView === "personal" ? appStorePersist.wallet.address : undefined
     );
-    console.log(trades);
     setHistory(trades);
+    console.log(trades[0]);
     setHistoryLoading(false);
   };
 
   useEffect(() => {
     loadAllTrades();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize, activeView]);
 
   useEffect(() => {
@@ -355,10 +321,7 @@ export default function Page() {
   }, [period]);
 
   useEffect(() => {
-    loadVolumeData("D");
     loadMetaData();
-    loadPriceData("W");
-    loadAllTrades();
     loadPools();
   }, []);
 
@@ -371,9 +334,7 @@ export default function Page() {
         mt: { xs: "4.5rem", md: 0 },
       }}
     >
-      {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
       <input type="hidden" value="Phoenix DeFi Hub - Transaction History" />
-
       <Typography
         sx={{
           color: "#FFF",
@@ -415,16 +376,12 @@ export default function Page() {
         totalTrades={meta.totalTrades}
         mostTradedAsset={meta.mostTradedAsset}
       />
-
       {!historyLoading ? (
         <TransactionsTable
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           entries={history}
-          activeSort={{
-            column: sortBy,
-            direction: sortOrder,
-          }}
+          activeSort={{ column: sortBy, direction: sortOrder }}
           activeView={activeView}
           setActiveView={(view) => {
             setHistory([]);
@@ -443,7 +400,6 @@ export default function Page() {
       ) : (
         <Skeleton.TransactionsTable />
       )}
-
       <Box sx={{ display: "flex", justifyContent: "end", mt: 3 }}>
         <Button type="secondary" label="Load more" onClick={loadMore} />
       </Box>

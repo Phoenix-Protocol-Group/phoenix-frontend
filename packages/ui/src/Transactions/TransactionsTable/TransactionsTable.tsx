@@ -1,10 +1,11 @@
 import React from "react";
-import { Box, Grid, Tooltip, Typography } from "@mui/material";
+import { Box, Grid, Tooltip, Typography, useMediaQuery } from "@mui/material"; // Import useMediaQuery
 import { motion } from "framer-motion"; // Import Framer Motion
 import FilterMenu from "./FilterMenu";
 import { TransactionsTableProps } from "@phoenix-protocol/types";
 import TransactionEntry from "./TransactionEntry";
 import TransactionHeader from "./TransactionsHeader";
+import { maxWidth } from "@mui/system";
 
 const customSpacing = {
   xs: "8px",
@@ -76,6 +77,7 @@ const TransactionsTable = ({
   entries,
 }: TransactionsTableProps) => {
   const [renderedEntries, setRenderedEntries] = React.useState<number>(0);
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md")); // Check if the device is mobile
 
   // Render entries one by one with a delay
   React.useEffect(() => {
@@ -100,10 +102,10 @@ const TransactionsTable = ({
       {/* @ts-ignore */}
       <Box sx={classes.root}>
         <Box
-          style={{
+          sx={{
             display: "flex",
             marginBottom: customSpacing.md,
-            minWidth: "700px",
+            minWidth: { md: "700px", xs: "100%" },
             justifyContent: "space-between",
           }}
         >
@@ -150,70 +152,61 @@ const TransactionsTable = ({
             applyFilters={applyFilters}
           />
         </Box>
-        <Box
-          style={{
-            padding: `${customSpacing.md} ${customSpacing.md}`,
-            borderRadius: "8px",
-            background:
-              "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-            boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          <Grid container>
-            <Grid item xs={3}>
-              <TransactionHeader
-                handleSort={handleSort}
-                label="Trade type"
-                active={
-                  activeSort.column === "tradeType"
-                    ? activeSort.direction
-                    : false
-                }
-              />
+        {!isMobile && ( // Hide header on mobile
+          <Box
+            style={{
+              padding: `${customSpacing.md} ${customSpacing.md}`,
+              borderRadius: "8px",
+              background:
+                "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+              boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+            }}
+          >
+            <Grid container>
+              <Grid item xs={2}>
+                <TransactionHeader
+                  handleSort={handleSort}
+                  label="Date"
+                  active={
+                    activeSort.column === "tradeType"
+                      ? activeSort.direction
+                      : false
+                  }
+                />
+              </Grid>
+              <Grid item xs={5}>
+                <TransactionHeader
+                  handleSort={handleSort}
+                  label="Swap Details"
+                  active={
+                    activeSort.column === "asset" ? activeSort.direction : false
+                  }
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <TransactionHeader
+                  handleSort={handleSort}
+                  label="Trade Value (USD)"
+                  active={
+                    activeSort.column === "tradeValue"
+                      ? activeSort.direction
+                      : false
+                  }
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <TransactionHeader
+                  handleSort={handleSort}
+                  label="Transaction ID"
+                  active={
+                    activeSort.column === "date" ? activeSort.direction : false
+                  }
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={3}>
-              <TransactionHeader
-                handleSort={handleSort}
-                label="Assets"
-                active={
-                  activeSort.column === "asset" ? activeSort.direction : false
-                }
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <TransactionHeader
-                handleSort={handleSort}
-                label="Trade Size"
-                active={
-                  activeSort.column === "tradeSize"
-                    ? activeSort.direction
-                    : false
-                }
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <TransactionHeader
-                handleSort={handleSort}
-                label="Trade Value"
-                active={
-                  activeSort.column === "tradeValue"
-                    ? activeSort.direction
-                    : false
-                }
-              />
-            </Grid>
-            <Grid item xs={1}>
-              <TransactionHeader
-                handleSort={handleSort}
-                label="Date"
-                active={
-                  activeSort.column === "date" ? activeSort.direction : false
-                }
-              />
-            </Grid>
-          </Grid>
-        </Box>
-        <Box style={{ minWidth: "700px" }}>
+          </Box>
+        )}
+        <Box sx={{ minWidth: { md: "700px", xs: "100%" } }}>
           {entries.map((entry, index) => (
             <motion.div
               key={index}
@@ -222,18 +215,7 @@ const TransactionsTable = ({
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.4, delay: index * 0.1 }} // Delay each entry animation
             >
-              <TransactionEntry
-                type={entry.type}
-                assets={entry.assets}
-                tradeSize={entry.tradeSize}
-                tradeValue={entry.tradeValue}
-                date={
-                  new Date(Number(entry.date)).toLocaleDateString() +
-                  " " +
-                  new Date(Number(entry.date)).toLocaleTimeString()
-                }
-                txHash={entry.txHash}
-              />
+              <TransactionEntry {...entry} isMobile={isMobile} />
             </motion.div>
           ))}
           {entries.length === 0 && (

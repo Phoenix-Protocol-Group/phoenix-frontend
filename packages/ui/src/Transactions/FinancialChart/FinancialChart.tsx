@@ -139,7 +139,7 @@ const GlowingChart = ({
           }
           onClick={() => setSelected("Y")}
         >
-          3M
+          A
         </Box>
       </Box>
     </Box>
