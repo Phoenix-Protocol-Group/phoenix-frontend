@@ -35,37 +35,39 @@ const GainerAndLooser = ({
       <Box
         sx={{
           display: "flex",
-          padding: "24px",
           flexDirection: "column",
           alignItems: "flex-start",
-          gap: "12px",
-          position: "relative",
-          borderRadius: "12px",
+          gap: "16px",
+          padding: "20px",
+          borderRadius: "16px",
           border: "1px solid var(--Secondary-S4, #2C2C31)",
           background:
-            "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+            "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.05) 100%))",
+          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
           overflow: "hidden",
+          position: "relative",
+          transition: "transform 0.3s ease, box-shadow 0.3s ease",
         }}
       >
         {loading ? (
           <>
             <Skeleton
               variant="text"
-              width={80}
-              height={24}
+              width={100}
+              height={28}
               sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
             />
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <Skeleton
                 variant="circular"
-                width={32}
-                height={32}
+                width={40}
+                height={40}
                 sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
               />
               <Skeleton
                 variant="text"
-                width={100}
-                height={24}
+                width={120}
+                height={28}
                 sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
               />
             </Box>
@@ -75,19 +77,19 @@ const GainerAndLooser = ({
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "100%",
-                gap: 1,
+                gap: 2,
               }}
             >
               <Skeleton
                 variant="text"
-                width={60}
-                height={36}
+                width={80}
+                height={40}
                 sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
               />
               <Skeleton
                 variant="text"
-                width={60}
-                height={24}
+                width={80}
+                height={28}
                 sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
               />
             </Box>
@@ -97,10 +99,10 @@ const GainerAndLooser = ({
             <Box
               sx={{
                 position: "absolute",
-                top: "-10%",
-                right: "-10%",
-                width: "120px",
-                height: "120px",
+                top: "-15%",
+                right: "-15%",
+                width: "140px",
+                height: "140px",
                 opacity: 0.1,
                 background: `url(${asset?.icon}) center / contain no-repeat`,
                 filter: "grayscale(100%)",
@@ -110,32 +112,30 @@ const GainerAndLooser = ({
               sx={{
                 color: "var(--Secondary-S2-2, #BDBEBE)",
                 fontFamily: "Ubuntu",
-                fontSize: "12px",
+                fontSize: "14px",
                 fontWeight: 700,
-                lineHeight: "140%",
+                textTransform: "uppercase",
               }}
             >
-              {title.toUpperCase()}
+              {title}
             </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <Box
                 sx={{
                   display: "flex",
-                  width: "32px",
-                  height: "32px",
-                  padding: "6px",
+                  width: "40px",
+                  height: "40px",
                   justifyContent: "center",
                   alignItems: "center",
-                  borderRadius: "32px",
+                  borderRadius: "50%",
                   background:
-                    "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+                    "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.05) 100%))",
                 }}
               >
                 <Box
                   sx={{
-                    width: "20px",
-                    height: "20px",
-                    flexShrink: 0,
+                    width: "24px",
+                    height: "24px",
                     borderRadius: "4px",
                     background: `url(${asset?.icon}) transparent 50% / cover no-repeat`,
                   }}
@@ -145,7 +145,7 @@ const GainerAndLooser = ({
                 sx={{
                   color: "var(--Secondary-S2, #FFF)",
                   fontFamily: "Ubuntu",
-                  fontSize: "14px",
+                  fontSize: "16px",
                   fontWeight: 700,
                 }}
               >
@@ -155,9 +155,8 @@ const GainerAndLooser = ({
                 sx={{
                   color: "var(--Secondary-S2-2, #BDBEBE)",
                   fontFamily: "Ubuntu",
-                  fontSize: "12px",
-                  fontWeight: 300,
-                  lineHeight: "140%",
+                  fontSize: "14px",
+                  fontWeight: 400,
                 }}
               >
                 {asset?.symbol}
@@ -169,14 +168,14 @@ const GainerAndLooser = ({
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "100%",
-                gap: 1,
+                gap: 2,
               }}
             >
               <Typography
                 sx={{
                   color: "var(--Secondary-S2, #FFF)",
                   fontFamily: "Ubuntu",
-                  fontSize: "24px",
+                  fontSize: "28px",
                   fontWeight: 700,
                 }}
               >
@@ -194,8 +193,8 @@ const GainerAndLooser = ({
                 <Box
                   component="span"
                   sx={{
-                    width: "16px",
-                    height: "16px",
+                    width: "20px",
+                    height: "20px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -210,7 +209,7 @@ const GainerAndLooser = ({
                 <Typography
                   sx={{
                     fontFamily: "Ubuntu",
-                    fontSize: "16px",
+                    fontSize: "18px",
                     fontWeight: 700,
                   }}
                 >
