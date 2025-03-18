@@ -4,7 +4,10 @@ import { ArrowForward, ArrowBack } from "@mui/icons-material";
 import { TransactionTableEntryProps } from "@phoenix-protocol/types";
 import LaunchIcon from "@mui/icons-material/Launch";
 
-const TransactionEntry = (props: TransactionTableEntryProps) => {
+const TransactionEntry = (
+  props: TransactionTableEntryProps & { isMobile: boolean }
+) => {
+  const { isMobile } = props; // Destructure isMobile
   const BoxStyle = {
     p: 3,
     borderRadius: "8px",
@@ -14,8 +17,6 @@ const TransactionEntry = (props: TransactionTableEntryProps) => {
     overflow: "hidden",
     boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
   };
-
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
   return (
     <Box sx={{ ...BoxStyle, mt: 2 }}>
@@ -55,29 +56,44 @@ const TransactionEntry = (props: TransactionTableEntryProps) => {
         spacing={isMobile ? 1 : 3}
         sx={{ position: "relative", zIndex: 2 }}
       >
-        <Grid item xs={isMobile ? 5 : 2}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "8px",
-            }}
-          >
+        <Grid item xs={12} sm={2}>
+          {isMobile && (
             <Typography
               sx={{
-                color: "#FFF",
-                fontSize: isMobile ? "14px" : "16px",
-                fontWeight: "400",
+                fontSize: "12px",
+                fontWeight: "700",
+                textTransform: "uppercase",
                 opacity: 0.6,
               }}
             >
-              {new Date(props.date).toLocaleString()}
+              Date
             </Typography>
-          </Box>
+          )}
+          <Typography
+            sx={{
+              color: "#FFF",
+              fontSize: isMobile ? "14px" : "16px",
+              fontWeight: "400",
+              opacity: 0.6,
+            }}
+          >
+            {new Date(props.date).toLocaleString()}
+          </Typography>
         </Grid>
 
-        <Grid item xs={isMobile ? 2 : 5}>
+        <Grid item xs={12} sm={5}>
+          {isMobile && (
+            <Typography
+              sx={{
+                fontSize: "12px",
+                fontWeight: "700",
+                textTransform: "uppercase",
+                opacity: 0.6,
+              }}
+            >
+              Swap Details
+            </Typography>
+          )}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Box
               sx={{
@@ -153,7 +169,19 @@ const TransactionEntry = (props: TransactionTableEntryProps) => {
             </Box>
           </Box>
         </Grid>
-        <Grid item xs={isMobile ? 2 : 2}>
+        <Grid item xs={12} sm={2}>
+          {isMobile && (
+            <Typography
+              sx={{
+                fontSize: "12px",
+                fontWeight: "700",
+                textTransform: "uppercase",
+                opacity: 0.6,
+              }}
+            >
+              Trade Value (USD)
+            </Typography>
+          )}
           <Typography
             sx={{
               fontSize: isMobile ? "12px" : "14px",
@@ -163,7 +191,19 @@ const TransactionEntry = (props: TransactionTableEntryProps) => {
             ${props.tradeValue}
           </Typography>
         </Grid>
-        <Grid item xs={isMobile ? 2 : 3}>
+        <Grid item xs={12} sm={3}>
+          {isMobile && (
+            <Typography
+              sx={{
+                fontSize: "12px",
+                fontWeight: "700",
+                textTransform: "uppercase",
+                opacity: 0.6,
+              }}
+            >
+              Transaction ID
+            </Typography>
+          )}
           <Typography
             onClick={() =>
               window.open(
