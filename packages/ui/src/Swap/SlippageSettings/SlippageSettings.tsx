@@ -55,17 +55,21 @@ const SlippageSettings = ({
             maxHeight: "32px",
             margin: "8px 16px 0 0",
             borderRadius: "8px",
-            background:
-              "linear-gradient(180deg, #292B2C 0%, #222426 100%),linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
+            color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+            background: "var(--neutral-900, #171717)", // Adjusted background
+            border: "1px solid var(--neutral-700, #404040)", // Adjusted border
+            "&:hover": {
+              background: "var(--neutral-800, #262626)", // Adjusted background on hover
+            },
           }}
         >
           <KeyboardArrowLeft />
         </IconButton>
         <Typography
           sx={{
-            color: "white",
-            fontSize: "32px",
-            fontWeight: "700",
+            color: "var(--neutral-50, #FAFAFA)", // Adjusted color
+            fontSize: "24px", // Adjusted font size
+            fontWeight: "500", // Adjusted font weight
           }}
         >
           Settings
@@ -73,9 +77,9 @@ const SlippageSettings = ({
       </Box>
       <Box
         sx={{
-          borderRadius: "16px",
-          background:
-            "linear-gradient(180deg, #292B2C 0%, #222426 100%), linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          borderRadius: "12px", // Reduced border radius
+          background: "var(--neutral-900, #171717)", // Adjusted background
+          border: "1px solid var(--neutral-700, #404040)", // Adjusted border
           padding: "16px",
           marginBottom: "16px",
           marginTop: "16px",
@@ -84,11 +88,10 @@ const SlippageSettings = ({
         <FormControl>
           <Typography
             sx={{
-              fontSize: "13px",
-              fontWeight: "400",
+              fontSize: "12px", // Adjusted font size
+              fontWeight: 500, // Adjusted font weight
               lineHeight: "18px",
-              color:
-                "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
+              color: "var(--neutral-400, #A3A3A3)", // Adjusted color
             }}
           >
             Select Spread tolerance
@@ -105,8 +108,12 @@ const SlippageSettings = ({
                   <Radio
                     color="primary"
                     sx={{
+                      color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                       "& .MuiSvgIcon-root": {
                         fontSize: 20,
+                      },
+                      "&.Mui-checked": {
+                        color: "#F97316", // Adjusted color
                       },
                     }}
                   />
@@ -114,7 +121,7 @@ const SlippageSettings = ({
                 label={
                   <Typography
                     sx={{
-                      color: "#FFF",
+                      color: "var(--neutral-50, #FAFAFA)", // Adjusted color
                       fontSize: "14px",
                       lineHeight: "140%",
                     }}
@@ -130,8 +137,12 @@ const SlippageSettings = ({
                 <Radio
                   color="primary"
                   sx={{
+                    color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                     "& .MuiSvgIcon-root": {
                       fontSize: 20,
+                    },
+                    "&.Mui-checked": {
+                      color: "#F97316", // Adjusted color
                     },
                   }}
                 />
@@ -145,9 +156,9 @@ const SlippageSettings = ({
                   inputProps={{ min: 0, max: 30 }}
                   InputLabelProps={{
                     sx: {
-                      color: "white!important",
+                      color: "var(--neutral-400, #A3A3A3) !important", // Adjusted color
                       fontSize: "14px",
-                      opacity: 0.6,
+                      opacity: 1,
                       textAlign: "center",
                     },
                   }}
@@ -157,16 +168,21 @@ const SlippageSettings = ({
                     ),
                     sx: {
                       minWidth: "140px",
-                      color: "white",
+                      color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                       fontSize: "14px",
                       lineHeight: "16px",
-                      borderRadius: "16px",
-                      "&:hover fieldset": {
-                        border: "1px solid #E2621B!important",
-                      },
-                      "&:focus-within fieldset, &:focus-visible fieldset": {
-                        border: "2px solid #E2621B!important",
-                        color: "white!important",
+                      borderRadius: "12px", // Reduced border radius
+                      background: "var(--neutral-900, #171717)", // Adjusted background
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "var(--neutral-700, #404040)", // Adjusted border
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#F97316 !important", // Adjusted border
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#F97316 !important", // Adjusted border
+                        },
                       },
                     },
                   }}

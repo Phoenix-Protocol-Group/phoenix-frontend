@@ -110,7 +110,7 @@ const SidebarNavigation = ({
       <MuiDrawer
         PaperProps={{
           sx: {
-            background: "#121212",
+            background: "var(--neutral-900, #171717)", // Adjusted background
             boxShadow: "-1px 0px 0px 0px rgba(228, 228, 228, 0.10) inset",
             maxWidth: "100vw",
           },

@@ -13,16 +13,16 @@ const listItemContainer = {
 };
 
 const listItemNameStyle = {
-  color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
+  color: "var(--neutral-400, #A3A3A3)", // Adjusted color
   fontSize: "14px",
   lineHeight: "140%",
   marginBottom: 0,
 };
 
 const listItemContentStyle = {
-  color: "#FFF",
+  color: "var(--neutral-50, #FAFAFA)", // Adjusted color
   fontSize: "14px",
-  fontWeight: "700",
+  fontWeight: "500", // Adjusted font weight
   lineHeight: "140%",
 };
 
@@ -48,7 +48,7 @@ const SwapAssetsButton = ({ onClick }: { onClick: () => void }) => {
         top: "25%",
         position: "absolute",
         background:
-          "linear-gradient(137deg, #E2491A 0%, #E21B1B 17.08%, #E2491A 42.71%, #E2AA1B 100%), #E2491A",
+          "linear-gradient(137deg, #F97316 0%, #F97316 17.08%, #F97316 42.71%, #F97316 100%), #F97316", // Adjusted color
         transform: "translate(-50%, -50%)",
         left: "50%",
         boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.25)",
@@ -114,12 +114,16 @@ const SwapContainer = ({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            background: "var(--neutral-900, #171717)", // Added background
+            borderRadius: "12px", // Added border radius
+            padding: "16px", // Added padding
           }}
         >
           <Typography
             sx={{
-              fontSize: "32px",
-              fontWeight: "700",
+              fontSize: "24px", // Adjusted font size
+              fontWeight: 500, // Adjusted font weight
+              color: "var(--neutral-50, #FAFAFA)", // Adjusted color
             }}
           >
             Swap tokens instantly
@@ -129,8 +133,13 @@ const SwapContainer = ({
             className="slippage-button"
             sx={{
               borderRadius: "50%",
-              background: "linear-gradient(180deg, #292B2C 0%, #222426 100%)",
+              background: "var(--neutral-900, #171717)",
+              border: "1px solid var(--neutral-700, #404040)",
               padding: "10px",
+              color: "var(--neutral-300, #D4D4D4)",
+              "&:hover": {
+                background: "var(--neutral-800, #262626)",
+              },
             }}
           >
             <img src="/GearSix.svg" alt="Options" />
@@ -222,18 +231,18 @@ const SwapContainer = ({
             sx={{
               flex: 1,
               width: "100%",
-              padding: "24px",
+              padding: "16px",
               borderRadius: "12px",
-              border: "1px solid var(--Secondary-S4, #2C2C31)",
-              background:
-                "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+              border: "1px solid var(--neutral-700, #404040)", // Added border
+              background: "var(--neutral-900, #171717)",
             }}
           >
             <Typography
               sx={{
-                fontWeight: "700",
-                fontSize: "20px",
-                marginBottom: "16px",
+                fontWeight: "500",
+                fontSize: "18px",
+                color: "var(--neutral-50, #FAFAFA)",
+                marginBottom: "12px",
               }}
             >
               Swap Details

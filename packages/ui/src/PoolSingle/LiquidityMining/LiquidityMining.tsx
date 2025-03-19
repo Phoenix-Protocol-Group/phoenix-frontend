@@ -38,16 +38,15 @@ const OptionButton = ({
       sx={{
         width: "100%",
         marginTop: "1rem",
-        background:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        color: "#FFF",
-        borderRadius: "16px",
+        background: "var(--neutral-900, #171717)", // Adjusted background
+        color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+        borderRadius: "12px", // Reduced border radius
         fontSize: "0.875rem",
-        fontWeight: 700,
+        fontWeight: 500, // Adjusted font weight
         textTransform: "none",
+        border: "1px solid var(--neutral-700, #404040)", // Adjusted border
         "&:hover": {
-          background:
-            "linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.06) 100%)",
+          background: "var(--neutral-800, #262626)", // Adjusted background on hover
         },
       }}
       component={motion.div}
@@ -111,20 +110,31 @@ const StakeInput = ({
         placeholder="0.00"
         fullWidth
         sx={{
-          color: "white",
+          color: "var(--neutral-300, #D4D4D4)", // Adjusted color
           marginTop: "1rem",
           "&::placeholder": {
-            color: "white",
-            opacity: 0.6,
+            color: "var(--neutral-400, #A3A3A3)", // Adjusted color
+            opacity: 1,
             fontSize: "0.8125rem!important",
+          },
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: "var(--neutral-700, #404040)", // Adjusted border
+            },
+            "&:hover fieldset": {
+              borderColor: "var(--primary-500, #F97316)", // Adjusted border
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "var(--primary-500, #F97316)", // Adjusted border
+            },
           },
         }}
         onChange={(e) => setAmount(e.target.value)}
         InputLabelProps={{
           sx: {
-            color: "white!important",
+            color: "var(--neutral-400, #A3A3A3) !important", // Adjusted color
             fontSize: "0.8125rem",
-            opacity: 0.6,
+            opacity: 1,
             textAlign: "center",
           },
         }}
@@ -141,24 +151,23 @@ const StakeInput = ({
               }}
             >
               <Typography
-                sx={{ fontSize: "1rem", color: "#FFF", fontWeight: 700 }}
+                sx={{
+                  fontSize: "1rem",
+                  color: "var(--neutral-50, #FAFAFA)",
+                  fontWeight: 500,
+                }} // Adjusted color and weight
               >
                 {tokenName}
               </Typography>
             </Box>
           ),
           sx: {
-            color: "white",
-            borderRadius: "16px",
-            "&:hover fieldset": {
-              border: "1px solid #E2621B!important",
-            },
-            "&:focus-within fieldset, &:focus-visible fieldset": {
-              border: "1px solid #E2621B!important",
-              color: "white!important",
-            },
+            color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+            borderRadius: "12px", // Reduced border radius
+            background: "var(--neutral-900, #171717)", // Adjusted background
             "& input[type=number]": {
               MozAppearance: "textfield",
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
             },
             "& input[type=number]::-webkit-outer-spin-button": {
               WebkitAppearance: "none",
@@ -194,7 +203,16 @@ const StakeInput = ({
           >
             Stake
           </Button>
-          <Typography sx={{ fontSize: "0.875rem", opacity: 0.7, mt: 1 }}>
+          <Typography
+            sx={{
+              fontSize: "0.875rem",
+              opacity: 0.7,
+              mt: 1,
+              color: "var(--neutral-400, #A3A3A3)",
+            }}
+          >
+            {" "}
+            {/* Adjusted color */}
             Available {balance.toFixed(2)}
           </Typography>
         </Grid>
@@ -224,10 +242,9 @@ const ClaimRewards = ({
   return (
     <Box
       sx={{
-        borderRadius: "0.5rem",
-        background:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        backdropFilter: "blur(42px)",
+        borderRadius: "0.75rem", // Adjusted border radius
+        background: "var(--neutral-900, #171717)", // Adjusted background
+        border: "1px solid var(--neutral-700, #404040)", // Adjusted border
         position: "relative",
         padding: "1rem",
         height: !largerThenMd ? "calc(100% + 44px)" : "100%",
@@ -238,7 +255,15 @@ const ClaimRewards = ({
       transition={{ duration: 0.5 }}
     >
       <Box>
-        <Typography sx={{ opacity: 0.7, fontSize: "0.875rem" }}>
+        <Typography
+          sx={{
+            opacity: 0.7,
+            fontSize: "0.875rem",
+            color: "var(--neutral-400, #A3A3A3)",
+          }}
+        >
+          {" "}
+          {/* Adjusted color */}
           Total rewards
         </Typography>
         {rewards.length > 0 ? (
@@ -250,16 +275,32 @@ const ClaimRewards = ({
               <Box
                 component="img"
                 src={reward.icon}
-                sx={{ width: "1.125rem", height: "1.125rem" }}
+                sx={{ width: "1.125rem", height: "1.125rem", opacity: 0.8 }} // Adjusted opacity
               />
-              <Typography sx={{ fontSize: "1.125rem", fontWeight: 700 }}>
+              <Typography
+                sx={{
+                  fontSize: "1.125rem",
+                  fontWeight: 500,
+                  color: "var(--neutral-50, #FAFAFA)",
+                }}
+              >
+                {" "}
+                {/* Adjusted color and weight */}
                 {reward.amount} {reward.name}
               </Typography>
             </Box>
           ))
         ) : (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
-            <Typography sx={{ fontSize: "1.125rem", fontWeight: 700 }}>
+            <Typography
+              sx={{
+                fontSize: "1.125rem",
+                fontWeight: 500,
+                color: "var(--neutral-300, #D4D4D4)",
+              }}
+            >
+              {" "}
+              {/* Adjusted color and weight */}
               No rewards
             </Typography>
           </Box>
@@ -274,7 +315,12 @@ const ClaimRewards = ({
           position: "absolute",
           bottom: "1rem",
           width: "calc(100% - 2rem)",
-          background: rewards.length > 0 ? "#E2621B" : "#6F6F6F",
+          background:
+            rewards.length > 0 ? "#F97316" : "var(--neutral-700, #404040)", // Adjusted color
+          "&:hover": {
+            background:
+              rewards.length > 0 ? "#F97316" : "var(--neutral-700, #404040)", // Adjusted color
+          },
         }}
         onClick={onClaim}
         disabled={rewards.length === 0}
@@ -315,11 +361,21 @@ const LiquidityMining = ({
             fontSize: "1.125rem",
             fontWeight: 700,
             marginBottom: 0,
+            color: "var(--neutral-50, #FAFAFA)", // Adjusted color
           }}
         >
           Liquidity Mining
         </Typography>
-        <Typography sx={{ mt: "0.75rem", opacity: 0.7, fontSize: "0.875rem" }}>
+        <Typography
+          sx={{
+            mt: "0.75rem",
+            opacity: 0.7,
+            fontSize: "0.875rem",
+            color: "var(--neutral-400, #A3A3A3)",
+          }}
+        >
+          {" "}
+          {/* Adjusted color */}
           Bond liquidity to earn liquidity reward and swap fees
         </Typography>
       </Grid>

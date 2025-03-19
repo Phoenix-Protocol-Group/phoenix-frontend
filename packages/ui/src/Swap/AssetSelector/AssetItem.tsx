@@ -28,17 +28,16 @@ const AssetItem = ({
         width: "100%",
         padding: "8px 12px",
         borderRadius: "8px",
-        background:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        color: "white",
+        background: "var(--neutral-900, #171717)", // Adjusted background
+        border: "1px solid var(--neutral-700, #404040)", // Adjusted border
+        color: "var(--neutral-300, #D4D4D4)", // Adjusted color
         textTransform: "none",
         fontSize: "14px",
-        fontWeight: 500,
+        fontWeight: 500, // Adjusted font weight
         lineHeight: "1.5",
         mb: 1,
         "&:hover": {
-          background:
-            "linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)",
+          background: "var(--neutral-800, #262626)", // Adjusted background on hover
         },
       }}
     >
@@ -50,6 +49,7 @@ const AssetItem = ({
           width: "24px",
           height: "24px",
           marginRight: "12px",
+          opacity: 0.7, // Adjusted opacity
         }}
       />
       {token.name}

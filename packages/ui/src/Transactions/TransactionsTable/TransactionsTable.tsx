@@ -17,10 +17,10 @@ const classes = {
   root: {
     marginTop: customSpacing.md,
     padding: `${customSpacing.md} ${customSpacing.md}`,
-    borderRadius: "8px",
-    background:
-      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+    borderRadius: "12px", // Adjusted border radius
+    background: "var(--neutral-900, #171717)", // Adjusted background
     overflowX: "auto",
+    border: "1px solid var(--neutral-700, #404040)", // Adjusted border
   },
   tabUnselected: {
     display: "flex",
@@ -32,9 +32,8 @@ const classes = {
     gap: "0.625rem",
     borderRadius: "1rem",
     cursor: "pointer",
-    background:
-      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-    color: "#FFF",
+    color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+    background: "var(--neutral-900, #171717)", // Adjusted background
     opacity: 0.6,
     textAlign: "center",
     fontFeatureSettings: "'clig' off, 'liga' off",
@@ -43,6 +42,7 @@ const classes = {
     fontStyle: "normal",
     fontWeight: 700,
     lineHeight: "1.25rem", // 200%
+    border: "1px solid var(--neutral-700, #404040)", // Adjusted border
   },
   tabSelected: {
     display: "flex",
@@ -53,9 +53,9 @@ const classes = {
     gap: "0.625rem",
     flex: "1 0 0",
     borderRadius: "1rem",
-    border: "1px solid var(--Primary-P3, #E2571C)",
-    background: "rgba(226, 73, 26, 0.10)",
-    color: "#FFF",
+    border: "1px solid #F97316", // Adjusted color
+    background: "rgba(249, 115, 22, 0.10)", // Adjusted background
+    color: "var(--neutral-50, #FAFAFA)", // Adjusted color
     textAlign: "center",
     fontFeatureSettings: "'clig' off, 'liga' off",
     fontFamily: "Ubuntu",
@@ -157,8 +157,8 @@ const TransactionsTable = ({
             style={{
               padding: `${customSpacing.md} ${customSpacing.md}`,
               borderRadius: "8px",
-              background:
-                "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+              background: "var(--neutral-900, #171717)", // Adjusted background
+              border: "1px solid var(--neutral-700, #404040)", // Adjusted border
               boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
             }}
           >
@@ -222,7 +222,7 @@ const TransactionsTable = ({
             <Box>
               <Typography
                 style={{
-                  color: "#FFF",
+                  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                   fontSize: "14px",
                   display: "flex",
                   alignItems: "center",

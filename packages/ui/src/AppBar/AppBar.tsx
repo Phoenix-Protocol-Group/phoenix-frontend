@@ -27,13 +27,18 @@ const BalanceChip = ({ balance }: { balance: number }) => (
         sx={{
           fontSize: "0.8125rem",
           lineHeight: "1.125rem",
-          opacity: 0.6,
+          opacity: 1,
+          color: "var(--neutral-300, #D4D4D4)",
         }}
       >
         {balance} XLM
       </Typography>
     }
-    sx={{ padding: "0.75rem!important" }}
+    sx={{
+      padding: "0.75rem!important",
+      background: "var(--neutral-800, #262626)",
+      borderColor: "var(--neutral-700, #404040)",
+    }}
     variant="outlined"
   />
 );
@@ -64,6 +69,7 @@ const OptionMenu = ({
         aria-expanded={open ? "true" : undefined}
         aria-haspopup="true"
         onClick={handleClick}
+        sx={{ color: "var(--neutral-300, #D4D4D4)" }}
       >
         <MoreVertIcon />
       </IconButton>
@@ -80,7 +86,8 @@ const OptionMenu = ({
             maxHeight: 48 * 4.5,
             width: "20ch",
             borderRadius: "16px",
-            background: "#1D1F21",
+            background: "var(--neutral-800, #262626)",
+            color: "var(--neutral-300, #D4D4D4)",
           },
         }}
       >
@@ -91,19 +98,35 @@ const OptionMenu = ({
             handleClose();
           }}
         >
-          <Typography sx={{ fontSize: "0.8125rem", opacity: 0.6 }}>
+          <Typography
+            sx={{
+              fontSize: "0.8125rem",
+              opacity: 1,
+              color: "var(--neutral-300, #D4D4D4)",
+            }}
+          >
             Wallet Address
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-            <ContentCopyIcon fontSize="small" />
-            <Typography sx={{ fontSize: "0.8125rem", opacity: 0.6 }}>
+            <ContentCopyIcon
+              fontSize="small"
+              sx={{ color: "var(--neutral-400, #A3A3A3)" }}
+            />
+            <Typography
+              sx={{
+                fontSize: "0.8125rem",
+                opacity: 1,
+                color: "var(--neutral-300, #D4D4D4)",
+              }}
+            >
               {walletAddress.slice(0, 15)}
               ...
             </Typography>
           </Box>
         </MenuItem>
-        <Divider />
+        <Divider sx={{ background: "var(--neutral-700, #404040)" }} />
         <MenuItem
+          sx={{ color: "var(--neutral-300, #D4D4D4)" }}
           onClick={() => {
             disconnectWallet();
             handleClose();
@@ -137,12 +160,12 @@ const AppBar = ({
           background: largerThenMd
             ? "transparent"
             : "linear-gradient(180deg, #1A1C20 0%, #0E1011 100%)",
-          position: {xs: "fixed", md: "absolute"},
+          position: { xs: "fixed", md: "absolute" },
           top: 0,
           left: 0,
           width: "100%",
           p: "0.8rem 0.3rem",
-          zIndex: 1
+          zIndex: 1,
         }}
       >
         <Box
@@ -155,28 +178,24 @@ const AppBar = ({
         >
           <Box component="img" src="/logo_icon.svg" />
         </Box>
-        <Box sx={{ display: "flex", mr: {xs: 2, md: 1.3} }}>
+        <Box sx={{ display: "flex", mr: { xs: 2, md: 1.3 } }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            {walletAddress && balance >= 0 ? (
-              <>
-                <BalanceChip balance={balance} />
-                <OptionMenu
-                  walletAddress={walletAddress}
-                  disconnectWallet={disconnectWallet}
-                />
-              </>
-            ) : (
+            {walletAddress && balance >= 0 && <BalanceChip balance={balance} />}
+            <OptionMenu
+              walletAddress={walletAddress || ""}
+              disconnectWallet={disconnectWallet}
+            />
+            {!walletAddress || balance < 0 ? (
               <Button
                 className={"connect-wallet"}
                 size="small"
                 sx={{ mr: { xs: 3, md: 1 }, padding: { sx: 2, md: 2 } }}
-                // @ts-ignore
                 variant="primary"
                 onClick={connectWallet}
               >
                 Connect Wallet
               </Button>
-            )}
+            ) : null}
           </Box>
           {!largerThenMd && (
             <Box sx={{ display: "flex", alignItems: "center", ml: 2 }}>

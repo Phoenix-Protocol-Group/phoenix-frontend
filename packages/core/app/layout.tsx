@@ -136,7 +136,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     //backgroundAttachment: "fixed",
     //backgroundPosition: "center",
     //backgroundSize: { xs: "cover", md: "50% 100%" },
-    background: "linear-gradient(to bottom, #1F2123, #131517)",
+    background: "linear-gradient(to bottom, #151719, #0A0B0C)",
 
     paddingBottom: "50px",
     width: {

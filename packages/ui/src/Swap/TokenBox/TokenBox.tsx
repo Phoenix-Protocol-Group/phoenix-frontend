@@ -26,30 +26,34 @@ const AssetButton = ({
     <Button
       onClick={onClick}
       sx={{
-        fontSize: "14px",
+        fontSize: "12px", // Adjusted font size
         padding: "4px",
         borderRadius: "8px",
-        background: hideDropdownButton
+        background: hideDropdownButton ? "none" : "var(--neutral-900, #171717)", // Adjusted background
+        border: hideDropdownButton
           ? "none"
-          : "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        display: "inline-flex",
-        justifyContent: "space-between",
-        color: "white",
+          : "1px solid var(--neutral-700, #404040)", // Adjusted border
+        color: "var(--neutral-300, #D4D4D4)", // Adjusted color
         "&:hover": {
-          background: hideDropdownButton ? "none" : "rgba(226, 87, 28, 0.08)",
+          background: hideDropdownButton
+            ? "none"
+            : "var(--neutral-800, #262626)", // Adjusted background on hover
         },
         cursor: hideDropdownButton ? "auto" : "pointer",
         pointerEvents: hideDropdownButton ? "none" : "auto",
         minWidth: "96px",
       }}
     >
-      <Box display="flex">
+      <Box display="flex" alignItems="center">
+        {" "}
+        {/* Adjusted alignment */}
         <Box
           component="img"
           src={token.icon}
           sx={{
             maxWidth: "24px",
             marginRight: "8px",
+            opacity: 0.7, // Adjusted opacity
           }}
         />
         {token.name}
@@ -60,6 +64,7 @@ const AssetButton = ({
           src="/CaretDown.svg"
           sx={{
             display: hideDropdownButton ? "none" : "block",
+            opacity: 0.6, // Adjusted opacity
           }}
         />
       )}
@@ -110,19 +115,23 @@ const TokenBox = ({
     >
       <Box
         sx={{
-          background:
-            "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
-          padding: "10px 16px",
-          borderRadius: "16px",
-          border: "1px solid #E2621B",
-          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+          background: "var(--neutral-900, #171717)", // Adjusted background
+          padding: "8px 12px", // Adjusted padding
+          borderRadius: "12px", // Adjusted border radius
+          border: "1px solid var(--neutral-700, #404040)", // Adjusted border
+          boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.15)", // Adjusted shadow
         }}
       >
         <Grid container>
           {/* Token Input */}
           <Grid item xs={6}>
             {loadingValues ? (
-              <Skeleton variant="text" width="80" animation="wave" />
+              <Skeleton
+                variant="text"
+                width="60"
+                animation="wave"
+                sx={{ bgcolor: "var(--neutral-700, #404040)" }}
+              /> // Adjusted color
             ) : (
               <Input
                 disabled={disabled}
@@ -132,31 +141,27 @@ const TokenBox = ({
                 type="number"
                 placeholder="0.00"
                 sx={{
-                  color: "#FFF",
-                  fontSize: "24px",
-                  fontWeight: 700,
+                  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+                  fontSize: "18px", // Adjusted font size
+                  fontWeight: 500, // Adjusted font weight
                   lineHeight: "140%",
                   width: "100%",
                   "&:before, &:after": {
                     content: "none",
                   },
-                  "&:hover fieldset": {
-                    border: "1px solid #E2621B!important",
-                  },
-                  "&:focus-within fieldset, &:focus-visible fieldset": {
-                    border: "1px solid #E2621B!important",
-                    color: "white!important",
+                  "& .MuiInput-input": {
+                    padding: "4px 0", // Adjusted padding
                   },
                   "& input[type=number]": {
                     MozAppearance: "textfield",
-                  },
-                  "& input[type=number]::-webkit-outer-spin-button": {
-                    WebkitAppearance: "none",
-                    margin: 0,
-                  },
-                  "& input[type=number]::-webkit-inner-spin-button": {
-                    WebkitAppearance: "none",
-                    margin: 0,
+                    /* Firefox */
+                    "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button":
+                      {
+                        WebkitAppearance: "none",
+                        margin: 0,
+                      },
+                    /* Chrome, Safari, Edge, Opera */
+                    "-moz-appearance": "textfield",
                   },
                 }}
               />
@@ -184,13 +189,17 @@ const TokenBox = ({
             item
             xs={6}
             sx={{
-              fontSize: "14px",
-              color:
-                "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70));",
+              fontSize: "12px", // Adjusted font size
+              color: "var(--neutral-400, #A3A3A3)", // Adjusted color
             }}
           >
             {loadingValues ? (
-              <Skeleton variant="text" width="80" animation="wave" />
+              <Skeleton
+                variant="text"
+                width="60"
+                animation="wave"
+                sx={{ bgcolor: "var(--neutral-700, #404040)" }}
+              /> // Adjusted color
             ) : (
               usdPrice.toFixed(2)
             )}
@@ -208,10 +217,9 @@ const TokenBox = ({
           >
             <Typography
               sx={{
-                fontSize: "12px",
+                fontSize: "10px", // Adjusted font size
                 lineHeight: "140%",
-                color:
-                  "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70));",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
               }}
             >
               Balance {token.amount}
@@ -219,8 +227,8 @@ const TokenBox = ({
             <Button
               onClick={handleMaxClick}
               sx={{
-                color: "white",
-                fontSize: "12px",
+                color: "#F97316", // Adjusted color
+                fontSize: "10px", // Adjusted font size
                 lineHeight: "140%",
                 minWidth: "unset",
                 padding: 0,

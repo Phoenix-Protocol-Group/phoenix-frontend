@@ -7,35 +7,53 @@ const Button = ({
   type = "primary",
   size = "medium",
   label,
+  fullWidth = false,
   ...props
 }: ButtonProps) => {
   const styles = {
     wrapper: {
       display: "inline-block",
-      background: "linear-gradient(180deg, #E2391B 0%, #E29E1B 100%)",
-      padding: "1px", // This is the border witdh
-      borderRadius: "16px",
-      width: props.fullWidth ? "100%" : "auto",
+      background:
+        type === "secondary"
+          ? "linear-gradient(180deg, #F97316 0%, #E29E1B 100%)"
+          : "transparent", // Adjusted background
+      padding: "1px",
+      borderRadius: "12px",
+
+      width: "100%",
     },
     button: {
-      background: type === "primary" ? Colors.primary : Colors.background,
-      border: "none",
-      padding:
-        size === "medium" ? "18px 40px 18px 40px" : "12px 40px 12px 40px",
-      borderRadius: "15px", // Slighter less then the wrapper to show the border
+      display: "block",
+      background:
+        type === "primary"
+          ? "linear-gradient(180deg, #F97316 0%, #E29E1B 100%)"
+          : "var(--neutral-900, #171717)", // Adjusted background
+      border:
+        type === "primary" ? "none" : "1px solid var(--neutral-700, #404040)", // Adjusted border
+      padding: size === "medium" ? "12px 32px" : "8px 24px", // Adjusted padding
+      borderRadius: "12px",
       fontSize: "14px",
-      fontWeight: "700",
+      fontWeight: 500,
       lineHeight: "20px",
       textTransform: "none",
-      color: Colors.backgroundLight,
+      color:
+        type === "primary"
+          ? "var(--neutral-50, #FAFAFA)"
+          : "var(--neutral-300, #D4D4D4)", // Adjusted color
       width: "100%",
+      "&:hover": {
+        background:
+          type === "primary"
+            ? "rgba(249, 115, 22, 0.8)"
+            : "var(--neutral-800, #262626)", // Adjusted background on hover
+      },
     },
   };
 
   const { sx, ...otherProps } = props;
 
   return (
-    <div style={type === "secondary" ? styles.wrapper : {}}>
+    <div style={styles.wrapper}>
       <MuiButton
         size={size}
         disabled={props.disabled}
@@ -44,6 +62,7 @@ const Button = ({
           ...styles.button,
           ...(sx || {}), // Merge with existing sx prop or an empty object
         }}
+        fullWidth
         {...otherProps}
       >
         {props.children || label}

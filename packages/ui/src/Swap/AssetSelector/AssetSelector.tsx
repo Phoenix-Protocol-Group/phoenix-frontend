@@ -42,9 +42,9 @@ const AssetSelector = ({
         sx={{
           width: "100%",
           padding: "1.5rem",
-          background:
-            "linear-gradient(180deg, #292B2C 0%, #222426 100%), linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-          borderRadius: "16px",
+          background: "var(--neutral-900, #171717)", // Adjusted background
+          border: "1px solid var(--neutral-700, #404040)", // Adjusted border
+          borderRadius: "12px", // Reduced border radius
         }}
       >
         {/* Header */}
@@ -59,19 +59,22 @@ const AssetSelector = ({
             onClick={onClose}
             sx={{
               borderRadius: "8px",
-              background:
-                "linear-gradient(180deg, #292B2C 0%, #222426 100%),linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+              background: "var(--neutral-800, #262626)", // Adjusted background
               padding: "0.5rem",
               marginRight: "1rem",
+              "&:hover": {
+                background: "var(--neutral-700, #404040)", // Adjusted background on hover
+              },
             }}
           >
-            <KeyboardArrowLeft sx={{ color: "white" }} />
+            <KeyboardArrowLeft sx={{ color: "inherit" }} />
           </IconButton>
           <Typography
             sx={{
-              color: "white",
-              fontSize: "1.5rem",
-              fontWeight: 700,
+              color: "var(--neutral-50, #FAFAFA)", // Adjusted color
+              fontSize: "1.25rem", // Adjusted font size
+              fontWeight: 500, // Adjusted font weight
             }}
           >
             Select Token
@@ -91,18 +94,18 @@ const AssetSelector = ({
             }
             sx={{
               width: "100%",
-              borderRadius: "16px",
-              border: "1px solid #2D303A",
-              background: "#1D1F21",
-              padding: "8px 16px",
-              color: "white",
+              borderRadius: "12px", // Reduced border radius
+              border: "1px solid var(--neutral-700, #404040)", // Adjusted border
+              background: "var(--neutral-800, #262626)", // Adjusted background
+              padding: "8px 12px", // Adjusted padding
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
               fontSize: "14px",
               marginBottom: "16px",
               "&:before, &:after": { content: "none" },
             }}
             startAdornment={
               <img
-                style={{ marginRight: "8px" }}
+                style={{ marginRight: "8px", opacity: 0.6 }} // Adjusted opacity
                 src="/MagnifyingGlass.svg"
                 alt="Search"
               />
@@ -119,18 +122,18 @@ const AssetSelector = ({
           >
             <Box
               sx={{
-                borderRadius: "16px",
+                borderRadius: "12px", // Reduced border radius
                 padding: "1rem",
-                background:
-                  "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+                background: "var(--neutral-900, #171717)", // Adjusted background
+                border: "1px solid var(--neutral-700, #404040)", // Adjusted border
                 marginBottom: "16px",
               }}
             >
               <Typography
                 sx={{
                   fontSize: "0.875rem",
-                  fontWeight: 600,
-                  color: "rgba(255, 255, 255, 0.7)",
+                  fontWeight: 500, // Adjusted font weight
+                  color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                   marginBottom: "1rem",
                 }}
               >
@@ -150,17 +153,17 @@ const AssetSelector = ({
         {/* All Tokens Section */}
         <Box
           sx={{
-            borderRadius: "16px",
+            borderRadius: "12px", // Reduced border radius
             padding: "1rem",
-            background:
-              "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+            background: "var(--neutral-900, #171717)", // Adjusted background
+            border: "1px solid var(--neutral-700, #404040)", // Adjusted border
           }}
         >
           <Typography
             sx={{
               fontSize: "0.875rem",
-              fontWeight: 600,
-              color: "rgba(255, 255, 255, 0.7)",
+              fontWeight: 500, // Adjusted font weight
+              color: "var(--neutral-400, #A3A3A3)", // Adjusted color
               marginBottom: "1rem",
             }}
           >
@@ -174,7 +177,7 @@ const AssetSelector = ({
                 width: "6px",
               },
               "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "#E2491A",
+                backgroundColor: "#F97316", // Adjusted color
                 borderRadius: "8px",
               },
             }}
@@ -196,13 +199,13 @@ const AssetSelector = ({
                   component="img"
                   src="/search-not-found.svg"
                   alt="No assets found"
-                  sx={{ maxWidth: "160px", marginBottom: "1rem" }}
+                  sx={{ maxWidth: "160px", marginBottom: "1rem", opacity: 0.6 }} // Adjusted opacity
                 />
                 <Typography
                   sx={{
                     fontSize: "0.875rem",
                     fontWeight: 400,
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                   }}
                 >
                   We didn’t find any assets for "{searchValue}"
