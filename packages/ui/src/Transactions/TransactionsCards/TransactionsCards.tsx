@@ -19,13 +19,14 @@ const TransactionCard = ({
       py: 4,
       borderRadius: "12px",
       flex: 1,
-      background:
-        "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+      background: "var(--neutral-900, #171717)",
+      border: "1px solid var(--neutral-700, #404040)",
     }}
   >
     <Typography
       sx={{
         fontSize: "12px",
+        color: "var(--neutral-300, #D4D4D4)",
       }}
     >
       {title}
@@ -36,6 +37,7 @@ const TransactionCard = ({
         fontWeight: "700",
         display: "flex",
         alignItems: "center",
+        color: "var(--neutral-50, #FAFAFA)",
       }}
     >
       {icon && (

@@ -8,15 +8,7 @@ const PhoenixThemeProvider = ({ children }: { children: any }) => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div
-        style={{
-          background: "linear-gradient(to bottom, #151719, #0A0B0C)",
-          minWidth: "100%",
-          minHeight: "100vh",
-        }}
-      >
-        {children}
-      </div>
+      {children}
     </ThemeProvider>
   );
 };

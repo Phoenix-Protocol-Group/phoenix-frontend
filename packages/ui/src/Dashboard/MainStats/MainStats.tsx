@@ -19,16 +19,15 @@ const Tile = ({ title, value, link, isMobile }: TileProps) => {
         gap: "12px",
         position: "relative",
         borderRadius: "12px",
-        border: "1px solid var(--Secondary-S4, #2C2C31)",
-        background:
-          "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+        border: "1px solid var(--neutral-700, #404040)",
+        background: "var(--neutral-900, #171717)",
         overflow: "hidden",
       }}
     >
       <Box display="flex" justifyContent="space-between">
         <Typography
           sx={{
-            color: "var(--Secondary-S2-2, #BDBEBE)",
+            color: "var(--neutral-300, #D4D4D4)",
             fontFamily: "Ubuntu",
             fontSize: "12px",
             fontWeight: 700,
@@ -40,7 +39,7 @@ const Tile = ({ title, value, link, isMobile }: TileProps) => {
       </Box>
       <Typography
         sx={{
-          color: "var(--Secondary-S2, #FFF)",
+          color: "var(--neutral-50, #FAFAFA)",
           fontFamily: "Ubuntu",
           fontSize: "24px",
           fontWeight: 700,

@@ -88,6 +88,7 @@ const tabUnselectedStyles = {
 const tabSelectedStyles = {
   borderRadius: "1rem",
   background: "rgba(226, 73, 26, 0.10)",
+  color: "var(--neutral-50, #FAFAFA)", // Adjusted color
 };
 
 const VolumeChart = ({
@@ -244,7 +245,13 @@ const VolumeChart = ({
                   />
                 </Box>
               </MenuItem>
-              <MenuItem value={undefined} sx={{ textAlign: "center" }}>
+              <MenuItem
+                value={undefined}
+                sx={{
+                  textAlign: "center",
+                  color: "var(--neutral-300, #D4D4D4)",
+                }}
+              >
                 All
               </MenuItem>
               {filteredPools.map((pool) => (
@@ -258,14 +265,18 @@ const VolumeChart = ({
                       alt={pool.tokenA.symbol}
                       width={20}
                     />
-                    <Typography>{pool.tokenA.symbol}</Typography>
+                    <Typography color="var(--neutral-300, #D4D4D4)">
+                      {pool.tokenA.symbol}
+                    </Typography>
                     <Typography>/</Typography>
                     <img
                       src={pool.tokenB.icon}
                       alt={pool.tokenB.symbol}
                       width={20}
                     />
-                    <Typography>{pool.tokenB.symbol}</Typography>
+                    <Typography color="var(--neutral-300, #D4D4D4)">
+                      {pool.tokenB.symbol}
+                    </Typography>
                   </Box>
                 </MenuItem>
               ))}
@@ -273,10 +284,9 @@ const VolumeChart = ({
           </Box>
           <Typography
             sx={{
-              color: "white",
+              color: "var(--neutral-50, #FAFAFA)", // Adjusted color
               fontFamily: "Ubuntu",
               fontSize: "1.5rem",
-              fontWeight: 700,
             }}
           >
             {formatCurrencyStatic.format(totalVolume)}
