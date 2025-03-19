@@ -22,8 +22,8 @@ const AssetInfoModal = ({ open, onClose, asset }: AssetInfoModalProps) => {
     transform: "translate(-50%, -50%)",
     width: "min(512px, 90%)",
     maxWidth: "100vw",
-    background: "#1F1F1F",
-    borderRadius: "16px",
+    background: "var(--neutral-900, #171717)",
+    borderRadius: "12px",
     boxShadow: "0px 4px 24px rgba(0, 0, 0, 0.6)",
     display: "flex",
     flexDirection: "column" as "column",
@@ -69,11 +69,11 @@ const AssetInfoModal = ({ open, onClose, asset }: AssetInfoModalProps) => {
             position: "absolute",
             top: 8,
             right: 8,
-            color: "#FFF",
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            color: "var(--neutral-300, #D4D4D4)",
+            backgroundColor: "transparent",
             borderRadius: "50%",
             "&:hover": {
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
             },
           }}
         >
@@ -84,15 +84,15 @@ const AssetInfoModal = ({ open, onClose, asset }: AssetInfoModalProps) => {
         <Box
           sx={{
             textAlign: "center",
-            mb: 3,
+            mb: 2,
           }}
         >
           <Typography
             variant="h5"
             sx={{
-              color: "#FFF",
-              fontWeight: 700,
-              fontSize: "1.5rem",
+              color: "var(--neutral-50, #FAFAFA)",
+              fontWeight: 600,
+              fontSize: "1.25rem",
               mb: 1,
               fontFamily: "Ubuntu",
             }}
@@ -104,37 +104,37 @@ const AssetInfoModal = ({ open, onClose, asset }: AssetInfoModalProps) => {
         {/* Asset Details */}
         <Box
           sx={{
-            borderRadius: "16px",
-            border: "1px solid #444",
-            p: "1.5rem",
+            borderRadius: "12px",
+            border: "1px solid var(--neutral-700, #404040)",
+            p: "1rem",
             width: "100%",
-            background: "#2A2A2A",
+            background: "var(--neutral-800, #262626)",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", paddingBottom: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", pb: 1 }}>
             <Typography
               sx={{
-                fontSize: "1.125rem",
-                fontFamily: "Poppins",
-                fontWeight: 600,
-                color: "#FFF",
+                fontSize: "1rem",
+                fontFamily: "Ubuntu",
+                fontWeight: 500,
+                color: "var(--neutral-50, #FAFAFA)",
               }}
             >
               Quick facts about
             </Typography>
             {asset.tomlInfo.image && (
-              <Box sx={{ ml: 1, mr: 0.5 }}>
+              <Box sx={{ ml: 0.5, mr: 0.25 }}>
                 <Avatar
                   src={asset.tomlInfo.image}
-                  sx={{ width: "1.5rem", height: "1.5rem" }}
+                  sx={{ width: "1.25rem", height: "1.25rem" }}
                 />
               </Box>
             )}
             <Typography
               sx={{
-                fontSize: "1.125rem",
-                fontFamily: "Poppins",
-                color: "#FFF",
+                fontSize: "1rem",
+                fontFamily: "Ubuntu",
+                color: "var(--neutral-50, #FAFAFA)",
               }}
             >
               {asset.tomlInfo.code}:
@@ -143,34 +143,52 @@ const AssetInfoModal = ({ open, onClose, asset }: AssetInfoModalProps) => {
           <Table size="small" aria-label="asset details">
             <TableBody>
               <TableRow>
-                <TableCell sx={{ color: "#BDBEBE", borderBottom: "none" }}>
+                <TableCell
+                  sx={{
+                    color: "var(--neutral-300, #D4D4D4)",
+                    borderBottom: "none",
+                    py: 0.5,
+                  }}
+                >
                   Domain
                 </TableCell>
                 <TableCell
-                  sx={{ color: "#FFF", fontWeight: 600, borderBottom: "none" }}
+                  sx={{
+                    color: "var(--neutral-50, #FAFAFA)",
+                    fontWeight: 400,
+                    borderBottom: "none",
+                    py: 0.5,
+                  }}
                 >
                   {asset.domain}
                 </TableCell>
               </TableRow>
               {asset.supply && (
                 <TableRow>
-                  <TableCell sx={{ color: "#BDBEBE", borderBottom: "none" }}>
+                  <TableCell
+                    sx={{
+                      color: "var(--neutral-300, #D4D4D4)",
+                      borderBottom: "none",
+                      py: 0.5,
+                    }}
+                  >
                     Total Supply
                   </TableCell>
                   <TableCell
                     sx={{
-                      color: "#FFF",
-                      fontWeight: 600,
+                      color: "var(--neutral-50, #FAFAFA)",
+                      fontWeight: 400,
                       display: "flex",
                       alignItems: "center",
                       borderBottom: "none",
+                      py: 0.5,
                     }}
                   >
                     {(Number(asset.supply) / 10 ** 7).toFixed()}
                     {asset.tomlInfo.image && (
                       <Avatar
                         src={asset.tomlInfo.image}
-                        sx={{ width: 24, height: 24, ml: 1 }}
+                        sx={{ width: 20, height: 20, ml: 0.5 }}
                       />
                     )}
                     {asset.tomlInfo.code}
@@ -178,11 +196,22 @@ const AssetInfoModal = ({ open, onClose, asset }: AssetInfoModalProps) => {
                 </TableRow>
               )}
               <TableRow>
-                <TableCell sx={{ color: "#BDBEBE", borderBottom: "none" }}>
+                <TableCell
+                  sx={{
+                    color: "var(--neutral-300, #D4D4D4)",
+                    borderBottom: "none",
+                    py: 0.5,
+                  }}
+                >
                   First Transaction
                 </TableCell>
                 <TableCell
-                  sx={{ color: "#FFF", fontWeight: 600, borderBottom: "none" }}
+                  sx={{
+                    color: "var(--neutral-50, #FAFAFA)",
+                    fontWeight: 400,
+                    borderBottom: "none",
+                    py: 0.5,
+                  }}
                 >
                   {new Date(asset.created * 1000).toLocaleString("en-US", {
                     timeZone: "UTC",
@@ -192,21 +221,43 @@ const AssetInfoModal = ({ open, onClose, asset }: AssetInfoModalProps) => {
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ color: "#BDBEBE", borderBottom: "none" }}>
+                <TableCell
+                  sx={{
+                    color: "var(--neutral-300, #D4D4D4)",
+                    borderBottom: "none",
+                    py: 0.5,
+                  }}
+                >
                   Trustlines
                 </TableCell>
                 <TableCell
-                  sx={{ color: "#FFF", fontWeight: 600, borderBottom: "none" }}
+                  sx={{
+                    color: "var(--neutral-50, #FAFAFA)",
+                    fontWeight: 400,
+                    borderBottom: "none",
+                    py: 0.5,
+                  }}
                 >
                   {asset.trustlines[2]} funded / {asset.trustlines[0]} total
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ color: "#BDBEBE", borderBottom: "none" }}>
+                <TableCell
+                  sx={{
+                    color: "var(--neutral-300, #D4D4D4)",
+                    borderBottom: "none",
+                    py: 0.5,
+                  }}
+                >
                   Total Payments
                 </TableCell>
                 <TableCell
-                  sx={{ color: "#FFF", fontWeight: 600, borderBottom: "none" }}
+                  sx={{
+                    color: "var(--neutral-50, #FAFAFA)",
+                    fontWeight: 400,
+                    borderBottom: "none",
+                    py: 0.5,
+                  }}
                 >
                   {new Intl.NumberFormat("en-US").format(asset.payments)}
                 </TableCell>
