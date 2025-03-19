@@ -190,7 +190,7 @@ const AppBar = ({
                 className={"connect-wallet"}
                 size="small"
                 sx={{ mr: { xs: 3, md: 1 }, padding: { sx: 2, md: 2 } }}
-                variant="primary"
+                type="primary"
                 onClick={connectWallet}
               >
                 Connect Wallet
