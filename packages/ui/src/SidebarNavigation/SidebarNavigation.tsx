@@ -110,7 +110,7 @@ const SidebarNavigation = ({
       <MuiDrawer
         PaperProps={{
           sx: {
-            background: Colors.backgroundSidenav,
+            background: "#121212",
             boxShadow: "-1px 0px 0px 0px rgba(228, 228, 228, 0.10) inset",
             maxWidth: "100vw",
           },
@@ -225,18 +225,23 @@ const ItemList = ({
           disablePadding
           className={item.label}
           sx={{
-            margin: "0 16px",
+            margin: open ? "0 16px" : "auto",
             width: "unset",
             borderRadius: "12px",
             overflow: "hidden",
-            border:
-              item.active && open
-                ? "1px solid #E2491A"
-                : "1px solid transparent",
-            background:
-              item.active && open ? "rgba(226, 73, 26, 0.10)" : "transparent",
+            border: item.active
+              ? open
+                ? "2px solid #E2491A"
+                : "1px solid transparent"
+              : "none",
+            background: item.active
+              ? open
+                ? "rgba(226, 73, 26, 0.10)"
+                : "transparent"
+              : "transparent",
             height: open ? "unset" : "32px",
             marginBottom: open ? 0 : "16px",
+            padding: open ? "0" : "4px", // Reduced padding when closed
           }}
         >
           <ListItemButton
@@ -252,8 +257,12 @@ const ItemList = ({
           >
             <ListItemIcon
               sx={{
-                minWidth: "24px",
-                marginLeft: open ? "20px" : "1px",
+                minWidth: "32px", // Increased icon size
+                marginLeft: open ? "20px" : "auto", // Reduced margin when closed
+                marginRight: open ? "8px" : "auto", // Removed margin when closed
+                justifyContent: "center", // Center the icon
+                // Colorize the icon when active to #E2491A
+                color: item.active ? "#E2491A" : "rgba(255, 255, 255, 0.6)",
               }}
             >
               {item.icon}
@@ -266,6 +275,7 @@ const ItemList = ({
               sx={{
                 padding: "16px 24px 16px 20px",
                 opacity: item.active ? 1 : 0.6,
+                display: open ? "block" : "none", // Hide text when closed
               }}
               primary={item.label}
             />
