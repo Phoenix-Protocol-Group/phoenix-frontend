@@ -186,14 +186,44 @@ const GlowingChart = ({
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <Box p={2} border={1} borderColor="grey.300">
-        <Typography variant="body2">{`Value: ${Number(payload[0].value).toFixed(
-          2
-        )}`}</Typography>
-        <Typography variant="body2">{`Date: ${new Date(
+      <Box
+        sx={{
+          background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
+          border: "1px solid #292B2C",
+          borderRadius: "0.5rem",
+          padding: "10px",
+          color: "white",
+          boxShadow:
+            "-3px 3px 10px 0px rgba(25, 13, 1, 0.10),-12px 13px 18px 0px rgba(25, 13, 1, 0.09),-26px 30px 24px 0px rgba(25, 13, 1, 0.05),-46px 53px 28px 0px rgba(25, 13, 1, 0.02),-73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
+        }}
+      >
+        <Typography
+          variant="body2"
+          sx={{
+            margin: 0,
+            color: "white",
+            fontSize: "0.875rem",
+            fontWeight: 600,
+          }}
+        >{`Value: ${Number(payload[0].value).toFixed(2)}`}</Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            margin: 0,
+            color: "white",
+            fontSize: "0.875rem",
+          }}
+        >{`Date: ${new Date(
           payload[0].payload.timeStamp
         ).toLocaleDateString()}`}</Typography>
-        <Typography variant="body2">{`Time: ${new Date(
+        <Typography
+          variant="body2"
+          sx={{
+            margin: 0,
+            color: "white",
+            fontSize: "0.875rem",
+          }}
+        >{`Time: ${new Date(
           payload[0].payload.timeStamp
         ).toLocaleTimeString()}`}</Typography>
       </Box>
