@@ -13,22 +13,32 @@ const Button = ({
     wrapper: {
       display: "inline-block",
       background: "linear-gradient(180deg, #E2391B 0%, #E29E1B 100%)",
-      padding: "1px", // This is the border witdh
-      borderRadius: "16px",
+      padding: "1px",
+      borderRadius: "12px",
       width: props.fullWidth ? "100%" : "auto",
     },
     button: {
-      background: type === "primary" ? Colors.primary : Colors.background,
+      background:
+        type === "primary"
+          ? "linear-gradient(135deg, #E2391B 0%, #E29E1B 100%)"
+          : Colors.background,
       border: "none",
-      padding:
-        size === "medium" ? "18px 40px 18px 40px" : "12px 40px 12px 40px",
-      borderRadius: "15px", // Slighter less then the wrapper to show the border
+      padding: size === "medium" ? "14px 32px" : "10px 24px",
+      borderRadius: "12px",
       fontSize: "14px",
       fontWeight: "700",
       lineHeight: "20px",
       textTransform: "none",
       color: Colors.backgroundLight,
       width: "100%",
+      boxShadow:
+        type === "primary" ? "0px 2px 6px rgba(226, 73, 26, 0.4)" : "none",
+      transition: "all 0.2s ease-in-out",
+      "&:hover": {
+        transform: type === "primary" ? "translateY(-2px)" : "none",
+        boxShadow:
+          type === "primary" ? "0px 4px 8px rgba(226, 73, 26, 0.5)" : "none",
+      },
     },
   };
 
@@ -41,8 +51,8 @@ const Button = ({
         disabled={props.disabled}
         //  @ts-ignore
         sx={{
-          ...styles.button,
-          ...(sx || {}), // Merge with existing sx prop or an empty object
+          ...(styles.button as React.CSSProperties), // Ensure styles are cast to valid CSS properties
+          ...((sx as Record<string, any>) || {}), // Ensure sx is properly typed
         }}
         {...otherProps}
       >
