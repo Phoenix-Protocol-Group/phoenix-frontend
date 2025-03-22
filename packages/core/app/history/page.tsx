@@ -366,7 +366,7 @@ export default function Page() {
               sx={{
                 height: "100%",
                 flexGrow: 1,
-                display: "flex",
+                display: "inline-flex",
                 justifyContent: "stretch",
               }}
             >
