@@ -362,7 +362,14 @@ export default function Page() {
         </Grid>
         <Grid item xs={12} md={6} sx={{ height: "auto" }}>
           {historicalPrices.length > 0 && (
-            <Box sx={{ height: "100%", flexGrow: 1 }}>
+            <Box
+              sx={{
+                height: "100%",
+                flexGrow: 1,
+                display: "flex",
+                justifyContent: "stretch",
+              }}
+            >
               <FinancialChart
                 setPeriod={setPeriod}
                 period={period}
