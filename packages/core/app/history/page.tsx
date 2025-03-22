@@ -348,11 +348,7 @@ export default function Page() {
       >
         Transaction History
       </Typography>
-      <Grid
-        container
-        spacing={2}
-        sx={{ display: "flex", flexDirection: "column" }}
-      >
+      <Grid container spacing={2} sx={{ display: "flex" }}>
         <Grid item xs={12} md={6}>
           <VolumeChart
             pools={pools}
@@ -364,7 +360,7 @@ export default function Page() {
             totalVolume={totalVolume}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} sx={{ height: "100%" }}>
           {historicalPrices.length > 0 && (
             <Box sx={{ height: "100%", flexGrow: 1 }}>
               <FinancialChart

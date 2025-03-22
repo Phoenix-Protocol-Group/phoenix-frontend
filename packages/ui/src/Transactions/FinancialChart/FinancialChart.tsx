@@ -73,6 +73,7 @@ const GlowingChart = ({
       borderRadius: "1.5rem",
       background: "var(--neutral-900, #171717)",
       border: "1px solid var(--neutral-700, #404040)",
+      height: "100%",
     }}
   >
     <Box
