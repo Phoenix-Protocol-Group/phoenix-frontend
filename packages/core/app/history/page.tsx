@@ -348,7 +348,11 @@ export default function Page() {
       >
         Transaction History
       </Typography>
-      <Grid container spacing={2}>
+      <Grid
+        container
+        spacing={2}
+        sx={{ display: "flex", flexDirection: "column" }}
+      >
         <Grid item xs={12} md={6}>
           <VolumeChart
             pools={pools}
@@ -362,11 +366,13 @@ export default function Page() {
         </Grid>
         <Grid item xs={12} md={6}>
           {historicalPrices.length > 0 && (
-            <FinancialChart
-              setPeriod={setPeriod}
-              period={period}
-              historicalPrices={historicalPrices}
-            />
+            <Box sx={{ height: "100%", flexGrow: 1 }}>
+              <FinancialChart
+                setPeriod={setPeriod}
+                period={period}
+                historicalPrices={historicalPrices}
+              />
+            </Box>
           )}
         </Grid>
       </Grid>
@@ -376,30 +382,34 @@ export default function Page() {
         totalTrades={meta.totalTrades}
         mostTradedAsset={meta.mostTradedAsset}
       />
-      {!historyLoading ? (
-        <TransactionsTable
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          entries={history}
-          activeSort={{ column: sortBy, direction: sortOrder }}
-          activeView={activeView}
-          setActiveView={(view) => {
-            setHistory([]);
-            setActiveView(view);
-          }}
-          loggedIn={!!appStorePersist.wallet.address}
-          activeFilters={activeFilters}
-          applyFilters={(newFilters: ActiveFilters) => applyFilters(newFilters)}
-          handleSort={(column) =>
-            handleSortChange(
-              column as any,
-              sortOrder === "asc" ? "desc" : "asc"
-            )
-          }
-        />
-      ) : (
-        <Skeleton.TransactionsTable />
-      )}
+      <Box sx={{ flexGrow: 1 }}>
+        {!historyLoading ? (
+          <TransactionsTable
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            entries={history}
+            activeSort={{ column: sortBy, direction: sortOrder }}
+            activeView={activeView}
+            setActiveView={(view) => {
+              setHistory([]);
+              setActiveView(view);
+            }}
+            loggedIn={!!appStorePersist.wallet.address}
+            activeFilters={activeFilters}
+            applyFilters={(newFilters: ActiveFilters) =>
+              applyFilters(newFilters)
+            }
+            handleSort={(column) =>
+              handleSortChange(
+                column as any,
+                sortOrder === "asc" ? "desc" : "asc"
+              )
+            }
+          />
+        ) : (
+          <Skeleton.TransactionsTable />
+        )}
+      </Box>
       <Box sx={{ display: "flex", justifyContent: "end", mt: 3 }}>
         <Button type="secondary" label="Load more" onClick={loadMore} />
       </Box>
