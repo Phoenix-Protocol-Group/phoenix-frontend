@@ -360,7 +360,7 @@ export default function Page() {
             totalVolume={totalVolume}
           />
         </Grid>
-        <Grid item xs={12} md={6} sx={{ height: "100%" }}>
+        <Grid item xs={12} md={6} sx={{ height: "auto" }}>
           {historicalPrices.length > 0 && (
             <Box sx={{ height: "100%", flexGrow: 1 }}>
               <FinancialChart
