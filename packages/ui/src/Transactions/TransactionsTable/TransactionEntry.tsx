@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Grid, Typography, useMediaQuery } from "@mui/material";
-import { ArrowForward, ArrowBack } from "@mui/icons-material";
-import { TransactionTableEntryProps } from "@phoenix-protocol/types";
+import { ArrowForward } from "@mui/icons-material";
 import LaunchIcon from "@mui/icons-material/Launch";
+import { TransactionTableEntryProps } from "@phoenix-protocol/types";
 
 const TransactionEntry = (
   props: TransactionTableEntryProps & { isMobile: boolean }
@@ -10,9 +10,9 @@ const TransactionEntry = (
   const { isMobile } = props; // Destructure isMobile
   const BoxStyle = {
     p: 3,
-    borderRadius: "8px",
-    background:
-      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+    borderRadius: "12px", // Adjusted border radius
+    background: "var(--neutral-900, #171717)", // Adjusted background
+    border: "1px solid var(--neutral-700, #404040)", // Adjusted border
     position: "relative",
     overflow: "hidden",
     boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
@@ -64,6 +64,7 @@ const TransactionEntry = (
                 fontSize: "12px",
                 fontWeight: "700",
                 textTransform: "uppercase",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 opacity: 0.6,
               }}
             >
@@ -72,7 +73,7 @@ const TransactionEntry = (
           )}
           <Typography
             sx={{
-              color: "#FFF",
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
               fontSize: isMobile ? "14px" : "16px",
               fontWeight: "400",
               opacity: 0.6,
@@ -89,6 +90,7 @@ const TransactionEntry = (
                 fontSize: "12px",
                 fontWeight: "700",
                 textTransform: "uppercase",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 opacity: 0.6,
               }}
             >
@@ -106,20 +108,25 @@ const TransactionEntry = (
                 component="img"
                 src={props.fromAsset.icon}
                 alt={props.fromAsset.name}
-                sx={{ width: "20px", height: "20px", mr: "0.5rem" }}
+                sx={{
+                  width: "20px",
+                  height: "20px",
+                  mr: "0.5rem",
+                  opacity: 0.7,
+                }} // Adjusted opacity
               />
               <Typography
                 sx={{
-                  color: "#FFF",
+                  color: "var(--neutral-50, #FAFAFA)", // Adjusted color
                   fontSize: isMobile ? "14px" : "16px",
-                  fontWeight: "700",
+                  fontWeight: "500", // Adjusted font weight
                 }}
               >
                 {props.fromAmount}
               </Typography>
               <Typography
                 sx={{
-                  color: "#FFF",
+                  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                   fontSize: isMobile ? "14px" : "16px",
                   fontWeight: "400",
                   opacity: 0.6,
@@ -133,6 +140,8 @@ const TransactionEntry = (
               sx={{
                 fontSize: isMobile ? "14px" : "16px",
                 mx: 1,
+                color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+                opacity: 0.7, // Adjusted opacity
               }}
             />
             <Box
@@ -145,20 +154,25 @@ const TransactionEntry = (
                 component="img"
                 src={props.toAsset.icon}
                 alt={props.toAsset.name}
-                sx={{ width: "20px", height: "20px", mr: "0.5rem" }}
+                sx={{
+                  width: "20px",
+                  height: "20px",
+                  mr: "0.5rem",
+                  opacity: 0.7,
+                }} // Adjusted opacity
               />
               <Typography
                 sx={{
-                  color: "#FFF",
+                  color: "var(--neutral-50, #FAFAFA)", // Adjusted color
                   fontSize: isMobile ? "14px" : "16px",
-                  fontWeight: "700",
+                  fontWeight: "500", // Adjusted font weight
                 }}
               >
                 {props.toAmount}
               </Typography>
               <Typography
                 sx={{
-                  color: "#FFF",
+                  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                   fontSize: isMobile ? "14px" : "16px",
                   fontWeight: "400",
                   opacity: 0.6,
@@ -177,6 +191,7 @@ const TransactionEntry = (
                 fontSize: "12px",
                 fontWeight: "700",
                 textTransform: "uppercase",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 opacity: 0.6,
               }}
             >
@@ -187,6 +202,7 @@ const TransactionEntry = (
             sx={{
               fontSize: isMobile ? "12px" : "14px",
               fontWeight: "400",
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
             }}
           >
             ${props.tradeValue}
@@ -199,6 +215,7 @@ const TransactionEntry = (
                 fontSize: "12px",
                 fontWeight: "700",
                 textTransform: "uppercase",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 opacity: 0.6,
               }}
             >
@@ -219,14 +236,19 @@ const TransactionEntry = (
               fontWeight: "400",
               textDecoration: "underline",
               textDecorationStyle: "dotted",
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
               "&:hover": {
                 textDecoration: "underline",
                 cursor: "pointer",
               },
             }}
           >
-            <LaunchIcon
-              sx={{ fontSize: isMobile ? "12px" : "14px", mr: 0.5 }}
+            <LaunchIcon // Changed to OpenInNewIcon
+              sx={{
+                fontSize: isMobile ? "12px" : "14px",
+                mr: 0.5,
+                color: "var(--neutral-300, #D4D4D4)",
+              }} // Adjusted color
             />
             {props.txHash}
           </Typography>

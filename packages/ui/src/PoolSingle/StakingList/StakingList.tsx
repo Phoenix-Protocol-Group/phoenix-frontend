@@ -19,8 +19,8 @@ const StakingEntry = ({ entry }: { entry: Entry }) => {
         sx={{
           p: 2,
           borderRadius: "12px",
-          background:
-            "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          background: "var(--neutral-900, #171717)", // Adjusted background
+          border: "1px solid var(--neutral-700, #404040)", // Adjusted border
           mb: 2,
         }}
       >
@@ -30,26 +30,42 @@ const StakingEntry = ({ entry }: { entry: Entry }) => {
               component="img"
               src="/cryptoIcons/poolIcon.png"
               alt="Pool Icon"
-              sx={{ width: "32px", height: "32px", mr: 2 }}
+              sx={{ width: "32px", height: "32px", mr: 2, opacity: 0.7 }} // Adjusted opacity
             />
             <Typography
-              sx={{ color: "#FFF", fontSize: "14px", fontWeight: 700 }}
+              sx={{
+                color: "var(--neutral-50, #FAFAFA)",
+                fontSize: "14px",
+                fontWeight: 500,
+              }} // Adjusted color and weight
             >
               {entry.title}
             </Typography>
           </Grid>
           <Grid item xs={6} md={2}>
-            <Typography sx={{ color: "#FFF", fontSize: "14px" }}>
+            <Typography
+              sx={{ color: "var(--neutral-300, #D4D4D4)", fontSize: "12px" }}
+            >
+              {" "}
+              {/* Adjusted color and size */}
               {entry.apr} APR
             </Typography>
           </Grid>
           <Grid item xs={6} md={2}>
-            <Typography sx={{ color: "#FFF", fontSize: "14px" }}>
+            <Typography
+              sx={{ color: "var(--neutral-300, #D4D4D4)", fontSize: "12px" }}
+            >
+              {" "}
+              {/* Adjusted color and size */}
               Locked: {entry.lockedPeriod}
             </Typography>
           </Grid>
           <Grid item xs={6} md={3}>
-            <Typography sx={{ color: "#FFF", fontSize: "14px" }}>
+            <Typography
+              sx={{ color: "var(--neutral-300, #D4D4D4)", fontSize: "12px" }}
+            >
+              {" "}
+              {/* Adjusted color and size */}
               {entry.amount.tokenAmount} (${entry.amount.tokenValueInUsd})
             </Typography>
           </Grid>
@@ -57,24 +73,26 @@ const StakingEntry = ({ entry }: { entry: Entry }) => {
             <IconButton
               onClick={entry.onClick}
               sx={{
-                color: "#FFF",
+                color: "var(--neutral-300, #D4D4D4)",
                 borderRadius: "12px",
+                border: "1px solid var(--neutral-700, #404040)",
                 background: "transparent",
                 transition: "all 0.2s",
                 "&:hover": {
-                  background: "rgba(226, 73, 27, 0.15)",
-                  color: "#E2621B",
+                  background: "rgba(249, 115, 22, 0.15)",
+                  color: "#F97316",
                 },
                 display: "flex",
                 alignItems: "center",
-                gap: 1,
+                gap: 0.5, // Adjusted gap
+                padding: "6px 12px", // Adjusted padding
               }}
             >
-              <ArrowBack />
+              <ArrowBack sx={{ fontSize: "1rem" }} /> {/* Adjusted size */}
               <Typography
                 sx={{
                   color: "inherit",
-                  fontSize: "14px",
+                  fontSize: "0.875rem", // Adjusted font size
                 }}
               >
                 Unstake
@@ -97,7 +115,7 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
       {/* Header */}
       <Typography
         sx={{
-          color: "#FFF",
+          color: "var(--neutral-50, #FAFAFA)", // Adjusted color
           fontSize: "24px",
           fontWeight: 700,
           mb: 2,
@@ -113,7 +131,7 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
       ) : (
         <Typography
           sx={{
-            color: "#FFF",
+            color: "var(--neutral-300, #D4D4D4)", // Adjusted color
             fontSize: "14px",
             textAlign: "center",
             pt: 2,

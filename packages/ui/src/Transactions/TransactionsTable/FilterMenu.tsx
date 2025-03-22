@@ -107,9 +107,9 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
 
   const BoxStyle = {
     p: 2,
-    borderRadius: "8px",
-    background:
-      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+    borderRadius: "12px", // Adjusted border radius
+    background: "var(--neutral-900, #171717)", // Adjusted background
+    border: "1px solid var(--neutral-700, #404040)", // Adjusted border
   };
 
   return (
@@ -119,20 +119,37 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
           ...BoxStyle,
           textTransform: "none",
           fontSize: "13px",
-          color: "rgba(255, 255, 255, 0.6)",
+          color: "var(--neutral-300, #D4D4D4)", // Adjusted color
           borderRadius: "8px",
           lineHeight: "20px",
           ml: 3,
           height: "38px",
+          "&:hover": {
+            background: "var(--neutral-800, #262626)", // Adjusted background on hover
+          },
         }}
         aria-controls={open ? "basic-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
         onClick={handleClick}
       >
-        <Tune sx={{ fontSize: "15px", mr: 0.5 }} />
+        <Tune
+          sx={{
+            fontSize: "15px",
+            mr: 0.5,
+            color: "var(--neutral-300, #D4D4D4)",
+          }}
+        />{" "}
+        {/* Adjusted color */}
         Filter
-        <ExpandMore sx={{ fontSize: "14px", ml: 0.5 }} />
+        <ExpandMore
+          sx={{
+            fontSize: "14px",
+            ml: 0.5,
+            color: "var(--neutral-300, #D4D4D4)",
+          }}
+        />{" "}
+        {/* Adjusted color */}
       </Button>
       <Menu
         id="basic-menu"
@@ -149,8 +166,9 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
             flexDirection: "column",
             gap: "1.5rem",
             borderRadius: "0.5rem",
-            border: "1px solid #292B2C",
-            background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
+            border: "1px solid var(--neutral-700, #404040)", // Adjusted border
+            background: "var(--neutral-800, #262626)", // Adjusted background
+            color: "var(--neutral-300, #D4D4D4)", // Adjusted color
             boxShadow:
               "-3px 3px 10px 0px rgba(25, 13, 1, 0.10), -12px 13px 18px 0px rgba(25, 13, 1, 0.09), -26px 30px 24px 0px rgba(25, 13, 1, 0.05), -46px 53px 28px 0px rgba(25, 13, 1, 0.02), -73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
           },
@@ -165,7 +183,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
         >
           <Typography
             sx={{
-              color: "#FFF",
+              color: "var(--neutral-50, #FAFAFA)", // Adjusted color
               fontFeatureSettings: "'clig' off, 'liga' off",
               fontFamily: "Ubuntu",
               fontSize: "0.625rem",
@@ -189,7 +207,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
           <Box flex={1}>
             <Typography
               sx={{
-                color: "#FFF",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 fontFamily: "Ubuntu",
                 fontSize: "0.75rem",
                 fontStyle: "normal",
@@ -223,20 +241,21 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   sx={{
                     "& .MuiInputBase-root": {
                       alignItems: "center",
-                      color: "rgba(255, 255, 255, 0.70)",
+                      color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                       fontFamily: "Ubuntu",
                       fontSize: "0.875rem",
                       fontStyle: "normal",
                       fontWeight: 400,
                       borderRadius: "1rem",
                       minWidth: "unset",
+                      background: "var(--neutral-900, #171717)", // Adjusted background
+                      border: "1px solid var(--neutral-700, #404040)", // Adjusted border
                     },
                     "& legend": {
                       display: "none",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
-                      border: "1px solid #2D303A",
-                      top: "-2px",
+                      border: "none",
                     },
                   }}
                 />
@@ -246,7 +265,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
           <Box flex={1}>
             <Typography
               sx={{
-                color: "#FFF",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 fontFamily: "Ubuntu",
                 fontSize: "0.75rem",
                 fontStyle: "normal",
@@ -282,13 +301,15 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   sx={{
                     "& .MuiInputBase-root": {
                       alignItems: "center",
-                      color: "rgba(255, 255, 255, 0.70)",
+                      color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                       fontFamily: "Ubuntu",
                       fontSize: "0.875rem",
                       fontStyle: "normal",
                       fontWeight: 400,
                       borderRadius: "1rem",
                       minWidth: "unset",
+                      background: "var(--neutral-900, #171717)", // Adjusted background
+                      border: "1px solid var(--neutral-700, #404040)", // Adjusted border
                     },
                     "& .MuiTextField-root": {
                       minWidth: "0 !important",
@@ -297,8 +318,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                       display: "none",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
-                      border: "1px solid #2D303A",
-                      top: "-2px",
+                      border: "none",
                     },
                   }}
                 />
@@ -306,7 +326,10 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
             </LocalizationProvider>
           </Box>
         </Box>
-        <Divider sx={{ my: "0.75rem" }} />
+        <Divider
+          sx={{ my: "0.75rem", background: "var(--neutral-700, #404040)" }}
+        />{" "}
+        {/* Adjusted color */}
         <Box
           sx={{
             display: "flex",
@@ -316,7 +339,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
         >
           <Typography
             sx={{
-              color: "#FFF",
+              color: "var(--neutral-50, #FAFAFA)", // Adjusted color
               fontFeatureSettings: "'clig' off, 'liga' off",
               fontFamily: "Ubuntu",
               fontSize: "0.625rem",
@@ -335,8 +358,12 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
               alignItems: "center",
               gap: "0.25rem",
               borderRadius: "0.5rem",
-              border: "1px solid #292B2C",
-              background: "#1F2123",
+              border: "1px solid var(--neutral-700, #404040)", // Adjusted border
+              background: "var(--neutral-900, #171717)", // Adjusted background
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+              "&:hover": {
+                background: "var(--neutral-800, #262626)", // Adjusted background on hover
+              },
             }}
             onClick={() => {
               setTradeSize({
@@ -369,7 +396,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
             </svg>
             <Typography
               sx={{
-                color: "var(--Secondary-S2, #FFF)",
+                color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                 fontFeatureSettings: "'clig' off, 'liga' off",
                 fontFamily: "Ubuntu",
                 fontSize: "0.625rem",
@@ -401,7 +428,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
           <Box sx={{ flex: 1 }}>
             <Typography
               sx={{
-                color: "#FFF",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 fontFamily: "Ubuntu",
                 fontSize: "0.75rem",
                 fontStyle: "normal",
@@ -427,12 +454,14 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                 "& .MuiInputBase-root": {
                   margin: 0,
                   alignItems: "center",
-                  color: "rgba(255, 255, 255, 0.70)",
+                  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                   fontFamily: "Ubuntu",
                   fontSize: "0.875rem",
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
+                  background: "var(--neutral-900, #171717)", // Adjusted background
+                  border: "1px solid var(--neutral-700, #404040)", // Adjusted border
                   "& .MuiOutlinedInput-input": {
                     padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
@@ -442,7 +471,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   display: "none",
                 },
                 "& .MuiOutlinedInput-notchedOutline": {
-                  border: "1px solid #2D303A",
+                  border: "none",
                 },
               }}
             />
@@ -450,7 +479,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
           <Box sx={{ flex: 1 }}>
             <Typography
               sx={{
-                color: "#FFF",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 fontFamily: "Ubuntu",
                 fontSize: "0.75rem",
                 fontStyle: "normal",
@@ -476,12 +505,14 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                 "& .MuiInputBase-root": {
                   margin: 0,
                   alignItems: "center",
-                  color: "rgba(255, 255, 255, 0.70)",
+                  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                   fontFamily: "Ubuntu",
                   fontSize: "0.875rem",
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
+                  background: "var(--neutral-900, #171717)", // Adjusted background
+                  border: "1px solid var(--neutral-700, #404040)", // Adjusted border
                   "& .MuiOutlinedInput-input": {
                     padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
@@ -491,13 +522,16 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   display: "none",
                 },
                 "& .MuiOutlinedInput-notchedOutline": {
-                  border: "1px solid #2D303A",
+                  border: "none",
                 },
               }}
             />
           </Box>
         </Box>
-        <Divider sx={{ my: "0.75rem" }} />
+        <Divider
+          sx={{ my: "0.75rem", background: "var(--neutral-700, #404040)" }}
+        />{" "}
+        {/* Adjusted color */}
         <Box
           sx={{
             display: "flex",
@@ -507,7 +541,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
         >
           <Typography
             sx={{
-              color: "#FFF",
+              color: "var(--neutral-50, #FAFAFA)", // Adjusted color
               fontFeatureSettings: "'clig' off, 'liga' off",
               fontFamily: "Ubuntu",
               fontSize: "0.625rem",
@@ -526,8 +560,12 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
               alignItems: "center",
               gap: "0.25rem",
               borderRadius: "0.5rem",
-              border: "1px solid #292B2C",
-              background: "#1F2123",
+              border: "1px solid var(--neutral-700, #404040)", // Adjusted border
+              background: "var(--neutral-900, #171717)", // Adjusted background
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+              "&:hover": {
+                background: "var(--neutral-800, #262626)", // Adjusted background on hover
+              },
             }}
             onClick={() => {
               setTradeValue({
@@ -560,7 +598,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
             </svg>
             <Typography
               sx={{
-                color: "var(--Secondary-S2, #FFF)",
+                color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                 fontFeatureSettings: "'clig' off, 'liga' off",
                 fontFamily: "Ubuntu",
                 fontSize: "0.625rem",
@@ -586,7 +624,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
           <Box sx={{ flex: 1 }}>
             <Typography
               sx={{
-                color: "#FFF",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 fontFamily: "Ubuntu",
                 fontSize: "0.75rem",
                 fontStyle: "normal",
@@ -612,12 +650,14 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                 "& .MuiInputBase-root": {
                   margin: 0,
                   alignItems: "center",
-                  color: "rgba(255, 255, 255, 0.70)",
+                  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                   fontFamily: "Ubuntu",
                   fontSize: "0.875rem",
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
+                  background: "var(--neutral-900, #171717)", // Adjusted background
+                  border: "1px solid var(--neutral-700, #404040)", // Adjusted border
                   "& .MuiOutlinedInput-input": {
                     padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
@@ -627,7 +667,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   display: "none",
                 },
                 "& .MuiOutlinedInput-notchedOutline": {
-                  border: "1px solid #2D303A",
+                  border: "none",
                 },
               }}
             />
@@ -635,7 +675,7 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
           <Box sx={{ flex: 1 }}>
             <Typography
               sx={{
-                color: "#FFF",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 fontFamily: "Ubuntu",
                 fontSize: "0.75rem",
                 fontStyle: "normal",
@@ -661,12 +701,14 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                 "& .MuiInputBase-root": {
                   margin: 0,
                   alignItems: "center",
-                  color: "rgba(255, 255, 255, 0.70)",
+                  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
                   fontFamily: "Ubuntu",
                   fontSize: "0.875rem",
                   fontStyle: "normal",
                   fontWeight: 400,
                   borderRadius: "1rem",
+                  background: "var(--neutral-900, #171717)", // Adjusted background
+                  border: "1px solid var(--neutral-700, #404040)", // Adjusted border
                   "& .MuiOutlinedInput-input": {
                     padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                     margin: 0,
@@ -676,13 +718,16 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                   display: "none",
                 },
                 "& .MuiOutlinedInput-notchedOutline": {
-                  border: "1px solid #2D303A",
+                  border: "none",
                 },
               }}
             />
           </Box>
         </Box>
-        <Divider sx={{ my: "0.75rem" }} />
+        <Divider
+          sx={{ my: "0.75rem", background: "var(--neutral-700, #404040)" }}
+        />{" "}
+        {/* Adjusted color */}
         <PhoButton label={"Apply"} onClick={() => updateFilters()} />
         <Box sx={{ width: "100%", mt: "0.5rem" }}>
           <PhoButton

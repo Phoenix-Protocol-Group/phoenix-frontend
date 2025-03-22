@@ -1,4 +1,4 @@
-import { Box, Typography, MenuItem, Select, TextField } from "@mui/material";
+import { Box, Typography, MenuItem, TextField } from "@mui/material";
 import React, { useMemo, useRef, useState } from "react";
 import {
   BarChart,
@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils";
+import { CustomDropdown } from "../../Common/CustomDropdown";
 
 type Pool = {
   tokenA: { icon: string; symbol: string };
@@ -80,14 +81,15 @@ const tabUnselectedStyles = {
   gap: "0.625rem",
   borderRadius: "1rem",
   cursor: "pointer",
-  background:
-    "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+  background: "var(--neutral-900, #171717)", // Adjusted background
+  border: "1px solid var(--neutral-700, #404040)", // Adjusted border
 };
 
 const tabSelectedStyles = {
   borderRadius: "1rem",
-  border: "1px solid #E2571C",
   background: "rgba(226, 73, 26, 0.10)",
+  color: "var(--neutral-50, #FAFAFA)", // Adjusted color
 };
 
 const VolumeChart = ({
@@ -131,8 +133,8 @@ const VolumeChart = ({
         alignItems: "flex-start",
         gap: "1.5625rem",
         borderRadius: "1.5rem",
-        background:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+        background: "var(--neutral-900, #171717)", // Adjusted background
+        border: "1px solid var(--neutral-700, #404040)", // Adjusted border
       }}
     >
       <Box
@@ -154,7 +156,7 @@ const VolumeChart = ({
           >
             <Typography
               sx={{
-                color: "white",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 fontFamily: "Ubuntu",
                 fontSize: "0.75rem",
                 fontWeight: 400,
@@ -163,120 +165,17 @@ const VolumeChart = ({
             >
               Volume {resolveSelectedVolume(selectedTab)} (USD)
             </Typography>
-            <Select
-              value={selectedPoolForVolume}
-              onChange={(e) => {
-                if (e.target.value != "12342") {
-                  setSelectedPoolForVolume(e.target.value);
-                }
-              }}
-              displayEmpty
-              open={open}
-              onOpen={() => setOpen(true)}
-              onClose={handleClose}
-              fullWidth
-              sx={{
-                width: { xs: "100%", sm: "auto" },
-                color: "white",
-                fontFamily: "Ubuntu",
-                background: "rgba(255, 255, 255, 0.1)",
-                borderRadius: "16px",
-                fontSize: "0.75rem",
-                fontWeight: 400,
-                ".MuiOutlinedInput-notchedOutline": { border: 0 },
-                ".MuiSelect-icon": { color: "white" },
-                ".MuiSelect-select": {
-                  padding: "8px 8px",
-                },
-              }}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    background:
-                      "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
-                    border: "1px solid #292B2C",
-                    borderRadius: "0.5rem",
-                    boxShadow:
-                      "-3px 3px 10px 0px rgba(25, 13, 1, 0.10),-12px 13px 18px 0px rgba(25, 13, 1, 0.09),-26px 30px 24px 0px rgba(25, 13, 1, 0.05),-46px 53px 28px 0px rgba(25, 13, 1, 0.02),-73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
-                    maxHeight: 300,
-                    overflowY: "auto",
-                  },
-                },
-              }}
-              renderValue={(selected) => {
-                if (selected === "All" || !selected) {
-                  return "All Pools";
-                }
-                const pool = pools.find((p) => p.contractAddress === selected);
-                return `${pool?.tokenA.symbol} / ${pool?.tokenB.symbol}`;
-              }}
-            >
-              <MenuItem
-                disabled
-                disableRipple
-                onClick={(e) => e.stopPropagation()}
-                style={{ pointerEvents: "none" }}
-              >
-                <Box
-                  sx={{ pointerEvents: "auto" }}
-                  onKeyDown={(e) => {
-                    e.stopPropagation();
-                    e.nativeEvent.stopImmediatePropagation();
-                  }}
-                >
-                  <TextField
-                    inputRef={searchRef}
-                    placeholder="Search Pools"
-                    variant="standard"
-                    fullWidth
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    InputProps={{
-                      disableUnderline: true,
-                      style: { color: "white" },
-                    }}
-                    sx={{
-                      mb: 1,
-                      "& .MuiInputBase-input": {
-                        padding: 0,
-                      },
-                    }}
-                  />
-                </Box>
-              </MenuItem>
-              <MenuItem value={undefined} sx={{ textAlign: "center" }}>
-                All
-              </MenuItem>
-              {filteredPools.map((pool) => (
-                <MenuItem
-                  key={pool.contractAddress}
-                  value={pool.contractAddress}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <img
-                      src={pool.tokenA.icon}
-                      alt={pool.tokenA.symbol}
-                      width={20}
-                    />
-                    <Typography>{pool.tokenA.symbol}</Typography>
-                    <Typography>/</Typography>
-                    <img
-                      src={pool.tokenB.icon}
-                      alt={pool.tokenB.symbol}
-                      width={20}
-                    />
-                    <Typography>{pool.tokenB.symbol}</Typography>
-                  </Box>
-                </MenuItem>
-              ))}
-            </Select>
+            <CustomDropdown
+              pools={pools}
+              selectedPoolForVolume={selectedPoolForVolume}
+              setSelectedPoolForVolume={setSelectedPoolForVolume}
+            />
           </Box>
           <Typography
             sx={{
-              color: "white",
+              color: "var(--neutral-50, #FAFAFA)", // Adjusted color
               fontFamily: "Ubuntu",
               fontSize: "1.5rem",
-              fontWeight: 700,
             }}
           >
             {formatCurrencyStatic.format(totalVolume)}
@@ -317,7 +216,7 @@ const VolumeChart = ({
         </Box>
       </Box>
       <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={data}>
+        <BarChart data={data} barCategoryGap={2}>
           <defs>
             <linearGradient id="highGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#E23F1C" />

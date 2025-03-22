@@ -75,6 +75,7 @@ export const Carousel = ({ items }: CarouselProps) => {
               opacity: 0.8,
               marginTop: "1rem",
               fontWeight: 600,
+              color: "var(--neutral-50, #FAFAFA)",
             }}
           >
             {items[currentIndex].title}
@@ -85,6 +86,7 @@ export const Carousel = ({ items }: CarouselProps) => {
               opacity: 0.4,
               marginBottom: "1rem",
               textAlign: "center",
+              color: "var(--neutral-300, #D4D4D4)",
             }}
           >
             {items[currentIndex].text}
@@ -111,7 +113,10 @@ export const Carousel = ({ items }: CarouselProps) => {
               width: "8px",
               height: "8px",
               borderRadius: "50%",
-              backgroundColor: currentIndex === index ? "#E2621B" : "#ccc",
+              backgroundColor:
+                currentIndex === index
+                  ? "#E2621B"
+                  : "var(--neutral-700, #404040)",
               margin: "0 4px",
             }}
           />

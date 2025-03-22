@@ -35,6 +35,7 @@ const TransactionHeader = ({
         lineHeight: "200%",
         fontWeight: "700",
         textTransform: "uppercase",
+        color: "var(--neutral-300, #D4D4D4)", // Adjusted color
         opacity: active && label !== "Actions" ? "1" : "0.6",
         mr: 0.5,
       }}
@@ -47,10 +48,17 @@ const TransactionHeader = ({
           sx={{
             fontSize: "14px",
             transform: active === "desc" ? "rotate(180deg)" : "none",
+            color: "var(--neutral-300, #D4D4D4)", // Adjusted color
           }}
         />
       ) : (
-        <SwapVert sx={{ fontSize: "14px", opacity: "0.6" }} />
+        <SwapVert
+          sx={{
+            fontSize: "14px",
+            opacity: "0.6",
+            color: "var(--neutral-300, #D4D4D4)",
+          }}
+        /> // Adjusted opacity and color
       ))}
   </Box>
 );

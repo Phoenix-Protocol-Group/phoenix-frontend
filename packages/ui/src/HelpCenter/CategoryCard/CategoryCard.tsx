@@ -16,20 +16,20 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
     <Box
       sx={{
         display: "inline-block",
-        background: "linear-gradient(180deg, #E2391B 0%, #E29E1B 100%)",
+        background: "var(--primary-500, #F97316)",
         padding: "1px", // This is the border witdh
-        borderRadius: "16px",
+        borderRadius: "12px",
         width: "100%",
       }}
     >
       <Box
         sx={{
           display: "flex",
-          background: Colors.background,
-          padding: "1.125rem",
+          background: "var(--neutral-900, #171717)",
+          padding: "1rem",
           alignItems: "center",
           flexShrink: 0,
-          borderRadius: "16px",
+          borderRadius: "12px",
           transition: "all 0.3s ease-in-out",
           "&:hover": {
             cursor: "pointer",
@@ -42,8 +42,8 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
           src={thumbnail}
           sx={{
             display: "flex",
-            width: "5rem",
-            height: "5rem",
+            width: "4rem",
+            height: "4rem",
             justifyContent: "center",
             alignItems: "center",
             flexShrink: 0,
@@ -52,16 +52,21 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
         />
         <Box>
           <Typography
-            sx={{ fontSize: "1.125rem", fontWeight: 700, ml: "1rem" }}
+            sx={{
+              fontSize: "1rem",
+              fontWeight: 700,
+              ml: "1rem",
+              color: "var(--neutral-50, #FAFAFA)",
+            }}
           >
             {name}
           </Typography>
           <Typography
             sx={{
-              fontSize: "0.875rem",
+              fontSize: "0.75rem",
               fontWeight: 400,
               ml: "1rem",
-              color: "#BFBFBF",
+              color: "var(--neutral-300, #D4D4D4)",
             }}
           >
             {description}

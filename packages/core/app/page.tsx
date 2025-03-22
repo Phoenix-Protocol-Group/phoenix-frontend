@@ -466,7 +466,7 @@ export default function Page() {
           <Grid
             item
             xs={12}
-            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+            sx={{ display: "flex", flexDirection: "column", gap: 4 }}
           >
             <Tile
               value={formatCurrencyStatic.format(dailyVolume)}

@@ -1,7 +1,7 @@
 "use client";
 import theme from "../Theme";
 import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider } from "@mui/material";
+import { ThemeProvider, Box } from "@mui/material";
 import React from "react";
 
 const PhoenixThemeProvider = ({ children }: { children: any }) => {

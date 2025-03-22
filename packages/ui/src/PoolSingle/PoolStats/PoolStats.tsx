@@ -22,36 +22,39 @@ const PoolStatsBox = ({ title, value }: PoolStatsBoxProps) => {
       <Box
         sx={{
           display: "flex",
-          padding: "24px",
           flexDirection: "column",
           alignItems: "flex-start",
           gap: "12px",
-          position: "relative",
+          padding: "16px",
           borderRadius: "12px",
-          border: "1px solid var(--Secondary-S4, #2C2C31)",
-          background:
-            "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+          border: "1px solid var(--neutral-700, #404040)",
+          background: "var(--neutral-900, #171717)",
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.25)",
           overflow: "hidden",
+          position: "relative",
+          transition: "transform 0.3s ease, box-shadow 0.3s ease",
+          "&:hover": {
+            boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.35)",
+          },
         }}
       >
         <Typography
           sx={{
-            color: "var(--Secondary-S2-2, #BDBEBE)",
+            color: "var(--neutral-300, #D4D4D4)",
             fontFamily: "Ubuntu",
             fontSize: "12px",
-            fontWeight: 700,
-            lineHeight: "140%",
+            fontWeight: 500,
+            textTransform: "uppercase",
           }}
         >
           {title.toUpperCase()}
         </Typography>
         <Typography
           sx={{
-            color: "var(--Secondary-S2, #FFF)",
+            color: "var(--neutral-50, #FAFAFA)",
             fontFamily: "Ubuntu",
             fontSize: "24px",
             fontWeight: 700,
-            lineHeight: "140%",
           }}
         >
           {value}

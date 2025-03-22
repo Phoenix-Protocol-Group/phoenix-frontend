@@ -11,6 +11,7 @@ import {
   TradeHistoryResponse,
   RatioResponse,
   PriceHistoryResponse,
+  TickerInfo,
 } from "./types";
 import { constants } from "..";
 
@@ -135,7 +136,15 @@ export const API = {
   },
   async getTickers(): Promise<TickersResponse> {
     const { data } = await apiClient.get(`/tickers`);
-    return data;
+
+    // Sort out double entries
+    const uniqueTickers = data.filter(
+      (ticker: TickerInfo, index: number, self: TickerInfo[]) =>
+        index ===
+        self.findIndex((t: TickerInfo) => t.pool_id === ticker.pool_id)
+    );
+
+    return uniqueTickers;
   },
   async getMostTraded(): Promise<MostTradedResponse> {
     const { data } = await apiClient.get(`/assets/most-traded`);

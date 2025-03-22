@@ -32,8 +32,8 @@ const GlowingChart = ({ data }: { data: number[][] }) => (
             </feMerge>
           </filter>
           <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#E2491A" stopOpacity={0.2} />
-            <stop offset="95%" stopColor="#E2491A" stopOpacity={0.02} />
+            <stop offset="5%" stopColor="#F97316" stopOpacity={0.2} />
+            <stop offset="95%" stopColor="#F97316" stopOpacity={0.02} />
           </linearGradient>
         </defs>
         <YAxis
@@ -44,7 +44,7 @@ const GlowingChart = ({ data }: { data: number[][] }) => (
         <Area
           type="monotone"
           dataKey={(v) => v[1]}
-          stroke="#E2491A"
+          stroke="#F97316"
           strokeWidth={2}
           filter="url(#neonGlow)"
           fill="url(#chartFill)"
@@ -95,16 +95,17 @@ const LabTabs = ({
   const buttonStyles = {
     flex: 1,
     maxWidth: "200px",
-    color: "#FFF",
+    color: "var(--neutral-50, #FAFAFA)",
     fontSize: "0.875rem",
-    fontWeight: 700,
+    fontWeight: 500,
     textTransform: "none",
     borderRadius: "12px",
     transition: "all 0.3s",
-    backgroundImage:
-      "linear-gradient(95.06deg, rgb(226, 73, 26) 0%, rgb(226, 27, 27) 16.92%, rgb(226, 73, 26) 42.31%, rgb(226, 170, 27) 99.08%)",
+    background: "var(--neutral-900, #171717)",
+    border: "1px solid var(--neutral-700, #404040)",
     "&:hover": {
       transform: "scale(1.05)",
+      background: "var(--neutral-800, #262626)",
     },
   };
 
@@ -116,11 +117,12 @@ const LabTabs = ({
             onClick={() => setValue("1")}
             sx={{
               ...buttonStyles,
-              backgroundImage:
-                value === "1"
-                  ? "linear-gradient(95.06deg, rgb(226, 73, 26) 0%, rgb(226, 27, 27) 16.92%, rgb(226, 73, 26) 42.31%, rgb(226, 170, 27) 99.08%)"
-                  : "none",
-              filter: value === "1" ? "brightness(1.2)" : "brightness(1)",
+              background:
+                value === "1" ? "#F97316" : "var(--neutral-900, #171717)",
+              "&:hover": {
+                background:
+                  value === "1" ? "#F97316" : "var(--neutral-800, #262626)",
+              },
             }}
           >
             Add Liquidity
@@ -129,11 +131,12 @@ const LabTabs = ({
             onClick={() => setValue("2")}
             sx={{
               ...buttonStyles,
-              backgroundImage:
-                value === "2"
-                  ? "linear-gradient(95.06deg, rgb(226, 73, 26) 0%, rgb(226, 27, 27) 16.92%, rgb(226, 73, 26) 42.31%, rgb(226, 170, 27) 99.08%)"
-                  : "none",
-              filter: value === "2" ? "brightness(1.2)" : "brightness(1)",
+              background:
+                value === "2" ? "#F97316" : "var(--neutral-900, #171717)",
+              "&:hover": {
+                background:
+                  value === "2" ? "#F97316" : "var(--neutral-800, #262626)",
+              },
             }}
           >
             Remove Liquidity
@@ -204,63 +207,98 @@ const PoolLiquidity = ({
   return (
     <Box
       sx={{
-        borderRadius: "16px",
-        background:
-          "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        p: 3,
+        borderRadius: "12px",
+        background: "var(--neutral-900, #171717)",
+        border: "1px solid var(--neutral-700, #404040)",
+        p: 2,
       }}
     >
-      <Box display="flex" justifyContent="center" gap={2} mb={3}>
+      <Box display="flex" justifyContent="center" gap={2} mb={2}>
         <motion.img
           src={tokenA.icon}
           alt={tokenA.name}
-          width={48}
-          height={48}
+          width={40}
+          height={40}
           whileHover={{ scale: 1.1 }}
         />
         <motion.img
           src={tokenB.icon}
           alt={tokenB.name}
-          width={48}
-          height={48}
+          width={40}
+          height={40}
           whileHover={{ scale: 1.1 }}
         />
       </Box>
       <Typography
-        sx={{ color: "#FFF", textAlign: "center", fontWeight: 700, mb: 2 }}
+        sx={{
+          color: "var(--neutral-50, #FAFAFA)",
+          textAlign: "center",
+          fontWeight: 500,
+          mb: 1,
+        }}
       >
         Pool Liquidity
       </Typography>
-      <Divider sx={{ mb: 2, borderColor: "rgba(255,255,255,0.1)" }} />
+      <Divider sx={{ mb: 1, borderColor: "var(--neutral-700, #404040)" }} />
       <GlowingChart data={poolHistory} />
-      <Grid container spacing={2} mt={2}>
+      <Grid container spacing={2} mt={1}>
         <Grid item xs={4}>
           <Typography
-            sx={{ color: "#FFF", fontSize: "0.875rem", opacity: 0.7 }}
+            sx={{
+              color: "var(--neutral-400, #A3A3A3)",
+              fontSize: "0.75rem",
+              opacity: 1,
+            }}
           >
             {tokenA.name}
           </Typography>
-          <Typography sx={{ color: "#FFF", fontWeight: 700 }}>
+          <Typography
+            sx={{
+              color: "var(--neutral-300, #D4D4D4)",
+              fontWeight: 500,
+              fontSize: "0.875rem",
+            }}
+          >
             {liquidityA}
           </Typography>
         </Grid>
         <Grid item xs={4}>
           <Typography
-            sx={{ color: "#FFF", fontSize: "0.875rem", opacity: 0.7 }}
+            sx={{
+              color: "var(--neutral-400, #A3A3A3)",
+              fontSize: "0.75rem",
+              opacity: 1,
+            }}
           >
             {tokenB.name}
           </Typography>
-          <Typography sx={{ color: "#FFF", fontWeight: 700 }}>
+          <Typography
+            sx={{
+              color: "var(--neutral-300, #D4D4D4)",
+              fontWeight: 500,
+              fontSize: "0.875rem",
+            }}
+          >
             {liquidityB}
           </Typography>
         </Grid>
         <Grid item xs={4}>
           <Typography
-            sx={{ color: "#FFF", fontSize: "0.875rem", opacity: 0.7 }}
+            sx={{
+              color: "var(--neutral-400, #A3A3A3)",
+              fontSize: "0.75rem",
+              opacity: 1,
+            }}
           >
             Ratio
           </Typography>
-          <Typography sx={{ color: "#FFF", fontWeight: 700 }}>
+          <Typography
+            sx={{
+              color: "var(--neutral-300, #D4D4D4)",
+              fontWeight: 500,
+              fontSize: "0.875rem",
+            }}
+          >
             1:{(liquidityB / liquidityA).toFixed(2)}
           </Typography>
         </Grid>

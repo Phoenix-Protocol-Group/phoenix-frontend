@@ -34,18 +34,17 @@ const OptionComponent = ({
   const baseStyles = {
     display: "flex",
     flexDirection: { xs: "column", md: "row" },
-    padding: { md: "1.125rem 1.5rem", xs: "1rem" },
+    padding: { md: "1rem", xs: "0.75rem" },
     alignItems: "center",
-    gap: "0.25rem",
-    background:
-      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-    border: "2px solid transparent",
-    width: { xs: "auto", md: "100%" },
-    marginTop: "1.25rem",
+    gap: "0.5rem",
+    background: "var(--neutral-800, #262626)",
+    border: "1px solid var(--neutral-700, #404040)",
+    width: "100%",
+    marginTop: "0.75rem",
     borderRadius: "8px",
     transition: "all 0.2s ease-in-out",
     opacity: allowed ? 1 : 0.5,
-    marginRight: { xs: "1rem", md: 0 },
+    marginRight: { xs: "0.5rem", md: 0 },
     "&:hover": hoverStyles,
   };
 
@@ -169,9 +168,9 @@ const ConnectWallet = ({
     transform: { md: "translate(-50%, -50%)", xs: "translate(-50%, 0)" },
     width: { xs: "96vh", md: 800 },
     maxWidth: "calc(100vw - 16px)",
-    background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
-    borderRadius: "16px",
-    flexDirection: { xs: "row", md: "column" },
+    background: "var(--neutral-900, #171717)",
+    borderRadius: "12px",
+    flexDirection: { xs: "column", md: "column" },
     minHeight: "50vh",
     maxHeight: { md: "530px", xs: "100vh" },
   };
