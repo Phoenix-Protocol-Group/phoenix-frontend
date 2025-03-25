@@ -51,7 +51,6 @@ const FilterBar = ({
           display: "flex",
           gap: "1rem",
           "& > *": {
-            flex: "1 1 auto",
             minWidth: "150px",
             maxWidth: "200px",
           },
@@ -66,6 +65,7 @@ const FilterBar = ({
               )
             }
             placeholder="Assets"
+            displayEmpty
             sx={{
               color: "#D4D4D4", // var(--neutral-300, #D4D4D4)
               fontFamily: "Ubuntu",
@@ -81,6 +81,9 @@ const FilterBar = ({
               "& .MuiSelect-select": {
                 padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                 margin: 0,
+              },
+              "& .MuiSelect-select:not([value])": {
+                color: "#D4D4D4", // Placeholder color
               },
             }}
           >
@@ -93,6 +96,7 @@ const FilterBar = ({
             value={typeFilter}
             onChange={(e) => onTypeFilterChange(e.target.value)}
             placeholder="Type"
+            displayEmpty
             sx={{
               color: "#D4D4D4", // var(--neutral-300, #D4D4D4)
               fontFamily: "Ubuntu",
@@ -109,8 +113,12 @@ const FilterBar = ({
                 padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                 margin: 0,
               },
+              "& .MuiSelect-select:not([value])": {
+                color: "#D4D4D4", // Placeholder color
+              },
             }}
           >
+            <MenuItem value="All">All Types</MenuItem>
             {types.map((type) => (
               <MenuItem key={type} value={type}>
                 {type}
@@ -122,16 +130,16 @@ const FilterBar = ({
           <Select
             value={platformFilter}
             onChange={(e) => onPlatformFilterChange(e.target.value)}
-            placeholder="Platform"
+            displayEmpty
             sx={{
-              color: "#D4D4D4", // var(--neutral-300, #D4D4D4)
+              color: "#D4D4D4",
               fontFamily: "Ubuntu",
               fontSize: "0.875rem",
               fontStyle: "normal",
               fontWeight: 400,
               borderRadius: "1rem",
-              background: "#171717", // var(--neutral-900, #171717)
-              border: "1px solid #404040", // var(--neutral-700, #404040)
+              background: "#171717",
+              border: "1px solid #404040",
               "& .MuiOutlinedInput-notchedOutline": {
                 border: "none",
               },
@@ -139,8 +147,12 @@ const FilterBar = ({
                 padding: "0.5rem 0.75rem 0.75rem 0.75rem",
                 margin: 0,
               },
+              "& .MuiSelect-select:not([value])": {
+                color: "#D4D4D4",
+              },
             }}
           >
+            <MenuItem value="All">All Platforms</MenuItem>
             {platforms.map((platform) => (
               <MenuItem key={platform} value={platform}>
                 {platform}
