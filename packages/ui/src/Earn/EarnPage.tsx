@@ -1,19 +1,9 @@
-"use client";
-import { Tab, Tabs } from "@mui/material";
-import { Box } from "@mui/system";
-import { useAppStore } from "@phoenix-protocol/state";
-import { StrategiesTable, YieldSummary } from "@phoenix-protocol/ui";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { Box, Tabs, Tab } from "@mui/material"; // Import Tabs and Tab
+import { YieldSummary } from "./YieldSummary/YieldSummary";
+import { StrategiesTable } from "./StrategiesTable/StrategiesTable";
 
-export default function SwapPage(): JSX.Element {
-  const appStore = useAppStore();
-
-  // Loader
-  useEffect(() => {
-    appStore.setLoading(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+const EarnPage = () => {
   const [assetsFilter, setAssetsFilter] = useState<
     "Your assets" | "All Assets"
   >("Your assets");
@@ -116,4 +106,6 @@ export default function SwapPage(): JSX.Element {
       </Box>
     </Box>
   );
-}
+};
+
+export { EarnPage };
