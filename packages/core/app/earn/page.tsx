@@ -1,5 +1,5 @@
 "use client";
-import { Tab, Tabs } from "@mui/material";
+import { Tab, Tabs, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useAppStore } from "@phoenix-protocol/state";
 import { StrategiesTable, YieldSummary } from "@phoenix-protocol/ui";
@@ -29,7 +29,7 @@ export default function SwapPage(): JSX.Element {
         address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
         icon: "/cryptoIcons/xlm.svg",
       },
-      name: "Stellar Yield",
+      name: "Provide Liquidity XLM/PHO",
       tvl: 123456,
       apr: 0.05,
       rewardToken: "XLM",
@@ -41,10 +41,10 @@ export default function SwapPage(): JSX.Element {
         address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
         icon: "/cryptoIcons/pho.svg",
       },
-      name: "Phoenix Boost",
+      name: "Provide Liquidity XLM/PHO",
       tvl: 789012,
       apr: 0.1,
-      rewardToken: "PHX",
+      rewardToken: "PHO",
       unbondTime: "7 Days",
     },
   ];
@@ -57,7 +57,28 @@ export default function SwapPage(): JSX.Element {
   };
 
   return (
-    <Box sx={{ padding: "2rem" }}>
+    <Box
+      sx={{
+        maxWidth: "1440px",
+        width: "100%",
+        padding: { xs: 0, md: "2.5rem" },
+        mt: { xs: "4.5rem", md: 1 },
+      }}
+    >
+      <input type="hidden" value="Phoenix DeFi Hub - Earn" />
+      <Typography
+        sx={{
+          color: "#FFF",
+          fontFamily: "Ubuntu",
+          fontSize: "2rem",
+          fontStyle: "normal",
+          fontWeight: 700,
+          lineHeight: "normal",
+          mb: "1.5rem",
+        }}
+      >
+        Earn
+      </Typography>
       <YieldSummary
         totalValue={5000}
         claimableRewards={100}
