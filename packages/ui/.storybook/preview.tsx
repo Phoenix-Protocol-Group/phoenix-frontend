@@ -1,9 +1,7 @@
 import type { Preview } from "@storybook/react";
-// Import theme directly without MUI components to avoid emotion issues at this level
-import theme from "../src/Theme";
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
-import React from 'react';
 import { withMuiTheme } from "./withMuiTheme.decorator";
+import React from "react";
 
 const customViewports = {
   iPhone12: {
@@ -73,10 +71,9 @@ const preview: Preview = {
       },
     },
     backgrounds: {
-      default: 'dark',
+      default: "dark",
     },
   },
-  // Just use the decorator we created separately
   decorators: [withMuiTheme],
 };
 

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { VestingTokensModal } from "./VestingTokensModal";
 import { PhoenixVestingContract } from "@phoenix-protocol/contracts";
 import { Grid } from "@mui/material";
+import React from "react";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof VestingTokensModal> = {

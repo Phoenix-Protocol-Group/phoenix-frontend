@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { SidebarNavigation } from "./SidebarNavigation";
 import MailIcon from "@mui/icons-material/Mail";
+import React from "react";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof SidebarNavigation> = {
