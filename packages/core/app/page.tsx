@@ -488,6 +488,8 @@ export default function Page() {
           open={tokenInfoOpen}
           onClose={() => setTokenInfoOpen(false)}
           asset={selectedTokenForInfo}
+          userBalance={0}
+          pools={[]}
         />
       )}
 
