@@ -154,22 +154,8 @@ const TransactionsTable = ({
             </Tooltip>
           </Box>
           <FilterMenu
-            fromAsset={{
-              name: "",
-              address: "",
-              icon: "",
-            }}
-            toAsset={{
-              name: "",
-              address: "",
-              icon: "",
-            }}
-            fromAmount={0}
-            toAmount={0}
-            tradeValue={""}
-            date={0}
-            txHash={""}
-            isMobile={false}
+            activeFilters={activeFilters}
+            applyFilters={applyFilters}
           />
         </Box>
         {!isMobile && ( // Hide header on mobile
