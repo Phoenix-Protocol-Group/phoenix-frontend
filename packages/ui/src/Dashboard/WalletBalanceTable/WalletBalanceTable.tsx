@@ -279,9 +279,11 @@ const ListItem = ({
 
   return (
     <motion.div
+      whileHover={{ scale: 0.98 }}
+      whileTap={{ scale: 0.95 }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.2 }}
     >
       <Box
         sx={{
@@ -290,7 +292,11 @@ const ListItem = ({
           background: "var(--neutral-900, #171717)",
           border: "1px solid var(--neutral-700, #404040)",
           mb: 2,
+          "&:hover": {
+            cursor: "pointer",
+          },
         }}
+        onClick={() => onTokenClick(contractId)}
       >
         <Grid container alignItems="center" spacing={1}>
           <Grid item xs={6} md={3} display="flex" alignItems="center">
@@ -308,49 +314,6 @@ const ListItem = ({
             >
               {name}
             </Typography>
-            {name !== "XLM" && (
-              <Box
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  marginLeft: "4px",
-                }}
-              >
-                <Tooltip
-                  title="More information"
-                  arrow
-                  placement="top"
-                  sx={{
-                    "& .MuiTooltip-arrow": {
-                      color: "var(--primary-500, #F97316)",
-                    },
-                    "& .MuiTooltip-tooltip": {
-                      backgroundColor: "var(--neutral-800, #262626)",
-                      color: "var(--neutral-300, #D4D4D4)",
-                      fontSize: "10px",
-                    },
-                  }}
-                >
-                  <motion.div
-                    whileHover={{
-                      scale: 1.2,
-                      rotate: 15,
-                      transition: { duration: 0.2 },
-                    }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <InfoOutlined
-                      sx={{
-                        color: "var(--primary-500, #F97316)",
-                        fontSize: "16px",
-                      }}
-                      onClick={() => onTokenClick(contractId)}
-                    />
-                  </motion.div>
-                </Tooltip>
-              </Box>
-            )}
             {/* If Name = PHO and has vesting, show a lock button */}
             {name === "PHO" && hasVesting && (
               <Box
