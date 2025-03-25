@@ -2,6 +2,9 @@
 const nextConfig = {
   experimental: {
     reactCompiler: true,
+    turbo: {
+      // Remove the problematic resolveAlias configuration
+    }
   },
   webpack: (config) => {
     config.resolve.alias.canvas = false;
