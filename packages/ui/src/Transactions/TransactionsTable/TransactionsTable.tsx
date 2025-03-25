@@ -6,7 +6,12 @@ import { TransactionsTableProps } from "@phoenix-protocol/types";
 import TransactionEntry from "./TransactionEntry";
 import TransactionHeader from "./TransactionsHeader";
 import { maxWidth } from "@mui/system";
-import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
+import {
+  colors,
+  typography,
+  spacing,
+  borderRadius,
+} from "../../Theme/styleConstants";
 
 const customSpacing = {
   xs: spacing.xs,
@@ -149,8 +154,22 @@ const TransactionsTable = ({
             </Tooltip>
           </Box>
           <FilterMenu
-            activeFilters={activeFilters}
-            applyFilters={applyFilters}
+            fromAsset={{
+              name: "",
+              address: "",
+              icon: "",
+            }}
+            toAsset={{
+              name: "",
+              address: "",
+              icon: "",
+            }}
+            fromAmount={0}
+            toAmount={0}
+            tradeValue={""}
+            date={0}
+            txHash={""}
+            isMobile={false}
           />
         </Box>
         {!isMobile && ( // Hide header on mobile

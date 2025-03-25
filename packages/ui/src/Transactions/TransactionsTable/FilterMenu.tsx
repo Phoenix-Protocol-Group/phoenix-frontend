@@ -1,259 +1,261 @@
-import React, { useState } from "react";
-import { Box, Menu, Typography, Divider } from "@mui/material";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import dayjs from "dayjs";
-import { FilterMenuProps } from "@phoenix-protocol/types";
-import { Button } from "../../Button/Button";
-import { colors, typography, spacing, borderRadius, shadows } from "../../Theme/styleConstants";
+import React from "react";
+import { Box, Grid, Typography, useMediaQuery } from "@mui/material";
+import { ArrowForward } from "@mui/icons-material";
+import LaunchIcon from "@mui/icons-material/Launch";
+import { TransactionTableEntryProps } from "@phoenix-protocol/types";
 
-const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-
-  // Set State for filters
-  const [dateRange, setDateRange] = React.useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
-    from: activeFilters.dateRange.from,
-    to: activeFilters.dateRange.to,
-  });
-  const [tradeSize, setTradeSize] = React.useState<{
-    from: number | undefined;
-    to: number | undefined;
-  }>({
-    from: activeFilters.tradeSize.from,
-    to: activeFilters.tradeSize.to,
-  });
-  const [tradeValue, setTradeValue] = React.useState<{
-    from: number | undefined;
-    to: number | undefined;
-  }>({
-    from: activeFilters.tradeValue.from,
-    to: activeFilters.tradeValue.to,
-  });
-
-  // React useEffect to update filters
-  React.useEffect(() => {
-    setDateRange({
-      from: activeFilters.dateRange.from,
-      to: activeFilters.dateRange.to,
-    });
-    setTradeSize({
-      from: activeFilters.tradeSize.from,
-      to: activeFilters.tradeSize.to,
-    });
-    setTradeValue({
-      from: activeFilters.tradeValue.from,
-      to: activeFilters.tradeValue.to,
-    });
-  }, [activeFilters]);
-
-  // Function to update new filters
-  const updateFilters = () => {
-    applyFilters({
-      dateRange,
-      tradeSize,
-      tradeValue,
-    });
-    handleClose();
-  };
-
-  // Function to reset filters
-  const resetFilters = () => {
-    setDateRange({
-      from: undefined,
-      to: undefined,
-    });
-    setTradeSize({
-      from: undefined,
-      to: undefined,
-    });
-    setTradeValue({
-      from: undefined,
-      to: undefined,
-    });
-    applyFilters({
-      dateRange: {
-        from: undefined,
-        to: undefined,
-      },
-      tradeSize: {
-        from: undefined,
-        to: undefined,
-      },
-      tradeValue: {
-        from: undefined,
-        to: undefined,
-      },
-    });
-  };
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
+const TransactionEntry = (
+  props: TransactionTableEntryProps & { isMobile: boolean }
+) => {
+  const { isMobile } = props; // Destructure isMobile
+  const BoxStyle = {
+    p: 3,
+    borderRadius: "12px", // Adjusted border radius
+    background: "var(--neutral-900, #171717)", // Adjusted background
+    border: "1px solid var(--neutral-700, #404040)", // Adjusted border
+    position: "relative",
+    overflow: "hidden",
+    boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
   };
 
   return (
-    <div>
-      <Button 
-        onClick={handleClick}
-        type="secondary"
-        label="Filter"
+    <Box sx={{ ...BoxStyle, mt: 2 }}>
+      <Box
+        component="img"
+        src={props.fromAsset.icon}
+        alt={props.fromAsset.name}
         sx={{
-          padding: `${spacing.xs} ${spacing.sm}`,
-          fontSize: typography.fontSize.sm,
+          position: "absolute",
+          top: "50%",
+
+          width: "20%",
+          height: "auto",
+          opacity: 0.1,
+          transform: "translateY(-50%)",
+          ...(isMobile ? { right: 80 } : { left: -40 }),
         }}
       />
-      
-      <Menu
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          "aria-labelledby": "basic-button",
-        }}
+
+      <Box
+        component="img"
+        src={props.toAsset.icon}
+        alt={props.toAsset.name}
         sx={{
-          "& .MuiMenu-paper": {
-            display: "flex",
-            padding: `${spacing.sm} ${spacing.lg}`,
-            flexDirection: "column",
-            gap: spacing.lg,
-            borderRadius: borderRadius.md,
-            border: `1px solid ${colors.neutral[700]}`,
-            background: colors.neutral[800],
-            color: colors.neutral[300],
-            boxShadow: shadows.tooltip,
-          },
+          position: "absolute",
+          top: "50%",
+          right: isMobile ? 0 : -40,
+          width: "20%",
+          height: "auto",
+          opacity: 0.1,
+          transform: "translateY(-50%)",
         }}
+      />
+
+      <Grid
+        container
+        alignItems="center"
+        spacing={isMobile ? 1 : 3}
+        sx={{ position: "relative", zIndex: 2 }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mt: spacing.sm,
-            gap: spacing.sm,
-          }}
-        >
-          <Box flex={1}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer
-                components={["DatePicker"]}
-                sx={{
-                  "& .MuiTextField-root": {
-                    minWidth: "0 !important",
-                  },
-                }}
-              >
-                <DatePicker
-                  value={dateRange.from ? dayjs(dateRange.from) : undefined}
-                  onChange={(newValue) =>
-                    setDateRange({
-                      ...dateRange,
-                      from: newValue ? newValue.toDate() : undefined,
-                    })
-                  }
-                  slotProps={{
-                    field: { clearable: true },
-                  }}
-                  sx={{
-                    "& .MuiInputBase-root": {
-                      alignItems: "center",
-                      color: colors.neutral[300],
-                      fontFamily: typography.fontFamily,
-                      fontSize: typography.fontSize.sm,
-                      fontWeight: typography.fontWeights.regular,
-                      borderRadius: borderRadius.lg,
-                      minWidth: "unset",
-                      background: colors.neutral[900],
-                      border: `1px solid ${colors.neutral[700]}`,
-                    },
-                    "& legend": {
-                      display: "none",
-                    },
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      border: "none",
-                    },
-                  }}
-                />
-              </DemoContainer>
-            </LocalizationProvider>
-          </Box>
-          <Box flex={1}>
+        <Grid item xs={12} md={2}>
+          {isMobile && (
             <Typography
               sx={{
-                color: colors.neutral[400],
-                fontFamily: typography.fontFamily,
-                fontSize: typography.fontSize.xs,
-                fontWeight: typography.fontWeights.regular,
-                lineHeight: "140%",
+                fontSize: "12px",
+                fontWeight: "700",
+                textTransform: "uppercase",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
                 opacity: 0.6,
               }}
             >
-              To
+              Date
             </Typography>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer
-                components={["DatePicker"]}
+          )}
+          <Typography
+            sx={{
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+              fontSize: isMobile ? "14px" : "16px",
+              fontWeight: "400",
+              opacity: 0.6,
+            }}
+          >
+            {new Date(props.date).toLocaleString()}
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12} md={5}>
+          {isMobile && (
+            <Typography
+              sx={{
+                fontSize: "12px",
+                fontWeight: "700",
+                textTransform: "uppercase",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
+                opacity: 0.6,
+              }}
+            >
+              Swap Details
+            </Typography>
+          )}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Box
+                component="img"
+                src={props.fromAsset.icon}
+                alt={props.fromAsset.name}
                 sx={{
-                  "& .MuiTextField-root": {
-                    minWidth: "0 !important",
-                  },
+                  width: "20px",
+                  height: "20px",
+                  mr: "0.5rem",
+                  opacity: 0.7,
+                }} // Adjusted opacity
+              />
+              <Typography
+                sx={{
+                  color: "var(--neutral-50, #FAFAFA)", // Adjusted color
+                  fontSize: isMobile ? "14px" : "16px",
+                  fontWeight: "500", // Adjusted font weight
                 }}
               >
-                <DatePicker
-                  value={dateRange.to ? dayjs(dateRange.to) : undefined}
-                  onChange={(newValue: dayjs.Dayjs | null) =>
-                    setDateRange({
-                      ...dateRange,
-                      to: newValue === null ? undefined : newValue.toDate(),
-                    })
-                  }
-                  disableFuture
-                  slotProps={{
-                    field: { clearable: true },
-                  }}
-                  sx={{
-                    "& .MuiInputBase-root": {
-                      alignItems: "center",
-                      color: colors.neutral[300],
-                      fontFamily: typography.fontFamily,
-                      fontSize: typography.fontSize.sm,
-                      fontWeight: typography.fontWeights.regular,
-                      borderRadius: borderRadius.lg,
-                      minWidth: "unset",
-                      background: colors.neutral[900],
-                      border: `1px solid ${colors.neutral[700]}`,
-                    },
-                    "& .MuiTextField-root": {
-                      minWidth: "0 !important",
-                    },
-                    "& legend": {
-                      display: "none",
-                    },
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      border: "none",
-                    },
-                  }}
-                />
-              </DemoContainer>
-            </LocalizationProvider>
+                {props.fromAmount}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+                  fontSize: isMobile ? "14px" : "16px",
+                  fontWeight: "400",
+                  opacity: 0.6,
+                  ml: 1,
+                }}
+              >
+                {props.fromAsset.name}
+              </Typography>
+            </Box>
+            <ArrowForward
+              sx={{
+                fontSize: isMobile ? "14px" : "16px",
+                mx: 1,
+                color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+                opacity: 0.7, // Adjusted opacity
+              }}
+            />
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Box
+                component="img"
+                src={props.toAsset.icon}
+                alt={props.toAsset.name}
+                sx={{
+                  width: "20px",
+                  height: "20px",
+                  mr: "0.5rem",
+                  opacity: 0.7,
+                }} // Adjusted opacity
+              />
+              <Typography
+                sx={{
+                  color: "var(--neutral-50, #FAFAFA)", // Adjusted color
+                  fontSize: isMobile ? "14px" : "16px",
+                  fontWeight: "500", // Adjusted font weight
+                }}
+              >
+                {props.toAmount}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+                  fontSize: isMobile ? "14px" : "16px",
+                  fontWeight: "400",
+                  opacity: 0.6,
+                  ml: 1,
+                }}
+              >
+                {props.toAsset.name}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-        <Divider sx={{ my: spacing.sm, background: colors.neutral[700] }} />
-        <Divider sx={{ my: spacing.sm, background: colors.neutral[700] }} />
-        <Divider sx={{ my: spacing.sm, background: colors.neutral[700] }} />
-        <Button label="Apply" onClick={updateFilters} />
-      </Menu>
-    </div>
+        </Grid>
+        <Grid item xs={12} sm={2}>
+          {isMobile && (
+            <Typography
+              sx={{
+                fontSize: "12px",
+                fontWeight: "700",
+                textTransform: "uppercase",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
+                opacity: 0.6,
+              }}
+            >
+              Trade Value (USD)
+            </Typography>
+          )}
+          <Typography
+            sx={{
+              fontSize: isMobile ? "12px" : "14px",
+              fontWeight: "400",
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+            }}
+          >
+            ${props.tradeValue}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          {isMobile && (
+            <Typography
+              sx={{
+                fontSize: "12px",
+                fontWeight: "700",
+                textTransform: "uppercase",
+                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
+                opacity: 0.6,
+              }}
+            >
+              Transaction ID
+            </Typography>
+          )}
+          <Typography
+            onClick={() =>
+              window.open(
+                `https://stellar.expert/explorer/public/tx/${props.txHash}`,
+                "_blank"
+              )
+            }
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              fontSize: isMobile ? "12px" : "14px",
+              fontWeight: "400",
+              textDecoration: "underline",
+              textDecorationStyle: "dotted",
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+              "&:hover": {
+                textDecoration: "underline",
+                cursor: "pointer",
+              },
+            }}
+          >
+            <LaunchIcon // Changed to OpenInNewIcon
+              sx={{
+                fontSize: isMobile ? "12px" : "14px",
+                mr: 0.5,
+                color: "var(--neutral-300, #D4D4D4)",
+              }} // Adjusted color
+            />
+            {props.txHash}
+          </Typography>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 
-export default FilterMenu;
+export default TransactionEntry;
