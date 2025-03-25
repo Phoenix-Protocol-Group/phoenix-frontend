@@ -14,27 +14,44 @@ const EarnPage = () => {
 
   const strategies = [
     {
-      asset: {
-        name: "XLM",
-        address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
-        icon: "/cryptoIcons/xlm.svg",
-      },
+      assets: [
+        {
+          name: "XLM",
+          address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
+          icon: "/cryptoIcons/xlm.svg",
+        },
+        {
+          name: "USDC",
+          address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
+          icon: "/cryptoIcons/usdc.svg",
+        },
+      ],
       name: "Stellar Yield",
       tvl: 123456,
       apr: 0.05,
-      rewardToken: "XLM",
-      unbondTime: "Instant",
-    },
-    {
-      asset: {
+      rewardToken: {
         name: "PHO",
         address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
         icon: "/cryptoIcons/pho.svg",
       },
+      unbondTime: "Instant",
+    },
+    {
+      assets: [
+        {
+          name: "XLM",
+          address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
+          icon: "/cryptoIcons/xlm.svg",
+        },
+      ],
       name: "Phoenix Boost",
       tvl: 789012,
       apr: 0.1,
-      rewardToken: "PHX",
+      rewardToken: {
+        name: "PHO",
+        address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
+        icon: "/cryptoIcons/pho.svg",
+      },
       unbondTime: "7 Days",
     },
   ];

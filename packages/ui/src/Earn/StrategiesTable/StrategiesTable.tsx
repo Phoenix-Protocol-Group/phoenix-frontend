@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { Button } from "../../Button/Button";
 import TransactionHeader from "../../Transactions/TransactionsTable/TransactionsHeader";
-import StrategyEntry from "./StrategyEntry";
+import StrategyEntry, { StrategyEntryProps } from "./StrategyEntry";
 import { FilterBar } from "../FilterBar/FilterBar";
 
 type assetDisplay = {
@@ -18,18 +18,9 @@ type assetDisplay = {
   icon: string;
 };
 
-export interface Strategy {
-  name: string;
-  asset: assetDisplay;
-  tvl: number;
-  apr: number;
-  rewardToken: string;
-  unbondTime: string;
-}
-
 export interface StrategiesTableProps {
   title?: string;
-  strategies: Strategy[];
+  strategies: StrategyEntryProps[];
   showFilters?: boolean; // Prop to control filter visibility
 }
 
@@ -141,7 +132,7 @@ const StrategiesTable = ({
               <Grid item xs={2}>
                 <TransactionHeader
                   handleSort={handleSort}
-                  label="Asset"
+                  label="Asset(s)"
                   active={
                     activeSort.column === "asset"
                       ? activeSort.direction

@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
 import { Button } from "../../Button/Button";
 import { Token } from "@phoenix-protocol/types";
+import { formatCurrencyStatic } from "@phoenix-protocol/utils";
 
 type assetDisplay = {
   name: string;
@@ -10,13 +11,15 @@ type assetDisplay = {
 };
 
 export interface StrategyEntryProps {
-  asset: assetDisplay;
+  assets: assetDisplay[];
   name: string;
   tvl: number;
   apr: number;
-  rewardToken: string;
-  unbondTime: string;
+  rewardToken: assetDisplay;
+  unbondTime: number;
   isMobile: boolean;
+  bond: () => void;
+  unbond: () => void;
 }
 
 const BoxStyle = {
@@ -37,13 +40,13 @@ const StrategyEntry = ({
   rewardToken,
   unbondTime,
   isMobile,
-  asset,
+  assets,
 }: StrategyEntryProps) => {
   return (
     <Box sx={BoxStyle}>
       <Box
         component="img"
-        src={asset.icon}
+        src={assets[0].icon}
         alt={name}
         sx={{
           position: "absolute",
@@ -56,24 +59,25 @@ const StrategyEntry = ({
         }}
       />
       <Grid container alignItems="center" spacing={isMobile ? 1 : 3}>
-        <Grid
-          item
-          xs={12}
-          md={2}
-          sx={{ display: "flex", alignItems: "center" }}
-        >
-          <img src={asset.icon} alt={name} width={24} />
-          <Typography
-            sx={{
-              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
-              fontSize: isMobile ? "14px" : "16px",
-              fontWeight: "400",
-              opacity: 0.6,
-              marginLeft: "8px",
-            }}
-          >
-            {asset.name}
-          </Typography>
+        <Grid item xs={12} md={2}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            {assets.map((asset) => (
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <img src={asset.icon} alt={name} width={24} />
+                <Typography
+                  sx={{
+                    color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+                    fontSize: isMobile ? "14px" : "16px",
+                    fontWeight: "700",
+                    opacity: 0.6,
+                    marginLeft: "8px",
+                  }}
+                >
+                  {asset.name}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
         </Grid>
         <Grid item xs={12} md={3}>
           <Typography
@@ -94,29 +98,32 @@ const StrategyEntry = ({
               color: "var(--neutral-300, #D4D4D4)",
             }}
           >
-            {tvl}
+            {formatCurrencyStatic.format(tvl)}
           </Typography>
         </Grid>
         <Grid item xs={12} md={1}>
           <Typography
             sx={{
               fontSize: isMobile ? "12px" : "14px",
-              fontWeight: "400",
+              fontWeight: "700",
               color: "var(--neutral-300, #D4D4D4)",
             }}
           >
-            {apr}
+            {apr * 100}%
           </Typography>
         </Grid>
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} md={2} sx={{ display: "flex" }}>
+          <img src={rewardToken.icon} alt={name} width={24} />
           <Typography
             sx={{
-              fontSize: isMobile ? "12px" : "14px",
-              fontWeight: "400",
-              color: "var(--neutral-300, #D4D4D4)",
+              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+              fontSize: isMobile ? "14px" : "16px",
+              fontWeight: "700",
+              opacity: 0.6,
+              marginLeft: "8px",
             }}
           >
-            {rewardToken}
+            {rewardToken.name}
           </Typography>
         </Grid>
         <Grid item xs={12} md={2}>
