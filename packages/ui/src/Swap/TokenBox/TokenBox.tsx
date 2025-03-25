@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback } from "react";
 import { Box, Button, Grid, Input, Skeleton, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { Token, TokenBoxProps } from "@phoenix-protocol/types";
+import { colors, borderRadius, typography, spacing } from "../../Theme/styleConstants";
 
 /**
  * AssetButton
@@ -26,45 +27,55 @@ const AssetButton = ({
     <Button
       onClick={onClick}
       sx={{
-        fontSize: "12px", // Adjusted font size
-        padding: "4px",
-        borderRadius: "8px",
-        background: hideDropdownButton ? "none" : "var(--neutral-900, #171717)", // Adjusted background
+        fontSize: typography.fontSize.xs,
+        padding: spacing.xs,
+        borderRadius: borderRadius.sm,
+        background: hideDropdownButton ? "none" : colors.neutral[900],
         border: hideDropdownButton
           ? "none"
-          : "1px solid var(--neutral-700, #404040)", // Adjusted border
-        color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+          : `1px solid ${colors.neutral[700]}`,
+        color: colors.neutral[300],
         "&:hover": {
           background: hideDropdownButton
             ? "none"
-            : "var(--neutral-800, #262626)", // Adjusted background on hover
+            : colors.neutral[800],
         },
         cursor: hideDropdownButton ? "auto" : "pointer",
         pointerEvents: hideDropdownButton ? "none" : "auto",
         minWidth: "96px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: spacing.xs,
       }}
     >
-      <Box display="flex" alignItems="center">
-        {" "}
-        {/* Adjusted alignment */}
+      {token.icon && (
         <Box
           component="img"
           src={token.icon}
+          alt={token.name}
           sx={{
-            maxWidth: "24px",
-            marginRight: "8px",
-            opacity: 0.7, // Adjusted opacity
+            width: "24px",
+            height: "24px",
+            borderRadius: "50%",
           }}
         />
+      )}
+      
+      <Box sx={{ fontWeight: typography.fontWeights.medium }}>
         {token.name}
       </Box>
+      
       {!hideDropdownButton && (
         <Box
           component="img"
           src="/CaretDown.svg"
           sx={{
             display: hideDropdownButton ? "none" : "block",
-            opacity: 0.6, // Adjusted opacity
+            opacity: 0.6,
+            ml: 0.5,
+            width: "12px",
+            height: "12px",
           }}
         />
       )}

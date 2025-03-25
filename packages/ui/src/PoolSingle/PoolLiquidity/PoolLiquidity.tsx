@@ -13,6 +13,7 @@ import { TokenBox } from "../../Swap";
 import { Button } from "../../Button/Button";
 import { LabTabProps, PoolLiquidityProps } from "@phoenix-protocol/types";
 import { motion } from "framer-motion";
+import { borderRadius, colors, typography } from "../../Theme/styleConstants";
 
 /**
  * GlowingChart Component
@@ -95,17 +96,17 @@ const LabTabs = ({
   const buttonStyles = {
     flex: 1,
     maxWidth: "200px",
-    color: "var(--neutral-50, #FAFAFA)",
-    fontSize: "0.875rem",
-    fontWeight: 500,
+    color: colors.neutral[50],
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeights.medium,
     textTransform: "none",
-    borderRadius: "12px",
+    borderRadius: borderRadius.md,
     transition: "all 0.3s",
-    background: "var(--neutral-900, #171717)",
-    border: "1px solid var(--neutral-700, #404040)",
+    background: colors.neutral[900],
+    border: `1px solid ${colors.neutral[700]}`,
     "&:hover": {
       transform: "scale(1.05)",
-      background: "var(--neutral-800, #262626)",
+      background: colors.neutral[800],
     },
   };
 

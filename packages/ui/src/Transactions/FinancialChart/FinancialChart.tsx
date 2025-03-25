@@ -10,6 +10,7 @@ import {
 import { Box, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { PriceHistoryResponse } from "@phoenix-protocol/utils";
+import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
 
 type HistoricalPrice = {
   price: number;
@@ -65,14 +66,14 @@ const GlowingChart = ({
     sx={{
       display: "flex",
       width: "100%",
-      padding: "1.5rem",
+      padding: spacing.lg,
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "flex-start",
-      gap: "1.5625rem",
-      borderRadius: "1.5rem",
-      background: "var(--neutral-900, #171717)",
-      border: "1px solid var(--neutral-700, #404040)",
+      gap: spacing.lg,
+      borderRadius: borderRadius.lg,
+      background: colors.neutral[900],
+      border: `1px solid ${colors.neutral[700]}`,
       height: "100%",
     }}
   >
@@ -87,10 +88,10 @@ const GlowingChart = ({
       <Box>
         <Typography
           sx={{
-            color: "var(--neutral-400, #A3A3A3)",
-            fontFamily: "Ubuntu",
-            fontSize: "0.75rem",
-            fontWeight: 400,
+            color: colors.neutral[400],
+            fontFamily: typography.fontFamily,
+            fontSize: typography.fontSize.sm,
+            fontWeight: typography.fontWeights.regular,
             opacity: 0.6,
           }}
         >
@@ -103,10 +104,10 @@ const GlowingChart = ({
         </Typography>
         <Typography
           sx={{
-            color: "var(--neutral-50, #FAFAFA)",
-            fontFamily: "Ubuntu",
-            fontSize: "1.5rem",
-            fontWeight: 700,
+            color: colors.neutral[50],
+            fontFamily: typography.fontFamily,
+            fontSize: typography.fontSize.xl,
+            fontWeight: typography.fontWeights.bold,
           }}
         >
           ${data[data.length - 1].price.toFixed(2)}

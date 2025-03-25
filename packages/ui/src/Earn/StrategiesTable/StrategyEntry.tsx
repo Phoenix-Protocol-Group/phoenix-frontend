@@ -1,8 +1,9 @@
 import React from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
+import { motion } from "framer-motion";
 import { Button } from "../../Button/Button";
-import { Token } from "@phoenix-protocol/types";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils";
+import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
 
 type assetDisplay = {
   name: string;
@@ -23,14 +24,20 @@ export interface StrategyEntryProps {
 }
 
 const BoxStyle = {
-  p: 3,
-  borderRadius: "12px",
-  background: "var(--neutral-900, #171717)",
-  border: "1px solid var(--neutral-700, #404040)",
+  p: spacing.md,
+  borderRadius: borderRadius.md,
+  background: colors.neutral[900],
+  border: `1px solid ${colors.neutral[700]}`,
   position: "relative",
   overflow: "hidden",
-  boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
-  marginTop: "16px",
+  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
+  marginTop: spacing.sm,
+  transition: "all 0.3s ease",
+  "&:hover": {
+    boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.25)",
+    borderColor: colors.neutral[600],
+    cursor: "pointer"
+  }
 };
 
 const StrategyEntry = ({
@@ -41,107 +48,319 @@ const StrategyEntry = ({
   unbondTime,
   isMobile,
   assets,
+  bond
 }: StrategyEntryProps) => {
+  const theme = useTheme();
+  
+  // Format unbond time for display
+  const formatUnbondTime = (time: number) => {
+    if (time === 0) return "Instant";
+    const days = Math.floor(time / 86400);
+    return days > 0 ? `${days} days` : "< 1 day";
+  };
+
   return (
-    <Box sx={BoxStyle}>
-      <Box
-        component="img"
-        src={assets[0].icon}
-        alt={name}
-        sx={{
-          position: "absolute",
-          top: "50%",
-          width: "20%",
-          height: "auto",
-          opacity: 0.1,
-          transform: "translateY(-50%)",
-          left: -40,
-        }}
-      />
-      <Grid container alignItems="center" spacing={isMobile ? 1 : 3}>
-        <Grid item xs={12} md={2}>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            {assets.map((asset) => (
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <img src={asset.icon} alt={name} width={24} />
+    <motion.div
+      whileHover={{ scale: 1.01 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+    >
+      <Box sx={BoxStyle}>
+        {/* Background asset graphics */}
+        {assets.map((asset, index) => (
+          <Box
+            key={index}
+            component="img"
+            src={asset.icon}
+            alt={asset.name}
+            sx={{
+              position: "absolute",
+              top: "50%",
+              width: "15%",
+              height: "auto",
+              opacity: 0.08,
+              transform: "translateY(-50%)",
+              left: `${-40 + (index * 60)}px`,
+              filter: "grayscale(80%)"
+            }}
+          />
+        ))}
+
+        {/* Mobile Layout */}
+        {isMobile ? (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: spacing.md }}>
+            {/* Header with assets and name */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: spacing.sm }}>
+              <Box sx={{ display: "flex", gap: 1 }}>
+                {assets.map((asset, idx) => (
+                  <Box
+                    key={idx}
+                    component="img"
+                    src={asset.icon}
+                    alt={asset.name}
+                    sx={{ 
+                      width: "24px", 
+                      height: "24px",
+                      borderRadius: "50%",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                    }}
+                  />
+                ))}
+              </Box>
+              <Typography
+                sx={{
+                  color: colors.neutral[50],
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.bold,
+                  flex: 1
+                }}
+              >
+                {name}
+              </Typography>
+            </Box>
+            
+            {/* Strategy details */}
+            <Grid container spacing={1}>
+              <Grid item xs={6}>
                 <Typography
                   sx={{
-                    color: "var(--neutral-300, #D4D4D4)", // Adjusted color
-                    fontSize: isMobile ? "14px" : "16px",
-                    fontWeight: "700",
-                    opacity: 0.6,
-                    marginLeft: "8px",
+                    color: colors.neutral[400],
+                    fontSize: typography.fontSize.xs,
                   }}
                 >
-                  {asset.name}
+                  TVL
                 </Typography>
-              </Box>
-            ))}
+                <Typography
+                  sx={{
+                    color: colors.neutral[300],
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.medium,
+                  }}
+                >
+                  {formatCurrencyStatic.format(tvl)}
+                </Typography>
+              </Grid>
+              
+              <Grid item xs={6}>
+                <Typography
+                  sx={{
+                    color: colors.neutral[400],
+                    fontSize: typography.fontSize.xs,
+                  }}
+                >
+                  APR
+                </Typography>
+                <Typography
+                  sx={{
+                    color: colors.success[300],
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.bold,
+                  }}
+                >
+                  {(apr * 100).toFixed(1)}%
+                </Typography>
+              </Grid>
+              
+              <Grid item xs={6}>
+                <Typography
+                  sx={{
+                    color: colors.neutral[400],
+                    fontSize: typography.fontSize.xs,
+                  }}
+                >
+                  Reward
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Box
+                    component="img"
+                    src={rewardToken.icon}
+                    alt={rewardToken.name}
+                    sx={{ 
+                      width: "16px", 
+                      height: "16px",
+                      borderRadius: "50%"
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      color: colors.neutral[300],
+                      fontSize: typography.fontSize.xs,
+                    }}
+                  >
+                    {rewardToken.name}
+                  </Typography>
+                </Box>
+              </Grid>
+              
+              <Grid item xs={6}>
+                <Typography
+                  sx={{
+                    color: colors.neutral[400],
+                    fontSize: typography.fontSize.xs,
+                  }}
+                >
+                  Unbond Time
+                </Typography>
+                <Typography
+                  sx={{
+                    color: unbondTime === 0 ? colors.success[300] : colors.neutral[300],
+                    fontSize: typography.fontSize.xs,
+                  }}
+                >
+                  {formatUnbondTime(unbondTime)}
+                </Typography>
+              </Grid>
+            </Grid>
+            
+            {/* Join button */}
+            <Button 
+              type="secondary"
+              onClick={bond}
+              fullWidth
+              sx={{
+                fontSize: typography.fontSize.xs,
+                padding: `${spacing.xs} ${spacing.sm}`,
+                borderRadius: borderRadius.md,
+                marginTop: spacing.xs,
+                transition: "all 0.2s ease"
+              }}
+            >
+              Join Strategy
+            </Button>
           </Box>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Typography
-            sx={{
-              color: "var(--neutral-50, #FAFAFA)",
-              fontSize: isMobile ? "14px" : "16px",
-              fontWeight: "500",
-            }}
-          >
-            {name}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={1}>
-          <Typography
-            sx={{
-              fontSize: isMobile ? "12px" : "14px",
-              fontWeight: "400",
-              color: "var(--neutral-300, #D4D4D4)",
-            }}
-          >
-            {formatCurrencyStatic.format(tvl)}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={1}>
-          <Typography
-            sx={{
-              fontSize: isMobile ? "12px" : "14px",
-              fontWeight: "700",
-              color: "var(--neutral-300, #D4D4D4)",
-            }}
-          >
-            {apr * 100}%
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={2} sx={{ display: "flex" }}>
-          <img src={rewardToken.icon} alt={name} width={24} />
-          <Typography
-            sx={{
-              color: "var(--neutral-300, #D4D4D4)", // Adjusted color
-              fontSize: isMobile ? "14px" : "16px",
-              fontWeight: "700",
-              opacity: 0.6,
-              marginLeft: "8px",
-            }}
-          >
-            {rewardToken.name}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={2}>
-          <Typography
-            sx={{
-              fontSize: isMobile ? "12px" : "14px",
-              fontWeight: "400",
-              color: "var(--neutral-300, #D4D4D4)",
-            }}
-          >
-            {unbondTime}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={1} sx={{ textAlign: "right" }}>
-          <Button type="secondary">Join</Button>
-        </Grid>
-      </Grid>
-    </Box>
+        ) : (
+          /* Desktop Layout */
+          <Grid container alignItems="center" spacing={3}>
+            {/* Assets Column */}
+            <Grid item md={2}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {assets.map((asset, idx) => (
+                  <Box key={idx} sx={{ display: "flex", alignItems: "center" }}>
+                    <Box
+                      component="img"
+                      src={asset.icon}
+                      alt={asset.name}
+                      sx={{ 
+                        width: "24px", 
+                        height: "24px",
+                        borderRadius: "50%",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        color: colors.neutral[300],
+                        fontSize: typography.fontSize.sm,
+                        fontWeight: typography.fontWeights.bold,
+                        marginLeft: spacing.xs,
+                      }}
+                    >
+                      {asset.name}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+
+            {/* Strategy Name */}
+            <Grid item md={3}>
+              <Typography
+                sx={{
+                  color: colors.neutral[50],
+                  fontSize: typography.fontSize.md,
+                  fontWeight: typography.fontWeights.medium,
+                }}
+              >
+                {name}
+              </Typography>
+            </Grid>
+
+            {/* TVL */}
+            <Grid item md={1}>
+              <Typography
+                sx={{
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.regular,
+                  color: colors.neutral[300],
+                }}
+              >
+                {formatCurrencyStatic.format(tvl)}
+              </Typography>
+            </Grid>
+
+            {/* APR */}
+            <Grid item md={1}>
+              <Typography
+                sx={{
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.bold,
+                  color: colors.success[300],
+                }}
+              >
+                {(apr * 100).toFixed(1)}%
+              </Typography>
+            </Grid>
+
+            {/* Reward Token */}
+            <Grid item md={2} sx={{ display: "flex", alignItems: "center" }}>
+              <Box
+                component="img"
+                src={rewardToken.icon}
+                alt={rewardToken.name}
+                sx={{ 
+                  width: "24px", 
+                  height: "24px",
+                  borderRadius: "50%",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                }}
+              />
+              <Typography
+                sx={{
+                  color: colors.neutral[300],
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.medium,
+                  marginLeft: spacing.xs,
+                }}
+              >
+                {rewardToken.name}
+              </Typography>
+            </Grid>
+
+            {/* Unbond Time */}
+            <Grid item md={2}>
+              <Typography
+                sx={{
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.regular,
+                  color: unbondTime === 0 ? colors.success[300] : colors.neutral[300],
+                }}
+              >
+                {formatUnbondTime(unbondTime)}
+              </Typography>
+            </Grid>
+
+            {/* Action Button */}
+            <Grid item md={1} sx={{ textAlign: "right" }}>
+              <Button 
+                type="secondary"
+                onClick={bond}
+                sx={{
+                  fontSize: typography.fontSize.xs,
+                  padding: `${spacing.xs} ${spacing.sm}`,
+                  borderRadius: borderRadius.md,
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.2)"
+                  },
+                  transition: "all 0.2s ease"
+                }}
+              >
+                Join
+              </Button>
+            </Grid>
+          </Grid>
+        )}
+      </Box>
+    </motion.div>
   );
 };
 

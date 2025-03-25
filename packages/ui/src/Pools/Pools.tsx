@@ -19,6 +19,7 @@ import {
   PoolsProps,
 } from "@phoenix-protocol/types";
 import { motion } from "framer-motion";
+import { borderRadius, colors, typography } from "../Theme/styleConstants";
 
 /**
  * Button Component for Pool Filter
@@ -43,26 +44,26 @@ const FilterButton = React.memo(
       <Button
         onClick={onClick}
         sx={{
-          borderRadius: "12px", // Reduced border radius
+          borderRadius: borderRadius.md,
           border: selected
-            ? "1px solid #F97316"
-            : "1px solid var(--neutral-700, #404040)", // Adjusted border
+            ? `1px solid ${colors.primary.main}`
+            : `1px solid ${colors.neutral[700]}`,
           background: selected
-            ? "rgba(249, 115, 22, 0.1)" // Adjusted background
-            : "var(--neutral-900, #171717)", // Adjusted background
-          color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+            ? `rgba(${colors.primary.gradient}, 0.1)`
+            : colors.neutral[900],
+          color: colors.neutral[300],
           padding: selected ? "7px 15px" : "8px 16px",
           "&:hover": {
             background: selected
-              ? "rgba(249, 115, 22, 0.2)" // Adjusted background on hover
-              : "var(--neutral-800, #262626)", // Adjusted background on hover
+              ? `rgba(${colors.primary.gradient}, 0.2)`
+              : colors.neutral[800],
           },
         }}
       >
         <Typography
           sx={{
-            fontSize: "10px",
-            fontWeight: 500, // Adjusted font weight
+            fontSize: typography.fontSize.xs,
+            fontWeight: typography.fontWeights.medium,
             lineHeight: "20px",
           }}
         >

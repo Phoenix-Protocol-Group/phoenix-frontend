@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils";
 import { CustomDropdown } from "../../Common/CustomDropdown";
+import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
 
 type Pool = {
   tokenA: { icon: string; symbol: string };
@@ -79,17 +80,17 @@ const tabUnselectedStyles = {
   justifyContent: "center",
   alignItems: "center",
   gap: "0.625rem",
-  borderRadius: "1rem",
+  borderRadius: borderRadius.md,
   cursor: "pointer",
-  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
-  background: "var(--neutral-900, #171717)", // Adjusted background
-  border: "1px solid var(--neutral-700, #404040)", // Adjusted border
+  color: colors.neutral[300],
+  background: colors.neutral[900],
+  border: `1px solid ${colors.neutral[700]}`,
 };
 
 const tabSelectedStyles = {
-  borderRadius: "1rem",
+  borderRadius: borderRadius.md,
   background: "rgba(226, 73, 26, 0.10)",
-  color: "var(--neutral-50, #FAFAFA)", // Adjusted color
+  color: colors.neutral[50],
 };
 
 const VolumeChart = ({
@@ -133,8 +134,8 @@ const VolumeChart = ({
         alignItems: "flex-start",
         gap: "1.5625rem",
         borderRadius: "1.5rem",
-        background: "var(--neutral-900, #171717)", // Adjusted background
-        border: "1px solid var(--neutral-700, #404040)", // Adjusted border
+        background: colors.neutral[900], // Adjusted background
+        border: `1px solid ${colors.neutral[700]}`, // Adjusted border
       }}
     >
       <Box
@@ -156,8 +157,8 @@ const VolumeChart = ({
           >
             <Typography
               sx={{
-                color: "var(--neutral-400, #A3A3A3)", // Adjusted color
-                fontFamily: "Ubuntu",
+                color: colors.neutral[400], // Adjusted color
+                fontFamily: typography.fontFamily,
                 fontSize: "0.75rem",
                 fontWeight: 400,
                 opacity: 0.6,
@@ -173,8 +174,8 @@ const VolumeChart = ({
           </Box>
           <Typography
             sx={{
-              color: "var(--neutral-50, #FAFAFA)", // Adjusted color
-              fontFamily: "Ubuntu",
+              color: colors.neutral[50], // Adjusted color
+              fontFamily: typography.fontFamily,
               fontSize: "1.5rem",
             }}
           >

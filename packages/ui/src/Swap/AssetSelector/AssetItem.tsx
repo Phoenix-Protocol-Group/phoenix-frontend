@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Button } from "@mui/material";
 import { Token } from "@phoenix-protocol/types";
+import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
 
 /**
  * AssetItem
@@ -26,18 +27,19 @@ const AssetItem = ({
         alignItems: "center",
         justifyContent: "flex-start",
         width: "100%",
-        padding: "8px 12px",
-        borderRadius: "8px",
-        background: "var(--neutral-900, #171717)", // Adjusted background
-        border: "1px solid var(--neutral-700, #404040)", // Adjusted border
-        color: "var(--neutral-300, #D4D4D4)", // Adjusted color
+        padding: `${spacing.xs} ${spacing.md}`,
+        borderRadius: borderRadius.sm,
+        background: colors.neutral[900],
+        border: `1px solid ${colors.neutral[700]}`,
+        color: colors.neutral[300],
         textTransform: "none",
-        fontSize: "14px",
-        fontWeight: 500, // Adjusted font weight
-        lineHeight: "1.5",
+        fontSize: typography.fontSize.sm,
+        fontWeight: typography.fontWeights.medium,
+        fontFamily: typography.fontFamily,
+        lineHeight: 1.5,
         mb: 1,
         "&:hover": {
-          background: "var(--neutral-800, #262626)", // Adjusted background on hover
+          background: colors.neutral[800],
         },
       }}
     >
@@ -48,8 +50,8 @@ const AssetItem = ({
         sx={{
           width: "24px",
           height: "24px",
-          marginRight: "12px",
-          opacity: 0.7, // Adjusted opacity
+          marginRight: spacing.md,
+          opacity: 0.7,
         }}
       />
       {token.name}

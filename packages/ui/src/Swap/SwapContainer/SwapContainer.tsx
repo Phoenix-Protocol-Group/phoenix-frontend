@@ -1,76 +1,13 @@
-import React, { useState } from "react";
-import { Box, IconButton, List, ListItem, Typography } from "@mui/material";
+import React from "react";
+import { Box, List, ListItem, Typography } from "@mui/material";
 import { motion } from "framer-motion";
-import { ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
 import { TokenBox } from "../TokenBox/TokenBox";
 import { Button } from "../../Button/Button";
 import { SwapContainerProps } from "@phoenix-protocol/types";
-
-const listItemContainer = {
-  display: "flex",
-  justifyContent: "space-between",
-  padding: "8px 0",
-};
-
-const listItemNameStyle = {
-  color: "var(--neutral-400, #A3A3A3)", // Adjusted color
-  fontSize: "14px",
-  lineHeight: "140%",
-  marginBottom: 0,
-};
-
-const listItemContentStyle = {
-  color: "var(--neutral-50, #FAFAFA)", // Adjusted color
-  fontSize: "14px",
-  fontWeight: "500", // Adjusted font weight
-  lineHeight: "140%",
-};
-
-const SwapAssetsButton = ({ onClick }: { onClick: () => void }) => {
-  const [isSpinning, setIsSpinning] = useState(false);
-
-  const handleClick = () => {
-    if (!isSpinning) {
-      onClick();
-      setIsSpinning(true);
-      setTimeout(() => setIsSpinning(false), 1000); // Reset spinning animation after 1 second
-    }
-  };
-
-  return (
-    <Button
-      onClick={handleClick}
-      className="swap-assets-button"
-      sx={{
-        padding: "4px",
-        borderRadius: "0.5rem",
-        minWidth: 0,
-        top: "25%",
-        position: "absolute",
-        background:
-          "linear-gradient(137deg, #F97316 0%, #F97316 17.08%, #F97316 42.71%, #F97316 100%), #F97316", // Adjusted color
-        transform: "translate(-50%, -50%)",
-        left: "50%",
-        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.25)",
-        transition: "transform 0.3s ease-in-out", // Add smooth transition for transform
-        "&:hover": {
-          transform: "translate(-50%, -50%) scale(1.15)", // Scale up on hover
-        },
-      }}
-    >
-      <motion.img
-        src="/ArrowsDownUp.svg"
-        alt="Swap"
-        animate={{ rotate: isSpinning ? 360 : 0 }} // Spin animation
-        transition={{
-          duration: 1,
-          ease: "linear",
-          repeat: isSpinning ? Infinity : 0,
-        }}
-      />
-    </Button>
-  );
-};
+import { SwapAssetsButton } from "./SwapAssetsButton";
+import { CardContainer } from "../../Common/CardContainer";
+import { SwapDetails } from "./SwapDetails";
+import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
 
 const SwapContainer = ({
   fromToken,
@@ -105,40 +42,39 @@ const SwapContainer = ({
           width: "100%",
           display: "flex",
           flexDirection: "column",
-          gap: "16px",
-          alignItems: "center", // Center items horizontally
+          gap: spacing.md,
+          alignItems: "center",
         }}
       >
         {/* Header Section */}
-        <Box
+        <CardContainer
           sx={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            background: "var(--neutral-900, #171717)", // Added background
-            borderRadius: "12px", // Added border radius
-            padding: "16px", // Added padding
+            padding: spacing.md,
+            width: "100%",
           }}
         >
           <Typography
             sx={{
-              fontSize: "24px", // Adjusted font size
-              fontWeight: 500, // Adjusted font weight
-              color: "var(--neutral-50, #FAFAFA)", // Adjusted color
+              fontSize: typography.fontSize.xxl,
+              fontWeight: typography.fontWeights.medium,
+              color: colors.neutral[50],
             }}
           >
             Swap tokens instantly
           </Typography>
-        </Box>
+        </CardContainer>
 
         {/* Main Content Section */}
         <Box
           sx={{
             display: "flex",
-            flexDirection: "column", // Stack items vertically
-            gap: "24px",
-            width: "100%", // Ensure full width
-            maxWidth: "600px", // Limit maximum width for better readability
+            flexDirection: "column",
+            gap: spacing.xl,
+            width: "100%",
+            maxWidth: "600px",
           }}
         >
           {/* Swap Form Section */}
@@ -160,14 +96,14 @@ const SwapContainer = ({
               />
               <Box
                 sx={{
-                  height: "36px", // Set fixed height for the ellipsis button
-                  width: "36px", // Set fixed width for the ellipsis button
+                  height: "36px",
+                  width: "36px",
                   position: "absolute",
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%, -50%)",
                   zIndex: 1,
-                  marginTop: "8px", // Add slight margin to separate input boxes
+                  marginTop: spacing.sm,
                 }}
               >
                 <SwapAssetsButton onClick={onSwapTokensClick} />
@@ -184,32 +120,31 @@ const SwapContainer = ({
             <Typography
               onClick={onOptionsClick}
               sx={{
-                color: "var(--primary-300, #F97316)",
-                fontSize: "0.875rem",
+                color: colors.primary.main,
+                fontSize: typography.fontSize.sm,
                 textDecoration: "underline",
                 cursor: "pointer",
                 textAlign: "right",
+                mt: spacing.xs,
               }}
             >
               Adjust maximum spread
             </Typography>
             {trustlineButtonActive ? (
-              <>
-                <Button
-                  onClick={onTrustlineButtonClick}
-                  disabled={trustlineButtonDisabled}
-                  type="primary"
-                  label={
-                    trustlineButtonDisabled
-                      ? `You need more than 0.5 XLM on your wallet`
-                      : `Add ${trustlineAssetName} trustline`
-                  }
-                  sx={{
-                    marginTop: "16px",
-                    width: "100%",
-                  }}
-                />
-              </>
+              <Button
+                onClick={onTrustlineButtonClick}
+                disabled={trustlineButtonDisabled}
+                type="primary"
+                label={
+                  trustlineButtonDisabled
+                    ? `You need more than 0.5 XLM on your wallet`
+                    : `Add ${trustlineAssetName} trustline`
+                }
+                sx={{
+                  marginTop: spacing.md,
+                  width: "100%",
+                }}
+              />
             ) : (
               <Button
                 onClick={onSwapButtonClick}
@@ -217,7 +152,7 @@ const SwapContainer = ({
                 type="primary"
                 label="Swap"
                 sx={{
-                  marginTop: "16px",
+                  marginTop: spacing.md,
                   width: "100%",
                 }}
               />
@@ -225,55 +160,12 @@ const SwapContainer = ({
           </Box>
 
           {/* Swap Details Section */}
-          <Box
-            sx={{
-              width: "100%",
-              padding: "16px",
-              borderRadius: "12px",
-              border: "1px solid var(--neutral-700, #404040)", // Added border
-              background: "var(--neutral-900, #171717)",
-            }}
-          >
-            <Typography
-              sx={{
-                fontWeight: "500",
-                fontSize: "18px",
-                color: "var(--neutral-50, #FAFAFA)",
-                marginBottom: "12px",
-              }}
-            >
-              Swap Details
-            </Typography>
-            <List
-              sx={{
-                padding: 0,
-                margin: 0,
-              }}
-            >
-              <ListItem sx={listItemContainer}>
-                <Typography sx={listItemNameStyle}>Exchange rate</Typography>
-                <Typography sx={listItemContentStyle}>
-                  {exchangeRate}
-                </Typography>
-              </ListItem>
-              <ListItem sx={listItemContainer}>
-                <Typography sx={listItemNameStyle}>Protocol fee</Typography>
-                <Typography sx={listItemContentStyle}>{networkFee}</Typography>
-              </ListItem>
-              <ListItem sx={listItemContainer}>
-                <Typography sx={listItemNameStyle}>Route</Typography>
-                <Typography sx={listItemContentStyle}>{route}</Typography>
-              </ListItem>
-              <ListItem sx={listItemContainer}>
-                <Typography sx={listItemNameStyle}>
-                  Slippage tolerance
-                </Typography>
-                <Typography sx={listItemContentStyle}>
-                  {slippageTolerance}
-                </Typography>
-              </ListItem>
-            </List>
-          </Box>
+          <SwapDetails 
+            exchangeRate={exchangeRate}
+            networkFee={networkFee}
+            route={route}
+            slippageTolerance={slippageTolerance}
+          />
         </Box>
       </Box>
     </motion.div>

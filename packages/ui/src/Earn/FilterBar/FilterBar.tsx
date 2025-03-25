@@ -8,6 +8,8 @@ import {
   FormControlLabel,
   Typography,
 } from "@mui/material";
+import { motion } from "framer-motion";
+import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
 
 export interface FilterBarProps {
   assetsFilter: "Your assets" | "All Assets";
@@ -34,163 +36,148 @@ const FilterBar = ({
   types,
   platforms,
 }: FilterBarProps) => {
+  // Common select styles
+  const selectStyles = {
+    color: colors.neutral[300],
+    fontFamily: typography.fontFamily,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeights.regular,
+    borderRadius: borderRadius.lg,
+    background: colors.neutral[900],
+    border: `1px solid ${colors.neutral[700]}`,
+    transition: "all 0.2s ease",
+    "& .MuiOutlinedInput-notchedOutline": {
+      border: "none",
+    },
+    "& .MuiSelect-select": {
+      padding: `${spacing.xs} ${spacing.sm}`,
+      margin: 0,
+    },
+    "& .MuiSelect-select:not([value])": {
+      color: colors.neutral[300],
+    },
+    "&:hover": {
+      borderColor: colors.primary.main,
+      boxShadow: `0 0 0 1px ${colors.primary.main}25`,
+    },
+  };
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "1rem",
-        borderRadius: "12px",
-        width: "100%",
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
     >
       <Box
         sx={{
           display: "flex",
-          gap: "1rem",
-          "& > *": {
-            minWidth: "150px",
-            maxWidth: "200px",
-          },
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: spacing.md,
+          borderRadius: borderRadius.lg,
+          width: "100%",
+          gap: spacing.md,
         }}
       >
-        <FormControl fullWidth>
-          <Select
-            value={assetsFilter}
-            onChange={(e) =>
-              onAssetsFilterChange(
-                e.target.value as "Your assets" | "All Assets"
-              )
+        <Box
+          sx={{
+            display: "flex",
+            gap: spacing.md,
+            flexWrap: "wrap",
+            "& > *": {
+              minWidth: "150px",
+              maxWidth: "200px",
+            },
+          }}
+        >
+          <FormControl fullWidth>
+            <Select
+              value={assetsFilter}
+              onChange={(e) =>
+                onAssetsFilterChange(
+                  e.target.value as "Your assets" | "All Assets"
+                )
+              }
+              placeholder="Assets"
+              displayEmpty
+              sx={selectStyles}
+            >
+              <MenuItem value="Your assets">Your assets</MenuItem>
+              <MenuItem value="All Assets">All Assets</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <Select
+              value={typeFilter}
+              onChange={(e) => onTypeFilterChange(e.target.value)}
+              placeholder="Type"
+              displayEmpty
+              sx={selectStyles}
+            >
+              <MenuItem value="All">All Types</MenuItem>
+              {types.map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <Select
+              value={platformFilter}
+              onChange={(e) => onPlatformFilterChange(e.target.value)}
+              displayEmpty
+              sx={selectStyles}
+            >
+              <MenuItem value="All">All Platforms</MenuItem>
+              {platforms.map((platform) => (
+                <MenuItem key={platform} value={platform}>
+                  {platform}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={instantUnbondOnly}
+                onChange={(e) => onInstantUnbondOnlyChange(e.target.checked)}
+                sx={{
+                  color: colors.neutral[50],
+                  "& .MuiSwitch-track": {
+                    backgroundColor: instantUnbondOnly 
+                      ? colors.success[300] 
+                      : colors.neutral[700],
+                    opacity: 1,
+                    border: "none",
+                  },
+                  "& .MuiSwitch-thumb": {
+                    backgroundColor: colors.neutral[50],
+                  },
+                  "& .MuiSwitch-switchBase.Mui-disabled + .MuiSwitch-track": {
+                    opacity: 0.5,
+                  },
+                }}
+              />
             }
-            placeholder="Assets"
-            displayEmpty
-            sx={{
-              color: "#D4D4D4", // var(--neutral-300, #D4D4D4)
-              fontFamily: "Ubuntu",
-              fontSize: "0.875rem",
-              fontStyle: "normal",
-              fontWeight: 400,
-              borderRadius: "1rem",
-              background: "#171717", // var(--neutral-900, #171717)
-              border: "1px solid #404040", // var(--neutral-700, #404040)
-              "& .MuiOutlinedInput-notchedOutline": {
-                border: "none",
-              },
-              "& .MuiSelect-select": {
-                padding: "0.5rem 0.75rem 0.75rem 0.75rem",
-                margin: 0,
-              },
-              "& .MuiSelect-select:not([value])": {
-                color: "#D4D4D4", // Placeholder color
-              },
-            }}
-          >
-            <MenuItem value="Your assets">Your assets</MenuItem>
-            <MenuItem value="All Assets">All Assets</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <Select
-            value={typeFilter}
-            onChange={(e) => onTypeFilterChange(e.target.value)}
-            placeholder="Type"
-            displayEmpty
-            sx={{
-              color: "#D4D4D4", // var(--neutral-300, #D4D4D4)
-              fontFamily: "Ubuntu",
-              fontSize: "0.875rem",
-              fontStyle: "normal",
-              fontWeight: 400,
-              borderRadius: "1rem",
-              background: "#171717", // var(--neutral-900, #171717)
-              border: "1px solid #404040", // var(--neutral-700, #404040)
-              "& .MuiOutlinedInput-notchedOutline": {
-                border: "none",
-              },
-              "& .MuiSelect-select": {
-                padding: "0.5rem 0.75rem 0.75rem 0.75rem",
-                margin: 0,
-              },
-              "& .MuiSelect-select:not([value])": {
-                color: "#D4D4D4", // Placeholder color
-              },
-            }}
-          >
-            <MenuItem value="All">All Types</MenuItem>
-            {types.map((type) => (
-              <MenuItem key={type} value={type}>
-                {type}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth>
-          <Select
-            value={platformFilter}
-            onChange={(e) => onPlatformFilterChange(e.target.value)}
-            displayEmpty
-            sx={{
-              color: "#D4D4D4",
-              fontFamily: "Ubuntu",
-              fontSize: "0.875rem",
-              fontStyle: "normal",
-              fontWeight: 400,
-              borderRadius: "1rem",
-              background: "#171717",
-              border: "1px solid #404040",
-              "& .MuiOutlinedInput-notchedOutline": {
-                border: "none",
-              },
-              "& .MuiSelect-select": {
-                padding: "0.5rem 0.75rem 0.75rem 0.75rem",
-                margin: 0,
-              },
-              "& .MuiSelect-select:not([value])": {
-                color: "#D4D4D4",
-              },
-            }}
-          >
-            <MenuItem value="All">All Platforms</MenuItem>
-            {platforms.map((platform) => (
-              <MenuItem key={platform} value={platform}>
-                {platform}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+            label={
+              <Typography 
+                sx={{ 
+                  color: colors.neutral[300],
+                  fontSize: typography.fontSize.sm, 
+                  fontWeight: typography.fontWeights.medium
+                }}
+              >
+                Instant Unbond Only
+              </Typography>
+            }
+          />
+        </Box>
       </Box>
-      <Box>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={instantUnbondOnly}
-              onChange={(e) => onInstantUnbondOnlyChange(e.target.checked)}
-              sx={{
-                color: "#FAFAFA", // var(--neutral-50)
-                "& .MuiSwitch-track": {
-                  backgroundColor: instantUnbondOnly ? "#66BB6A" : "#404040", // var(--success-300) : var(--neutral-700)
-                  opacity: 1,
-                  border: "none",
-                },
-                "& .MuiSwitch-thumb": {
-                  backgroundColor: "#FAFAFA", // var(--neutral-50)
-                },
-                "& .MuiSwitch-switchBase.Mui-disabled + .MuiSwitch-track": {
-                  opacity: 0.5,
-                },
-              }}
-            />
-          }
-          label={
-            <Typography sx={{ color: "#D4D4D4" }}>
-              Instant Unbond Only
-            </Typography>
-          }
-        />
-      </Box>
-    </Box>
+    </motion.div>
   );
 };
 

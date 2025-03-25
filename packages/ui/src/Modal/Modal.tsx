@@ -6,10 +6,11 @@ import {
   Modal as MuiModal,
   Typography,
 } from "@mui/material";
-import Colors from "../Theme/colors";
 import { Button } from "../Button/Button";
 import { ModalProps } from "@phoenix-protocol/types";
 import SwapAnimation from "./SwapAnimation";
+import { motion } from "framer-motion";
+import { colors, typography, spacing, borderRadius, shadows } from "../Theme/styleConstants";
 
 const Modal = ({
   type,
@@ -30,42 +31,46 @@ const Modal = ({
     transform: "translate(-50%, -50%)",
     width: 317,
     maxWidth: "calc(100vw - 16px)",
-    background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
-    borderRadius: "16px",
+    background: colors.gradients.card,
+    borderRadius: borderRadius.lg,
     display: "flex",
     flexDirection: "column" as "column",
-    padding: "16px",
+    padding: spacing.md,
+    boxShadow: shadows.card,
   };
 
   const tokenHeaderStyle = {
     color: "rgba(255, 255, 255, 0.70)",
-    fontSize: "12px",
-    fontWeight: 400,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeights.regular,
+    fontFamily: typography.fontFamily,
     lineHeight: "140%",
-    marginBottom: "8px",
+    marginBottom: spacing.xs,
   };
 
   const tokenIconStyle = {
     width: "24px",
     height: "24px",
-    marginRight: "8px",
+    marginRight: spacing.xs,
   };
 
   const tokenAmountStyle = {
-    color: "#FFF",
-    fontSize: "14px",
-    fontWeight: 700,
+    color: colors.neutral[50],
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeights.bold,
+    fontFamily: typography.fontFamily,
     lineHeight: "140%",
   };
 
   const getAsset = () => {
-    if (type == "SUCCESS") {
+    if (type === "SUCCESS") {
       return "/check.svg";
-    } else if (type == "WARNING") {
+    } else if (type === "WARNING") {
       return "/warning.svg";
-    } else if (type == "ERROR") {
+    } else if (type === "ERROR") {
       return "/cross.svg";
     }
+    return "";
   };
 
   const phoIconStyle = {
@@ -77,196 +82,203 @@ const Modal = ({
     <MuiModal
       open={open}
       onClose={() => setOpen(false)}
-      aria-labelledby="connectwallet-modal"
-      aria-describedby="connect your wallet to the app"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
     >
-      <Box sx={style}>
-        <Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      >
+        <Box sx={style}>
+          <Box>
             <Box
-              onClick={() => setOpen(false)}
-              component="img"
               sx={{
-                display: "inline-flex",
-                justifyContent: "center",
-                alignItems: "center",
-                w: "16px",
-                h: "16px",
-                backgroundColor: Colors.inputsHover,
-                borderRadius: "8px",
-                cursor: "pointer",
-              }}
-              src="/x.svg"
-            />
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            {type == "LOADING" || type == "LOADING_SWAP" ? (
-              <Box
-                sx={{
-                  h: "98px",
-                  width: type == "LOADING_SWAP" ? "60%" : "98px",
-                  marginBottom: "12px",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                {type == "LOADING_SWAP" ? (
-                  // @ts-ignore
-                  <SwapAnimation fromToken={tokens[0]} toToken={tokens[1]} />
-                ) : (
-                  <CircularProgress />
-                )}
-              </Box>
-            ) : (
-              <Box
-                component="img"
-                sx={{
-                  h: "98px",
-                  w: "98px",
-                  margin: "0 auto",
-                  marginBottom: "12px",
-                }}
-                src={getAsset()}
-              />
-            )}
-            <Typography
-              sx={{
-                color: "#FFF",
-                textAlign: "center",
-                fontSize: "24px",
-                fontWeight: 700,
+                display: "flex",
+                justifyContent: "flex-end",
               }}
             >
-              {title}
-            </Typography>
-
-            {!!tokens && type !== "LOADING_SWAP" && (
               <Box
+                onClick={() => setOpen(false)}
+                component="img"
                 sx={{
-                  width: "100%",
+                  display: "inline-flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "16px",
+                  height: "16px",
+                  backgroundColor: colors.neutral[800],
+                  borderRadius: borderRadius.sm,
+                  cursor: "pointer",
                 }}
-              >
+                src="/x.svg"
+              />
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {type === "LOADING" || type === "LOADING_SWAP" ? (
                 <Box
                   sx={{
-                    borderRadius: "8px",
-                    width: "100%",
-                    background:
-                      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-                    padding: "12px",
-                    marginBottom: "16px",
-                    marginTop: "20px",
+                    height: "98px",
+                    width: type === "LOADING_SWAP" ? "60%" : "98px",
+                    marginBottom: spacing.md,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
                 >
-                  <Grid container>
-                    <Grid item xs={tokens.length > 1 ? 6 : 12}>
-                      <Typography sx={tokenHeaderStyle}>
-                        {tokenTitles[0]}
-                      </Typography>
-                      <Box display="flex" alignItems="center">
-                        <Box
-                          component="img"
-                          sx={
-                            tokens[0].name === "PHO"
-                              ? { ...tokenIconStyle, ...phoIconStyle }
-                              : tokenIconStyle
-                          }
-                          src={tokens[0].icon}
-                        />
-                        <Typography sx={tokenAmountStyle}>
-                          {tokenAmounts[0]}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    {tokens.length > 1 && (
-                      <Grid item xs={6}>
+                  {type === "LOADING_SWAP" ? (
+                    // @ts-ignore
+                    <SwapAnimation fromToken={tokens[0]} toToken={tokens[1]} />
+                  ) : (
+                    <CircularProgress sx={{ color: colors.primary.main }} />
+                  )}
+                </Box>
+              ) : (
+                <Box
+                  component="img"
+                  sx={{
+                    height: "98px",
+                    width: "98px",
+                    margin: "0 auto",
+                    marginBottom: spacing.md,
+                  }}
+                  src={getAsset()}
+                />
+              )}
+              <Typography
+                sx={{
+                  color: colors.neutral[50],
+                  textAlign: "center",
+                  fontSize: typography.fontSize.xxl,
+                  fontWeight: typography.fontWeights.bold,
+                  fontFamily: typography.fontFamily,
+                }}
+              >
+                {title}
+              </Typography>
+
+              {!!tokens && type !== "LOADING_SWAP" && (
+                <Box
+                  sx={{
+                    width: "100%",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      borderRadius: borderRadius.sm,
+                      width: "100%",
+                      background: "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+                      padding: spacing.md,
+                      marginBottom: spacing.md,
+                      marginTop: spacing.lg,
+                    }}
+                  >
+                    <Grid container>
+                      <Grid item xs={tokens.length > 1 ? 6 : 12}>
                         <Typography sx={tokenHeaderStyle}>
-                          {tokenTitles[1]}
+                          {tokenTitles[0]}
                         </Typography>
                         <Box display="flex" alignItems="center">
                           <Box
                             component="img"
                             sx={
-                              tokens[1].name === "PHO"
+                              tokens[0].name === "PHO"
                                 ? { ...tokenIconStyle, ...phoIconStyle }
                                 : tokenIconStyle
                             }
-                            src={tokens[1].icon}
+                            src={tokens[0].icon}
                           />
                           <Typography sx={tokenAmountStyle}>
-                            {tokenAmounts[1]}
+                            {tokenAmounts[0]}
                           </Typography>
                         </Box>
                       </Grid>
-                    )}
-                  </Grid>
+                      {tokens.length > 1 && (
+                        <Grid item xs={6}>
+                          <Typography sx={tokenHeaderStyle}>
+                            {tokenTitles[1]}
+                          </Typography>
+                          <Box display="flex" alignItems="center">
+                            <Box
+                              component="img"
+                              sx={
+                                tokens[1].name === "PHO"
+                                  ? { ...tokenIconStyle, ...phoIconStyle }
+                                  : tokenIconStyle
+                              }
+                              src={tokens[1].icon}
+                            />
+                            <Typography sx={tokenAmountStyle}>
+                              {tokenAmounts[1]}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      )}
+                    </Grid>
+                  </Box>
                 </Box>
-              </Box>
-            )}
+              )}
 
-            {description && (
-              <Box>
-                <Typography
+              {description && (
+                <Box>
+                  <Typography
+                    sx={{
+                      color: "rgba(255, 255, 255, 0.70)",
+                      textAlign: "center",
+                      fontSize: typography.fontSize.xs,
+                      fontWeight: typography.fontWeights.regular,
+                      fontFamily: typography.fontFamily,
+                      lineHeight: "140%",
+                      marginBottom: spacing.xl,
+                      marginTop: spacing.xs,
+                    }}
+                  >
+                    {description}
+                  </Typography>
+                </Box>
+              )}
+              {error && (
+                <Box>
+                  <Typography
+                    sx={{
+                      color: "rgba(255, 255, 255, 0.70)",
+                      textAlign: "center",
+                      fontSize: typography.fontSize.xs,
+                      fontWeight: typography.fontWeights.regular,
+                      fontFamily: typography.fontFamily,
+                      lineHeight: "140%",
+                      marginBottom: spacing.xl,
+                      marginTop: spacing.xs,
+                    }}
+                  >
+                    {error}
+                  </Typography>
+                </Box>
+              )}
+              {onButtonClick && type !== "LOADING_SWAP" && error && (
+                <Button
+                  onClick={onButtonClick}
                   sx={{
-                    color:
-                      "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
-                    textAlign: "center",
-                    fontSize: "12px",
-                    fontWeight: 400,
-                    lineHeight: "140%",
-                    marginBottom: "22px",
-                    marginTop: "4px",
+                    width: "100%",
+                    display: type === "LOADING" ? "none" : "block",
                   }}
-                >
-                  {description}
-                </Typography>
-              </Box>
-            )}
-            {error && (
-              <Box>
-                <Typography
-                  sx={{
-                    color:
-                      "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
-                    textAlign: "center",
-                    fontSize: "12px",
-                    fontWeight: 400,
-                    lineHeight: "140%",
-                    marginBottom: "22px",
-                    marginTop: "4px",
-                  }}
-                >
-                  {error}
-                </Typography>
-              </Box>
-            )}
-            {onButtonClick && type !== "LOADING_SWAP" && error && (
-              <Button
-                onClick={onButtonClick}
-                sx={{
-                  width: "100%",
-                  display: type == "LOADING" ? "none" : "block",
-                }}
-                label={
-                  error ? "Copy error to clipboard" : "Transaction Details"
-                }
-              />
-            )}
+                  label={
+                    error ? "Copy error to clipboard" : "Transaction Details"
+                  }
+                />
+              )}
+            </Box>
           </Box>
         </Box>
-      </Box>
+      </motion.div>
     </MuiModal>
   );
 };

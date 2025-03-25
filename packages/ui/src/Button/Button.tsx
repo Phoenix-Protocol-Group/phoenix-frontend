@@ -1,7 +1,7 @@
 import React from "react";
 import { Button as MuiButton } from "@mui/material";
-import Colors from "../Theme/colors";
 import { ButtonProps } from "@phoenix-protocol/types";
+import { colors, borderRadius, typography, shadows } from "../Theme/styleConstants";
 
 const Button = ({
   type = "primary",
@@ -9,35 +9,41 @@ const Button = ({
   label,
   ...props
 }: ButtonProps) => {
+  // Define consistent styling based on our style constants
   const styles = {
     wrapper: {
       display: "inline-block",
-      background: "linear-gradient(180deg, #E2391B 0%, #E29E1B 100%)",
+      background: colors.primary.gradient,
       padding: "1px",
-      borderRadius: "12px",
+      borderRadius: borderRadius.lg,
       width: props.fullWidth ? "100%" : "auto",
     },
     button: {
       background:
         type === "primary"
-          ? "linear-gradient(135deg, #E2391B 0%, #E29E1B 100%)"
-          : Colors.background,
+          ? colors.primary.gradient
+          : colors.gradients.card,
       border: "none",
       padding: size === "medium" ? "14px 32px" : "10px 24px",
-      borderRadius: "12px",
-      fontSize: "14px",
-      fontWeight: "700",
+      borderRadius: borderRadius.lg,
+      fontSize: typography.fontSize.sm,
+      fontWeight: typography.fontWeights.bold,
+      fontFamily: typography.fontFamily,
       lineHeight: "20px",
       textTransform: "none",
-      color: Colors.backgroundLight,
+      color: "#FFFFFF",
       width: "100%",
       boxShadow:
-        type === "primary" ? "0px 2px 6px rgba(226, 73, 26, 0.4)" : "none",
+        type === "primary" ? shadows.elevated : "none",
       transition: "all 0.2s ease-in-out",
       "&:hover": {
         transform: type === "primary" ? "translateY(-2px)" : "none",
         boxShadow:
-          type === "primary" ? "0px 4px 8px rgba(226, 73, 26, 0.5)" : "none",
+          type === "primary" ? shadows.card : "none",
+      },
+      "&:disabled": {
+        background: colors.neutral[700],
+        color: colors.neutral[400],
       },
     },
   };
@@ -49,10 +55,9 @@ const Button = ({
       <MuiButton
         size={size}
         disabled={props.disabled}
-        //  @ts-ignore
         sx={{
-          ...(styles.button as React.CSSProperties), // Ensure styles are cast to valid CSS properties
-          ...((sx as Record<string, any>) || {}), // Ensure sx is properly typed
+          ...(styles.button as React.CSSProperties),
+          ...((sx as Record<string, any>) || {}),
         }}
         {...otherProps}
       >

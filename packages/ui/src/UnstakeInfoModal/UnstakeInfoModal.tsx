@@ -6,9 +6,9 @@ import {
   Grid,
   CircularProgress,
 } from "@mui/material";
-import Colors from "../Theme/colors";
 import { Button } from "../Button/Button";
 import { UnstakeInfoModalProps } from "@phoenix-protocol/types";
+import { colors, typography, spacing, borderRadius, shadows } from "../Theme/styleConstants";
 
 const UnstakeInfoModal = ({
   open,
@@ -22,11 +22,12 @@ const UnstakeInfoModal = ({
     transform: "translate(-50%, -50%)",
     width: 512,
     maxWidth: "calc(100vw - 16px)",
-    background: "var(--neutral-900, #171717)",
-    borderRadius: "12px",
+    background: colors.neutral[900],
+    borderRadius: borderRadius.lg,
     display: "flex",
     flexDirection: "column" as "column",
-    padding: "24px",
+    padding: spacing.lg,
+    boxShadow: shadows.card,
   };
 
   return (
@@ -53,10 +54,10 @@ const UnstakeInfoModal = ({
                 display: "inline-flex",
                 justifyContent: "center",
                 alignItems: "center",
-                w: "16px",
-                h: "16px",
-                backgroundColor: Colors.inputsHover,
-                borderRadius: "8px",
+                width: "16px",
+                height: "16px",
+                backgroundColor: colors.neutral[800],
+                borderRadius: borderRadius.sm,
                 cursor: "pointer",
               }}
               src="/x.svg"
@@ -72,49 +73,45 @@ const UnstakeInfoModal = ({
           >
             <Typography
               sx={{
-                color: "#FFF",
+                color: colors.neutral[50],
                 textAlign: "center",
-                fontSize: "20px",
-                fontWeight: 700,
+                fontSize: typography.fontSize.xl,
+                fontWeight: typography.fontWeights.bold,
+                fontFamily: typography.fontFamily,
+                marginBottom: spacing.md,
               }}
             >
               Warning
             </Typography>
-
-            <Box sx={{ px: 3 }}>
-              <Typography
-                sx={{
-                  color: "var(--neutral-300, #D4D4D4)",
-                  textAlign: "justify",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  lineHeight: "140%",
-                  marginBottom: "16px",
-                  marginTop: "8px",
-                  maxHeight: "300px",
-                  overflowY: "auto",
-                  "&::-webkit-scrollbar": {
-                    width: "4px",
-                  },
-                  "&::-webkit-scrollbar-thumb": {
-                    backgroundColor: "var(--primary-500, #F97316)",
-                    borderRadius: "8px",
-                  },
-                  // Styles for Firefox
-                  scrollbarWidth: "thin",
-                  scrollbarColor:
-                    "var(--primary-500, #F97316) var(--neutral-800, #262626)",
-                }}
-              >
-                You{"'"}re about to unstake. By doing so, you will lose the APR
-                progress you've accumulated. Remember, your APR increases daily
-                up to 60 days. If you unstake now, you'll need to start over
-                from day one.
-                <br />
-                <br />
-                Are you sure you want to proceed?
-              </Typography>
-              <Button onClick={onConfirm} label="Unstake" />
+            
+            <Typography
+              sx={{
+                color: colors.neutral[300],
+                textAlign: "center",
+                fontSize: typography.fontSize.sm,
+                fontWeight: typography.fontWeights.regular,
+                fontFamily: typography.fontFamily,
+                lineHeight: "140%",
+                marginBottom: spacing.lg,
+              }}
+            >
+              Unstaking your tokens will result in the loss of any unclaimed rewards.
+              Please make sure to claim your rewards before unstaking.
+            </Typography>
+            
+            <Box sx={{ display: "flex", gap: spacing.md, width: "100%", justifyContent: "space-around" }}>
+              <Button 
+                type="secondary" 
+                label="Cancel" 
+                onClick={onClose}
+                sx={{ flex: 1 }}
+              />
+              <Button 
+                type="primary" 
+                label="Confirm Unstake" 
+                onClick={onConfirm}
+                sx={{ flex: 1 }}
+              />
             </Box>
           </Box>
         </Box>

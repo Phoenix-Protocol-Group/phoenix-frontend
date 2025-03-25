@@ -21,6 +21,7 @@ import {
 import { Button } from "../../Button/Button";
 import { Token, LiquidityMiningProps } from "@phoenix-protocol/types";
 import { motion } from "framer-motion";
+import { colors, spacing } from "../../Theme/styleConstants";
 
 const OptionButton = ({
   value,
@@ -110,22 +111,22 @@ const StakeInput = ({
         placeholder="0.00"
         fullWidth
         sx={{
-          color: "var(--neutral-300, #D4D4D4)", // Adjusted color
-          marginTop: "1rem",
+          color: colors.neutral[300],
+          marginTop: spacing.md,
           "&::placeholder": {
-            color: "var(--neutral-400, #A3A3A3)", // Adjusted color
+            color: colors.neutral[400],
             opacity: 1,
             fontSize: "0.8125rem!important",
           },
           "& .MuiOutlinedInput-root": {
             "& fieldset": {
-              borderColor: "var(--neutral-700, #404040)", // Adjusted border
+              borderColor: colors.neutral[700],
             },
             "&:hover fieldset": {
-              borderColor: "var(--primary-500, #F97316)", // Adjusted border
+              borderColor: colors.primary.main,
             },
             "&.Mui-focused fieldset": {
-              borderColor: "var(--primary-500, #F97316)", // Adjusted border
+              borderColor: colors.primary.main,
             },
           },
         }}

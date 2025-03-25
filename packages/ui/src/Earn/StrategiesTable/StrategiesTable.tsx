@@ -1,231 +1,229 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  TableContainer,
-  Paper,
-  useMediaQuery,
-  Grid,
-} from "@mui/material";
-import { Button } from "../../Button/Button";
-import TransactionHeader from "../../Transactions/TransactionsTable/TransactionsHeader";
-import StrategyEntry, { StrategyEntryProps } from "./StrategyEntry";
+import React from "react";
+import { Box, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { motion } from "framer-motion";
 import { FilterBar } from "../FilterBar/FilterBar";
-
-type assetDisplay = {
-  name: string;
-  address: string;
-  icon: string;
-};
+import StrategyEntry from "./StrategyEntry";
+import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
 
 export interface StrategiesTableProps {
-  title?: string;
-  strategies: StrategyEntryProps[];
-  showFilters?: boolean; // Prop to control filter visibility
+  title: string;
+  strategies: any[];
+  showFilters?: boolean;
 }
 
-const customSpacing = {
-  xs: "8px",
-  sm: "12px",
-  md: "16px",
-};
-
-const tableClasses = {
-  root: {
-    marginTop: customSpacing.md,
-    padding: `${customSpacing.md} ${customSpacing.md}`,
-    borderRadius: "12px",
-    background: "var(--neutral-900, #171717)",
-    border: "1px solid var(--neutral-700, #404040)",
-    overflowX: "auto",
-  },
-  header: {
-    color: "var(--neutral-300, #D4D4D4)",
-    fontFamily: "Ubuntu",
-    fontSize: "0.75rem",
-    fontWeight: 400,
-    textTransform: "uppercase",
-  },
-  row: {
-    borderBottom: "1px solid var(--neutral-700, #404040)",
-    "&:last-child": {
-      borderBottom: 0,
-    },
-  },
-  cell: {
-    color: "var(--neutral-50, #FAFAFA)",
-    fontFamily: "Ubuntu",
-    fontSize: "0.875rem",
-    fontWeight: 400,
-    padding: `${customSpacing.xs} ${customSpacing.md}`,
-  },
-  joinButton: {
-    backgroundColor: "var(--primary-300, #F97316)",
-    color: "var(--neutral-50, #FAFAFA)",
-    "&:hover": {
-      backgroundColor: "var(--primary-400, #F97316)",
-    },
-  },
-};
-
-const StrategiesTable = ({
-  title,
-  strategies,
-  showFilters = true,
+export const StrategiesTable = ({ 
+  title, 
+  strategies, 
+  showFilters = true 
 }: StrategiesTableProps) => {
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"));
-  const [activeSort, setActiveSort] = React.useState({
-    column: "",
-    direction: false,
-  });
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
+  // Sample filter states
+  const [assetsFilter, setAssetsFilter] = React.useState<"Your assets" | "All Assets">("All Assets");
+  const [typeFilter, setTypeFilter] = React.useState("All");
+  const [platformFilter, setPlatformFilter] = React.useState("All");
+  const [instantUnbondOnly, setInstantUnbondOnly] = React.useState(false);
 
-  const [assetsFilter, setAssetsFilter] = useState<
-    "Your assets" | "All Assets"
-  >("Your assets");
-  const [typeFilter, setTypeFilter] = useState("All");
-  const [platformFilter, setPlatformFilter] = useState("All");
-  const [instantUnbondOnly, setInstantUnbondOnly] = useState(false);
-
-  const types = ["Type1", "Type2", "Type3"];
-  const platforms = ["Platform1", "Platform2", "Platform3"];
-
-  const handleSort = (column: string) => {
-    setActiveSort((prev) => ({
-      column: column,
-      direction: prev.column === column ? !prev.direction : true,
-    }));
-  };
+  const types = ["LP Staking", "Single Asset Staking", "Farming"];
+  const platforms = ["Phoenix", "External"];
 
   return (
-    <Box>
-      <TableContainer component={Paper} sx={tableClasses.root}>
-        {/* Filter Bar */}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Box sx={{ mt: 4 }}>
+        <Typography 
+          sx={{ 
+            color: colors.neutral[50],
+            fontSize: typography.fontSize.xl,
+            fontWeight: typography.fontWeights.bold,
+            mb: spacing.md
+          }}
+        >
+          {title}
+        </Typography>
+        
         {showFilters && (
-          <Box sx={{ padding: customSpacing.md }}>
-            <FilterBar
-              assetsFilter={assetsFilter}
-              onAssetsFilterChange={setAssetsFilter}
-              typeFilter={typeFilter}
-              onTypeFilterChange={setTypeFilter}
-              platformFilter={platformFilter}
-              onPlatformFilterChange={setPlatformFilter}
-              instantUnbondOnly={instantUnbondOnly}
-              onInstantUnbondOnlyChange={setInstantUnbondOnly}
-              types={types}
-              platforms={platforms}
-            />
-          </Box>
+          <FilterBar
+            assetsFilter={assetsFilter}
+            onAssetsFilterChange={setAssetsFilter}
+            typeFilter={typeFilter}
+            onTypeFilterChange={setTypeFilter}
+            platformFilter={platformFilter}
+            onPlatformFilterChange={setPlatformFilter}
+            instantUnbondOnly={instantUnbondOnly}
+            onInstantUnbondOnlyChange={setInstantUnbondOnly}
+            types={types}
+            platforms={platforms}
+          />
         )}
-        {/* Header */}
+
+        {/* Table header - only show on desktop */}
         {!isMobile && (
           <Box
             sx={{
-              padding: `${customSpacing.md} ${customSpacing.md}`,
-              borderRadius: "8px",
-              background: "var(--neutral-900, #171717)",
-              border: "1px solid var(--neutral-700, #404040)",
-              boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
-              marginBottom: customSpacing.sm,
+              padding: spacing.md,
+              borderRadius: borderRadius.md,
+              background: colors.neutral[900],
+              border: `1px solid ${colors.neutral[700]}`,
+              mb: 2,
             }}
           >
-            <Grid container>
-              <Grid item xs={2}>
-                <TransactionHeader
-                  handleSort={handleSort}
-                  label="Asset(s)"
-                  active={
-                    activeSort.column === "asset"
-                      ? activeSort.direction
-                        ? "asc"
-                        : "desc"
-                      : false
-                  }
-                />
+            <Grid container spacing={3} alignItems="center">
+              {/* Assets Column - 2/12 width */}
+              <Grid item md={2}>
+                <Typography 
+                  sx={{ 
+                    color: colors.neutral[300],
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.bold,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Assets
+                </Typography>
               </Grid>
-              <Grid item xs={3}>
-                <TransactionHeader
-                  handleSort={handleSort}
-                  label="Strategy Name"
-                  active={
-                    activeSort.column === "name"
-                      ? activeSort.direction
-                        ? "asc"
-                        : "desc"
-                      : false
-                  }
-                />
+              
+              {/* Strategy Name Column - 3/12 width */}
+              <Grid item md={3}>
+                <Typography 
+                  sx={{ 
+                    color: colors.neutral[300],
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.bold,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Strategy
+                </Typography>
               </Grid>
-              <Grid item xs={1}>
-                <TransactionHeader
-                  handleSort={handleSort}
-                  label="TVL"
-                  active={
-                    activeSort.column === "tvl"
-                      ? activeSort.direction
-                        ? "asc"
-                        : "desc"
-                      : false
-                  }
-                />
+              
+              {/* TVL Column - 1/12 width */}
+              <Grid item md={1}>
+                <Typography 
+                  sx={{ 
+                    color: colors.neutral[300],
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.bold,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  TVL
+                </Typography>
               </Grid>
-              <Grid item xs={1}>
-                <TransactionHeader
-                  handleSort={handleSort}
-                  label="APR"
-                  active={
-                    activeSort.column === "apr"
-                      ? activeSort.direction
-                        ? "asc"
-                        : "desc"
-                      : false
-                  }
-                />
+              
+              {/* APR Column - 1/12 width */}
+              <Grid item md={1}>
+                <Typography 
+                  sx={{ 
+                    color: colors.neutral[300],
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.bold,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  APR
+                </Typography>
               </Grid>
-              <Grid item xs={2}>
-                <TransactionHeader
-                  handleSort={handleSort}
-                  label="Reward Token"
-                  active={
-                    activeSort.column === "rewardToken"
-                      ? activeSort.direction
-                        ? "asc"
-                        : "desc"
-                      : false
-                  }
-                />
+              
+              {/* Reward Token Column - 2/12 width */}
+              <Grid item md={2}>
+                <Typography 
+                  sx={{ 
+                    color: colors.neutral[300],
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.bold,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Reward
+                </Typography>
               </Grid>
-              <Grid item xs={2}>
-                <TransactionHeader
-                  handleSort={handleSort}
-                  label="Unbond Time"
-                  active={
-                    activeSort.column === "unbondingTime"
-                      ? activeSort.direction
-                        ? "asc"
-                        : "desc"
-                      : false
-                  }
-                />
+              
+              {/* Unbond Time Column - 2/12 width */}
+              <Grid item md={2}>
+                <Typography 
+                  sx={{ 
+                    color: colors.neutral[300],
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.bold,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Unbond Time
+                </Typography>
               </Grid>
-              <Grid item xs={1}>
-                <Typography sx={tableClasses.header}></Typography>
+              
+              {/* Action Column - 1/12 width */}
+              <Grid item md={1}>
+                <Typography 
+                  sx={{ 
+                    color: colors.neutral[300],
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.bold,
+                    textTransform: "uppercase",
+                    textAlign: "right"
+                  }}
+                >
+                  Action
+                </Typography>
               </Grid>
             </Grid>
           </Box>
         )}
-        {/* Table Body */}
-        <Box sx={{ minWidth: 650, overflowX: "auto" }}>
-          {strategies.map((strategy) => (
-            <StrategyEntry
-              key={strategy.name}
-              {...strategy}
-              isMobile={isMobile}
-            />
-          ))}
-        </Box>
-      </TableContainer>
-    </Box>
+
+        {/* Mobile title for strategies - only show on mobile */}
+        {isMobile && (
+          <Typography
+            sx={{
+              color: colors.neutral[300],
+              fontSize: typography.fontSize.sm,
+              fontWeight: typography.fontWeights.medium,
+              mb: spacing.sm,
+            }}
+          >
+            {strategies.length} strategies found
+          </Typography>
+        )}
+
+        {/* Strategy entries */}
+        {strategies.length > 0 ? (
+          <Box>
+            {strategies.map((strategy, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
+                <StrategyEntry
+                  {...strategy}
+                  isMobile={isMobile}
+                />
+              </motion.div>
+            ))}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "200px",
+              borderRadius: borderRadius.md,
+              background: colors.neutral[900],
+              border: `1px solid ${colors.neutral[700]}`,
+            }}
+          >
+            <Typography sx={{ color: colors.neutral[300] }}>
+              No strategies found
+            </Typography>
+          </Box>
+        )}
+      </Box>
+    </motion.div>
   );
 };
-
-export { StrategiesTable };
