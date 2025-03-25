@@ -34,7 +34,7 @@ const EarnPage = () => {
         address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
         icon: "/cryptoIcons/pho.svg",
       },
-      unbondTime: "Instant",
+      unbondTime: 0,
     },
     {
       assets: [
@@ -52,7 +52,7 @@ const EarnPage = () => {
         address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
         icon: "/cryptoIcons/pho.svg",
       },
-      unbondTime: "7 Days",
+      unbondTime: 604800,
     },
   ];
 
