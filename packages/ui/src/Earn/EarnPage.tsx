@@ -35,6 +35,9 @@ const EarnPage = () => {
         icon: "/cryptoIcons/pho.svg",
       },
       unbondTime: 0,
+      isMobile: false,
+      bond: () => alert("Bond action for Stellar Yield"),
+      unbond: () => alert("Unbond action for Stellar Yield"),
     },
     {
       assets: [
@@ -53,6 +56,9 @@ const EarnPage = () => {
         icon: "/cryptoIcons/pho.svg",
       },
       unbondTime: 604800,
+      isMobile: false,
+      bond: () => alert("Bond action for Phoenix Boost"),
+      unbond: () => alert("Unbond action for Phoenix Boost"),
     },
   ];
 

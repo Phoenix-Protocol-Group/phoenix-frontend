@@ -48,8 +48,16 @@ export const Default: Story = {
           icon: "/cryptoIcons/pho.svg",
         },
         unbondTime: 0,
+        isMobile: false,
+        bond: function (): void {
+          throw new Error("Function not implemented.");
+        },
+        unbond: function (): void {
+          throw new Error("Function not implemented.");
+        },
       },
       {
+        isMobile: false,
         assets: [
           {
             name: "XLM",
@@ -66,7 +74,16 @@ export const Default: Story = {
           icon: "/cryptoIcons/pho.svg",
         },
         unbondTime: 604800,
+        bond: function (): void {
+          throw new Error("Function not implemented.");
+        },
+        unbond: function (): void {
+          throw new Error("Function not implemented.");
+        },
       },
     ],
   },
 };
+function bond(): void {
+  throw new Error("Function not implemented.");
+}
