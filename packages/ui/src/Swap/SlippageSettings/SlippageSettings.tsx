@@ -27,8 +27,9 @@ const SlippageSettings = ({
   onClose,
   onChange,
 }: SlippageOptionsProps) => {
-  const [customInputValue, setCustomInputValue] =
-    useState<number>(selectedOption);
+  const [customInputValue, setCustomInputValue] = useState<number | null>(
+    selectedOption
+  );
   const [activeOption, setActiveOption] = useState<number | null>(
     options.includes(selectedOption) ? selectedOption : null
   );
@@ -45,7 +46,7 @@ const SlippageSettings = ({
   const evaluateSlippage = (value: number) => {
     if (value > 5) {
       return "high";
-    } else if (value < 0.1) {
+    } else if (value < 0.5) {
       return "low";
     }
     return "normal";
@@ -62,22 +63,27 @@ const SlippageSettings = ({
   const handleCustomInputChange = (event) => {
     const value = event.target.value;
 
-    // Validate the input
-    if (value === "" || /^\d*\.?\d*$/.test(value)) {
+    // Validate the input - allow both commas and dots
+    if (value === "" || /^\d*[.,]?\d*$/.test(value)) {
+      // Convert commas to dots for proper number parsing
+      const normalizedValue = value.replace(",", ".");
+      const numericValue = Number(normalizedValue);
+
       // If input matches an option, highlight that option
-      const matchedOption = options.includes(Number(value))
-        ? Number(value)
+      const matchedOption = options.includes(numericValue)
+        ? numericValue
         : null;
       setActiveOption(matchedOption);
 
-      if (Number(value) > 30) {
+      if (numericValue > 30) {
         setCustomInputValue(30);
         onChange(30);
         setShowWarning(true);
       } else {
-        setCustomInputValue(Number(value));
-        onChange(Number(value));
-        setShowWarning(Number(value) > 5);
+        // Set the input field to show the original input (with comma or dot)
+        setCustomInputValue(normalizedValue === "" ? null : numericValue);
+        onChange(numericValue || 0);
+        setShowWarning(numericValue > 5);
       }
     }
   };
@@ -249,7 +255,7 @@ const SlippageSettings = ({
             onClick={() => setCustomValue(true)}
             onFocus={() => setCustomValue(true)}
             placeholder="Custom"
-            type="text"
+            type="number"
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
