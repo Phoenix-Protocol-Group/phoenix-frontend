@@ -44,6 +44,19 @@ const SideNav = ({
       href: "/swap",
     },
     {
+      label: "Earn",
+      icon: (
+        <Image
+          alt="Earn Icon"
+          width={24}
+          height={24}
+          src={pathname == "/earn" ? "/earnIconActive.svg" : "/earnIcon.svg"}
+        />
+      ),
+      active: pathname == "/earn",
+      href: "/earn",
+    },
+    {
       label: "Pools",
       icon: (
         <Image
@@ -57,10 +70,10 @@ const SideNav = ({
       href: "/pools",
     },
     {
-      label: "Trade History",
+      label: "Statistics",
       icon: (
         <Image
-          alt="History Icon"
+          alt="Statistics Icon"
           width={24}
           height={24}
           src={

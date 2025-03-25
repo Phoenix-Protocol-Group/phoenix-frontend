@@ -365,7 +365,6 @@ export default function Page() {
             <Box
               sx={{
                 height: "100%",
-                flexGrow: 1,
                 display: "inline-flex",
                 justifyContent: "stretch",
               }}
