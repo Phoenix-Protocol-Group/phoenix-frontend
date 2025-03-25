@@ -106,6 +106,7 @@ const SwapContainer = ({
           display: "flex",
           flexDirection: "column",
           gap: "16px",
+          alignItems: "center", // Center items horizontally
         }}
       >
         {/* Header Section */}
@@ -128,35 +129,20 @@ const SwapContainer = ({
           >
             Swap tokens instantly
           </Typography>
-          <IconButton
-            onClick={onOptionsClick}
-            className="slippage-button"
-            sx={{
-              borderRadius: "50%",
-              background: "var(--neutral-900, #171717)",
-              border: "1px solid var(--neutral-700, #404040)",
-              padding: "10px",
-              color: "var(--neutral-300, #D4D4D4)",
-              "&:hover": {
-                background: "var(--neutral-800, #262626)",
-              },
-            }}
-          >
-            <img src="/GearSix.svg" alt="Options" />
-          </IconButton>
         </Box>
 
         {/* Main Content Section */}
         <Box
           sx={{
             display: "flex",
+            flexDirection: "column", // Stack items vertically
             gap: "24px",
-            flexDirection: { xs: "column", lg: "row" },
-            alignItems: "stretch", // Adjust to stretch both areas to full height
+            width: "100%", // Ensure full width
+            maxWidth: "600px", // Limit maximum width for better readability
           }}
         >
           {/* Swap Form Section */}
-          <Box sx={{ flex: 1, position: "relative", width: "100%" }}>
+          <Box sx={{ position: "relative", width: "100%" }}>
             <div
               className="token-box"
               style={{
@@ -195,6 +181,18 @@ const SwapContainer = ({
                 loadingValues={loadingSimulate}
               />
             </div>
+            <Typography
+              onClick={onOptionsClick}
+              sx={{
+                color: "var(--primary-300, #F97316)",
+                fontSize: "0.875rem",
+                textDecoration: "underline",
+                cursor: "pointer",
+                textAlign: "right",
+              }}
+            >
+              Adjust maximum spread
+            </Typography>
             {trustlineButtonActive ? (
               <>
                 <Button
@@ -229,7 +227,6 @@ const SwapContainer = ({
           {/* Swap Details Section */}
           <Box
             sx={{
-              flex: 1,
               width: "100%",
               padding: "16px",
               borderRadius: "12px",
