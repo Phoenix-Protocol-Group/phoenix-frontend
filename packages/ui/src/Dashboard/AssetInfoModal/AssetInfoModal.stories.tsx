@@ -16,6 +16,7 @@ type Story = StoryObj<typeof AssetInfoModal>;
 export const Primary: Story = {
   args: {
     open: true,
+    userBalance: 1250,
     asset: {
       asset: "PHO-GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO-1",
       supply: 2000897775221742,
@@ -54,6 +55,55 @@ export const Primary: Story = {
         orgLogo: "/cryptoIcons/pho.svg",
       },
       paging_token: 1,
+    },
+    pools: [
+      {
+        tokens: [
+          {
+            name: "PHO",
+            icon: "/cryptoIcons/pho.svg",
+            usdValue: 1,
+            amount: 1000,
+            category: "crypto",
+          },
+          {
+            name: "USDC",
+            icon: "/cryptoIcons/usdc.svg",
+            usdValue: 1,
+            amount: 1000,
+            category: "crypto",
+          },
+        ],
+        tvl: "2500000",
+        maxApr: "1%",
+        userLiquidity: 0,
+        poolAddress:
+          "PHO-GAX5TXB5RYJNLBUR477PEXM4X75APK2PGMTN6KEFQSESGWFXEAKFSXJO-1",
+      },
+    ],
+  },
+};
+
+export const NoUserBalance: Story = {
+  args: {
+    ...Primary.args,
+    userBalance: 0,
+  },
+};
+
+export const NoPools: Story = {
+  args: {
+    ...Primary.args,
+    pools: [],
+  },
+};
+
+export const NoRating: Story = {
+  args: {
+    ...Primary.args,
+    asset: {
+      ...Primary.args.asset,
+      rating: null,
     },
   },
 };

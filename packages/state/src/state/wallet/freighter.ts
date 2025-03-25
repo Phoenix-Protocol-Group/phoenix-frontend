@@ -5,7 +5,7 @@ export function freighter(): Connector {
   return {
     id: "freighter",
     name: "Freighter",
-    iconUrl: "https://app.phoenix-hub.io/freighter.png",
+    iconUrl: "/freighter.svg",
     iconBackground: "#fff",
     installed: true,
     downloadUrls: {

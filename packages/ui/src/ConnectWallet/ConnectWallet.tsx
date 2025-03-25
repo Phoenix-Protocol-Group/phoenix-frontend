@@ -4,12 +4,24 @@ import {
   ConnectWalletProps,
   OptionComponentProps,
 } from "@phoenix-protocol/types";
-import { Box, Modal, Typography, Grid, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  Modal,
+  Typography,
+  Grid,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../Button/Button";
-import { colors, typography, spacing, borderRadius } from "../Theme/styleConstants";
+import {
+  colors,
+  typography,
+  spacing,
+  borderRadius,
+} from "../Theme/styleConstants";
 import CarouselComponent from "./Carousel";
-import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from "@mui/icons-material/Close";
 
 /**
  * OptionComponent for displaying individual wallet options
@@ -37,8 +49,8 @@ const OptionComponent = ({
           alignItems: "center",
           gap: spacing.xs,
           background: colors.neutral[900],
-          border: selected 
-            ? `1px solid ${colors.primary.main}` 
+          border: selected
+            ? `1px solid ${colors.primary.main}`
             : `1px solid ${colors.neutral[700]}`,
           width: "100%",
           marginTop: spacing.sm,
@@ -46,30 +58,38 @@ const OptionComponent = ({
           transition: "all 0.3s ease",
           opacity: allowed ? 1 : 0.6,
           cursor: allowed ? "pointer" : "default",
-          boxShadow: selected ? `0 0 16px rgba(${colors.primary.gradient}, 0.15)` : "none"
+          boxShadow: selected
+            ? `0 0 16px rgba(${colors.primary.gradient}, 0.15)`
+            : "none",
         }}
       >
-        <Box 
+        <Box
           component="img"
           src={connector.iconUrl}
           alt={connector.name}
           sx={{
-            width: "37px", 
+            width: "37px",
             height: "37px",
             borderRadius: "50%",
             objectFit: "contain",
             background: colors.neutral[800],
             padding: spacing.xs,
-            boxShadow: "0 2px 6px rgba(0,0,0,0.15)"
+            boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
           }}
         />
-        <Box sx={{ flex: 1, textAlign: { xs: "center", md: "left" }, mt: { xs: 1, md: 0 } }}>
+        <Box
+          sx={{
+            flex: 1,
+            textAlign: { xs: "center", md: "left" },
+            mt: { xs: 1, md: 0 },
+          }}
+        >
           <Typography
             sx={{
               fontSize: typography.fontSize.md,
               fontWeight: typography.fontWeights.medium,
               color: colors.neutral[50],
-              mb: 0.5
+              mb: 0.5,
             }}
           >
             {connector.name}
@@ -80,7 +100,7 @@ const OptionComponent = ({
                 fontSize: typography.fontSize.xs,
                 fontWeight: typography.fontWeights.regular,
                 color: colors.neutral[400],
-                display: { xs: "none", md: "block" }
+                display: { xs: "none", md: "block" },
               }}
             >
               Not installed
@@ -116,42 +136,43 @@ const WalletConnectingScreen = ({ connector, onBack }) => (
       <motion.img
         src={connector?.iconUrl || "/cryptoIcons/pho.svg"}
         alt="Loading Wallet"
-        style={{ width: "120px", height: "120px", borderRadius: "50%", marginBottom: spacing.md }}
-        animate={{ 
-          scale: [1, 1.05, 1],
-          opacity: [1, 0.8, 1]
+        style={{
+          width: "120px",
+          height: "120px",
+          borderRadius: "50%",
+          marginBottom: spacing.md,
         }}
-        transition={{ 
-          duration: 1.5, 
+        animate={{
+          scale: [1, 1.05, 1],
+          opacity: [1, 0.8, 1],
+        }}
+        transition={{
+          duration: 1.5,
           repeat: Infinity,
-          ease: "easeInOut" 
+          ease: "easeInOut",
         }}
       />
-      <Typography 
-        sx={{ 
-          fontSize: typography.fontSize.lg, 
+      <Typography
+        sx={{
+          fontSize: typography.fontSize.lg,
           fontWeight: typography.fontWeights.bold,
           color: colors.neutral[50],
-          mt: spacing.md
+          mt: spacing.md,
         }}
       >
         Opening {connector?.name}
       </Typography>
-      <Typography 
-        sx={{ 
-          fontSize: typography.fontSize.sm, 
-          color: colors.neutral[400], 
+      <Typography
+        sx={{
+          fontSize: typography.fontSize.sm,
+          color: colors.neutral[400],
           mb: spacing.lg,
-          textAlign: "center"
+          textAlign: "center",
         }}
       >
         Please confirm the connection request in the {connector?.name} app
       </Typography>
-      <Button
-        sx={{ width: "100%" }}
-        onClick={onBack}
-        type="secondary"
-      >
+      <Button sx={{ width: "100%" }} onClick={onBack} type="secondary">
         Back
       </Button>
     </Box>
@@ -165,19 +186,22 @@ const InfoSlides = () => {
   const items = [
     {
       title: "What are wallets?",
-      content: "Wallets are used to send, receive, and access all your digital assets like PHO and XLM.",
-      image: "/pho-wallets.png"
+      content:
+        "Wallets are used to send, receive, and access all your digital assets like PHO and XLM.",
+      image: "/wallet-3.png",
     },
     {
       title: "No accounts. No passwords.",
-      content: "Use your wallet to sign into many different platforms. No unique accounts or passwords.",
-      image: "/pho-wallets.png"
+      content:
+        "Use your wallet to sign into many different platforms. No unique accounts or passwords.",
+      image: "/wallet-2.png",
     },
     {
       title: "Your wallet, your keys.",
-      content: "Your wallet is your key to the Stellar network. Keep it safe and secure. Phoenix Protocol never has access to your funds.",
-      image: "/pho-wallets.png"
-    }
+      content:
+        "Your wallet is your key to the Stellar network. Keep it safe and secure. Phoenix Protocol never has access to your funds.",
+      image: "/wallet-1.png",
+    },
   ];
 
   return (
@@ -198,11 +222,13 @@ const ConnectWallet = ({
 }: ConnectWalletProps): JSX.Element => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  
+
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<Connector | undefined>(undefined);
   const [allowedConnectors, setAllowedConnectors] = useState<Connector[]>([]);
-  const [disallowedConnectors, setDisallowedConnectors] = useState<Connector[]>([]);
+  const [disallowedConnectors, setDisallowedConnectors] = useState<Connector[]>(
+    []
+  );
   const [loadingConnectors, setLoadingConnectors] = useState(true);
 
   // Check which connectors are allowed (installed)
@@ -211,7 +237,7 @@ const ConnectWallet = ({
       setLoadingConnectors(true);
       const allowed: Connector[] = [];
       const disallowed: Connector[] = [];
-      
+
       for (const connector of connectors) {
         try {
           const isAllowed = await connector.isConnected();
@@ -224,12 +250,12 @@ const ConnectWallet = ({
           disallowed.push(connector);
         }
       }
-      
+
       setAllowedConnectors(allowed);
       setDisallowedConnectors(disallowed);
       setLoadingConnectors(false);
     };
-    
+
     if (open) {
       checkConnectors();
     }
@@ -240,7 +266,7 @@ const ConnectWallet = ({
     async (connector: Connector) => {
       setLoading(true);
       setSelected(connector);
-      
+
       try {
         await connect(connector);
         // Success will be handled by the parent component closing the modal
@@ -261,7 +287,7 @@ const ConnectWallet = ({
   // Handle closing the modal
   const handleClose = useCallback(() => {
     setOpen(false);
-    
+
     // Reset state after animation
     setTimeout(() => {
       setLoading(false);
@@ -307,15 +333,18 @@ const ConnectWallet = ({
           >
             <Grid container sx={{ height: "100%" }}>
               {/* Left Side - Wallet Selection */}
-              <Grid 
-                item 
-                xs={12} 
-                md={6} 
-                sx={{ 
+              <Grid
+                item
+                xs={12}
+                md={6}
+                sx={{
                   padding: spacing.lg,
                   height: "100%",
                   overflow: "auto",
-                  borderRight: { md: `1px solid ${colors.neutral[800]}`, xs: "none" },
+                  borderRight: {
+                    md: `1px solid ${colors.neutral[800]}`,
+                    xs: "none",
+                  },
                   "&::-webkit-scrollbar": {
                     width: "4px",
                   },
@@ -325,13 +354,20 @@ const ConnectWallet = ({
                   },
                 }}
               >
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: spacing.md }}>
-                  <Typography 
-                    variant="h2" 
-                    sx={{ 
-                      fontSize: typography.fontSize.xl, 
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: spacing.md,
+                  }}
+                >
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      fontSize: typography.fontSize.xl,
                       fontWeight: typography.fontWeights.bold,
-                      color: colors.neutral[50]
+                      color: colors.neutral[50],
                     }}
                   >
                     Connect Wallet
@@ -341,11 +377,11 @@ const ConnectWallet = ({
                     transition={{ duration: 0.2 }}
                   >
                     <Box
-                      sx={{ 
-                        cursor: "pointer", 
+                      sx={{
+                        cursor: "pointer",
                         opacity: 0.7,
                         color: colors.neutral[300],
-                        "&:hover": { opacity: 1 }
+                        "&:hover": { opacity: 1 },
                       }}
                       onClick={handleClose}
                     >
@@ -353,17 +389,17 @@ const ConnectWallet = ({
                     </Box>
                   </motion.div>
                 </Box>
-                
-                <Typography 
-                  sx={{ 
-                    fontSize: typography.fontSize.sm, 
+
+                <Typography
+                  sx={{
+                    fontSize: typography.fontSize.sm,
                     color: colors.neutral[400],
-                    mb: spacing.md
+                    mb: spacing.md,
                   }}
                 >
                   Start by connecting with one of the wallets below.
                 </Typography>
-                
+
                 {loadingConnectors ? (
                   // Loading skeleton
                   [...Array(4)].map((_, index) => (
@@ -407,27 +443,27 @@ const ConnectWallet = ({
                   </Box>
                 )}
               </Grid>
-              
+
               {/* Right Side - Loading or Info */}
-              <Grid 
-                item 
-                xs={12} 
-                md={6} 
-                sx={{ 
+              <Grid
+                item
+                xs={12}
+                md={6}
+                sx={{
                   padding: spacing.lg,
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  position: "relative"
+                  position: "relative",
                 }}
               >
                 <AnimatePresence mode="wait">
                   {loading ? (
-                    <WalletConnectingScreen 
-                      key="loading" 
-                      connector={selected} 
-                      onBack={handleBack} 
+                    <WalletConnectingScreen
+                      key="loading"
+                      connector={selected}
+                      onBack={handleBack}
                     />
                   ) : (
                     <motion.div

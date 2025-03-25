@@ -1,4 +1,3 @@
-import Colors from "../Theme/colors";
 import React, { useEffect } from "react";
 import { CSSObject, styled, Theme } from "@mui/material/styles";
 import {
@@ -15,7 +14,13 @@ import {
   useTheme,
 } from "@mui/material";
 import { DrawerProps } from "@phoenix-protocol/types";
-import { motion, MotionProps } from "framer-motion"; // Import MotionProps
+import { motion, MotionProps } from "framer-motion";
+import {
+  colors,
+  typography,
+  spacing,
+  borderRadius,
+} from "../Theme/styleConstants";
 
 const drawerWidth = 240;
 
@@ -29,7 +34,7 @@ const openedMixin = (theme: Theme): CSSObject => ({
   [theme.breakpoints.down("md")]: {
     width: "100%",
     top: "70px",
-    paddingTop: 2,
+    paddingTop: spacing.md,
   },
 });
 
@@ -41,7 +46,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
   overflowX: "hidden",
   width: 0,
   [theme.breakpoints.up("md")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
+    width: `calc(${theme.spacing(10)} + 1px)`, // Increased from 8 to 10
   },
   [theme.breakpoints.down("md")]: {
     top: "70px",
@@ -56,7 +61,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-start",
 }));
 
-// Define props interface for DrawerMotion
 interface DrawerMotionProps extends MotionProps {
   open?: boolean;
 }
@@ -103,49 +107,62 @@ const SidebarNavigation = ({
   return (
     <DrawerMotion
       initial={{ width: 0 }}
-      animate={{ width: open ? drawerWidth : 0 }}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-      open={open} // Pass open prop to DrawerMotion
+      animate={{ width: open ? drawerWidth : largerThenMd ? 80 : 0 }} // Explicit width when closed
+      transition={{ type: "spring", stiffness: 400, damping: 40 }}
+      open={open}
     >
       <MuiDrawer
         PaperProps={{
           sx: {
-            background: "var(--neutral-900, #171717)", // Adjusted background
-            boxShadow: "-1px 0px 0px 0px rgba(228, 228, 228, 0.10) inset",
+            background: colors.neutral[900],
+            boxShadow: `0 0 1px 0 ${colors.neutral[700]}`,
             maxWidth: "100vw",
           },
         }}
         variant="permanent"
-        open={open} // Pass open prop to MuiDrawer
+        open={open}
       >
         {largerThenMd && (
           <DrawerHeader
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              padding: open ? "30px" : "18px",
+              padding: open ? spacing.xl : spacing.md,
+              minHeight: "64px", // Ensure consistent height
             }}
           >
             <Box
               component="img"
               alt="Phoenix Logo"
-              sx={open ? { maxWidth: "128px" } : { mx: "-8px" }}
+              sx={
+                open
+                  ? { maxWidth: "128px" }
+                  : {
+                      width: "40px",
+                      height: "40px",
+                      objectFit: "contain",
+                      margin: "0 0 0 -13px",
+                    }
+              }
               src={open ? "/logo.png" : "/logo_icon.svg"}
             />
             {open && (
               <IconButton
                 onClick={toggleDrawer}
                 sx={{
-                  borderRadius: "8px",
-                  background:
-                    "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
+                  borderRadius: borderRadius.md,
+                  background: `linear-gradient(180deg, ${colors.neutral[800]} 0%, ${colors.neutral[900]} 100%)`,
                   transform: open ? "none" : "rotate(180deg)",
-                  marginTop: open ? 0 : "12px",
-                  marginLeft: "8px",
-                  padding: "10px",
+                  marginTop: open ? 0 : spacing.sm,
+                  marginLeft: spacing.sm,
+                  padding: spacing.xs,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background: colors.neutral[800],
+                  },
                 }}
               >
-                <img alt="arrow" src="/arrow.svg" />
+                <Box component="img" alt="arrow" src="/arrow.svg" />
               </IconButton>
             )}
           </DrawerHeader>
@@ -153,12 +170,13 @@ const SidebarNavigation = ({
         <List>
           <ListSubheader
             sx={{
-              paddingLeft: "40px",
-              background: "unset",
-              fontSize: "14px",
+              paddingLeft: spacing.xxl,
+              background: "transparent",
+              fontSize: typography.fontSize.sm,
               lineHeight: "16px",
-              marginBottom: "20px",
+              marginBottom: spacing.lg,
               display: open ? "block" : "none",
+              color: colors.neutral[400],
             }}
           >
             Menu
@@ -171,25 +189,34 @@ const SidebarNavigation = ({
             open={open}
           />
           {!open && (
-            <ListItem>
+            <ListItem
+              sx={{
+                justifyContent: "center",
+                marginTop: spacing.md,
+              }}
+            >
               <IconButton
                 onClick={toggleDrawer}
                 sx={{
-                  borderRadius: "8px",
-                  background:
-                    "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
-                  transform: open ? "none" : "rotate(180deg)",
-                  marginTop: open ? 0 : "12px",
-                  padding: "10px",
+                  borderRadius: borderRadius.md,
+                  background: `linear-gradient(180deg, ${colors.neutral[800]} 0%, ${colors.neutral[900]} 100%)`,
+                  transform: "rotate(180deg)",
+                  padding: spacing.sm,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background: colors.neutral[800],
+                  },
                 }}
               >
-                <img alt="arrow" src="/arrow.svg" />
+                <Box component="img" alt="arrow" src="/arrow.svg" />
               </IconButton>
             </ListItem>
           )}
         </List>
         {bottomItems && (
-          <List sx={{ position: "absolute", bottom: "2rem", width: "100%" }}>
+          <List
+            sx={{ position: "absolute", bottom: spacing.lg, width: "100%" }}
+          >
             <ItemList
               items={bottomItems}
               setOpen={setOpen}
@@ -225,23 +252,34 @@ const ItemList = ({
           disablePadding
           className={item.label}
           sx={{
-            margin: open ? "0 16px" : "auto",
-            width: "unset",
-            borderRadius: "12px",
+            margin: open ? `0 ${spacing.sm}` : "0 auto",
+            width: open ? "unset" : "80%",
+            borderRadius: borderRadius.lg,
             overflow: "hidden",
             border: item.active
               ? open
-                ? "2px solid #E2491A"
-                : "1px solid transparent"
+                ? `2px solid ${colors.primary.main}`
+                : `none`
               : "none",
             background: item.active
               ? open
-                ? "rgba(226, 73, 26, 0.10)"
-                : "transparent"
+                ? `rgba(${colors.primary.gradient}, 0.1)`
+                : `rgba(${colors.primary.gradient}, 0.05)`
               : "transparent",
-            height: open ? "unset" : "32px",
-            marginBottom: open ? 0 : "16px",
-            padding: open ? "0" : "4px", // Reduced padding when closed
+            height: "auto", // Changed from fixed height
+            marginBottom: spacing.xs,
+            marginTop: spacing.xs,
+            padding: open ? 0 : spacing.xs,
+            transition: "all 0.2s ease",
+            "&:hover": {
+              background: item.active
+                ? open
+                  ? `rgba(${colors.primary.gradient}, 0.2)`
+                  : `rgba(${colors.primary.gradient}, 0.1)`
+                : open
+                ? colors.neutral[800]
+                : colors.neutral[800],
+            },
           }}
         >
           <ListItemButton
@@ -252,30 +290,38 @@ const ItemList = ({
               onNavClick(item.href, item.target);
             }}
             sx={{
-              padding: 0,
+              padding: open ? 0 : spacing.xs,
+              justifyContent: open ? "flex-start" : "center",
+              minHeight: "40px",
             }}
           >
             <ListItemIcon
               sx={{
-                minWidth: "32px", // Increased icon size
-                marginLeft: open ? "20px" : "auto", // Reduced margin when closed
-                marginRight: open ? "8px" : "auto", // Removed margin when closed
-                justifyContent: "center", // Center the icon
-                // Colorize the icon when active to #E2491A
-                color: item.active ? "#E2491A" : "rgba(255, 255, 255, 0.6)",
+                minWidth: open ? "32px" : "24px",
+                width: open ? "32px" : "24px",
+                marginLeft: open ? spacing.lg : 0,
+                marginRight: open ? spacing.sm : 0,
+                justifyContent: "center",
+                color: item.active ? colors.primary.main : colors.neutral[400],
+                transition: "color 0.2s ease",
               }}
             >
               {item.icon}
             </ListItemIcon>
             <ListItemText
               primaryTypographyProps={{
-                fontSize: "14px",
+                fontSize: typography.fontSize.sm,
+                fontWeight: item.active
+                  ? typography.fontWeights.medium
+                  : typography.fontWeights.regular,
                 lineHeight: "20px",
+                fontFamily: typography.fontFamily,
+                color: item.active ? colors.neutral[50] : colors.neutral[300],
               }}
               sx={{
-                padding: "16px 24px 16px 20px",
-                opacity: item.active ? 1 : 0.6,
-                display: open ? "block" : "none", // Hide text when closed
+                padding: `${spacing.md} ${spacing.lg} ${spacing.md} ${spacing.md}`,
+                opacity: 1,
+                display: open ? "block" : "none",
               }}
               primary={item.label}
             />
