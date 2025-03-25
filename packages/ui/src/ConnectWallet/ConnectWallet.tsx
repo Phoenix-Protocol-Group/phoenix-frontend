@@ -46,7 +46,7 @@ const OptionComponent = ({
           transition: "all 0.3s ease",
           opacity: allowed ? 1 : 0.6,
           cursor: allowed ? "pointer" : "default",
-          boxShadow: selected ? `0 0 16px rgba(${colors.primary.mainRgb}, 0.15)` : "none"
+          boxShadow: selected ? `0 0 16px rgba(${colors.primary.gradient}, 0.15)` : "none"
         }}
       >
         <Box 
