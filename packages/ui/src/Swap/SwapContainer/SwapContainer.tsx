@@ -47,15 +47,7 @@ const SwapContainer = ({
         }}
       >
         {/* Header Section */}
-        <CardContainer
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: spacing.md,
-            width: "100%",
-          }}
-        >
+
           <Typography
             sx={{
               fontSize: typography.fontSize.xxl,
@@ -65,7 +57,7 @@ const SwapContainer = ({
           >
             Swap tokens instantly
           </Typography>
-        </CardContainer>
+
 
         {/* Main Content Section */}
         <Box

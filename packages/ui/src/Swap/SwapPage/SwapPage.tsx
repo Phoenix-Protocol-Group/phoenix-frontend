@@ -179,7 +179,7 @@ const SwapPage = () => {
 
         {optionsOpen && (
           <SlippageSettings
-            options={["0.1%", "0.5%", "2%"]}
+            options={[1, 2, 5]}
             selectedOption={0}
             onClose={() => setOptionsOpen(false)}
             onChange={() => {}}

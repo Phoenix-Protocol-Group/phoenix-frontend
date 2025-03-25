@@ -423,12 +423,14 @@ export default function SwapPage(): JSX.Element {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <SlippageSettings
-                  options={["1%", "3%", "5%"]}
-                  selectedOption={maxSpread}
-                  onClose={() => setOptionsOpen(false)}
-                  onChange={(option: string) => setMaxSpread(Number(option))}
-                />
+                <Box sx={{ maxWidth: "600px", margin: "auto" }}>
+                  <SlippageSettings
+                    options={[1, 3, 5]}
+                    selectedOption={maxSpread}
+                    onClose={() => setOptionsOpen(false)}
+                    onChange={(option: number) => setMaxSpread(option)}
+                  />
+                </Box>
               </motion.div>
             )}
             {assetSelectorOpen && (
@@ -438,12 +440,14 @@ export default function SwapPage(): JSX.Element {
                 exit={{ opacity: 0 }}
               >
                 {tokens.length > 0 ? (
-                  <AssetSelector
-                    tokens={tokens}
-                    tokensAll={tokens}
-                    onClose={() => setAssetSelectorOpen(false)}
-                    onTokenClick={handleTokenClick}
-                  />
+                  <Box sx={{ maxWidth: "600px", margin: "auto" }}>
+                    <AssetSelector
+                      tokens={tokens}
+                      tokensAll={tokens}
+                      onClose={() => setAssetSelectorOpen(false)}
+                      onTokenClick={handleTokenClick}
+                    />
+                  </Box>
                 ) : (
                   <Skeleton.AssetSelector
                     onClose={() => setAssetSelectorOpen(false)}
