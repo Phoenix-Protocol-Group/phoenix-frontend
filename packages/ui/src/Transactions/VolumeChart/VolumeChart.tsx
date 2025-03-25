@@ -238,12 +238,11 @@ const VolumeChart = ({
           <CartesianGrid
             horizontal
             stroke="#FFF"
-            strokeOpacity={0.4}
-            strokeWidth={1}
+            strokeOpacity={0}
+            strokeWidth={3}
             vertical={false}
           />
           <XAxis dataKey="timestamp" />
-          <YAxis tickFormatter={renderCustomAxisTick} />
           <Tooltip
             content={({ active, payload, label }) => {
               if (active && payload && payload.length) {
