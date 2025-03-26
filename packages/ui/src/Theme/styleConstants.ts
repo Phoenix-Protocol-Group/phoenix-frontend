@@ -26,7 +26,6 @@ export const colors = {
     800: '#262626',
     900: '#171717',
   },
-  
   // Semantic colors
   success: {
     main: '#66BB6A',
@@ -42,6 +41,11 @@ export const colors = {
     main: '#FFB74D',
     light: '#FFF8E1',
     dark: '#F57C00',
+  },
+  info: {
+    main: '#29B6F6',
+    light: '#E3F2FD',
+    dark: '#0288D1',
   },
   
   // Special gradients
