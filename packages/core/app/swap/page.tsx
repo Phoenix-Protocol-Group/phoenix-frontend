@@ -357,6 +357,7 @@ export default function SwapPage(): JSX.Element {
 
       hasPoolsLoaded.current = true;
       setAllPools(allPairs);
+      appStore.setLoading(false);
       return allPairs;
     } catch (error) {
       console.error("Failed to load pools data:", error);
@@ -382,6 +383,12 @@ export default function SwapPage(): JSX.Element {
         setToToken(appStore.allTokens[1]);
         hasTokensLoaded.current = true;
         appStore.setLoading(false);
+
+        // Still load pools in the background
+        setTimeout(() => {
+          loadPoolsData();
+        }, 500);
+
         return;
       }
 
@@ -396,16 +403,16 @@ export default function SwapPage(): JSX.Element {
           setToToken(allTokens[1]);
           hasTokensLoaded.current = true;
         }
-
-        // Load pools separately to avoid blocking the UI
-        setTimeout(() => {
-          loadPoolsData();
-        }, 500);
       } catch (e) {
         console.error("Failed to load tokens:", e);
       } finally {
         setIsLoading(false);
         appStore.setLoading(false);
+
+        // Load pools separately regardless of token loading success
+        setTimeout(() => {
+          loadPoolsData();
+        }, 500);
       }
     };
 
