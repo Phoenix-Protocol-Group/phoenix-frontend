@@ -373,7 +373,7 @@ export default function Page() {
                         mb: 1,
                       }}
                     >
-                      Welcome to Phoenix Protocol
+                      Welcome to Phoenix!
                     </Typography>
                     <Typography
                       sx={{
@@ -382,8 +382,7 @@ export default function Page() {
                         maxWidth: "90%",
                       }}
                     >
-                      Start trading, providing liquidity, and earning rewards on
-                      the leading Stellar DEX
+                      Your one-stop shop for all things DeFi on Stellar.
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={5}>
