@@ -11,6 +11,7 @@ export default function Page() {
   const appStore = useAppStore();
   useEffect(() => {
     appStore.setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <Box sx={{ mt: 6 }}>

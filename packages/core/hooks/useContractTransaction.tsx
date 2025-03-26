@@ -26,6 +26,11 @@ type ContractType =
   | "vesting"
   | "token";
 
+// Add options interface with onSuccess callback
+interface TransactionOptions {
+  onSuccess?: () => void;
+}
+
 const contractClients = {
   pair: PhoenixPairContract.Client,
   multihop: PhoenixMultihopContract.Client,
@@ -55,6 +60,7 @@ interface BaseExecuteContractTransactionParams<T extends ContractType> {
     client: ContractClientType<T>,
     restore?: boolean
   ) => Promise<AssembledTransaction<any>>;
+  options?: TransactionOptions;
 }
 
 interface ExecuteContractTransactionParams<T extends ContractType>
@@ -110,6 +116,7 @@ export const useContractTransaction = () => {
       contractType,
       contractAddress,
       transactionFunction,
+      options = {},
     }: ExecuteContractTransactionParams<T>) => {
       const signer = getSigner(storePersist, appStore);
       const networkPassphrase = constants.NETWORK_PASSPHRASE;
@@ -144,9 +151,11 @@ export const useContractTransaction = () => {
                 if (restore) {
                   console.log("Restoring transaction state...");
                   await transaction.simulate({ restore: true });
+                  options.onSuccess?.(); // Call onSuccess callback after successful restore
                   resolve({});
                 } else {
                   const sentTransaction = await transaction.signAndSend();
+                  options.onSuccess?.(); // Call onSuccess callback after successful transaction
                   resolve({
                     transactionId:
                       sentTransaction.sendTransactionResponse?.hash,

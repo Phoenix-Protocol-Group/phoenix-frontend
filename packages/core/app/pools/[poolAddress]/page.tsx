@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import React, { useEffect, useState, use, useMemo, useCallback } from "react";
@@ -270,6 +271,7 @@ export default function Page(props: PoolPageProps) {
    */
   const refreshPoolData = useCallback(async () => {
     await getPool();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -297,13 +299,6 @@ export default function Page(props: PoolPageProps) {
             },
             { simulate: !restore }
           );
-        },
-        options: {
-          onSuccess: () => {
-            setTokenAmounts([tokenAAmount, tokenBAmount]);
-            // Wait 7 Seconds for the next block and fetch new balances
-            setTimeout(refreshPoolData, 7000);
-          },
         },
       });
     },
@@ -338,13 +333,6 @@ export default function Page(props: PoolPageProps) {
             },
             { simulate: !restore }
           );
-        },
-        options: {
-          onSuccess: () => {
-            setTokenAmounts([lpTokenAmount]);
-            // Wait 7 Seconds for the next block and fetch new balances
-            setTimeout(refreshPoolData, 7000);
-          },
         },
       });
     },
@@ -382,16 +370,9 @@ export default function Page(props: PoolPageProps) {
             { simulate: !restore }
           );
         },
-        options: {
-          onSuccess: async () => {
-            await fetchStakes();
-            setTokenAmounts([lpTokenAmount]);
-            // Wait 7 Seconds for the next block and fetch new balances
-            setTimeout(refreshPoolData, 7000);
-          },
-        },
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       stakeContractAddress,
       fetchStakingAddress,
@@ -428,13 +409,6 @@ export default function Page(props: PoolPageProps) {
             },
             { simulate: !restore }
           );
-        },
-        options: {
-          onSuccess: () => {
-            setTokenAmounts([lpTokenAmount]);
-            // Wait 7 Seconds for the next block and fetch new balances
-            setTimeout(refreshPoolData, 7000);
-          },
         },
       });
     },
@@ -641,12 +615,6 @@ export default function Page(props: PoolPageProps) {
           },
           { simulate: !restore }
         );
-      },
-      options: {
-        onSuccess: () => {
-          // Wait 7 Seconds for the next block and fetch new balances
-          setTimeout(refreshPoolData, 7000);
-        },
       },
     });
   }, [

@@ -558,10 +558,10 @@ export default function SwapPage(): JSX.Element {
         operationsUpdateComplete.current = false;
         prevOperations.current = "";
       },
-      fromTokenValue: tokenAmounts[0].toString(),
-      toTokenValue: tokenAmounts[1].toString(),
-      fromToken,
-      toToken,
+      fromTokenValue: tokenAmounts[0].toString()!,
+      toTokenValue: tokenAmounts[1].toString()!,
+      fromToken: fromToken!,
+      toToken: toToken!,
       onTokenSelectorClick: handleSelectorOpen,
       onSwapButtonClick: doSwap,
       onInputChange: (isFrom: boolean, value: string) => {

@@ -7,6 +7,7 @@ import React, {
   useCallback,
   useRef,
   useMemo,
+  Fragment,
 } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -306,7 +307,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     <Loader />
                   </Box>
                 )}
-                {children}
+                <Fragment>{children}</Fragment>
               </Box>
             </RestoreModalProvider>
           </ToastProvider>

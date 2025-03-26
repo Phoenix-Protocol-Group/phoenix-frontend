@@ -131,8 +131,12 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 
         updateToast(toastId, {
           type: "error",
-          message: errorMessage,
-          error: errorObj, // Store a serializable error object
+          message: errorMessage as string,
+          error: errorObj as
+            | string
+            | Error
+            | { message: string; stack?: string | undefined }
+            | undefined, // Store a serializable error object
         });
         throw error;
       } finally {

@@ -7,7 +7,7 @@ import {
 export const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <UIToastProvider>
-      {children}
+      {children as any}
       {/* ToastContainer will now automatically use toasts from context */}
       <ToastContainer position="top-right" />
     </UIToastProvider>
