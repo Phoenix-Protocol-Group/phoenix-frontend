@@ -220,6 +220,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       transition: "all 0.2s ease-in-out",
       display: "flex",
       justifyContent: "center",
+      mt: 3,
       padding: "16px",
       ...swapPageStyle,
     }),

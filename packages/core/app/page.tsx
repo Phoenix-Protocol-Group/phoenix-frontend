@@ -325,7 +325,7 @@ export default function Page() {
       )}
 
       <Grid container spacing={3} sx={{ mt: 4, maxWidth: 1440 }}>
-        {/* Banner */}
+        {/* Phoenix-styled Welcome Banner */}
         <Grid item xs={12}>
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -334,37 +334,83 @@ export default function Page() {
           >
             <Box
               sx={{
-                background: "url('/banner.png') center/cover",
-                padding: "3rem",
+                background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
+                border: "1px solid rgba(255, 255, 255, 0.05)",
                 borderRadius: "16px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                textAlign: "left",
+                boxShadow: "0px 4px 24px rgba(0, 0, 0, 0.2)",
+                overflow: "hidden",
+                position: "relative",
               }}
             >
-              <Box>
-                <Typography
-                  variant="h1"
-                  sx={{ fontSize: "2rem", fontWeight: 700, color: "#fff" }}
-                >
-                  Are you an artist?
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: "1rem",
-                    fontWeight: 400,
-                    opacity: 0.8,
-                    color: "#fff",
-                    mt: 1,
-                  }}
-                >
-                  Be one of the first and become a genesis NFT creator!
-                </Typography>
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  height: "100%",
+                  width: "100%",
+                  opacity: 0.05,
+                  backgroundImage: "url('/gradient-overlay.png')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  zIndex: 0,
+                }}
+              />
+              <Box
+                sx={{
+                  padding: { xs: "1.5rem", md: "2rem" },
+                  position: "relative",
+                  zIndex: 1,
+                }}
+              >
+                <Grid container alignItems="center" spacing={3}>
+                  <Grid item xs={12} md={7}>
+                    <Typography
+                      sx={{
+                        color: "#FFFFFF",
+                        fontSize: { xs: "1.5rem", md: "1.75rem" },
+                        fontWeight: 700,
+                        mb: 1,
+                      }}
+                    >
+                      Welcome to Phoenix Protocol
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: "1rem",
+                        color: "rgba(255, 255, 255, 0.7)",
+                        maxWidth: "90%",
+                      }}
+                    >
+                      Start trading, providing liquidity, and earning rewards on
+                      the leading Stellar DEX
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={5}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexWrap: { xs: "wrap", sm: "nowrap" },
+                        gap: 2,
+                        justifyContent: { xs: "flex-start", md: "flex-end" },
+                      }}
+                    >
+                      <Button
+                        type="primary"
+                        onClick={() => router.push("/swap")}
+                      >
+                        Trade Tokens
+                      </Button>
+                      <Button
+                        type="secondary"
+                        onClick={() => router.push("/pools")}
+                      >
+                        Explore Pools
+                      </Button>
+                    </Box>
+                  </Grid>
+                </Grid>
               </Box>
-              <Button type="primary" onClick={() => router.push("/nft")}>
-                Apply Now!
-              </Button>
             </Box>
           </motion.div>
         </Grid>
