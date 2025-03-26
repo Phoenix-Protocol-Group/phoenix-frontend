@@ -3711,6 +3711,7 @@ __metadata:
     "@walletconnect/modal": ^2.6.2
     "@walletconnect/sign-client": ^2.13.1
     "@walletconnect/types": ^2.13.1
+    framer-motion: ^12.6.0
     jest: ^29.5.0
     next: 15.0.3
   languageName: unknown
@@ -9157,6 +9158,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"framer-motion@npm:^12.6.0":
+  version: 12.6.0
+  resolution: "framer-motion@npm:12.6.0"
+  dependencies:
+    motion-dom: ^12.6.0
+    motion-utils: ^12.5.0
+    tslib: ^2.4.0
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: be4dc3570cc7a901cd3a633959fa115e3510e58d44e47b1f9700301f038f763f2863fce433409f430a1070242c07a6400438dfabba6638b350377bbfbc999bb1
+  languageName: node
+  linkType: hard
+
 "fs-extra@npm:^10.0.0":
   version: 10.1.0
   resolution: "fs-extra@npm:10.1.0"
@@ -11861,6 +11884,22 @@ __metadata:
   version: 2.30.1
   resolution: "moment@npm:2.30.1"
   checksum: 859236bab1e88c3e5802afcf797fc801acdbd0ee509d34ea3df6eea21eb6bcc2abd4ae4e4e64aa7c986aa6cba563c6e62806218e6412a765010712e5fa121ba6
+  languageName: node
+  linkType: hard
+
+"motion-dom@npm:^12.6.0":
+  version: 12.6.0
+  resolution: "motion-dom@npm:12.6.0"
+  dependencies:
+    motion-utils: ^12.5.0
+  checksum: 27723aa1c55d2abfd3f89b71d03aaa979b7205f40056d2f495eb39ac5a8dbf0871d2d0ad436c36bec678b3f7ff17deb7a5189a4a67b854efdb47ec3ffbcb81c6
+  languageName: node
+  linkType: hard
+
+"motion-utils@npm:^12.5.0":
+  version: 12.5.0
+  resolution: "motion-utils@npm:12.5.0"
+  checksum: 347169ab97d8b3720b363afad6c9f4e8999490d1d95c70aaa8f83333be1b8b4e11c5f25564a9809fb091160fad2184403222e5b383be1bba004243c8b47497fe
   languageName: node
   linkType: hard
 

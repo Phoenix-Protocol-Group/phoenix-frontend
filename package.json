@@ -47,6 +47,7 @@
     "@walletconnect/modal": "^2.6.2",
     "@walletconnect/sign-client": "^2.13.1",
     "@walletconnect/types": "^2.13.1",
+    "framer-motion": "^12.6.0",
     "next": "15.0.3"
   }
 }
