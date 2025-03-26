@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, use } from "react";
+import React, { useEffect, useState, use, useMemo, useCallback } from "react";
 import * as refuse from "react-usestateref";
 import { Box, GlobalStyles, Grid, Skeleton, Typography } from "@mui/material";
 import {
@@ -111,14 +111,133 @@ export default function Page(props: PoolPageProps) {
   const [unstakeAmount, setUnstakeAmount] = useState<number>(0);
   const [unstakeTimestamp, setUnstakeTimestamp] = useState<number>(0);
 
-  const PairContract = new PhoenixPairContract.Client({
-    contractId: params.poolAddress,
-    networkPassphrase: constants.NETWORK_PASSPHRASE,
-    rpcUrl: constants.RPC_URL,
-  });
+  // Memoize the PairContract
+  const PairContract = useMemo(
+    () =>
+      new PhoenixPairContract.Client({
+        contractId: params.poolAddress,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      }),
+    [params.poolAddress]
+  );
+
   const appStore = useAppStore();
 
-  const fetchStakingAddress = async (): Promise<string | undefined> => {
+  const loadRewards = useCallback(
+    async (stakeContract = StakeContract) => {
+      try {
+        // Stake Contract
+        const _rewards = await stakeContract?.query_withdrawable_rewards({
+          user: storePersist.wallet.address!,
+        });
+
+        const __rewards = _rewards?.result.rewards?.map(async (reward: any) => {
+          // Get the token
+          const token = await store.fetchTokenInfo(reward.reward_address);
+          return {
+            name: token?.symbol.toUpperCase(),
+            icon: `/cryptoIcons/${token?.symbol.toLowerCase()}.svg`,
+            usdValue: "0",
+            amount:
+              Number(reward.reward_amount.toString()) / 10 ** token?.decimals!,
+            category: "",
+          };
+        });
+
+        const rew = await Promise.all(__rewards);
+        setRewards(rew);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    [StakeContract, store, storePersist.wallet.address]
+  );
+
+  const fetchStakes = useCallback(
+    async (
+      name = lpToken?.name,
+      stakeContract = StakeContract,
+      calcApr = maxApr,
+      tokenPrice = lpTokenPrice
+    ) => {
+      if (storePersist.wallet.address) {
+        // Get user stakes
+        const stakesA = await stakeContract?.query_staked(
+          {
+            address: storePersist.wallet.address!,
+          },
+          { simulate: false }
+        );
+
+        const stakes = await stakesA.simulate({ restore: true });
+        // If stakes are okay
+        if (stakes?.result) {
+          // If filled
+          if (stakes.result.stakes.length > 0) {
+            //@ts-ignore
+            const _stakes: Entry[] = stakes.result.stakes.map((stake: any) => {
+              return {
+                icon: `/cryptoIcons/poolIcon.png`,
+                title: name!,
+                apr:
+                  // Calculate APR
+
+                  (
+                    (time.daysSinceTimestamp(Number(stake.stake_timestamp)) > 60
+                      ? 60
+                      : time.daysSinceTimestamp(
+                          Number(stake.stake_timestamp)
+                        )) *
+                    (calcApr / 2 / 60)
+                  ).toFixed(2) + "%",
+                lockedPeriod:
+                  time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
+                  " days",
+                amount: {
+                  tokenAmount: Number(stake.stake) / 10 ** 7,
+                  tokenValueInUsd: (
+                    (Number(stake.stake) / 10 ** 7) *
+                    tokenPrice
+                  ).toFixed(2),
+                },
+                onClick: () => {
+                  setIsFixUnstake(false);
+                  setUnstakeAmount(Number(stake.stake) / 10 ** 7);
+                  setUnstakeTimestamp(stake.stake_timestamp);
+                  setUnstakeModalOpen(true);
+                },
+                onClickFix: () => {
+                  setIsFixUnstake(true);
+                  setUnstakeAmount(Number(stake.stake) / 10 ** 7);
+                  setUnstakeTimestamp(stake.stake_timestamp);
+                  setUnstakeModalOpen(true);
+                },
+              };
+            });
+            setUserStakes(_stakes);
+            await loadRewards(stakeContract);
+            return _stakes;
+          }
+        }
+      }
+    },
+    [
+      lpToken?.name,
+      StakeContract,
+      maxApr,
+      lpTokenPrice,
+      storePersist.wallet.address,
+      loadRewards,
+    ]
+  );
+
+  /**
+   * Fetch staking address with error handling
+   */
+  const fetchStakingAddress = useCallback(async (): Promise<
+    string | undefined
+  > => {
     try {
       // Fetch pool config and info from chain
       const [pairConfig, pairInfo] = await Promise.all([
@@ -126,155 +245,208 @@ export default function Page(props: PoolPageProps) {
         PairContract.query_pool_info(),
       ]);
 
-      console.log(pairConfig.result);
-      console.log("hi");
       // When results ok...
       if (pairConfig?.result && pairInfo?.result) {
-        // Fetch token infos from chain and save in global appstore
-        const [_tokenA, _tokenB, _lpToken, stakeContractAddress] =
-          await Promise.all([
-            store.fetchTokenInfo(pairConfig.result.token_a),
-            store.fetchTokenInfo(pairConfig.result.token_b),
-            store.fetchTokenInfo(pairConfig.result.share_token, true),
-            new PhoenixStakeContract.Client({
-              contractId: pairConfig.result.stake_contract.toString(),
-              networkPassphrase: constants.NETWORK_PASSPHRASE,
-              rpcUrl: constants.RPC_URL,
-              publicKey: storePersist.wallet.address,
-              signTransaction: (tx: string) => new Signer().sign(tx),
-            }),
-          ]);
-        return pairConfig.result.stake_contract.toString();
+        // Fetch token infos
+        const stakeContractId = pairConfig.result.stake_contract.toString();
+        const stakeContractAddress = new PhoenixStakeContract.Client({
+          contractId: stakeContractId,
+          networkPassphrase: constants.NETWORK_PASSPHRASE,
+          rpcUrl: constants.RPC_URL,
+          publicKey: storePersist.wallet.address,
+          signTransaction: (tx: string) => new Signer().sign(tx),
+        });
+
+        return stakeContractId;
       }
     } catch (e) {
-      console.log(e);
+      console.log("Error fetching staking address:", e);
     }
-  };
-  // Provide Liquidity
-  const provideLiquidity = async (
-    tokenAAmount: number,
-    tokenBAmount: number
-  ) => {
-    await executeContractTransaction({
-      contractType: "pair",
-      contractAddress: params.poolAddress,
-      transactionFunction: async (client, restore) => {
-        return client.provide_liquidity(
-          {
-            sender: storePersist.wallet.address!,
-            desired_a: BigInt(
-              (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
-            ),
-            desired_b: BigInt(
-              (tokenBAmount * 10 ** (tokenB?.decimals || 7)).toFixed(0)
-            ),
-            min_a: undefined,
-            min_b: undefined,
-            custom_slippage_bps: undefined,
-            deadline: undefined,
-          },
-          { simulate: !restore }
-        );
-      },
-    });
-    // Refresh pool data
+    return undefined;
+  }, [PairContract, storePersist.wallet.address]);
+
+  /**
+   * Refresh pool data and balances after operations
+   */
+  const refreshPoolData = useCallback(async () => {
     await getPool();
-    setTokenAmounts([tokenAAmount, tokenBAmount]);
-    setTimeout(() => {
-      getPool();
-    }, 7000);
-  };
+  }, []);
 
-  // Remove Liquidity
-  const removeLiquidity = async (lpTokenAmount: number, fix?: boolean) => {
-    await executeContractTransaction({
-      contractType: "pair",
-      contractAddress: params.poolAddress,
-      transactionFunction: async (client, restore) => {
-        return client.withdraw_liquidity(
-          {
-            sender: storePersist.wallet.address!,
-            share_amount: BigInt(
-              (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-            ),
-            min_a: BigInt(1),
-            min_b: BigInt(1),
-            deadline: undefined,
+  /**
+   * Provide liquidity to the pool with callback for balance updates
+   */
+  const provideLiquidity = useCallback(
+    async (tokenAAmount: number, tokenBAmount: number) => {
+      await executeContractTransaction({
+        contractType: "pair",
+        contractAddress: params.poolAddress,
+        transactionFunction: async (client, restore) => {
+          return client.provide_liquidity(
+            {
+              sender: storePersist.wallet.address!,
+              desired_a: BigInt(
+                (tokenAAmount * 10 ** (tokenA?.decimals || 7)).toFixed(0)
+              ),
+              desired_b: BigInt(
+                (tokenBAmount * 10 ** (tokenB?.decimals || 7)).toFixed(0)
+              ),
+              min_a: undefined,
+              min_b: undefined,
+              custom_slippage_bps: undefined,
+              deadline: undefined,
+            },
+            { simulate: !restore }
+          );
+        },
+        options: {
+          onSuccess: () => {
+            setTokenAmounts([tokenAAmount, tokenBAmount]);
+            // Wait 7 Seconds for the next block and fetch new balances
+            setTimeout(refreshPoolData, 7000);
           },
-          { simulate: !restore }
-        );
-      },
-    });
-    setTokenAmounts([lpTokenAmount]);
-    // Wait 7 Seconds for the next block and fetch new balances
-    setTimeout(() => {
-      getPool();
-    }, 7000);
-  };
+        },
+      });
+    },
+    [
+      executeContractTransaction,
+      params.poolAddress,
+      storePersist.wallet.address,
+      tokenA?.decimals,
+      tokenB?.decimals,
+      refreshPoolData,
+    ]
+  );
 
-  // Stake
-  const stake = async (lpTokenAmount: number) => {
-    let stakeAddress: string | undefined = stakeContractAddress;
-    if (stakeContractAddress === "") {
-      stakeAddress = await fetchStakingAddress();
-    }
-
-    await executeContractTransaction({
-      contractType: "stake",
-      contractAddress: stakeAddress!,
-      transactionFunction: async (client, restore) => {
-        return client.bond(
-          {
-            sender: storePersist.wallet.address!,
-            tokens: BigInt(
-              (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-            ),
+  /**
+   * Remove liquidity from the pool with callback for balance updates
+   */
+  const removeLiquidity = useCallback(
+    async (lpTokenAmount: number, fix?: boolean) => {
+      await executeContractTransaction({
+        contractType: "pair",
+        contractAddress: params.poolAddress,
+        transactionFunction: async (client, restore) => {
+          return client.withdraw_liquidity(
+            {
+              sender: storePersist.wallet.address!,
+              share_amount: BigInt(
+                (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+              ),
+              min_a: BigInt(1),
+              min_b: BigInt(1),
+              deadline: undefined,
+            },
+            { simulate: !restore }
+          );
+        },
+        options: {
+          onSuccess: () => {
+            setTokenAmounts([lpTokenAmount]);
+            // Wait 7 Seconds for the next block and fetch new balances
+            setTimeout(refreshPoolData, 7000);
           },
-          { simulate: !restore }
-        );
-      },
-    });
-    await fetchStakes();
-    setTokenAmounts([lpTokenAmount]);
-    // Wait 7 Seconds for the next block and fetch new balances
-    setTimeout(() => {
-      getPool();
-    }, 7000);
-  };
+        },
+      });
+    },
+    [
+      executeContractTransaction,
+      params.poolAddress,
+      storePersist.wallet.address,
+      lpToken?.decimals,
+      refreshPoolData,
+    ]
+  );
 
-  // Stake
-  const unstake = async (
-    lpTokenAmount: number,
-    stake_timestamp: number,
-    fix?: boolean
-  ) => {
-    let stakeAddress: string | undefined = stakeContractAddress;
-    if (stakeContractAddress === "") {
-      stakeAddress = await fetchStakingAddress();
-    }
+  /**
+   * Stake LP tokens with callback for balance updates
+   */
+  const stake = useCallback(
+    async (lpTokenAmount: number) => {
+      let stakeAddress: string | undefined = stakeContractAddress;
+      if (!stakeAddress) {
+        stakeAddress = await fetchStakingAddress();
+        if (!stakeAddress) return;
+      }
 
-    await executeContractTransaction({
-      contractType: "stake",
-      contractAddress: stakeAddress!,
-      transactionFunction: async (client, restore) => {
-        return client.unbond(
-          {
-            sender: storePersist.wallet.address!,
-            stake_amount: BigInt(
-              (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
-            ),
-            stake_timestamp: BigInt(stake_timestamp),
+      await executeContractTransaction({
+        contractType: "stake",
+        contractAddress: stakeAddress,
+        transactionFunction: async (client, restore) => {
+          return client.bond(
+            {
+              sender: storePersist.wallet.address!,
+              tokens: BigInt(
+                (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+              ),
+            },
+            { simulate: !restore }
+          );
+        },
+        options: {
+          onSuccess: async () => {
+            await fetchStakes();
+            setTokenAmounts([lpTokenAmount]);
+            // Wait 7 Seconds for the next block and fetch new balances
+            setTimeout(refreshPoolData, 7000);
           },
-          { simulate: !restore }
-        );
-      },
-    });
-    setTokenAmounts([lpTokenAmount]);
-    // Wait 7 Seconds for the next block and fetch new balances
-    setTimeout(() => {
-      getPool();
-    }, 7000);
-  };
+        },
+      });
+    },
+    [
+      stakeContractAddress,
+      fetchStakingAddress,
+      executeContractTransaction,
+      storePersist.wallet.address,
+      lpToken?.decimals,
+      fetchStakes,
+      refreshPoolData,
+    ]
+  );
+
+  /**
+   * Unstake LP tokens with callback for balance updates
+   */
+  const unstake = useCallback(
+    async (lpTokenAmount: number, stake_timestamp: number, fix?: boolean) => {
+      let stakeAddress: string | undefined = stakeContractAddress;
+      if (!stakeAddress) {
+        stakeAddress = await fetchStakingAddress();
+        if (!stakeAddress) return;
+      }
+
+      await executeContractTransaction({
+        contractType: "stake",
+        contractAddress: stakeAddress,
+        transactionFunction: async (client, restore) => {
+          return client.unbond(
+            {
+              sender: storePersist.wallet.address!,
+              stake_amount: BigInt(
+                (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
+              ),
+              stake_timestamp: BigInt(stake_timestamp),
+            },
+            { simulate: !restore }
+          );
+        },
+        options: {
+          onSuccess: () => {
+            setTokenAmounts([lpTokenAmount]);
+            // Wait 7 Seconds for the next block and fetch new balances
+            setTimeout(refreshPoolData, 7000);
+          },
+        },
+      });
+    },
+    [
+      stakeContractAddress,
+      fetchStakingAddress,
+      executeContractTransaction,
+      storePersist.wallet.address,
+      lpToken?.decimals,
+      refreshPoolData,
+    ]
+  );
 
   // Function to fetch pool config and info from chain
   const getPool = async () => {
@@ -449,108 +621,19 @@ export default function Page(props: PoolPageProps) {
     }
   };
 
-  const fetchStakes = async (
-    name = lpToken?.name,
-    stakeContract = StakeContract,
-    calcApr = maxApr,
-    tokenPrice = lpTokenPrice
-  ) => {
-    if (storePersist.wallet.address) {
-      // Get user stakes
-      const stakesA = await stakeContract?.query_staked(
-        {
-          address: storePersist.wallet.address!,
-        },
-        { simulate: false }
-      );
-
-      const stakes = await stakesA.simulate({ restore: true });
-      // If stakes are okay
-      if (stakes?.result) {
-        // If filled
-        if (stakes.result.stakes.length > 0) {
-          //@ts-ignore
-          const _stakes: Entry[] = stakes.result.stakes.map((stake: any) => {
-            return {
-              icon: `/cryptoIcons/poolIcon.png`,
-              title: name!,
-              apr:
-                // Calculate APR
-
-                (
-                  (time.daysSinceTimestamp(Number(stake.stake_timestamp)) > 60
-                    ? 60
-                    : time.daysSinceTimestamp(Number(stake.stake_timestamp))) *
-                  (calcApr / 2 / 60)
-                ).toFixed(2) + "%",
-              lockedPeriod:
-                time.daysSinceTimestamp(Number(stake.stake_timestamp)) +
-                " days",
-              amount: {
-                tokenAmount: Number(stake.stake) / 10 ** 7,
-                tokenValueInUsd: (
-                  (Number(stake.stake) / 10 ** 7) *
-                  tokenPrice
-                ).toFixed(2),
-              },
-              onClick: () => {
-                setIsFixUnstake(false);
-                setUnstakeAmount(Number(stake.stake) / 10 ** 7);
-                setUnstakeTimestamp(stake.stake_timestamp);
-                setUnstakeModalOpen(true);
-              },
-              onClickFix: () => {
-                setIsFixUnstake(true);
-                setUnstakeAmount(Number(stake.stake) / 10 ** 7);
-                setUnstakeTimestamp(stake.stake_timestamp);
-                setUnstakeModalOpen(true);
-              },
-            };
-          });
-          setUserStakes(_stakes);
-          await loadRewards(stakeContract);
-          return _stakes;
-        }
-      }
-    }
-  };
-
-  const loadRewards = async (stakeContract = StakeContract) => {
-    try {
-      // Stake Contract
-      const _rewards = await stakeContract?.query_withdrawable_rewards({
-        user: storePersist.wallet.address!,
-      });
-
-      const __rewards = _rewards?.result.rewards?.map(async (reward: any) => {
-        // Get the token
-        const token = await store.fetchTokenInfo(reward.reward_address);
-        return {
-          name: token?.symbol.toUpperCase(),
-          icon: `/cryptoIcons/${token?.symbol.toLowerCase()}.svg`,
-          usdValue: "0",
-          amount:
-            Number(reward.reward_amount.toString()) / 10 ** token?.decimals!,
-          category: "",
-        };
-      });
-
-      const rew = await Promise.all(__rewards);
-      setRewards(rew);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const claimTokens = async () => {
+  /**
+   * Claim rewards with callback for balance updates
+   */
+  const claimTokens = useCallback(async () => {
     let stakeAddress: string | undefined = stakeContractAddress;
-    if (stakeContractAddress === "") {
+    if (!stakeAddress) {
       stakeAddress = await fetchStakingAddress();
+      if (!stakeAddress) return;
     }
 
     await executeContractTransaction({
       contractType: "stake",
-      contractAddress: stakeAddress!,
+      contractAddress: stakeAddress,
       transactionFunction: async (client, restore) => {
         return client.withdraw_rewards(
           {
@@ -559,16 +642,26 @@ export default function Page(props: PoolPageProps) {
           { simulate: !restore }
         );
       },
+      options: {
+        onSuccess: () => {
+          // Wait 7 Seconds for the next block and fetch new balances
+          setTimeout(refreshPoolData, 7000);
+        },
+      },
     });
-    // Wait 7 Seconds for the next block and fetch new balances
-    setTimeout(() => {
-      getPool();
-    }, 7000);
-  };
+  }, [
+    stakeContractAddress,
+    fetchStakingAddress,
+    executeContractTransaction,
+    storePersist.wallet.address,
+    refreshPoolData,
+  ]);
 
+  // Fetch pool data when address changes
   useEffect(() => {
-    getPool();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (storePersist.wallet.address) {
+      getPool();
+    }
   }, [storePersist.wallet.address]);
 
   if (!params.poolAddress || poolNotFound) {
