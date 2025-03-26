@@ -32,6 +32,10 @@ export class API {
       });
     }
     const response = await fetch(url.toString());
+    // if endpoint is /price/{name} and response is not JSON, return 0
+    if (endpoint.startsWith("/price/") && !response.ok) {
+      return 0 as any;
+    }
     // Try again if the response is not JSON
     if (!response.ok) {
       return this.get<T>(endpoint, params);
@@ -44,6 +48,9 @@ export class API {
   }
 
   async getPrice(name: string): Promise<number> {
+    if (name === "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75" || name === "CDIKURWHYS4FFTR5KOQK6MBFZA2K3E26WGBQI6PXBYWZ4XIOPJHDFJKP") {
+      return 1;
+    }
     return this.get<number>(`/price/${name}`);
   }
 

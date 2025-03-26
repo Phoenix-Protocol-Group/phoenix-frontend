@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import LiquidityMining from "./LiquidityMining";
 import { Grid } from "@mui/material";
+import React from "react";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof LiquidityMining> = {

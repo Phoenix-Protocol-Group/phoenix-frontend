@@ -1,7 +1,11 @@
+import { Pool } from './Pools';
+
 export interface AssetInfoModalProps {
   open: boolean;
   onClose: () => void;
   asset: AssetInfo;
+  userBalance: number;
+  pools: Pool[];
 }
 
 export interface AssetInfo {

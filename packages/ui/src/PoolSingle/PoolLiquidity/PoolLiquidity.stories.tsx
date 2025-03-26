@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import PoolLiquidity from "./PoolLiquidity";
 import { Grid } from "@mui/material";
 import { testTokens } from "../../Dashboard/WalletBalanceTable/WalletBalanceTable.stories";
+import React from "react";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof PoolLiquidity> = {

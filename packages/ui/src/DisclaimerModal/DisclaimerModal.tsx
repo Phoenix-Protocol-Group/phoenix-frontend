@@ -18,11 +18,11 @@ const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps) => {
     transform: "translate(-50%, -50%)",
     width: 512,
     maxWidth: "calc(100vw - 16px)",
-    background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
-    borderRadius: "16px",
+    background: "var(--neutral-900, #171717)",
+    borderRadius: "12px",
     display: "flex",
     flexDirection: "column" as "column",
-    padding: "16px",
+    padding: "24px",
   };
 
   return (
@@ -70,7 +70,7 @@ const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps) => {
               sx={{
                 color: "#FFF",
                 textAlign: "center",
-                fontSize: "24px",
+                fontSize: "20px",
                 fontWeight: 700,
               }}
             >
@@ -80,16 +80,26 @@ const DisclaimerModal = ({ open, onAccepted }: DisclaimerModalProps) => {
             <Box>
               <Typography
                 sx={{
-                  color:
-                    "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
+                  color: "var(--neutral-300, #D4D4D4)",
                   textAlign: "justify",
-                  fontSize: "14px",
+                  fontSize: "12px",
                   fontWeight: 400,
                   lineHeight: "140%",
-                  marginBottom: "22px",
-                  marginTop: "4px",
-                  maxHeight: "400px",
+                  marginBottom: "16px",
+                  marginTop: "8px",
+                  maxHeight: "300px",
                   overflowY: "auto",
+                  "&::-webkit-scrollbar": {
+                    width: "4px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: "var(--primary-500, #F97316)",
+                    borderRadius: "8px",
+                  },
+                  // Styles for Firefox
+                  scrollbarWidth: "thin",
+                  scrollbarColor:
+                    "var(--primary-500, #F97316) var(--neutral-800, #262626)",
                 }}
               >
                 This agreement governs your use of the services provided through

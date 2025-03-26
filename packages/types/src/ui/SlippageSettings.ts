@@ -1,6 +1,6 @@
 export interface SlippageOptionsProps {
-  options: string[];
+  options: number[];
   selectedOption: number;
   onClose: () => void;
-  onChange: (option: string) => void;
+  onChange: (option: number) => void;
 }

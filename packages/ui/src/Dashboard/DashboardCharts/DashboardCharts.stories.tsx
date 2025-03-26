@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import DashboardPriceCharts from "./DashboardCharts";
 import { Grid } from "@mui/material";
 import { mockDataset, mockDataset2 } from "./mockdata";
+import React from "react";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof DashboardPriceCharts> = {
