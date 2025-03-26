@@ -346,11 +346,12 @@ export default function Page() {
                 sx={{
                   position: "absolute",
                   top: 0,
-                  left: 0,
-                  height: "100%",
-                  width: "100%",
-                  opacity: 0.05,
-                  backgroundImage: "url('/gradient-overlay.png')",
+                  left: { md: 0, xs: "auto" },
+                  right: { md: "auto", xs: 0 },
+                  width: 200,
+                  height: 200,
+                  opacity: 0.8,
+                  backgroundImage: "url('/3d.png')",
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   zIndex: 0,
@@ -364,7 +365,8 @@ export default function Page() {
                 }}
               >
                 <Grid container alignItems="center" spacing={3}>
-                  <Grid item xs={12} md={7}>
+                  <Grid item xs={0} md={2} />
+                  <Grid item xs={12} md={5}>
                     <Typography
                       sx={{
                         color: "#FFFFFF",
