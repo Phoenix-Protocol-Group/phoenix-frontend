@@ -837,8 +837,7 @@ const AssetInfoModal = ({
                                   Total Volume (7d):
                                   {formatNumber(
                                     // @ts-ignore
-                                    calculateTotalVolume(tradingVolume7d) /
-                                      10 ** 7
+                                    calculateTotalVolume(tradingVolume7d)
                                   )}{" "}
                                   USDC
                                 </Typography>
