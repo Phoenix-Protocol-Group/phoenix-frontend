@@ -76,7 +76,7 @@ const FilterButton = React.memo(
 /**
  * Pool Item Component
  */
-const PoolItem = React.memo(
+export const PoolItem = React.memo(
   ({
     pool,
     filter,

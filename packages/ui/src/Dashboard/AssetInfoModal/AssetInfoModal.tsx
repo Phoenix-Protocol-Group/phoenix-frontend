@@ -4,24 +4,20 @@ import {
   Typography,
   Modal as MuiModal,
   Avatar,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
   Tabs,
   Tab,
   Grid,
   IconButton,
-  Divider,
   useMediaQuery,
   useTheme,
   Tooltip,
+  CircularProgress,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import CloseIcon from "@mui/icons-material/Close";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { AssetInfoModalProps } from "@phoenix-protocol/types";
+import { AssetInfoModalProps, PoolsFilter } from "@phoenix-protocol/types";
 import {
   colors,
   typography,
@@ -30,8 +26,6 @@ import {
   shadows,
 } from "../../Theme/styleConstants";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip as RechartsTooltip,
@@ -42,6 +36,9 @@ import {
   Bar,
 } from "recharts";
 import { CardContainer } from "../../Common/CardContainer";
+import { TradingVolume } from "@phoenix-protocol/utils/build/trade_api";
+import { PoolItem } from "../../Pools/Pools";
+import { formatCurrencyStatic } from "@phoenix-protocol/utils";
 
 // Interface for a tab panel
 interface TabPanelProps {
@@ -53,7 +50,8 @@ interface TabPanelProps {
 // Define chart data type
 interface ChartDataPoint {
   date: string;
-  value: number;
+  value?: number;
+  volume?: number;
 }
 
 // Helper function to determine color based on rating
@@ -70,6 +68,13 @@ const formatNumber = (num: number): string => {
   return num.toFixed(1);
 };
 
+// Calculate total volume
+const calculateTotalVolume = (volumes: TradingVolume[]): number => {
+  return volumes.reduce((total, volume) => {
+    return total + Number(volume.usdVolume);
+  }, 0);
+};
+
 // Helper function to shorten addresses
 const shortenAddress = (address: string): string => {
   if (!address) return "";
@@ -78,12 +83,33 @@ const shortenAddress = (address: string): string => {
 
 // Data transformations for charts
 const prepareVolumeChartData = (
+  data: TradingVolume[] | undefined
+): ChartDataPoint[] => {
+  if (!data || !Array.isArray(data)) return [];
+
+  // Map to date and volume minding the date and time object format
+  return data.map((item) => {
+    const date = item.date
+      ? `${item.date.year}-${String(item.date.month).padStart(2, "0")}-${String(
+          item.date.day
+        ).padStart(2, "0")}`
+      : "";
+
+    return {
+      date,
+      volume: Number(item.usdVolume),
+    };
+  });
+};
+
+// Data transformations for charts
+const preparePriceChartData = (
   data: [number, number][] | undefined
 ): ChartDataPoint[] => {
   if (!data || !Array.isArray(data)) return [];
 
   return data.map((item) => ({
-    date: new Date(item[0] * 1000).toLocaleDateString(),
+    date: new Date(item[0]).toLocaleDateString(),
     value: item[1],
   }));
 };
@@ -118,8 +144,10 @@ const AssetInfoModal = ({
   open,
   onClose,
   asset,
+  tradingVolume7d,
   userBalance = 0,
   pools = [],
+  loading = false,
 }: AssetInfoModalProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -134,7 +162,11 @@ const AssetInfoModal = ({
   }, []);
 
   // Chart data
-  const volumeData = prepareVolumeChartData(asset.price7d || []);
+  const volumeData = prepareVolumeChartData(
+    (tradingVolume7d as TradingVolume[]) || []
+  );
+
+  const priceData = preparePriceChartData(asset.price7d || []);
 
   // Modal styles using the app's style constants
   const style = {
@@ -156,16 +188,6 @@ const AssetInfoModal = ({
   // Chart height constant to ensure consistency
   const chartHeight = 300;
   const chartCardHeight = 420;
-
-  // Custom tooltip formatter
-  const formatTooltip = (value: number, name: string, props: any) => {
-    return [`${value.toFixed(6)}`, "Value"];
-  };
-
-  // Date formatter for tooltip
-  const formatXAxis = (tickItem: string) => {
-    return tickItem;
-  };
 
   // Custom tooltip component for better styling
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -241,843 +263,747 @@ const AssetInfoModal = ({
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
           <Box sx={style}>
-            {/* Header */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: spacing.lg,
-                borderBottom: `1px solid ${colors.neutral[800]}`,
-              }}
-            >
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: spacing.sm }}
-              >
-                {asset.tomlInfo.image && (
-                  <Avatar
-                    src={asset.tomlInfo.image}
-                    alt={asset.tomlInfo.code}
-                    sx={{ width: 40, height: 40 }}
-                  />
-                )}
-                <Box>
-                  <Typography
-                    sx={{
-                      color: colors.neutral[50],
-                      fontSize: typography.fontSize.xl,
-                      fontWeight: typography.fontWeights.bold,
-                      fontFamily: typography.fontFamily,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: spacing.xs,
-                    }}
-                  >
-                    {asset.tomlInfo.code}
-                    {asset.domain && (
-                      <Tooltip title={`Issuer: ${asset.domain}`}>
-                        <Typography
-                          component="span"
-                          sx={{
-                            fontSize: typography.fontSize.sm,
-                            color: colors.neutral[400],
-                            fontWeight: typography.fontWeights.regular,
-                          }}
-                        >
-                          ({asset.domain})
-                        </Typography>
-                      </Tooltip>
-                    )}
-                  </Typography>
-
-                  {userBalance > 0 && (
-                    <Typography
-                      sx={{
-                        fontSize: typography.fontSize.md,
-                        color: colors.neutral[300],
-                        fontFamily: typography.fontFamily,
-                      }}
-                    >
-                      Your Balance: {formatNumber(userBalance)}{" "}
-                      {asset.tomlInfo.code}
-                    </Typography>
-                  )}
-                </Box>
-              </Box>
-
-              <IconButton
-                onClick={onClose}
-                aria-label="close"
-                sx={{
-                  color: colors.neutral[400],
-                  backgroundColor: colors.neutral[800],
-                  "&:hover": {
-                    backgroundColor: colors.neutral[700],
-                  },
-                  width: 36,
-                  height: 36,
-                }}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </Box>
-
-            {/* Content Area */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                height: "100%", // Use full height
-                overflow: "hidden",
-                flex: 1,
-              }}
-            >
-              {/* Tabs */}
+            {loading ? (
               <Box
                 sx={{
-                  borderBottom: 1,
-                  borderColor: colors.neutral[800],
-                  px: spacing.lg,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "100%",
+                  width: "100%",
                 }}
               >
-                <Tabs
-                  value={tabValue}
-                  onChange={handleTabChange}
-                  variant="scrollable"
-                  scrollButtons="auto"
+                <CircularProgress
                   sx={{
-                    "& .MuiTab-root": {
-                      color: colors.neutral[400],
-                      fontSize: typography.fontSize.sm,
-                      fontWeight: typography.fontWeights.medium,
-                      textTransform: "none",
-                      minWidth: 120,
-                    },
-                    "& .Mui-selected": {
-                      color: colors.neutral[50],
-                    },
-                    "& .MuiTabs-indicator": {
-                      backgroundColor: colors.primary.main,
-                    },
+                    color: colors.primary.main,
+                    mb: spacing.md,
+                  }}
+                  size={48}
+                />
+                <Typography
+                  sx={{
+                    color: colors.neutral[300],
+                    fontSize: typography.fontSize.md,
+                    mt: spacing.sm,
+                    textAlign: "center",
                   }}
                 >
-                  <Tab label="Overview" />
-                  <Tab label="Charts" />
-                  <Tab label="Pools" />
-                </Tabs>
+                  Loading asset data...
+                </Typography>
               </Box>
+            ) : (
+              <>
+                {/* Header */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: spacing.lg,
+                    borderBottom: `1px solid ${colors.neutral[800]}`,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: spacing.sm,
+                    }}
+                  >
+                    {asset.tomlInfo.image && (
+                      <Avatar
+                        src={asset.tomlInfo.image}
+                        alt={asset.tomlInfo.code}
+                        sx={{ width: 40, height: 40 }}
+                      />
+                    )}
+                    <Box>
+                      <Typography
+                        sx={{
+                          color: colors.neutral[50],
+                          fontSize: typography.fontSize.xl,
+                          fontWeight: typography.fontWeights.bold,
+                          fontFamily: typography.fontFamily,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: spacing.xs,
+                        }}
+                      >
+                        {asset.tomlInfo.code}
+                        {asset.domain && (
+                          <Tooltip title={`Issuer: ${asset.domain}`}>
+                            <Typography
+                              component="span"
+                              sx={{
+                                fontSize: typography.fontSize.sm,
+                                color: colors.neutral[400],
+                                fontWeight: typography.fontWeights.regular,
+                              }}
+                            >
+                              ({asset.domain})
+                            </Typography>
+                          </Tooltip>
+                        )}
+                      </Typography>
 
-              {/* Tab content with scrollable area */}
-              <Box
-                sx={{
-                  overflow: "auto",
-                  flex: 1,
-                  p: spacing.lg,
-                  height: "100%", // Take full remaining height
-                  "&::-webkit-scrollbar": {
-                    width: "6px",
-                  },
-                  "&::-webkit-scrollbar-thumb": {
-                    backgroundColor: colors.primary.main,
-                    borderRadius: borderRadius.sm,
-                  },
-                }}
-              >
-                {/* Overview Tab */}
-                <TabPanel value={tabValue} index={0}>
-                  <Grid container spacing={3} sx={{ minHeight: "100%" }}>
-                    {/* Key metrics */}
-                    <Grid item xs={12} md={6}>
-                      <CardContainer sx={{ height: "100%" }}>
+                      {userBalance > 0 && (
                         <Typography
                           sx={{
-                            color: colors.neutral[50],
-                            fontSize: typography.fontSize.lg,
-                            fontWeight: typography.fontWeights.medium,
+                            fontSize: typography.fontSize.md,
+                            color: colors.neutral[300],
                             fontFamily: typography.fontFamily,
-                            mb: spacing.md,
                           }}
                         >
-                          Key Metrics
+                          Your Balance: {formatNumber(userBalance)}{" "}
+                          {asset.tomlInfo.code}
                         </Typography>
+                      )}
+                    </Box>
+                  </Box>
 
-                        <Grid container spacing={2}>
-                          <Grid item xs={6}>
-                            <Box sx={{ mb: spacing.md }}>
-                              <Typography
-                                sx={{
-                                  fontSize: typography.fontSize.xs,
-                                  color: colors.neutral[400],
-                                  mb: spacing.xs,
-                                }}
-                              >
-                                Total Supply
-                              </Typography>
-                              <Typography
-                                sx={{
-                                  fontSize: typography.fontSize.md,
-                                  fontWeight: typography.fontWeights.medium,
-                                  color: colors.neutral[50],
-                                }}
-                              >
-                                {asset.supply
-                                  ? formatNumber(Number(asset.supply) / 10 ** 7)
-                                  : "N/A"}
-                              </Typography>
-                            </Box>
-                          </Grid>
+                  <IconButton
+                    onClick={onClose}
+                    aria-label="close"
+                    sx={{
+                      color: colors.neutral[400],
+                      backgroundColor: colors.neutral[800],
+                      "&:hover": {
+                        backgroundColor: colors.neutral[700],
+                      },
+                      width: 36,
+                      height: 36,
+                    }}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Box>
 
-                          <Grid item xs={6}>
-                            <Box sx={{ mb: spacing.md }}>
-                              <Typography
-                                sx={{
-                                  fontSize: typography.fontSize.xs,
-                                  color: colors.neutral[400],
-                                  mb: spacing.xs,
-                                }}
-                              >
-                                Total Payments
-                              </Typography>
-                              <Typography
-                                sx={{
-                                  fontSize: typography.fontSize.md,
-                                  fontWeight: typography.fontWeights.medium,
-                                  color: colors.neutral[50],
-                                }}
-                              >
-                                {formatNumber(asset.payments)}
-                              </Typography>
-                            </Box>
-                          </Grid>
+                {/* Content Area */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%", // Use full height
+                    overflow: "hidden",
+                    flex: 1,
+                  }}
+                >
+                  {/* Tabs */}
+                  <Box
+                    sx={{
+                      borderBottom: 1,
+                      borderColor: colors.neutral[800],
+                      px: spacing.lg,
+                    }}
+                  >
+                    <Tabs
+                      value={tabValue}
+                      onChange={handleTabChange}
+                      variant="scrollable"
+                      scrollButtons="auto"
+                      sx={{
+                        "& .MuiTab-root": {
+                          color: colors.neutral[400],
+                          fontSize: typography.fontSize.sm,
+                          fontWeight: typography.fontWeights.medium,
+                          textTransform: "none",
+                          minWidth: 120,
+                        },
+                        "& .Mui-selected": {
+                          color: colors.neutral[50],
+                        },
+                        "& .MuiTabs-indicator": {
+                          backgroundColor: colors.primary.main,
+                        },
+                      }}
+                    >
+                      <Tab label="Overview" />
+                      <Tab label="Charts" />
+                      <Tab label="Pools" />
+                    </Tabs>
+                  </Box>
 
-                          <Grid item xs={6}>
-                            <Box sx={{ mb: spacing.md }}>
-                              <Typography
-                                sx={{
-                                  fontSize: typography.fontSize.xs,
-                                  color: colors.neutral[400],
-                                  mb: spacing.xs,
-                                }}
-                              >
-                                Trustlines
-                              </Typography>
-                              <Typography
-                                sx={{
-                                  fontSize: typography.fontSize.md,
-                                  fontWeight: typography.fontWeights.medium,
-                                  color: colors.neutral[50],
-                                }}
-                              >
-                                {asset.trustlines[2]} funded /{" "}
-                                {asset.trustlines[0]} total
-                              </Typography>
-                            </Box>
-                          </Grid>
+                  {/* Loading State or Tab Content */}
+                  {loading ? (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flex: 1,
+                        p: spacing.lg,
+                        height: "100%",
+                      }}
+                    >
+                      <CircularProgress
+                        sx={{
+                          color: colors.primary.main,
+                          mb: spacing.md,
+                        }}
+                        size={48}
+                      />
+                      <Typography
+                        sx={{
+                          color: colors.neutral[300],
+                          fontSize: typography.fontSize.md,
+                          mt: spacing.sm,
+                          textAlign: "center",
+                        }}
+                      >
+                        Loading asset data...
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        overflow: "auto",
+                        flex: 1,
+                        p: spacing.lg,
+                        height: "100%", // Take full remaining height
+                        "&::-webkit-scrollbar": {
+                          width: "6px",
+                        },
+                        "&::-webkit-scrollbar-thumb": {
+                          backgroundColor: colors.primary.main,
+                          borderRadius: borderRadius.sm,
+                        },
+                      }}
+                    >
+                      {/* Tab content with scrollable area */}
+                      {/* Overview Tab */}
 
-                          <Grid item xs={6}>
-                            <Box sx={{ mb: spacing.md }}>
-                              <Typography
-                                sx={{
-                                  fontSize: typography.fontSize.xs,
-                                  color: colors.neutral[400],
-                                  mb: spacing.xs,
-                                }}
-                              >
-                                First Transaction
-                              </Typography>
-                              <Typography
-                                sx={{
-                                  fontSize: typography.fontSize.md,
-                                  fontWeight: typography.fontWeights.medium,
-                                  color: colors.neutral[50],
-                                }}
-                              >
-                                {new Date(
-                                  asset.created * 1000
-                                ).toLocaleDateString()}
-                              </Typography>
-                            </Box>
-                          </Grid>
-
+                      <TabPanel value={tabValue} index={0}>
+                        <Grid container spacing={3} sx={{ minHeight: "100%" }}>
+                          {/* Key metrics */}
                           <Grid item xs={12}>
-                            <Box sx={{ mb: spacing.md }}>
-                              <Typography
+                            <CardContainer sx={{ height: "100%" }}>
+                              <Box
                                 sx={{
-                                  fontSize: typography.fontSize.xs,
-                                  color: colors.neutral[400],
-                                  mb: spacing.xs,
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                  mb: spacing.md,
                                 }}
                               >
-                                Issuer
+                                <Typography
+                                  sx={{
+                                    color: colors.neutral[50],
+                                    fontSize: typography.fontSize.lg,
+                                    fontWeight: typography.fontWeights.medium,
+                                    fontFamily: typography.fontFamily,
+                                  }}
+                                >
+                                  Key Metrics
+                                </Typography>
+                                <Typography
+                                  component="a"
+                                  href="https://stellar.expert"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  sx={{
+                                    fontSize: typography.fontSize.xs,
+                                    color: colors.neutral[400],
+                                    textDecoration: "none",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: spacing.xs,
+                                    "&:hover": {
+                                      color: colors.primary.main,
+                                      textDecoration: "underline",
+                                    },
+                                  }}
+                                >
+                                  Powered by stellar.expert
+                                  <OpenInNewIcon sx={{ fontSize: 14 }} />
+                                </Typography>
+                              </Box>
+
+                              <Grid container spacing={2}>
+                                <Grid item xs={6}>
+                                  <Box sx={{ mb: spacing.md }}>
+                                    <Typography
+                                      sx={{
+                                        fontSize: typography.fontSize.xs,
+                                        color: colors.neutral[400],
+                                        mb: spacing.xs,
+                                      }}
+                                    >
+                                      Total Supply
+                                    </Typography>
+                                    <Typography
+                                      sx={{
+                                        fontSize: typography.fontSize.md,
+                                        fontWeight:
+                                          typography.fontWeights.medium,
+                                        color: colors.neutral[50],
+                                      }}
+                                    >
+                                      {asset.supply
+                                        ? formatNumber(
+                                            Number(asset.supply) / 10 ** 7
+                                          )
+                                        : "N/A"}
+                                    </Typography>
+                                  </Box>
+                                </Grid>
+
+                                <Grid item xs={6}>
+                                  <Box sx={{ mb: spacing.md }}>
+                                    <Typography
+                                      sx={{
+                                        fontSize: typography.fontSize.xs,
+                                        color: colors.neutral[400],
+                                        mb: spacing.xs,
+                                      }}
+                                    >
+                                      Total Payments
+                                    </Typography>
+                                    <Typography
+                                      sx={{
+                                        fontSize: typography.fontSize.md,
+                                        fontWeight:
+                                          typography.fontWeights.medium,
+                                        color: colors.neutral[50],
+                                      }}
+                                    >
+                                      {formatNumber(asset.payments)}
+                                    </Typography>
+                                  </Box>
+                                </Grid>
+
+                                <Grid item xs={6}>
+                                  <Box sx={{ mb: spacing.md }}>
+                                    <Typography
+                                      sx={{
+                                        fontSize: typography.fontSize.xs,
+                                        color: colors.neutral[400],
+                                        mb: spacing.xs,
+                                      }}
+                                    >
+                                      Trustlines
+                                    </Typography>
+                                    <Typography
+                                      sx={{
+                                        fontSize: typography.fontSize.md,
+                                        fontWeight:
+                                          typography.fontWeights.medium,
+                                        color: colors.neutral[50],
+                                      }}
+                                    >
+                                      {asset.trustlines[2]} funded /{" "}
+                                      {asset.trustlines[0]} total
+                                    </Typography>
+                                  </Box>
+                                </Grid>
+
+                                <Grid item xs={6}>
+                                  <Box sx={{ mb: spacing.md }}>
+                                    <Typography
+                                      sx={{
+                                        fontSize: typography.fontSize.xs,
+                                        color: colors.neutral[400],
+                                        mb: spacing.xs,
+                                      }}
+                                    >
+                                      First Transaction
+                                    </Typography>
+                                    <Typography
+                                      sx={{
+                                        fontSize: typography.fontSize.md,
+                                        fontWeight:
+                                          typography.fontWeights.medium,
+                                        color: colors.neutral[50],
+                                      }}
+                                    >
+                                      {new Date(
+                                        asset.created * 1000
+                                      ).toLocaleDateString()}
+                                    </Typography>
+                                  </Box>
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                  <Box sx={{ mb: spacing.md }}>
+                                    <Typography
+                                      sx={{
+                                        fontSize: typography.fontSize.xs,
+                                        color: colors.neutral[400],
+                                        mb: spacing.xs,
+                                      }}
+                                    >
+                                      Issuer
+                                    </Typography>
+                                    <Box
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                        bgcolor: colors.neutral[800],
+                                        borderRadius: borderRadius.sm,
+                                        p: spacing.sm,
+                                        maxWidth: "fit-content",
+                                      }}
+                                    >
+                                      <Typography
+                                        sx={{
+                                          fontSize: typography.fontSize.sm,
+                                          color: colors.neutral[300],
+                                          fontFamily: "monospace",
+                                        }}
+                                      >
+                                        {shortenAddress(asset.tomlInfo.issuer)}
+                                      </Typography>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() =>
+                                          handleCopyToClipboard(
+                                            asset.tomlInfo.issuer
+                                          )
+                                        }
+                                        sx={{ color: colors.neutral[400] }}
+                                      >
+                                        <ContentCopyIcon
+                                          sx={{ fontSize: 16 }}
+                                        />
+                                      </IconButton>
+                                      <IconButton
+                                        size="small"
+                                        component="a"
+                                        href={`https://stellar.expert/explorer/public/account/${asset.tomlInfo.issuer}`}
+                                        target="_blank"
+                                        sx={{ color: colors.neutral[400] }}
+                                      >
+                                        <OpenInNewIcon sx={{ fontSize: 16 }} />
+                                      </IconButton>
+                                    </Box>
+                                  </Box>
+                                </Grid>
+                              </Grid>
+                            </CardContainer>
+                          </Grid>
+                          {/* Asset Rating section has been removed */}
+                        </Grid>
+                      </TabPanel>
+
+                      {/* Charts Tab */}
+                      <TabPanel value={tabValue} index={1}>
+                        <Grid container spacing={3}>
+                          {/* Price Chart */}
+                          <Grid item xs={12} md={6}>
+                            <CardContainer sx={{ height: chartCardHeight }}>
+                              <Typography
+                                sx={{
+                                  color: colors.neutral[50],
+                                  fontSize: typography.fontSize.lg,
+                                  fontWeight: typography.fontWeights.medium,
+                                  fontFamily: typography.fontFamily,
+                                  mb: spacing.md,
+                                }}
+                              >
+                                Price (USDC) - 7 Days
                               </Typography>
+
+                              {volumeData.length > 0 ? (
+                                <Box
+                                  sx={{ height: chartHeight, mt: spacing.md }}
+                                >
+                                  <ResponsiveContainer
+                                    width="100%"
+                                    height="100%"
+                                  >
+                                    <AreaChart
+                                      data={priceData}
+                                      margin={{
+                                        top: 10,
+                                        right: 30,
+                                        left: 0,
+                                        bottom: 0,
+                                      }}
+                                    >
+                                      <defs>
+                                        <linearGradient
+                                          id="colorPrice"
+                                          x1="0"
+                                          y1="0"
+                                          x2="0"
+                                          y2="1"
+                                        >
+                                          <stop
+                                            offset="5%"
+                                            stopColor={colors.primary.main}
+                                            stopOpacity={0.8}
+                                          />
+                                          <stop
+                                            offset="95%"
+                                            stopColor={colors.primary.main}
+                                            stopOpacity={0}
+                                          />
+                                        </linearGradient>
+                                      </defs>
+                                      <XAxis
+                                        dataKey="date"
+                                        tick={{
+                                          fill: colors.neutral[400],
+                                          fontSize: 12,
+                                        }}
+                                        axisLine={{
+                                          stroke: colors.neutral[700],
+                                        }}
+                                        tickLine={{
+                                          stroke: colors.neutral[700],
+                                        }}
+                                      />
+                                      <YAxis
+                                        tick={{
+                                          fill: colors.neutral[400],
+                                          fontSize: 12,
+                                        }}
+                                        axisLine={{
+                                          stroke: colors.neutral[700],
+                                        }}
+                                        tickLine={{
+                                          stroke: colors.neutral[700],
+                                        }}
+                                      />
+                                      <RechartsTooltip
+                                        content={<CustomTooltip />}
+                                        cursor={{
+                                          stroke: colors.neutral[600],
+                                          strokeDasharray: "3 3",
+                                        }}
+                                      />
+                                      <Area
+                                        type="monotone"
+                                        dataKey="value"
+                                        stroke={colors.primary.main}
+                                        fillOpacity={1}
+                                        fill="url(#colorPrice)"
+                                      />
+                                    </AreaChart>
+                                  </ResponsiveContainer>
+                                </Box>
+                              ) : (
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    height: chartHeight,
+                                    border: `1px dashed ${colors.neutral[700]}`,
+                                    borderRadius: borderRadius.md,
+                                  }}
+                                >
+                                  <Typography
+                                    sx={{ color: colors.neutral[400] }}
+                                  >
+                                    No price data available
+                                  </Typography>
+                                </Box>
+                              )}
+                            </CardContainer>
+                          </Grid>
+
+                          {/* Volume Chart */}
+                          <Grid item xs={12} md={6}>
+                            <CardContainer sx={{ height: chartCardHeight }}>
+                              <Typography
+                                sx={{
+                                  color: colors.neutral[50],
+                                  fontSize: typography.fontSize.lg,
+                                  fontWeight: typography.fontWeights.medium,
+                                  fontFamily: typography.fontFamily,
+                                  mb: spacing.md,
+                                }}
+                              >
+                                Volume - 7 Days
+                              </Typography>
+
                               <Box
                                 sx={{
                                   display: "flex",
                                   alignItems: "center",
-                                  gap: 1,
-                                  bgcolor: colors.neutral[800],
-                                  borderRadius: borderRadius.sm,
-                                  p: spacing.sm,
-                                  maxWidth: "fit-content",
+                                  justifyContent: "flex-end",
+                                  mb: spacing.sm,
                                 }}
                               >
                                 <Typography
                                   sx={{
                                     fontSize: typography.fontSize.sm,
-                                    color: colors.neutral[300],
-                                    fontFamily: "monospace",
+                                    color: colors.neutral[400],
                                   }}
                                 >
-                                  {shortenAddress(asset.tomlInfo.issuer)}
+                                  Total Volume (7d):
+                                  {formatNumber(
+                                    // @ts-ignore
+                                    calculateTotalVolume(tradingVolume7d) /
+                                      10 ** 7
+                                  )}{" "}
+                                  USDC
                                 </Typography>
-                                <IconButton
-                                  size="small"
-                                  onClick={() =>
-                                    handleCopyToClipboard(asset.tomlInfo.issuer)
-                                  }
-                                  sx={{ color: colors.neutral[400] }}
-                                >
-                                  <ContentCopyIcon sx={{ fontSize: 16 }} />
-                                </IconButton>
-                                <IconButton
-                                  size="small"
-                                  component="a"
-                                  href={`https://stellar.expert/explorer/public/account/${asset.tomlInfo.issuer}`}
-                                  target="_blank"
-                                  sx={{ color: colors.neutral[400] }}
-                                >
-                                  <OpenInNewIcon sx={{ fontSize: 16 }} />
-                                </IconButton>
                               </Box>
-                            </Box>
+
+                              {volumeData.length > 0 ? (
+                                <Box
+                                  sx={{ height: chartHeight, mt: spacing.md }}
+                                >
+                                  <ResponsiveContainer
+                                    width="100%"
+                                    height="100%"
+                                  >
+                                    <BarChart
+                                      data={volumeData}
+                                      margin={{
+                                        top: 10,
+                                        right: 30,
+                                        left: 0,
+                                        bottom: 0,
+                                      }}
+                                    >
+                                      <defs>
+                                        <linearGradient
+                                          id="colorVolume"
+                                          x1="0"
+                                          y1="0"
+                                          x2="0"
+                                          y2="1"
+                                        >
+                                          <stop
+                                            offset="0%"
+                                            stopColor={colors.primary.main}
+                                            stopOpacity={0.9}
+                                          />
+                                          <stop
+                                            offset="100%"
+                                            stopColor={colors.primary.gradient}
+                                            stopOpacity={0.8}
+                                          />
+                                        </linearGradient>
+                                      </defs>
+                                      <XAxis
+                                        dataKey="date"
+                                        tick={{
+                                          fill: colors.neutral[400],
+                                          fontSize: 12,
+                                        }}
+                                        axisLine={{
+                                          stroke: colors.neutral[700],
+                                        }}
+                                        tickLine={{
+                                          stroke: colors.neutral[700],
+                                        }}
+                                      />
+                                      <YAxis
+                                        tick={{
+                                          fill: colors.neutral[400],
+                                          fontSize: 12,
+                                        }}
+                                        axisLine={{
+                                          stroke: colors.neutral[700],
+                                        }}
+                                        tickLine={{
+                                          stroke: colors.neutral[700],
+                                        }}
+                                      />
+                                      <RechartsTooltip
+                                        content={<CustomTooltip />}
+                                        cursor={{
+                                          fill: colors.neutral[800],
+                                          opacity: 0.3,
+                                        }}
+                                      />
+                                      <Bar
+                                        dataKey="volume"
+                                        fill="url(#colorVolume)"
+                                        radius={[4, 4, 0, 0]}
+                                      />
+                                    </BarChart>
+                                  </ResponsiveContainer>
+                                </Box>
+                              ) : (
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    height: chartHeight,
+                                    border: `1px dashed ${colors.neutral[700]}`,
+                                    borderRadius: borderRadius.md,
+                                  }}
+                                >
+                                  <Typography
+                                    sx={{ color: colors.neutral[400] }}
+                                  >
+                                    No volume data available
+                                  </Typography>
+                                </Box>
+                              )}
+                            </CardContainer>
                           </Grid>
                         </Grid>
-                      </CardContainer>
-                    </Grid>
+                      </TabPanel>
 
-                    {/* Asset Rating */}
-                    <Grid item xs={12} md={6}>
-                      <CardContainer>
-                        <Typography
-                          sx={{
-                            color: colors.neutral[50],
-                            fontSize: typography.fontSize.lg,
-                            fontWeight: typography.fontWeights.medium,
-                            fontFamily: typography.fontFamily,
-                            mb: spacing.md,
-                          }}
-                        >
-                          Asset Rating
-                        </Typography>
-
-                        {asset.rating && (
-                          <Grid container spacing={2}>
-                            <Grid item xs={6} sm={4}>
-                              <Box sx={{ mb: spacing.md }}>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.xs,
-                                    color: colors.neutral[400],
-                                    mb: spacing.xs,
-                                  }}
-                                >
-                                  Overall Rating
-                                </Typography>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.lg,
-                                    fontWeight: typography.fontWeights.bold,
-                                    color: getRatingColor(asset.rating.average),
-                                  }}
-                                >
-                                  {asset.rating.average.toFixed(1)}/5
-                                </Typography>
-                              </Box>
-                            </Grid>
-
-                            <Grid item xs={6} sm={4}>
-                              <Box sx={{ mb: spacing.md }}>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.xs,
-                                    color: colors.neutral[400],
-                                    mb: spacing.xs,
-                                  }}
-                                >
-                                  Liquidity
-                                </Typography>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.md,
-                                    fontWeight: typography.fontWeights.medium,
-                                    color: getRatingColor(
-                                      asset.rating.liquidity
-                                    ),
-                                  }}
-                                >
-                                  {asset.rating.liquidity}/5
-                                </Typography>
-                              </Box>
-                            </Grid>
-
-                            <Grid item xs={6} sm={4}>
-                              <Box sx={{ mb: spacing.md }}>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.xs,
-                                    color: colors.neutral[400],
-                                    mb: spacing.xs,
-                                  }}
-                                >
-                                  Trades
-                                </Typography>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.md,
-                                    fontWeight: typography.fontWeights.medium,
-                                    color: getRatingColor(asset.rating.trades),
-                                  }}
-                                >
-                                  {asset.rating.trades}/5
-                                </Typography>
-                              </Box>
-                            </Grid>
-
-                            <Grid item xs={6} sm={4}>
-                              <Box sx={{ mb: spacing.md }}>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.xs,
-                                    color: colors.neutral[400],
-                                    mb: spacing.xs,
-                                  }}
-                                >
-                                  Payments
-                                </Typography>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.md,
-                                    fontWeight: typography.fontWeights.medium,
-                                    color: getRatingColor(
-                                      asset.rating.payments
-                                    ),
-                                  }}
-                                >
-                                  {asset.rating.payments}/5
-                                </Typography>
-                              </Box>
-                            </Grid>
-
-                            <Grid item xs={6} sm={4}>
-                              <Box sx={{ mb: spacing.md }}>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.xs,
-                                    color: colors.neutral[400],
-                                    mb: spacing.xs,
-                                  }}
-                                >
-                                  Trustlines
-                                </Typography>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.md,
-                                    fontWeight: typography.fontWeights.medium,
-                                    color: getRatingColor(
-                                      asset.rating.trustlines
-                                    ),
-                                  }}
-                                >
-                                  {asset.rating.trustlines}/5
-                                </Typography>
-                              </Box>
-                            </Grid>
-
-                            <Grid item xs={6} sm={4}>
-                              <Box sx={{ mb: spacing.md }}>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.xs,
-                                    color: colors.neutral[400],
-                                    mb: spacing.xs,
-                                  }}
-                                >
-                                  Volume (7d)
-                                </Typography>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.md,
-                                    fontWeight: typography.fontWeights.medium,
-                                    color: getRatingColor(
-                                      asset.rating.volume7d
-                                    ),
-                                  }}
-                                >
-                                  {asset.rating.volume7d}/5
-                                </Typography>
-                              </Box>
-                            </Grid>
+                      {/* Pools Tab */}
+                      <TabPanel value={tabValue} index={2}>
+                        {pools.length > 0 ? (
+                          <Grid container spacing={3}>
+                            {pools.map((pool) => (
+                              <PoolItem
+                                pool={{
+                                  ...pool,
+                                  tvl: formatCurrencyStatic.format(
+                                    Number(pool.tvl)
+                                  ),
+                                  maxApr: `${pool.maxApr}%`,
+                                }}
+                                filter={{} as PoolsFilter}
+                                onShowDetailsClick={() => {
+                                  window.location.href = `/pools/${pool.poolAddress}`;
+                                }}
+                                onAddLiquidityClick={() => {}}
+                              />
+                            ))}
                           </Grid>
-                        )}
-
-                        {!asset.rating && (
-                          <Typography
-                            sx={{
-                              color: colors.neutral[400],
-                              fontSize: typography.fontSize.sm,
-                            }}
-                          >
-                            No rating data available for this asset.
-                          </Typography>
-                        )}
-                      </CardContainer>
-                    </Grid>
-                  </Grid>
-                </TabPanel>
-
-                {/* Charts Tab */}
-                <TabPanel value={tabValue} index={1}>
-                  <Grid container spacing={3}>
-                    {/* Price Chart */}
-                    <Grid item xs={12} md={6}>
-                      <CardContainer sx={{ height: chartCardHeight }}>
-                        <Typography
-                          sx={{
-                            color: colors.neutral[50],
-                            fontSize: typography.fontSize.lg,
-                            fontWeight: typography.fontWeights.medium,
-                            fontFamily: typography.fontFamily,
-                            mb: spacing.md,
-                          }}
-                        >
-                          Price (USDC) - 7 Days
-                        </Typography>
-
-                        {volumeData.length > 0 ? (
-                          <Box sx={{ height: chartHeight, mt: spacing.md }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                              <AreaChart
-                                data={volumeData}
-                                margin={{
-                                  top: 10,
-                                  right: 30,
-                                  left: 0,
-                                  bottom: 0,
-                                }}
-                              >
-                                <defs>
-                                  <linearGradient
-                                    id="colorPrice"
-                                    x1="0"
-                                    y1="0"
-                                    x2="0"
-                                    y2="1"
-                                  >
-                                    <stop
-                                      offset="5%"
-                                      stopColor={colors.primary.main}
-                                      stopOpacity={0.8}
-                                    />
-                                    <stop
-                                      offset="95%"
-                                      stopColor={colors.primary.main}
-                                      stopOpacity={0}
-                                    />
-                                  </linearGradient>
-                                </defs>
-                                <XAxis
-                                  dataKey="date"
-                                  tick={{
-                                    fill: colors.neutral[400],
-                                    fontSize: 12,
-                                  }}
-                                  axisLine={{ stroke: colors.neutral[700] }}
-                                  tickLine={{ stroke: colors.neutral[700] }}
-                                />
-                                <YAxis
-                                  tick={{
-                                    fill: colors.neutral[400],
-                                    fontSize: 12,
-                                  }}
-                                  axisLine={{ stroke: colors.neutral[700] }}
-                                  tickLine={{ stroke: colors.neutral[700] }}
-                                />
-                                <RechartsTooltip
-                                  content={<CustomTooltip />}
-                                  cursor={{
-                                    stroke: colors.neutral[600],
-                                    strokeDasharray: "3 3",
-                                  }}
-                                />
-                                <Area
-                                  type="monotone"
-                                  dataKey="value"
-                                  stroke={colors.primary.main}
-                                  fillOpacity={1}
-                                  fill="url(#colorPrice)"
-                                />
-                              </AreaChart>
-                            </ResponsiveContainer>
-                          </Box>
                         ) : (
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              height: chartHeight,
-                              border: `1px dashed ${colors.neutral[700]}`,
-                              borderRadius: borderRadius.md,
-                            }}
-                          >
-                            <Typography sx={{ color: colors.neutral[400] }}>
-                              No price data available
-                            </Typography>
-                          </Box>
-                        )}
-                      </CardContainer>
-                    </Grid>
-
-                    {/* Volume Chart */}
-                    <Grid item xs={12} md={6}>
-                      <CardContainer sx={{ height: chartCardHeight }}>
-                        <Typography
-                          sx={{
-                            color: colors.neutral[50],
-                            fontSize: typography.fontSize.lg,
-                            fontWeight: typography.fontWeights.medium,
-                            fontFamily: typography.fontFamily,
-                            mb: spacing.md,
-                          }}
-                        >
-                          Volume - 7 Days
-                        </Typography>
-
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "flex-end",
-                            mb: spacing.sm,
-                          }}
-                        >
-                          <Typography
-                            sx={{
-                              fontSize: typography.fontSize.sm,
-                              color: colors.neutral[400],
-                            }}
-                          >
-                            Total Volume (7d):{" "}
-                            {formatNumber(asset.volume7d / 10 ** 7)} USDC
-                          </Typography>
-                        </Box>
-
-                        {volumeData.length > 0 ? (
-                          <Box sx={{ height: chartHeight, mt: spacing.md }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                              <BarChart
-                                data={volumeData}
-                                margin={{
-                                  top: 10,
-                                  right: 30,
-                                  left: 0,
-                                  bottom: 0,
-                                }}
-                              >
-                                <defs>
-                                  <linearGradient
-                                    id="colorVolume"
-                                    x1="0"
-                                    y1="0"
-                                    x2="0"
-                                    y2="1"
-                                  >
-                                    <stop
-                                      offset="0%"
-                                      stopColor={colors.primary.main}
-                                      stopOpacity={0.9}
-                                    />
-                                    <stop
-                                      offset="100%"
-                                      stopColor={colors.primary.gradient}
-                                      stopOpacity={0.8}
-                                    />
-                                  </linearGradient>
-                                </defs>
-                                <XAxis
-                                  dataKey="date"
-                                  tick={{
-                                    fill: colors.neutral[400],
-                                    fontSize: 12,
-                                  }}
-                                  axisLine={{ stroke: colors.neutral[700] }}
-                                  tickLine={{ stroke: colors.neutral[700] }}
-                                />
-                                <YAxis
-                                  tick={{
-                                    fill: colors.neutral[400],
-                                    fontSize: 12,
-                                  }}
-                                  axisLine={{ stroke: colors.neutral[700] }}
-                                  tickLine={{ stroke: colors.neutral[700] }}
-                                />
-                                <RechartsTooltip
-                                  content={<CustomTooltip />}
-                                  cursor={{
-                                    fill: colors.neutral[800],
-                                    opacity: 0.3,
-                                  }}
-                                />
-                                <Bar
-                                  dataKey="value"
-                                  fill="url(#colorVolume)"
-                                  radius={[4, 4, 0, 0]}
-                                />
-                              </BarChart>
-                            </ResponsiveContainer>
-                          </Box>
-                        ) : (
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              height: chartHeight,
-                              border: `1px dashed ${colors.neutral[700]}`,
-                              borderRadius: borderRadius.md,
-                            }}
-                          >
-                            <Typography sx={{ color: colors.neutral[400] }}>
-                              No volume data available
-                            </Typography>
-                          </Box>
-                        )}
-                      </CardContainer>
-                    </Grid>
-                  </Grid>
-                </TabPanel>
-
-                {/* Pools Tab */}
-                <TabPanel value={tabValue} index={2}>
-                  {pools.length > 0 ? (
-                    <Grid container spacing={3}>
-                      {pools.map((pool) => (
-                        <Grid item xs={12} md={6} key={pool.poolAddress}>
                           <CardContainer>
                             <Box
                               sx={{
                                 display: "flex",
+                                flexDirection: "column",
                                 alignItems: "center",
-                                gap: 1,
+                                p: spacing.md,
                               }}
                             >
-                              <Box sx={{ display: "flex" }}>
-                                <Avatar
-                                  src={pool.tokens[0].icon}
-                                  sx={{ width: 28, height: 28, zIndex: 1 }}
-                                />
-                                <Avatar
-                                  src={pool.tokens[1].icon}
-                                  sx={{ width: 28, height: 28, ml: -1 }}
-                                />
-                              </Box>
+                              <Box
+                                component="img"
+                                src="/icons/liquidity.svg"
+                                alt="No pools"
+                                sx={{
+                                  width: 80,
+                                  height: 80,
+                                  opacity: 0.5,
+                                  mb: spacing.md,
+                                }}
+                              />
                               <Typography
                                 sx={{
+                                  color: colors.neutral[400],
                                   fontSize: typography.fontSize.md,
-                                  fontWeight: typography.fontWeights.medium,
-                                  color: colors.neutral[50],
+                                  textAlign: "center",
                                 }}
                               >
-                                {pool.tokens[0].name}/{pool.tokens[1].name}
+                                No liquidity pools available for this asset
                               </Typography>
                             </Box>
-
-                            <Divider
-                              sx={{
-                                my: spacing.sm,
-                                borderColor: colors.neutral[800],
-                              }}
-                            />
-
-                            <Grid container spacing={1}>
-                              <Grid item xs={6}>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.xs,
-                                    color: colors.neutral[400],
-                                  }}
-                                >
-                                  TVL
-                                </Typography>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.sm,
-                                    color: colors.neutral[50],
-                                  }}
-                                >
-                                  ${formatNumber(Number(pool.tvl))}
-                                </Typography>
-                              </Grid>
-
-                              <Grid item xs={6}>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.xs,
-                                    color: colors.neutral[400],
-                                  }}
-                                >
-                                  APR
-                                </Typography>
-                                <Typography
-                                  sx={{
-                                    fontSize: typography.fontSize.sm,
-                                    color: colors.neutral[50],
-                                  }}
-                                >
-                                  {pool.maxApr}%
-                                </Typography>
-                              </Grid>
-                            </Grid>
                           </CardContainer>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  ) : (
-                    <CardContainer>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          p: spacing.md,
-                        }}
-                      >
-                        <Box
-                          component="img"
-                          src="/icons/liquidity.svg"
-                          alt="No pools"
-                          sx={{
-                            width: 80,
-                            height: 80,
-                            opacity: 0.5,
-                            mb: spacing.md,
-                          }}
-                        />
-                        <Typography
-                          sx={{
-                            color: colors.neutral[400],
-                            fontSize: typography.fontSize.md,
-                            textAlign: "center",
-                          }}
-                        >
-                          No liquidity pools available for this asset
-                        </Typography>
-                      </Box>
-                    </CardContainer>
+                        )}
+                      </TabPanel>
+                    </Box>
                   )}
-                </TabPanel>
-              </Box>
-            </Box>
+                </Box>
+              </>
+            )}
           </Box>
         </motion.div>
       </AnimatePresence>
