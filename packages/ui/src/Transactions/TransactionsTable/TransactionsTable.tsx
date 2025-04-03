@@ -6,21 +6,27 @@ import { TransactionsTableProps } from "@phoenix-protocol/types";
 import TransactionEntry from "./TransactionEntry";
 import TransactionHeader from "./TransactionsHeader";
 import { maxWidth } from "@mui/system";
+import {
+  colors,
+  typography,
+  spacing,
+  borderRadius,
+} from "../../Theme/styleConstants";
 
 const customSpacing = {
-  xs: "8px",
-  sm: "12px",
-  md: "16px",
+  xs: spacing.xs,
+  sm: spacing.sm,
+  md: spacing.md,
 };
 
 const classes = {
   root: {
     marginTop: customSpacing.md,
     padding: `${customSpacing.md} ${customSpacing.md}`,
-    borderRadius: "8px",
-    background:
-      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+    borderRadius: borderRadius.md,
+    background: colors.neutral[900],
     overflowX: "auto",
+    border: `1px solid ${colors.neutral[700]}`,
   },
   tabUnselected: {
     display: "flex",
@@ -30,19 +36,19 @@ const classes = {
     justifyContent: "center",
     alignItems: "center",
     gap: "0.625rem",
-    borderRadius: "1rem",
+    borderRadius: borderRadius.lg,
     cursor: "pointer",
-    background:
-      "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-    color: "#FFF",
+    color: colors.neutral[300],
+    background: colors.neutral[900],
     opacity: 0.6,
     textAlign: "center",
     fontFeatureSettings: "'clig' off, 'liga' off",
-    fontFamily: "Ubuntu",
-    fontSize: "0.625rem",
+    fontFamily: typography.fontFamily,
+    fontSize: typography.fontSize.xs,
     fontStyle: "normal",
-    fontWeight: 700,
-    lineHeight: "1.25rem", // 200%
+    fontWeight: typography.fontWeights.bold,
+    lineHeight: "1.25rem",
+    border: `1px solid ${colors.neutral[700]}`,
   },
   tabSelected: {
     display: "flex",
@@ -52,17 +58,17 @@ const classes = {
     alignItems: "center",
     gap: "0.625rem",
     flex: "1 0 0",
-    borderRadius: "1rem",
-    border: "1px solid var(--Primary-P3, #E2571C)",
-    background: "rgba(226, 73, 26, 0.10)",
-    color: "#FFF",
+    borderRadius: borderRadius.lg,
+    border: `1px solid ${colors.primary.main}`,
+    background: `rgba(${colors.primary.gradient}, 0.10)`,
+    color: colors.neutral[50],
     textAlign: "center",
     fontFeatureSettings: "'clig' off, 'liga' off",
-    fontFamily: "Ubuntu",
-    fontSize: "0.625rem",
+    fontFamily: typography.fontFamily,
+    fontSize: typography.fontSize.xs,
     fontStyle: "normal",
-    fontWeight: 700,
-    lineHeight: "1.25rem", // 200%
+    fontWeight: typography.fontWeights.bold,
+    lineHeight: "1.25rem",
   },
 };
 
@@ -157,8 +163,8 @@ const TransactionsTable = ({
             style={{
               padding: `${customSpacing.md} ${customSpacing.md}`,
               borderRadius: "8px",
-              background:
-                "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+              background: colors.neutral[900],
+              border: `1px solid ${colors.neutral[700]}`,
               boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
             }}
           >
@@ -222,7 +228,7 @@ const TransactionsTable = ({
             <Box>
               <Typography
                 style={{
-                  color: "#FFF",
+                  color: colors.neutral[300],
                   fontSize: "14px",
                   display: "flex",
                   alignItems: "center",

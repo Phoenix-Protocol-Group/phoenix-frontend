@@ -26,6 +26,11 @@ type ContractType =
   | "vesting"
   | "token";
 
+// Add options interface with onSuccess callback
+interface TransactionOptions {
+  onSuccess?: () => void;
+}
+
 const contractClients = {
   pair: PhoenixPairContract.Client,
   multihop: PhoenixMultihopContract.Client,
@@ -55,6 +60,7 @@ interface BaseExecuteContractTransactionParams<T extends ContractType> {
     client: ContractClientType<T>,
     restore?: boolean
   ) => Promise<AssembledTransaction<any>>;
+  options?: TransactionOptions;
 }
 
 interface ExecuteContractTransactionParams<T extends ContractType>
@@ -110,6 +116,7 @@ export const useContractTransaction = () => {
       contractType,
       contractAddress,
       transactionFunction,
+      options = {},
     }: ExecuteContractTransactionParams<T>) => {
       const signer = getSigner(storePersist, appStore);
       const networkPassphrase = constants.NETWORK_PASSPHRASE;
@@ -137,16 +144,18 @@ export const useContractTransaction = () => {
 
           console.log("Attempting to sign and send transaction...");
 
-          // Step 2: Handle signing and sending the transaction with async toast
-          const promise = new Promise<{ transactionId?: string }>(
-            async (resolve, reject) => {
+          // Step 2: Handle signing and sending with the new addAsyncToast
+          return addAsyncToast(
+            new Promise(async (resolve, reject) => {
               try {
                 if (restore) {
                   console.log("Restoring transaction state...");
                   await transaction.simulate({ restore: true });
+                  options.onSuccess?.(); // Call onSuccess callback after successful restore
                   resolve({});
                 } else {
                   const sentTransaction = await transaction.signAndSend();
+                  options.onSuccess?.(); // Call onSuccess callback after successful transaction
                   resolve({
                     transactionId:
                       sentTransaction.sendTransactionResponse?.hash,
@@ -169,33 +178,29 @@ export const useContractTransaction = () => {
                         "Error during restoring transaction:",
                         restoreError
                       );
-                      reject(restoreError); // Reject with the restoration error
+                      reject(restoreError);
                     } finally {
                       closeRestoreModal();
                     }
                   });
                   return; // Exit early since restore will handle the resolution
                 }
-
-                reject(error); // Reject with the error
+                reject(error);
               }
-            }
+            }),
+            loadingMessage,
+            { title: "Transaction" }
           );
-
-          // Add the promise to the toast for UI updates
-          addAsyncToast(promise, loadingMessage);
-
-          // Delay at least 5 seconds before finishing the transaction process
-          await promise;
-          await new Promise((resolve) => setTimeout(resolve, 5000));
         } catch (error) {
           console.log("Unexpected error executing contract transaction", error);
-          addAsyncToast(Promise.reject(error), loadingMessage);
+          return addAsyncToast(Promise.reject(error), loadingMessage, {
+            title: "Transaction",
+          });
         }
       };
 
       // Start transaction execution
-      await executeTransaction();
+      return executeTransaction();
     },
     [addAsyncToast, storePersist, openRestoreModal, closeRestoreModal]
   );

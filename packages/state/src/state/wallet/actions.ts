@@ -11,7 +11,7 @@ import {
   SorobanTokenContract,
 } from "@phoenix-protocol/contracts";
 import { usePersistStore } from "../store";
-import { constants, fetchTokenPrices } from "@phoenix-protocol/utils";
+import { constants, fetchTokenPrices, TradeAPi } from "@phoenix-protocol/utils";
 import { LiquidityPoolInfo } from "@phoenix-protocol/contracts/build/phoenix-pair";
 
 const getCategory = (name: string) => {
@@ -102,6 +102,8 @@ export const createWalletActions = (
 
       await Promise.all(allAssets);
 
+      const tradeAPI = new TradeAPi.API(constants.TRADING_API_URL);
+
       const _tokens = getState()
         .tokens.filter(
           (token: Token) =>
@@ -126,7 +128,7 @@ export const createWalletActions = (
             usdValue: Number(
               token?.symbol === "PHO"
                 ? await fetchPho()
-                : await fetchTokenPrices(token?.symbol)
+                : await tradeAPI.getPrice(token?.id)
             ).toFixed(2),
             contractId: token?.id,
           };

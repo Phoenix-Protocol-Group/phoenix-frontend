@@ -10,7 +10,6 @@ import {
   MenuItem,
   Select,
   Typography,
-  Skeleton,
 } from "@mui/material";
 import React, { useMemo, useState } from "react";
 import {
@@ -19,15 +18,15 @@ import {
   PoolsProps,
 } from "@phoenix-protocol/types";
 import { motion } from "framer-motion";
+import {
+  borderRadius,
+  colors,
+  spacing,
+  typography,
+} from "../Theme/styleConstants";
 
 /**
  * Button Component for Pool Filter
- *
- * @component
- * @param {Object} props - The properties for the FilterButton.
- * @param {string} props.label - The label of the filter button.
- * @param {boolean} props.selected - Whether the button is selected.
- * @param {Function} props.onClick - Function to execute on button click.
  */
 const FilterButton = React.memo(
   ({
@@ -43,19 +42,27 @@ const FilterButton = React.memo(
       <Button
         onClick={onClick}
         sx={{
-          borderRadius: "16px",
-          border: selected ? "1px solid #E2491A" : "none",
+          borderRadius: borderRadius.md,
+          border: selected
+            ? `1px solid ${colors.primary.main}`
+            : `1px solid ${colors.neutral[700]}`,
           background: selected
-            ? "rgba(226, 73, 26, 0.10)"
-            : "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-          color: "white",
+            ? `rgba(${colors.primary.gradient}, 0.1)`
+            : colors.neutral[900],
+          color: colors.neutral[300],
           padding: selected ? "7px 15px" : "8px 16px",
+          transition: "all 0.2s ease",
+          "&:hover": {
+            background: selected
+              ? `rgba(${colors.primary.gradient}, 0.2)`
+              : colors.neutral[800],
+          },
         }}
       >
         <Typography
           sx={{
-            fontSize: "10px",
-            fontWeight: 700,
+            fontSize: typography.fontSize.xs,
+            fontWeight: typography.fontWeights.medium,
             lineHeight: "20px",
           }}
         >
@@ -66,7 +73,10 @@ const FilterButton = React.memo(
   }
 );
 
-const PoolItem = React.memo(
+/**
+ * Pool Item Component
+ */
+export const PoolItem = React.memo(
   ({
     pool,
     filter,
@@ -86,35 +96,40 @@ const PoolItem = React.memo(
         md={4}
         lg={3}
         xl={3}
-        onClick={() => onShowDetailsClick(pool)}
         component={motion.div}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => onShowDetailsClick(pool)}
       >
         <Box
           sx={{
-            padding: "24px",
-            borderRadius: "20px",
-            background:
-              "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+            padding: spacing.lg,
+            borderRadius: borderRadius.lg,
+            background: colors.neutral[900],
+            border: `1px solid ${colors.neutral[700]}`,
             position: "relative",
             overflow: "hidden",
             cursor: "pointer",
-            boxShadow: "0 6px 18px rgba(0, 0, 0, 0.4)",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+            transition: "all 0.2s ease",
+            "&:hover": {
+              border: `1px solid ${colors.neutral[600]}`,
+              boxShadow: "0 6px 16px rgba(0, 0, 0, 0.4)",
+            },
           }}
         >
-          {/* Logos in the background */}
+          {/* Background Logos */}
           <Box
             sx={{
               position: "absolute",
               top: "-10%",
               left: "-10%",
-              width: "120px",
-              height: "120px",
-              opacity: 0.1,
+              width: "100px",
+              height: "100px",
+              opacity: 0.08,
               background: `url(${pool.tokens[0].icon}) center / cover no-repeat`,
               filter: "grayscale(100%)",
               borderRadius: "50%",
@@ -125,9 +140,9 @@ const PoolItem = React.memo(
               position: "absolute",
               top: "-10%",
               right: "-10%",
-              width: "120px",
-              height: "120px",
-              opacity: 0.1,
+              width: "100px",
+              height: "100px",
+              opacity: 0.08,
               background: `url(${pool.tokens[1].icon}) center / cover no-repeat`,
               filter: "grayscale(100%)",
               borderRadius: "50%",
@@ -139,28 +154,28 @@ const PoolItem = React.memo(
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: "12px",
-              marginBottom: "16px",
+              gap: spacing.sm,
+              marginBottom: spacing.md,
               zIndex: 1,
+              position: "relative",
             }}
           >
             <Box
               sx={{
                 display: "flex",
-                width: "36px",
-                height: "36px",
+                width: "28px",
+                height: "28px",
                 padding: "4px",
                 justifyContent: "center",
                 alignItems: "center",
-                borderRadius: "32px",
-                background:
-                  "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+                borderRadius: "28px",
+                background: colors.neutral[800],
               }}
             >
               <Box
                 sx={{
-                  width: "28px",
-                  height: "28px",
+                  width: "20px",
+                  height: "20px",
                   borderRadius: "50%",
                   background: `url(${pool.tokens[0].icon}) transparent 50% / cover no-repeat`,
                 }}
@@ -168,9 +183,9 @@ const PoolItem = React.memo(
             </Box>
             <Typography
               sx={{
-                fontWeight: 700,
-                fontSize: "20px",
-                color: "#fff",
+                fontWeight: typography.fontWeights.medium,
+                fontSize: typography.fontSize.md,
+                color: colors.neutral[50],
               }}
             >
               {`${pool.tokens[0].name} - ${pool.tokens[1].name}`}
@@ -178,20 +193,19 @@ const PoolItem = React.memo(
             <Box
               sx={{
                 display: "flex",
-                width: "36px",
-                height: "36px",
+                width: "28px",
+                height: "28px",
                 padding: "4px",
                 justifyContent: "center",
                 alignItems: "center",
-                borderRadius: "32px",
-                background:
-                  "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+                borderRadius: "28px",
+                background: colors.neutral[800],
               }}
             >
               <Box
                 sx={{
-                  width: "28px",
-                  height: "28px",
+                  width: "20px",
+                  height: "20px",
                   borderRadius: "50%",
                   background: `url(${pool.tokens[1].icon}) transparent 50% / cover no-repeat`,
                 }}
@@ -200,13 +214,17 @@ const PoolItem = React.memo(
           </Box>
 
           {/* Pool Stats */}
-          <Grid container rowSpacing={1} sx={{ zIndex: 1 }}>
+          <Grid
+            container
+            rowSpacing={1}
+            sx={{ position: "relative", zIndex: 1 }}
+          >
             <Grid item xs={6}>
               <Typography
                 sx={{
-                  color: "var(--Secondary-S2-2, #BDBEBE)",
-                  fontSize: "14px",
-                  fontWeight: 700,
+                  color: colors.neutral[400],
+                  fontSize: typography.fontSize.xs,
+                  fontWeight: typography.fontWeights.medium,
                 }}
               >
                 TVL
@@ -215,9 +233,9 @@ const PoolItem = React.memo(
             <Grid item xs={6} textAlign="right">
               <Typography
                 sx={{
-                  color: "var(--Secondary-S2, #FFF)",
-                  fontSize: "18px",
-                  fontWeight: 700,
+                  color: colors.neutral[50],
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.medium,
                 }}
               >
                 {pool.tvl}
@@ -226,9 +244,9 @@ const PoolItem = React.memo(
             <Grid item xs={6}>
               <Typography
                 sx={{
-                  color: "var(--Secondary-S2-2, #BDBEBE)",
-                  fontSize: "14px",
-                  fontWeight: 700,
+                  color: colors.neutral[400],
+                  fontSize: typography.fontSize.xs,
+                  fontWeight: typography.fontWeights.medium,
                 }}
               >
                 Max APR
@@ -237,9 +255,9 @@ const PoolItem = React.memo(
             <Grid item xs={6} textAlign="right">
               <Typography
                 sx={{
-                  color: "var(--Secondary-S2, #FFF)",
-                  fontSize: "18px",
-                  fontWeight: 700,
+                  color: colors.neutral[50],
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.medium,
                 }}
               >
                 {pool.maxApr}
@@ -250,9 +268,9 @@ const PoolItem = React.memo(
                 <Grid item xs={6}>
                   <Typography
                     sx={{
-                      color: "var(--Secondary-S2-2, #BDBEBE)",
-                      fontSize: "14px",
-                      fontWeight: 700,
+                      color: colors.neutral[400],
+                      fontSize: typography.fontSize.xs,
+                      fontWeight: typography.fontWeights.medium,
                     }}
                   >
                     My Liquidity
@@ -261,9 +279,9 @@ const PoolItem = React.memo(
                 <Grid item xs={6} textAlign="right">
                   <Typography
                     sx={{
-                      color: "var(--Secondary-S2, #FFF)",
-                      fontSize: "18px",
-                      fontWeight: 700,
+                      color: colors.neutral[50],
+                      fontSize: typography.fontSize.sm,
+                      fontWeight: typography.fontWeights.medium,
                     }}
                   >
                     {pool.userLiquidity}
@@ -279,10 +297,7 @@ const PoolItem = React.memo(
 );
 
 /**
- * Pools Overview Component
- *
- * @component
- * @param {PoolsProps} props - The properties for the Pools component.
+ * Pools Component
  */
 const Pools = ({
   pools,
@@ -309,16 +324,32 @@ const Pools = ({
     const sortedPools = [...filteredPools];
     switch (sort) {
       case "HighTVL":
-        sortedPools.sort((a, b) => parseFloat(b.tvl) - parseFloat(a.tvl));
+        sortedPools.sort(
+          (a, b) =>
+            parseFloat(b.tvl.replace(/[^0-9.-]+/g, "")) -
+            parseFloat(a.tvl.replace(/[^0-9.-]+/g, ""))
+        );
         break;
       case "LowTVL":
-        sortedPools.sort((a, b) => parseFloat(a.tvl) - parseFloat(b.tvl));
+        sortedPools.sort(
+          (a, b) =>
+            parseFloat(a.tvl.replace(/[^0-9.-]+/g, "")) -
+            parseFloat(b.tvl.replace(/[^0-9.-]+/g, ""))
+        );
         break;
       case "HighAPR":
-        sortedPools.sort((a, b) => parseFloat(b.maxApr) - parseFloat(a.maxApr));
+        sortedPools.sort(
+          (a, b) =>
+            parseFloat(b.maxApr.replace(/[^0-9.-]+/g, "")) -
+            parseFloat(a.maxApr.replace(/[^0-9.-]+/g, ""))
+        );
         break;
       case "LowAPR":
-        sortedPools.sort((a, b) => parseFloat(a.maxApr) - parseFloat(b.maxApr));
+        sortedPools.sort(
+          (a, b) =>
+            parseFloat(a.maxApr.replace(/[^0-9.-]+/g, "")) -
+            parseFloat(b.maxApr.replace(/[^0-9.-]+/g, ""))
+        );
         break;
       default:
         break;
@@ -331,15 +362,15 @@ const Pools = ({
     <Box sx={{ flex: 1 }}>
       <Typography
         sx={{
-          color: "#FFF",
-          fontSize: "32px",
-          fontWeight: 700,
-          marginBottom: "16px",
+          color: colors.neutral[50],
+          fontSize: typography.fontSize.xl,
+          fontWeight: typography.fontWeights.bold,
+          marginBottom: spacing.md,
         }}
       >
         Pools
       </Typography>
-      <Grid container spacing={2} sx={{ marginBottom: "24px" }}>
+      <Grid container spacing={2} sx={{ marginBottom: spacing.md }}>
         <Grid item>
           <FilterButton
             onClick={() => onFilterClick("ALL")}
@@ -347,19 +378,34 @@ const Pools = ({
             selected={filter === "ALL"}
           />
         </Grid>
+        <Grid item>
+          <FilterButton
+            onClick={() => onFilterClick("MY")}
+            label="My Pools"
+            selected={filter === "MY"}
+          />
+        </Grid>
       </Grid>
-      <Box sx={{ display: "flex", gap: 2, marginBottom: "16px" }}>
+      <Box sx={{ display: "flex", gap: spacing.md, marginBottom: spacing.md }}>
         <Input
           placeholder="Search"
           onChange={(e) => setSearchValue(e.target.value)}
           sx={{
             width: "100%",
-            borderRadius: "16px",
-            border: "1px solid #2D303A",
-            background: "#1D1F21",
-            padding: "8px 16px",
-            lineHeight: "18px",
-            fontSize: "13px",
+            borderRadius: borderRadius.lg,
+            border: `1px solid ${colors.neutral[700]}`,
+            background: colors.neutral[900],
+            padding: `${spacing.sm} ${spacing.md}`,
+            lineHeight: "1.5",
+            fontSize: typography.fontSize.xs,
+            color: colors.neutral[300],
+            transition: "all 0.2s ease",
+            "&:hover": {
+              borderColor: colors.neutral[600],
+            },
+            "&:focus-within": {
+              borderColor: colors.primary.main,
+            },
             "&:before": {
               content: "none",
             },
@@ -368,20 +414,21 @@ const Pools = ({
             },
           }}
           startAdornment={
-            <img
-              style={{ marginRight: "8px" }}
+            <Box
+              component="img"
               src="/MagnifyingGlass.svg"
               alt="search"
+              sx={{ marginRight: spacing.sm, opacity: 0.6 }}
             />
           }
         />
-        <FormControl sx={{ minWidth: "180px" }}>
+        <FormControl sx={{ minWidth: "160px" }}>
           <InputLabel
             sx={{
-              fontSize: "13px !important",
-              paddingBottom: "12px",
+              fontSize: `${typography.fontSize.xs} !important`,
+              paddingBottom: spacing.sm,
               top: "-2px",
-              color: "rgba(255, 255, 255, 0.70) !important",
+              color: `${colors.neutral[400]} !important`,
             }}
           >
             Sort by
@@ -400,25 +447,53 @@ const Pools = ({
             label="Sort by"
             value={sort}
             sx={{
-              padding: "16px",
-              height: "46px",
-              borderRadius: "16px",
-              border: "1px solid #2D303A !important",
-              background: "#1F2123",
-              fontSize: "14px !important",
+              padding: `${spacing.sm} ${spacing.md}`,
+              height: "40px",
+              borderRadius: borderRadius.lg,
+              border: `1px solid ${colors.neutral[700]} !important`,
+              background: colors.neutral[900],
+              fontSize: `${typography.fontSize.xs} !important`,
+              color: colors.neutral[300],
+              transition: "all 0.2s ease",
+              "&:hover": {
+                borderColor: colors.neutral[600],
+              },
+              "&.Mui-focused": {
+                borderColor: colors.primary.main,
+              },
             }}
           >
             <MenuItem value={"HighTVL"}>
-              <Typography fontSize="14px">TVL High to Low</Typography>
+              <Typography
+                fontSize={typography.fontSize.xs}
+                color={colors.neutral[300]}
+              >
+                TVL High to Low
+              </Typography>
             </MenuItem>
             <MenuItem value={"LowTVL"}>
-              <Typography fontSize="14px">TVL Low to High</Typography>
+              <Typography
+                fontSize={typography.fontSize.xs}
+                color={colors.neutral[300]}
+              >
+                TVL Low to High
+              </Typography>
             </MenuItem>
             <MenuItem value={"HighAPR"}>
-              <Typography fontSize="14px">APR High to Low</Typography>
+              <Typography
+                fontSize={typography.fontSize.xs}
+                color={colors.neutral[300]}
+              >
+                APR High to Low
+              </Typography>
             </MenuItem>
             <MenuItem value={"LowAPR"}>
-              <Typography fontSize="14px">APR Low to High</Typography>
+              <Typography
+                fontSize={typography.fontSize.xs}
+                color={colors.neutral[300]}
+              >
+                APR Low to High
+              </Typography>
             </MenuItem>
           </Select>
         </FormControl>
@@ -429,7 +504,7 @@ const Pools = ({
             key={index}
             filter={filter}
             onAddLiquidityClick={() => onAddLiquidityClick(pool)}
-            onShowDetailsClick={onShowDetailsClick}
+            onShowDetailsClick={() => onShowDetailsClick(pool)}
             pool={pool}
           />
         ))}

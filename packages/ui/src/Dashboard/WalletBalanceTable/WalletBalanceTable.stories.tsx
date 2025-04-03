@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import WalletBalanceTable from "./WalletBalanceTable";
 import { Grid } from "@mui/material";
+import React from "react";
 
 export const testTokens = [
   {

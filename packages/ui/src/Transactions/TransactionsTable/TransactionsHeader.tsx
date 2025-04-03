@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { ArrowDownward, SwapVert } from "@mui/icons-material";
+import { colors, typography } from "../../Theme/styleConstants";
 
 function convertToCamelCase(input: string): string {
   return input
@@ -31,10 +32,11 @@ const TransactionHeader = ({
   >
     <Typography
       sx={{
-        fontSize: "10px",
+        fontSize: typography.fontSize.xs,
         lineHeight: "200%",
-        fontWeight: "700",
+        fontWeight: typography.fontWeights.bold,
         textTransform: "uppercase",
+        color: colors.neutral[300],
         opacity: active && label !== "Actions" ? "1" : "0.6",
         mr: 0.5,
       }}
@@ -47,10 +49,17 @@ const TransactionHeader = ({
           sx={{
             fontSize: "14px",
             transform: active === "desc" ? "rotate(180deg)" : "none",
+            color: colors.neutral[300],
           }}
         />
       ) : (
-        <SwapVert sx={{ fontSize: "14px", opacity: "0.6" }} />
+        <SwapVert
+          sx={{
+            fontSize: "14px",
+            opacity: "0.6",
+            color: colors.neutral[300],
+          }}
+        />
       ))}
   </Box>
 );

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Box, Grid, Typography, CircularProgress } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { motion } from "framer-motion";
@@ -32,14 +32,23 @@ import {
   Anchor,
   AssetInfo,
   GainerOrLooserAsset,
+  Pool,
 } from "@phoenix-protocol/types";
 import NftCarouselPlaceholder from "@/components/_preview";
 import {
+  fetchPho,
+  PhoenixFactoryContract,
+  PhoenixPairContract,
+  PhoenixStakeContract,
   PhoenixVestingContract,
   SorobanTokenContract,
 } from "@phoenix-protocol/contracts";
 import { useContractTransaction } from "@/hooks/useContractTransaction";
-import { API as TradeAPI } from "@phoenix-protocol/utils/build/trade_api";
+import {
+  API as TradeAPI,
+  TradingVolume,
+} from "@phoenix-protocol/utils/build/trade_api";
+import { LiquidityPoolInfo } from "@phoenix-protocol/contracts/build/phoenix-pair";
 
 export default function Page() {
   const theme = useTheme();
@@ -70,6 +79,45 @@ export default function Page() {
   const [dailyVolume, setDailyVolume] = useState<number>(0);
   const [vestingModalOpen, setVestingModalOpen] = useState(false);
   const [vestingInfo, setVestingInfo] = useState<any>([]);
+  const [selectedAssetPools, setSelectedAssetPools] = useState<Pool[]>([]);
+  const [tradingVolume7d, setTradingVolume7d] = useState<TradingVolume[]>([]);
+  const [loadingAssetInfo, setLoadingAssetInfo] = useState(false);
+
+  // Create an empty asset placeholder for use during loading
+  const emptyAssetPlaceholder: AssetInfo = useMemo(
+    () => ({
+      asset: "",
+      supply: 0,
+      traded_amount: 0,
+      payments_amount: 0,
+      created: 0,
+      trustlines: [],
+      payments: 0,
+      domain: "",
+      rating: {
+        age: 0,
+        trades: 0,
+        payments: 0,
+        trustlines: 0,
+        volume7d: 0,
+        interop: 0,
+        liquidity: 0,
+        average: 0,
+      },
+      price7d: [],
+      volume7d: 0,
+      tomlInfo: {
+        code: "",
+        issuer: "",
+        image: "",
+        decimals: 0,
+        orgName: "",
+        orgLogo: "",
+      },
+      paging_token: 0,
+    }),
+    []
+  );
 
   const tradeApi = new TradeAPI(constants.TRADING_API_URL);
 
@@ -282,29 +330,217 @@ export default function Page() {
   );
 
   const fetchTokenInfo = async (tokenId: string) => {
-    const TokenContract = new SorobanTokenContract.Client({
-      contractId: tokenId,
-      networkPassphrase: constants.NETWORK_PASSPHRASE,
-      rpcUrl: constants.RPC_URL,
-    });
-    const tokenName = (await TokenContract.name()).result
-      .toLowerCase()
-      .replace(":", "-");
-
-    const fetchedInfo = await (
-      await fetch(
-        `https://api.stellar.expert/explorer/public/asset?search=${tokenName}`
-      )
-    ).json();
-
-    const info = fetchedInfo._embedded.records.find(
-      (el: any) =>
-        el.asset.toUpperCase() === tokenName.toUpperCase() ||
-        el.asset.toUpperCase() === tokenName.toUpperCase() + "-1" ||
-        el.asset.toUpperCase() === tokenName.toUpperCase() + "-2"
-    );
-    setSelectedTokenForInfo(info);
+    setLoadingAssetInfo(true);
     setTokenInfoOpen(true);
+
+    try {
+      const TokenContract = new SorobanTokenContract.Client({
+        contractId: tokenId,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+      const tokenName = (await TokenContract.name()).result
+        .toLowerCase()
+        .replace(":", "-");
+
+      const fetchedInfo = await (
+        await fetch(
+          `https://api.stellar.expert/explorer/public/asset?search=${tokenName}`
+        )
+      ).json();
+
+      const info = fetchedInfo._embedded.records.find(
+        (el: any) =>
+          el.asset.toUpperCase() === tokenName.toUpperCase() ||
+          el.asset.toUpperCase() === tokenName.toUpperCase() + "-1" ||
+          el.asset.toUpperCase() === tokenName.toUpperCase() + "-2"
+      );
+
+      const fetchPool = async (poolAddress: string) => {
+        try {
+          const PairContract = new PhoenixPairContract.Client({
+            contractId: poolAddress,
+            networkPassphrase: constants.NETWORK_PASSPHRASE,
+            rpcUrl: constants.RPC_URL,
+          });
+
+          const [pairConfig, pairInfo] = await Promise.all([
+            PairContract.query_config(),
+            PairContract.query_pool_info(),
+          ]);
+
+          if (pairConfig?.result && pairInfo?.result) {
+            const [tokenA, tokenB] = await Promise.all([
+              appStore.fetchTokenInfo(pairConfig.result.token_a),
+              appStore.fetchTokenInfo(pairConfig.result.token_b),
+            ]);
+
+            // Fetch prices and calculate TVL
+            const [priceA, priceB] = await Promise.all([
+              API.getPrice(tokenA?.symbol || ""),
+              API.getPrice(tokenB?.symbol || ""),
+            ]);
+
+            const tvl =
+              (priceA * Number(pairInfo.result.asset_a.amount)) /
+                10 ** Number(tokenA?.decimals) +
+              (priceB * Number(pairInfo.result.asset_b.amount)) /
+                10 ** Number(tokenB?.decimals);
+
+            const stakingAddress = pairInfo.result.stake_address;
+
+            const StakeContract = new PhoenixStakeContract.Client({
+              contractId: stakingAddress,
+              networkPassphrase: constants.NETWORK_PASSPHRASE,
+              rpcUrl: constants.RPC_URL,
+            });
+
+            const [stakingInfo, allPoolDetails] = await Promise.all([
+              StakeContract.query_total_staked(),
+              new PhoenixFactoryContract.Client({
+                contractId: constants.FACTORY_ADDRESS,
+                networkPassphrase: constants.NETWORK_PASSPHRASE,
+                rpcUrl: constants.RPC_URL,
+              }).query_all_pools_details(),
+            ]);
+
+            const totalStaked = Number(stakingInfo.result);
+            const totalTokens = Number(
+              allPoolDetails.result.find(
+                (pool: any) => pool.pool_address === poolAddress
+              )?.pool_response.asset_lp_share.amount
+            );
+
+            const ratioStaked = totalStaked / totalTokens;
+            const valueStaked = tvl * ratioStaked;
+
+            // Calculate APR based on incentives
+            const poolIncentives = [
+              {
+                address:
+                  "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX",
+                amount: 12500,
+              },
+              {
+                address:
+                  "CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH",
+                amount: 25000,
+              },
+              {
+                address:
+                  "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA",
+                amount: 18750,
+              },
+            ];
+
+            const poolIncentive = poolIncentives.find(
+              (incentive) => incentive.address === poolAddress
+            );
+
+            const phoprice = await fetchPho();
+            const _apr =
+              ((poolIncentive?.amount || 0 * phoprice) / valueStaked) * 100 * 6;
+
+            const apr = isNaN(_apr) ? 0 : _apr;
+
+            // Construct and return pool object if all fetches are successful
+            return {
+              tokens: [
+                {
+                  name: tokenA?.symbol || "",
+                  icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
+                  amount:
+                    Number(pairInfo.result.asset_a.amount) /
+                    10 ** Number(tokenA?.decimals),
+                  category: "",
+                  usdValue: 0,
+                  address: tokenA?.id,
+                },
+                {
+                  name: tokenB?.symbol || "",
+                  icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
+                  amount:
+                    Number(pairInfo.result.asset_b.amount) /
+                    10 ** Number(tokenB?.decimals),
+                  category: "",
+                  usdValue: 0,
+                  address: tokenB?.id,
+                },
+              ],
+              tvl,
+              maxApr: `${(apr / 2).toFixed(2)}`,
+              userLiquidity: 0,
+              poolAddress: poolAddress,
+            };
+          }
+        } catch (e) {
+          console.log(e);
+        }
+        return;
+      };
+
+      const FactoryContract = new PhoenixFactoryContract.Client({
+        contractId: constants.FACTORY_ADDRESS,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+
+      const pools = await FactoryContract.query_pools({});
+
+      const poolWithData =
+        pools && Array.isArray(pools.result)
+          ? await Promise.all(
+              pools.result.map(async (pool: string) => {
+                return await fetchPool(pool);
+              })
+            )
+          : [];
+
+      const poolsFiltered: Pool[] = poolWithData.filter(
+        (el: any) =>
+          el !== undefined &&
+          el.tokens.length >= 2 &&
+          el.tokens.some((token: any) => token.address === tokenId)
+      );
+
+      // Grab volume  and price of token from last 7d
+      const tokenPrice = await tradeApi.getTokenPrices(
+        tokenId,
+        Number(((Date.now() - 604800000) / 1000).toFixed(0))
+      );
+
+      let prices7d: [number, number][];
+
+      if (!tokenPrice.prices) {
+        prices7d = [];
+      } else {
+        prices7d = tokenPrice.prices.map((price) => [
+          Number(price.txTime) * 1000,
+          price.price,
+        ]);
+      }
+
+      const volumes = poolsFiltered.map((pool) => {
+        const volume7d = tradeApi.getTradingVolumePerDay(
+          pool.poolAddress,
+          Number(((Date.now() - 604800000) / 1000).toFixed(0))
+        );
+        return volume7d;
+      });
+
+      const d7d = tradeApi.sumTradingVolumesByBucket(
+        await Promise.all(volumes)
+      );
+      info.price7d = prices7d;
+      setTradingVolume7d(d7d.tradingVolume);
+
+      setSelectedAssetPools(poolsFiltered);
+      setSelectedTokenForInfo(info);
+    } catch (error) {
+      console.error("Error fetching token info:", error);
+    } finally {
+      setLoadingAssetInfo(false);
+    }
   };
 
   return (
@@ -325,7 +561,7 @@ export default function Page() {
       )}
 
       <Grid container spacing={3} sx={{ mt: 4, maxWidth: 1440 }}>
-        {/* Banner */}
+        {/* Phoenix-styled Welcome Banner */}
         <Grid item xs={12}>
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -334,37 +570,84 @@ export default function Page() {
           >
             <Box
               sx={{
-                background: "url('/banner.png') center/cover",
-                padding: "3rem",
+                background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
+                border: "1px solid rgba(255, 255, 255, 0.05)",
                 borderRadius: "16px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                textAlign: "left",
+                boxShadow: "0px 4px 24px rgba(0, 0, 0, 0.2)",
+                overflow: "hidden",
+                position: "relative",
               }}
             >
-              <Box>
-                <Typography
-                  variant="h1"
-                  sx={{ fontSize: "2rem", fontWeight: 700, color: "#fff" }}
-                >
-                  Are you an artist?
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: "1rem",
-                    fontWeight: 400,
-                    opacity: 0.8,
-                    color: "#fff",
-                    mt: 1,
-                  }}
-                >
-                  Be one of the first and become a genesis NFT creator!
-                </Typography>
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: { md: 0, xs: "auto" },
+                  right: { md: "auto", xs: 0 },
+                  width: 200,
+                  height: 200,
+                  opacity: 0.8,
+                  backgroundImage: "url('/3d.png')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  zIndex: 0,
+                }}
+              />
+              <Box
+                sx={{
+                  padding: { xs: "1.5rem", md: "2rem" },
+                  position: "relative",
+                  zIndex: 1,
+                }}
+              >
+                <Grid container alignItems="center" spacing={3}>
+                  <Grid item xs={0} md={2} />
+                  <Grid item xs={12} md={5}>
+                    <Typography
+                      sx={{
+                        color: "#FFFFFF",
+                        fontSize: { xs: "1.5rem", md: "1.75rem" },
+                        fontWeight: 700,
+                        mb: 1,
+                      }}
+                    >
+                      Welcome to Phoenix!
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: "1rem",
+                        color: "rgba(255, 255, 255, 0.7)",
+                        maxWidth: "90%",
+                      }}
+                    >
+                      Your one-stop shop for all things DeFi on Stellar.
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={5}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexWrap: { xs: "wrap", sm: "nowrap" },
+                        gap: 2,
+                        justifyContent: { xs: "flex-start", md: "flex-end" },
+                      }}
+                    >
+                      <Button
+                        type="primary"
+                        onClick={() => router.push("/swap")}
+                      >
+                        Trade Tokens
+                      </Button>
+                      <Button
+                        type="secondary"
+                        onClick={() => router.push("/pools")}
+                      >
+                        Explore Pools
+                      </Button>
+                    </Box>
+                  </Grid>
+                </Grid>
               </Box>
-              <Button type="primary" onClick={() => router.push("/nft")}>
-                Apply Now!
-              </Button>
             </Box>
           </motion.div>
         </Grid>
@@ -466,7 +749,7 @@ export default function Page() {
           <Grid
             item
             xs={12}
-            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+            sx={{ display: "flex", flexDirection: "column", gap: 4 }}
           >
             <Tile
               value={formatCurrencyStatic.format(dailyVolume)}
@@ -483,13 +766,22 @@ export default function Page() {
         </Grid>
       </Grid>
       {/* Asset Info Modal */}
-      {selectedTokenForInfo && (
-        <AssetInfoModal
-          open={tokenInfoOpen}
-          onClose={() => setTokenInfoOpen(false)}
-          asset={selectedTokenForInfo}
-        />
-      )}
+
+      <AssetInfoModal
+        open={tokenInfoOpen}
+        onClose={() => {
+          setTokenInfoOpen(false);
+          if (loadingAssetInfo) {
+            setLoadingAssetInfo(false);
+          }
+        }}
+        asset={selectedTokenForInfo || emptyAssetPlaceholder}
+        userBalance={0}
+        pools={selectedAssetPools}
+        // @ts-ignore
+        tradingVolume7d={tradingVolume7d}
+        loading={loadingAssetInfo}
+      />
 
       {/* Vesting Modal */}
       {vestingInfo.length > 0 && (

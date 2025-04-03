@@ -16,7 +16,7 @@ type Story = StoryObj<typeof SlippageSettings>;
 
 export const Primary: Story = {
   args: {
-    options: ["1%", "3%", "5%"],
+    options: [1, 3, 5],
     selectedOption: 1,
   },
 };

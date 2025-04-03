@@ -1,18 +1,18 @@
 import React, { useState, useMemo } from "react";
-import { Box, Grid, IconButton, Input, Typography } from "@mui/material";
+import { Box, Grid, IconButton, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { KeyboardArrowLeft } from "@mui/icons-material";
 import { AssetSelectorProps } from "@phoenix-protocol/types";
 import AssetItem from "./AssetItem";
+import { SearchInput } from "../../Common/SearchInput";
+import { colors, typography, spacing, borderRadius, shadows } from "../../Theme/styleConstants";
+import { CardContainer } from "../../Common/CardContainer";
 
 /**
  * AssetSelector
  * A modern and searchable token selector modal with quick select and token list sections.
- *
- * @param {AssetSelectorProps} props - Props containing token data and event handlers.
- * @returns {JSX.Element}
  */
-const AssetSelector = ({
+export const AssetSelector = ({
   tokens,
   tokensAll,
   onClose,
@@ -38,13 +38,10 @@ const AssetSelector = ({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
-      <Box
+      <CardContainer
         sx={{
           width: "100%",
-          padding: "1.5rem",
-          background:
-            "linear-gradient(180deg, #292B2C 0%, #222426 100%), linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-          borderRadius: "16px",
+          padding: spacing.lg,
         }}
       >
         {/* Header */}
@@ -52,26 +49,30 @@ const AssetSelector = ({
           sx={{
             display: "flex",
             alignItems: "center",
-            marginBottom: "1rem",
+            marginBottom: spacing.md,
           }}
         >
           <IconButton
             onClick={onClose}
             sx={{
-              borderRadius: "8px",
-              background:
-                "linear-gradient(180deg, #292B2C 0%, #222426 100%),linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.025) 100%)",
-              padding: "0.5rem",
-              marginRight: "1rem",
+              borderRadius: borderRadius.sm,
+              color: colors.neutral[300],
+              background: colors.neutral[800],
+              padding: spacing.sm,
+              marginRight: spacing.md,
+              "&:hover": {
+                background: colors.neutral[700],
+              },
             }}
           >
-            <KeyboardArrowLeft sx={{ color: "white" }} />
+            <KeyboardArrowLeft sx={{ color: "inherit" }} />
           </IconButton>
           <Typography
             sx={{
-              color: "white",
-              fontSize: "1.5rem",
-              fontWeight: 700,
+              color: colors.neutral[50],
+              fontSize: typography.fontSize.xl,
+              fontWeight: typography.fontWeights.medium,
+              fontFamily: typography.fontFamily,
             }}
           >
             Select Token
@@ -84,29 +85,11 @@ const AssetSelector = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Input
+          <SearchInput
             placeholder="Search by name or address"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setSearchValue(e.target.value)
-            }
-            sx={{
-              width: "100%",
-              borderRadius: "16px",
-              border: "1px solid #2D303A",
-              background: "#1D1F21",
-              padding: "8px 16px",
-              color: "white",
-              fontSize: "14px",
-              marginBottom: "16px",
-              "&:before, &:after": { content: "none" },
-            }}
-            startAdornment={
-              <img
-                style={{ marginRight: "8px" }}
-                src="/MagnifyingGlass.svg"
-                alt="Search"
-              />
-            }
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            sx={{ marginBottom: spacing.md }}
           />
         </motion.div>
 
@@ -117,21 +100,14 @@ const AssetSelector = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
           >
-            <Box
-              sx={{
-                borderRadius: "16px",
-                padding: "1rem",
-                background:
-                  "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-                marginBottom: "16px",
-              }}
-            >
+            <CardContainer sx={{ marginBottom: spacing.md }}>
               <Typography
                 sx={{
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  color: "rgba(255, 255, 255, 0.7)",
-                  marginBottom: "1rem",
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.medium,
+                  color: colors.neutral[400],
+                  marginBottom: spacing.md,
+                  fontFamily: typography.fontFamily,
                 }}
               >
                 Quick select
@@ -143,25 +119,19 @@ const AssetSelector = ({
                   </Grid>
                 ))}
               </Grid>
-            </Box>
+            </CardContainer>
           </motion.div>
         )}
 
         {/* All Tokens Section */}
-        <Box
-          sx={{
-            borderRadius: "16px",
-            padding: "1rem",
-            background:
-              "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
-          }}
-        >
+        <CardContainer>
           <Typography
             sx={{
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              color: "rgba(255, 255, 255, 0.7)",
-              marginBottom: "1rem",
+              fontSize: typography.fontSize.sm,
+              fontWeight: typography.fontWeights.medium,
+              color: colors.neutral[400],
+              marginBottom: spacing.md,
+              fontFamily: typography.fontFamily,
             }}
           >
             All tokens
@@ -174,8 +144,8 @@ const AssetSelector = ({
                 width: "6px",
               },
               "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "#E2491A",
-                borderRadius: "8px",
+                backgroundColor: colors.primary.main,
+                borderRadius: borderRadius.sm,
               },
             }}
           >
@@ -189,31 +159,30 @@ const AssetSelector = ({
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  padding: "1rem",
+                  padding: spacing.md,
                 }}
               >
                 <Box
                   component="img"
                   src="/search-not-found.svg"
                   alt="No assets found"
-                  sx={{ maxWidth: "160px", marginBottom: "1rem" }}
+                  sx={{ maxWidth: "160px", marginBottom: spacing.md, opacity: 0.6 }}
                 />
                 <Typography
                   sx={{
-                    fontSize: "0.875rem",
-                    fontWeight: 400,
-                    color: "rgba(255, 255, 255, 0.7)",
+                    fontSize: typography.fontSize.sm,
+                    fontWeight: typography.fontWeights.regular,
+                    color: colors.neutral[400],
+                    fontFamily: typography.fontFamily,
                   }}
                 >
-                  We didn’t find any assets for "{searchValue}"
+                  We didn't find any assets for "{searchValue}"
                 </Typography>
               </Box>
             )}
           </Box>
-        </Box>
-      </Box>
+        </CardContainer>
+      </CardContainer>
     </motion.div>
   );
 };
-
-export { AssetSelector };
