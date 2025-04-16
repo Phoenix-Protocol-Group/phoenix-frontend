@@ -1,17 +1,26 @@
 import React from "react";
 import {
   Box,
-  FormControl,
-  Select,
-  MenuItem,
-  Switch,
+  Button,
   FormControlLabel,
+  MenuItem,
+  Select,
+  Switch,
+  Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
+  SelectChangeEvent,
 } from "@mui/material";
-import { motion } from "framer-motion";
-import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import {
+  colors,
+  typography,
+  spacing,
+  borderRadius,
+} from "../../Theme/styleConstants";
 
-export interface FilterBarProps {
+interface FilterBarProps {
   assetsFilter: "Your assets" | "All Assets";
   onAssetsFilterChange: (value: "Your assets" | "All Assets") => void;
   typeFilter: string;
@@ -24,7 +33,7 @@ export interface FilterBarProps {
   platforms: string[];
 }
 
-const FilterBar = ({
+export const FilterBar = ({
   assetsFilter,
   onAssetsFilterChange,
   typeFilter,
@@ -36,149 +45,216 @@ const FilterBar = ({
   types,
   platforms,
 }: FilterBarProps) => {
-  // Common select styles
-  const selectStyles = {
-    color: colors.neutral[300],
-    fontFamily: typography.fontFamily,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeights.regular,
-    borderRadius: borderRadius.lg,
-    background: colors.neutral[900],
-    border: `1px solid ${colors.neutral[700]}`,
-    transition: "all 0.2s ease",
-    "& .MuiOutlinedInput-notchedOutline": {
-      border: "none",
-    },
-    "& .MuiSelect-select": {
-      padding: `${spacing.xs} ${spacing.sm}`,
-      margin: 0,
-    },
-    "& .MuiSelect-select:not([value])": {
-      color: colors.neutral[300],
-    },
-    "&:hover": {
-      borderColor: colors.primary.main,
-      boxShadow: `0 0 0 1px ${colors.primary.main}25`,
-    },
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  const allTypes = ["All", ...types];
+  const allPlatforms = ["All", ...platforms];
+
+  // Handle toggle change
+  const handleToggleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onInstantUnbondOnlyChange(event.target.checked);
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        alignItems: isMobile ? "stretch" : "center",
+        gap: spacing.md,
+        mb: 3,
+        padding: spacing.md,
+        borderRadius: borderRadius.md,
+        background: "rgba(18, 18, 18, 0.40)",
+        backdropFilter: "blur(12px)",
+        border: "1px solid rgba(255, 255, 255, 0.1)",
+      }}
     >
+      {/* Assets Filter */}
       <Box
         sx={{
           display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: spacing.md,
-          borderRadius: borderRadius.lg,
-          width: "100%",
-          gap: spacing.md,
+          gap: spacing.xs,
+          flexShrink: 0,
         }}
       >
-        <Box
+        <Button
+          variant="text"
+          onClick={() => onAssetsFilterChange("Your assets")}
           sx={{
-            display: "flex",
-            gap: spacing.md,
-            flexWrap: "wrap",
-            "& > *": {
-              minWidth: "150px",
-              maxWidth: "200px",
+            color: assetsFilter === "Your assets" ? "#FAFAFA" : "#A3A3A3",
+            fontWeight: assetsFilter === "Your assets" ? 500 : 400,
+            fontSize: "14px",
+            textTransform: "none",
+            p: 1,
+            minWidth: "auto",
+            borderBottom:
+              assetsFilter === "Your assets" ? "2px solid #F97316" : "none",
+            borderRadius: 0,
+            "&:hover": {
+              backgroundColor: "transparent",
+              color: "#FAFAFA",
             },
           }}
         >
-          <FormControl fullWidth>
-            <Select
-              value={assetsFilter}
-              onChange={(e) =>
-                onAssetsFilterChange(
-                  e.target.value as "Your assets" | "All Assets"
-                )
-              }
-              placeholder="Assets"
-              displayEmpty
-              sx={selectStyles}
-            >
-              <MenuItem value="Your assets">Your assets</MenuItem>
-              <MenuItem value="All Assets">All Assets</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth>
-            <Select
-              value={typeFilter}
-              onChange={(e) => onTypeFilterChange(e.target.value)}
-              placeholder="Type"
-              displayEmpty
-              sx={selectStyles}
-            >
-              <MenuItem value="All">All Types</MenuItem>
-              {types.map((type) => (
-                <MenuItem key={type} value={type}>
-                  {type}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth>
-            <Select
-              value={platformFilter}
-              onChange={(e) => onPlatformFilterChange(e.target.value)}
-              displayEmpty
-              sx={selectStyles}
-            >
-              <MenuItem value="All">All Platforms</MenuItem>
-              {platforms.map((platform) => (
-                <MenuItem key={platform} value={platform}>
-                  {platform}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-        <Box>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={instantUnbondOnly}
-                onChange={(e) => onInstantUnbondOnlyChange(e.target.checked)}
-                sx={{
-                  color: colors.neutral[50],
-                  "& .MuiSwitch-track": {
-                    backgroundColor: instantUnbondOnly 
-                      ? colors.success[300] 
-                      : colors.neutral[700],
-                    opacity: 1,
-                    border: "none",
-                  },
-                  "& .MuiSwitch-thumb": {
-                    backgroundColor: colors.neutral[50],
-                  },
-                  "& .MuiSwitch-switchBase.Mui-disabled + .MuiSwitch-track": {
-                    opacity: 0.5,
-                  },
-                }}
-              />
-            }
-            label={
-              <Typography 
-                sx={{ 
-                  color: colors.neutral[300],
-                  fontSize: typography.fontSize.sm, 
-                  fontWeight: typography.fontWeights.medium
-                }}
-              >
-                Instant Unbond Only
-              </Typography>
-            }
-          />
-        </Box>
+          Your assets
+        </Button>
+        <Button
+          variant="text"
+          onClick={() => onAssetsFilterChange("All Assets")}
+          sx={{
+            color: assetsFilter === "All Assets" ? "#FAFAFA" : "#A3A3A3",
+            fontWeight: assetsFilter === "All Assets" ? 500 : 400,
+            fontSize: "14px",
+            textTransform: "none",
+            p: 1,
+            minWidth: "auto",
+            borderBottom:
+              assetsFilter === "All Assets" ? "2px solid #F97316" : "none",
+            borderRadius: 0,
+            "&:hover": {
+              backgroundColor: "transparent",
+              color: "#FAFAFA",
+            },
+          }}
+        >
+          All assets
+        </Button>
       </Box>
-    </motion.div>
+
+      {/* Type Filter */}
+      <Box sx={{ minWidth: 120, flexGrow: isMobile ? 1 : 0 }}>
+        <Typography
+          sx={{
+            color: "#A3A3A3",
+            fontSize: "12px",
+            mb: 0.5,
+          }}
+        >
+          Type
+        </Typography>
+        <Select
+          value={typeFilter}
+          onChange={(e: SelectChangeEvent) =>
+            onTypeFilterChange(e.target.value as string)
+          }
+          size="small"
+          sx={{
+            color: "#D4D4D4",
+            fontSize: "14px",
+            ".MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(255, 255, 255, 0.1)",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(255, 255, 255, 0.2)",
+            },
+            ".MuiSvgIcon-root": {
+              color: "#D4D4D4",
+            },
+            minWidth: "100px",
+            maxWidth: "150px",
+          }}
+        >
+          {allTypes.map((type) => (
+            <MenuItem key={type} value={type}>
+              {type}
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
+
+      {/* Platform Filter */}
+      <Box sx={{ minWidth: 120, flexGrow: isMobile ? 1 : 0 }}>
+        <Typography
+          sx={{
+            color: "#A3A3A3",
+            fontSize: "12px",
+            mb: 0.5,
+          }}
+        >
+          Platform
+        </Typography>
+        <Select
+          value={platformFilter}
+          onChange={(e: SelectChangeEvent) =>
+            onPlatformFilterChange(e.target.value as string)
+          }
+          size="small"
+          sx={{
+            color: "#D4D4D4",
+            fontSize: "14px",
+            ".MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(255, 255, 255, 0.1)",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(255, 255, 255, 0.2)",
+            },
+            ".MuiSvgIcon-root": {
+              color: "#D4D4D4",
+            },
+            minWidth: "100px",
+            maxWidth: "150px",
+          }}
+        >
+          {allPlatforms.map((platform) => (
+            <MenuItem key={platform} value={platform}>
+              {platform}
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
+
+      {/* Instant Unbond Toggle */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          marginLeft: "auto",
+          gap: 0.5,
+        }}
+      >
+        <FormControlLabel
+          control={
+            <Switch
+              checked={instantUnbondOnly}
+              onChange={handleToggleChange}
+              sx={{
+                "& .MuiSwitch-switchBase.Mui-checked": {
+                  color: "#F97316",
+                },
+                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                  backgroundColor: "rgba(249, 115, 22, 0.5)",
+                },
+              }}
+            />
+          }
+          label={
+            <Typography
+              sx={{
+                color: "#D4D4D4",
+                fontSize: "14px",
+              }}
+            >
+              Instant unbond only
+            </Typography>
+          }
+          sx={{ ml: 0, mr: 0 }}
+        />
+        <Tooltip
+          title="Show only strategies with instant unbonding"
+          placement="top"
+          arrow
+        >
+          <InfoOutlinedIcon
+            sx={{
+              color: "#A3A3A3",
+              fontSize: "16px",
+              cursor: "help",
+            }}
+          />
+        </Tooltip>
+      </Box>
+    </Box>
   );
 };
-
-export { FilterBar };

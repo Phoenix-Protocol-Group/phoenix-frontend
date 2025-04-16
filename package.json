@@ -12,7 +12,8 @@
     "build:state": "yarn workspace @phoenix-protocol/state build",
     "build:ui": "yarn workspace @phoenix-protocol/ui build",
     "build:utils": "yarn workspace @phoenix-protocol/utils build",
-    "build:types": "yarn workspace @phoenix-protocol/types build"
+    "build:types": "yarn workspace @phoenix-protocol/types build",
+    "build:strat": "yarn workspace @phoenix-protocol/strategies build"
   },
   "repository": {
     "type": "git",
