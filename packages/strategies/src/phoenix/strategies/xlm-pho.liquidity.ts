@@ -33,7 +33,7 @@ class PhoenixXlmPhoStrategy implements Strategy {
       category: "phoenix",
       usdValue: 0,
     },
-    unbondTime: 604800, // 7 days in seconds
+    unbondTime: 0,
     category: "liquidity",
     available: true,
     contractAddress,

@@ -761,7 +761,11 @@ export default function Page() {
               title="Total Value Locked"
               link=""
             />
-            <CryptoCTA onClick={() => window.open("https://app.kado.money")} />
+            <Box sx={{ mt: 5 }}>
+              <CryptoCTA
+                onClick={() => window.open("https://app.kado.money")}
+              />
+            </Box>
           </Grid>
         </Grid>
       </Grid>

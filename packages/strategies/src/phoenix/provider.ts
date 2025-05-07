@@ -1,6 +1,7 @@
 import { Strategy, StrategyProvider } from "../types";
 import PhoenixPhoUsdcStrategy from "./strategies/pho-usdc.liquidity";
 import PhoenixXlmPhoStrategy from "./strategies/xlm-pho.liquidity";
+import PhoenixXlmUsdcStrategy from "./strategies/xlm-usdc.liquidity";
 
 export class PhoenixBoostProvider implements StrategyProvider {
   id = "phoenix-boost";
@@ -15,7 +16,8 @@ export class PhoenixBoostProvider implements StrategyProvider {
     // Initialize with the PHO-USDC strategy
     this.strategies.push(
       new PhoenixPhoUsdcStrategy(),
-      new PhoenixXlmPhoStrategy()
+      new PhoenixXlmPhoStrategy(),
+      new PhoenixXlmUsdcStrategy()
     );
     console.log(
       "Phoenix provider initialized with strategies:",
