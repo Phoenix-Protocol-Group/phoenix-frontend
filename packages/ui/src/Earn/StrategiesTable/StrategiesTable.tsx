@@ -11,6 +11,7 @@ import {
 import { motion } from "framer-motion";
 import { FilterBar } from "../FilterBar/FilterBar";
 import StrategyEntry from "./StrategyEntry";
+import { StrategyMetadata } from "@phoenix-protocol/strategies";
 import {
   colors,
   typography,
@@ -20,10 +21,12 @@ import {
 
 export interface StrategiesTableProps {
   title: string;
-  strategies: any[];
+  strategies: StrategyMetadata[];
   showFilters?: boolean;
   isLoading?: boolean;
   onViewDetails?: (id: string) => void;
+  onBondClick: (strategy: StrategyMetadata) => void;
+  onUnbondClick: (strategy: StrategyMetadata) => void;
 }
 
 type SortField = "tvl" | "apr" | null;
@@ -35,6 +38,8 @@ export const StrategiesTable = ({
   showFilters = true,
   isLoading = false,
   onViewDetails = () => {},
+  onBondClick,
+  onUnbondClick,
 }: StrategiesTableProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -73,9 +78,8 @@ export const StrategiesTable = ({
 
     // Asset filter (would need to be implemented based on user assets)
     if (assetsFilter === "Your assets") {
-      // In a real app, you'd filter to only show strategies with assets the user owns
-      // This is just a placeholder
-      filtered = filtered.filter((s) => s.userAssetMatch || true);
+      // Check for userAssetMatch with correct null/undefined handling
+      filtered = filtered.filter((s) => s.hasJoined !== false);
     }
 
     // Type filter
@@ -120,6 +124,7 @@ export const StrategiesTable = ({
     instantUnbondOnly,
     sortField,
     sortDirection,
+    isLoading,
   ]);
 
   // Helper function for table headers
@@ -279,7 +284,7 @@ export const StrategiesTable = ({
                 </Grid>
               )}
 
-              {/* Details Column - 1/12 width */}
+              {/* Action Column - Renamed from Details */}
               <Grid item md={1}>
                 <Typography
                   sx={{
@@ -290,7 +295,7 @@ export const StrategiesTable = ({
                     textAlign: "right",
                   }}
                 >
-                  Details
+                  Action
                 </Typography>
               </Grid>
             </Grid>
@@ -336,9 +341,11 @@ export const StrategiesTable = ({
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
                 <StrategyEntry
-                  {...strategy}
+                  strategy={strategy}
                   isMobile={isMobile}
                   onViewDetails={onViewDetails}
+                  onBondClick={onBondClick}
+                  onUnbondClick={onUnbondClick}
                 />
               </motion.div>
             ))}
@@ -366,6 +373,6 @@ export const StrategiesTable = ({
 };
 
 // Helper function to check if any strategy has the user joined
-const hasAnyUserJoined = (strategies: any[]): boolean => {
+const hasAnyUserJoined = (strategies: StrategyMetadata[]): boolean => {
   return strategies.some((strategy) => strategy.hasJoined);
 };

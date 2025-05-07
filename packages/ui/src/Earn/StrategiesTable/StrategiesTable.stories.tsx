@@ -3,6 +3,7 @@ import { Meta, StoryObj } from "@storybook/react";
 import { StrategiesTable } from "./StrategiesTable";
 import { Grid } from "@mui/material";
 import { action } from "@storybook/addon-actions";
+import { StrategyMetadata, ContractType } from "@phoenix-protocol/strategies";
 
 const meta: Meta<typeof StrategiesTable> = {
   title: "Earn/StrategiesTable",
@@ -40,8 +41,10 @@ export const Default: Story = {
         assets: [
           {
             name: "XLM",
-            address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
             icon: "/cryptoIcons/xlm.svg",
+            amount: 0,
+            category: "native",
+            usdValue: 0.11,
           },
         ],
         name: "Stellar Yield",
@@ -50,14 +53,19 @@ export const Default: Story = {
         apr: 0.05,
         rewardToken: {
           name: "PHO",
-          address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
           icon: "/cryptoIcons/pho.svg",
+          amount: 0,
+          category: "phoenix",
+          usdValue: 0.02,
         },
         unbondTime: 0,
         isMobile: false,
         link: "/earn/stellar-yield-strategy",
         category: "yield",
         providerId: "stellar",
+        available: true,
+        contractAddress: "MOCK_CONTRACT_ADDRESS",
+        contractType: "stake" as ContractType,
       },
       {
         id: "phoenix-boost-strategy",
@@ -65,8 +73,10 @@ export const Default: Story = {
         assets: [
           {
             name: "XLM",
-            address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
             icon: "/cryptoIcons/xlm.svg",
+            amount: 0,
+            category: "native",
+            usdValue: 0.11,
           },
         ],
         name: "Phoenix Boost",
@@ -75,13 +85,18 @@ export const Default: Story = {
         apr: 0.1,
         rewardToken: {
           name: "PHO",
-          address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
           icon: "/cryptoIcons/pho.svg",
+          amount: 0,
+          category: "phoenix",
+          usdValue: 0.02,
         },
         unbondTime: 604800,
         link: "/earn/phoenix-boost-strategy",
         category: "staking",
         providerId: "phoenix",
+        available: true,
+        contractAddress: "MOCK_CONTRACT_ADDRESS",
+        contractType: "stake" as ContractType,
       },
     ],
     showFilters: true,
@@ -100,8 +115,10 @@ export const WithUserData: Story = {
         assets: [
           {
             name: "XLM",
-            address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
             icon: "/cryptoIcons/xlm.svg",
+            amount: 0,
+            category: "native",
+            usdValue: 0.11,
           },
         ],
         name: "Stellar Yield",
@@ -112,6 +129,9 @@ export const WithUserData: Story = {
           name: "PHO",
           address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
           icon: "/cryptoIcons/pho.svg",
+          amount: 0,
+          category: "phoenix",
+          usdValue: 0.02,
         },
         unbondTime: 0,
         isMobile: false,
@@ -121,6 +141,9 @@ export const WithUserData: Story = {
         hasJoined: true,
         userStake: 1000,
         userRewards: 25.5,
+        available: true,
+        contractAddress: "MOCK_CONTRACT_ADDRESS",
+        contractType: "stake" as ContractType,
       },
       {
         id: "phoenix-boost-strategy",
@@ -130,6 +153,9 @@ export const WithUserData: Story = {
             name: "XLM",
             address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
             icon: "/cryptoIcons/xlm.svg",
+            amount: 0,
+            category: "native",
+            usdValue: 0.11,
           },
         ],
         name: "Phoenix Boost",
@@ -140,6 +166,9 @@ export const WithUserData: Story = {
           name: "PHO",
           address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
           icon: "/cryptoIcons/pho.svg",
+          amount: 0,
+          category: "phoenix",
+          usdValue: 0.02,
         },
         unbondTime: 604800,
         link: "/earn/phoenix-boost-strategy",
@@ -148,6 +177,9 @@ export const WithUserData: Story = {
         hasJoined: true,
         userStake: 5000,
         userRewards: 75.25,
+        available: true,
+        contractAddress: "MOCK_CONTRACT_ADDRESS",
+        contractType: "stake" as ContractType,
       },
     ],
     showFilters: false,

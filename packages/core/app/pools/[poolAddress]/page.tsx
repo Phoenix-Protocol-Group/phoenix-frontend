@@ -431,8 +431,6 @@ export default function Page(props: PoolPageProps) {
         PairContract.query_pool_info(),
       ]);
 
-      console.log(pairConfig.result);
-
       // When results ok...
       if (pairConfig?.result && pairInfo?.result) {
         // Fetch token infos from chain and save in global appstore
@@ -449,7 +447,6 @@ export default function Page(props: PoolPageProps) {
               publicKey: storePersist.wallet.address,
             }),
           ]);
-        console.log(_lpToken);
         setStakeContractAddress(pairConfig.result.stake_contract.toString());
 
         // Fetch prices and calculate TVL

@@ -34,6 +34,9 @@ class LiquidityFarmingStrategy implements Strategy {
     unbondTime: 259200, // 3 days in seconds
     category: "farming",
     available: true,
+    // Mock contract details
+    contractAddress: "CDLZXA6KCSMAPYOURMOCKliquidityFARMINGCONTRACTADDRESS", // Replace with actual mock/testnet address if available
+    contractType: "pair", // Assuming interaction with a pair contract for LP tokens
   };
 
   // Mock user stakes storage
@@ -63,6 +66,7 @@ class LiquidityFarmingStrategy implements Strategy {
     // Update TVL
     this.metadata.tvl += amount;
 
+    console.log(`[Mock LiquidityFarming] Bond: ${amount} for ${walletAddress}`);
     return true;
   }
 
@@ -77,10 +81,14 @@ class LiquidityFarmingStrategy implements Strategy {
     // Update TVL
     this.metadata.tvl -= amount;
 
+    console.log(
+      `[Mock LiquidityFarming] Unbond: ${amount} for ${walletAddress}`
+    );
     return true;
   }
 
   async claim(walletAddress: string): Promise<boolean> {
+    console.log(`[Mock LiquidityFarming] Claim for ${walletAddress}`);
     return this.hasUserJoined(walletAddress);
   }
 

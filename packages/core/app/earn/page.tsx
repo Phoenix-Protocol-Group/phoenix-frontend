@@ -1,18 +1,32 @@
 "use client";
 import { Tab, Tabs, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Box } from "@mui/system";
-import { useAppStore } from "@phoenix-protocol/state";
-import { usePersistStore } from "@phoenix-protocol/state";
-import { StrategiesTable, YieldSummary } from "@phoenix-protocol/ui";
+import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
-  Strategy,
-  StrategyMetadata,
-  StrategyRegistry,
-} from "@phoenix-protocol/strategies";
-import { registerMockProviders } from "@phoenix-protocol/strategies/build/mock";
+  StrategiesTable,
+  YieldSummary,
+  BondModal,
+  UnbondModal,
+  ClaimAllModal,
+} from "@phoenix-protocol/ui";
+
+// Fix the imports to properly import StrategyRegistry
+import { Strategy, StrategyMetadata } from "@phoenix-protocol/strategies";
+import { StrategyRegistry } from "@phoenix-protocol/strategies";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useContractTransaction } from "../../hooks/useContractTransaction";
+
+// Define the Token type
+interface Token {
+  name: string;
+  icon: string;
+  usdValue: number;
+  amount: number;
+  category: string;
+}
 
 export default function EarnPage(): JSX.Element {
   const router = useRouter();
@@ -21,6 +35,7 @@ export default function EarnPage(): JSX.Element {
   const walletAddress = persistStore.wallet.address;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { executeContractTransaction } = useContractTransaction();
 
   // Strategy state
   const [allStrategies, setAllStrategies] = useState<
@@ -33,27 +48,27 @@ export default function EarnPage(): JSX.Element {
   const [claimableRewards, setClaimableRewards] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Modal States
+  const [bondModalOpen, setBondModalOpen] = useState(false);
+  const [unbondModalOpen, setUnbondModalOpen] = useState(false);
+  const [claimAllModalOpen, setClaimAllModalOpen] = useState(false);
+  const [selectedStrategy, setSelectedStrategy] =
+    useState<StrategyMetadata | null>(null);
+
   // Filters
-  const [assetsFilter, setAssetsFilter] = useState<
-    "Your assets" | "All Assets"
-  >("Your assets");
-  const [typeFilter, setTypeFilter] = useState("All");
-  const [platformFilter, setPlatformFilter] = useState("All");
-  const [instantUnbondOnly, setInstantUnbondOnly] = useState(false);
   const [tabValue, setTabValue] = useState(0);
 
-  // Initialize strategy registry
+  // Initialize strategies on first load
   useEffect(() => {
-    // Register mock providers (in production, you'd do this elsewhere, maybe during app initialization)
-    registerMockProviders();
+    // Don't register mock providers anymore - we're using real ones
+    // registerMockProviders();
 
-    // Initial load of strategies
+    appStore.setLoading(true);
     loadStrategies();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Effect to update when wallet changes
+  // Load user-specific data when wallet changes
   useEffect(() => {
     if (walletAddress) {
       loadUserStrategies();
@@ -66,179 +81,273 @@ export default function EarnPage(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletAddress, allStrategies]);
 
+  // Set loading spinner timeout
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      appStore.setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [appStore]);
+
+  // Load all strategies with their metadata
   const loadStrategies = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Load all strategies from the registry
-      const strategies = await StrategyRegistry.getAllStrategies();
+      console.log("Getting strategies from StrategyRegistry...");
+      console.log("StrategyRegistry available?", !!StrategyRegistry);
 
-      // Load metadata for each strategy
+      const providers = StrategyRegistry.getProviders();
+      console.log("Available providers:", providers.length);
+      providers.forEach((p) => console.log("- Provider:", p.id));
+
+      const strategies = await StrategyRegistry.getAllStrategies();
+      console.log("Strategies found:", strategies.length);
+
       const strategiesWithMetadata = await Promise.all(
         strategies.map(async (strategy) => {
           const metadata = await StrategyRegistry.getStrategyMetadata(strategy);
-          return { strategy, metadata };
+          // Fetch user data immediately if wallet is connected
+          let userStake = 0;
+          let userRewards = 0;
+          let hasJoined = false;
+          if (walletAddress) {
+            try {
+              userStake = await strategy.getUserStake(walletAddress);
+              userRewards = await strategy.getUserRewards(walletAddress);
+              hasJoined = await strategy.hasUserJoined(walletAddress);
+            } catch (e) {
+              console.error(
+                "Error fetching user data for strategy",
+                metadata.id,
+                e
+              );
+            }
+          }
+          return {
+            strategy,
+            metadata: { ...metadata, userStake, userRewards, hasJoined },
+          };
         })
       );
-
       setAllStrategies(strategiesWithMetadata);
     } catch (error) {
       console.error("Error loading strategies:", error);
     } finally {
       setIsLoading(false);
-      appStore.setLoading(false);
-    }
-  }, [appStore]);
-
-  useEffect(() => {
-    // Set loading for mock after 1 sec to false
-    const timer = setTimeout(() => {
-      appStore.setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const loadUserStrategies = useCallback(async () => {
-    if (!walletAddress) return;
-
-    try {
-      // Get strategies user has joined
-      const strategies = await StrategyRegistry.getUserStrategies(
-        walletAddress
-      );
-
-      // Load metadata for each strategy
-      const strategiesWithMetadata = await Promise.all(
-        strategies.map(async (strategy) => {
-          const metadata = await StrategyRegistry.getStrategyMetadata(strategy);
-          return { strategy, metadata };
-        })
-      );
-
-      setUserStrategies(strategiesWithMetadata);
-    } catch (error) {
-      console.error("Error loading user strategies:", error);
     }
   }, [walletAddress]);
 
-  const calculateUserStats = useCallback(async () => {
+  // Filter out strategies the user has joined
+  const loadUserStrategies = useCallback(async () => {
     if (!walletAddress) return;
-
-    try {
-      let totalStaked = 0;
-      let totalRewards = 0;
-
-      // Calculate total value staked across all strategies
-      for (const { strategy } of allStrategies) {
-        const userStake = await strategy.getUserStake(walletAddress);
-        totalStaked += userStake;
-
-        // In a real implementation, you'd also calculate rewards here
-        totalRewards += userStake * 0.01; // Mock 1% rewards for example
-      }
-
-      setTotalValue(totalStaked);
-      setClaimableRewards(totalRewards);
-    } catch (error) {
-      console.error("Error calculating user stats:", error);
-    }
+    const joined = allStrategies.filter((s) => s.metadata.hasJoined);
+    setUserStrategies(joined);
   }, [walletAddress, allStrategies]);
 
+  // Calculate total value and rewards from user strategies
+  const calculateUserStats = useCallback(async () => {
+    if (!walletAddress) return;
+    let totalStaked = 0;
+    let totalRewards = 0;
+    allStrategies.forEach(({ metadata }) => {
+      totalStaked += metadata.userStake || 0;
+      totalRewards += metadata.userRewards || 0;
+    });
+    setTotalValue(totalStaked);
+    setClaimableRewards(totalRewards);
+  }, [walletAddress, allStrategies]);
+
+  // Modal Handlers
+  const handleBondClick = useCallback((strategyMeta: StrategyMetadata) => {
+    setSelectedStrategy(strategyMeta);
+    setBondModalOpen(true);
+  }, []);
+
+  const handleUnbondClick = useCallback(
+    (strategyMeta: StrategyMetadata) => {
+      if (!walletAddress) return;
+      setSelectedStrategy(strategyMeta);
+      setUnbondModalOpen(true);
+    },
+    [walletAddress]
+  );
+
+  const handleClaimAllClick = useCallback(() => {
+    if (!walletAddress || claimableRewards <= 0) return;
+    setClaimAllModalOpen(true);
+  }, [walletAddress, claimableRewards]);
+
+  const handleCloseModals = () => {
+    setBondModalOpen(false);
+    setUnbondModalOpen(false);
+    setClaimAllModalOpen(false);
+    setSelectedStrategy(null);
+  };
+
+  // Transaction Execution Handlers
+  const handleConfirmBond = useCallback(
+    async (tokenAmounts: { token: Token; amount: number }[]) => {
+      if (!selectedStrategy || !walletAddress) return;
+
+      const { contractAddress, contractType } = selectedStrategy;
+      const strategyInstance = allStrategies.find(
+        (s) => s.metadata.id === selectedStrategy.id
+      )?.strategy;
+
+      if (!strategyInstance) {
+        console.error("Strategy instance not found for bonding");
+        return;
+      }
+
+      // Define transaction function based on contract type
+      const transactionFunction = async (client: any) => {
+        const tokenA = tokenAmounts[0]?.amount || 0;
+        const tokenB = tokenAmounts[1]?.amount || 0;
+
+        if (contractType === "stake" || contractType === "vesting") {
+          // For staking strategies, use single amount
+          return strategyInstance.bond(walletAddress, tokenA);
+        } else if (contractType === "pair") {
+          // For liquidity provision strategies, pass both amounts
+          return strategyInstance.bond(walletAddress, tokenA, tokenB);
+        } else {
+          throw new Error(
+            `Unsupported contract type for bonding: ${contractType}`
+          );
+        }
+      };
+
+      // Close modal before transaction
+      handleCloseModals();
+
+      // Execute transaction
+      await executeContractTransaction({
+        contractAddress,
+        contractType,
+        transactionFunction,
+      });
+
+      // Reload data after transaction
+      await loadStrategies();
+    },
+    [
+      selectedStrategy,
+      walletAddress,
+      executeContractTransaction,
+      allStrategies,
+      loadStrategies,
+    ]
+  );
+
+  const handleConfirmUnbond = useCallback(
+    async (amount: number) => {
+      if (!selectedStrategy || !walletAddress) return;
+
+      const { contractAddress, contractType } = selectedStrategy;
+      const strategyInstance = allStrategies.find(
+        (s) => s.metadata.id === selectedStrategy.id
+      )?.strategy;
+
+      if (!strategyInstance) {
+        console.error("Strategy instance not found for unbonding");
+        return;
+      }
+
+      // Define transaction function based on contract type
+      const transactionFunction = async (client: any) => {
+        if (contractType === "stake" || contractType === "pair") {
+          return strategyInstance.unbond(walletAddress, amount);
+        } else {
+          throw new Error(
+            `Unsupported contract type for unbonding: ${contractType}`
+          );
+        }
+      };
+
+      // Close modal before transaction
+      handleCloseModals();
+
+      // Execute transaction
+      await executeContractTransaction({
+        contractAddress,
+        contractType,
+        transactionFunction,
+      });
+
+      // Reload data after transaction
+      await loadStrategies();
+    },
+    [
+      selectedStrategy,
+      walletAddress,
+      executeContractTransaction,
+      allStrategies,
+      loadStrategies,
+    ]
+  );
+
+  const handleClaimStrategy = useCallback(
+    async (strategy: Strategy, metadata: StrategyMetadata) => {
+      if (!walletAddress) return;
+
+      const { contractAddress, contractType } = metadata;
+
+      const transactionFunction = async (client: any) => {
+        return strategy.claim(walletAddress);
+      };
+
+      await executeContractTransaction({
+        contractAddress,
+        contractType,
+        transactionFunction,
+      });
+    },
+    [walletAddress, executeContractTransaction]
+  );
+
+  // Tab handling
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
   const handleViewStrategyDetails = useCallback(
     (strategyId: string) => {
-      // Navigate to the strategy details page
       router.push(`/earn/${strategyId}`);
     },
     [router]
   );
 
-  const handleClaimAll = useCallback(async () => {
-    if (!walletAddress || claimableRewards <= 0) return;
+  // Prepare data for UI components
+  const allStrategiesUI = allStrategies.map((s) => ({
+    ...s.metadata,
+    isMobile,
+  }));
 
-    try {
-      // Reset claimable rewards for demo
-      setClaimableRewards(0);
+  const userStrategiesUI = userStrategies.map((s) => ({
+    ...s.metadata,
+    isMobile,
+  }));
 
-      // In a real app, you'd show a success notification here
-    } catch (error) {
-      console.error("Error claiming rewards:", error);
-    }
-  }, [walletAddress, claimableRewards]);
-
-  // Map strategy data to UI format
-  const mapStrategiesToUI = useCallback(
-    (
-      strategiesWithMetadata: {
-        strategy: Strategy;
-        metadata: StrategyMetadata;
-      }[]
-    ) => {
-      return Promise.all(
-        strategiesWithMetadata.map(async ({ strategy, metadata }) => {
-          // Get user-specific data if wallet is connected
-          let userStake = 0;
-          let userRewards = 0;
-          let hasJoined = false;
-
-          if (walletAddress) {
-            userStake = await strategy.getUserStake(walletAddress);
-            userRewards = await strategy.getUserRewards(walletAddress);
-            hasJoined = await strategy.hasUserJoined(walletAddress);
-          }
-
-          return {
-            id: metadata.id,
-            assets: metadata.assets,
-            name: metadata.name,
-            description: metadata.description,
-            tvl: metadata.tvl,
-            apr: metadata.apr,
-            rewardToken: metadata.rewardToken,
-            unbondTime: metadata.unbondTime,
-            isMobile: isMobile,
-            link: `/earn/${metadata.id}`,
-            userStake,
-            userRewards,
-            hasJoined,
-          };
-        })
-      );
-    },
-    [isMobile, walletAddress]
-  );
-
-  // Update to use async/await and handle the Promise
-  const loadTableData = useCallback(
-    async (data) => {
-      const mappedData = await mapStrategiesToUI(data);
-      return mappedData;
-    },
-    [mapStrategiesToUI]
-  );
-
-  // State for UI data
-  const [allStrategiesUI, setAllStrategiesUI] = useState([]);
-  const [userStrategiesUI, setUserStrategiesUI] = useState([]);
-
-  // Effect to update UI data when underlying data changes
-  useEffect(() => {
-    const updateUIData = async () => {
-      setAllStrategiesUI(await loadTableData(allStrategies));
-      setUserStrategiesUI(await loadTableData(userStrategies));
-    };
-
-    updateUIData();
-  }, [allStrategies, userStrategies, loadTableData]);
+  // Prepare claimable strategies for modal
+  const claimableForModal = allStrategies
+    .filter(
+      (s) =>
+        s.metadata.hasJoined &&
+        s.metadata.userRewards &&
+        s.metadata.userRewards > 0
+    )
+    .map((s) => ({
+      strategy: s.strategy,
+      metadata: s.metadata,
+      rewards: s.metadata.userRewards || 0,
+    }));
 
   return (
     <Box
       sx={{
         maxWidth: "1440px",
         width: "100%",
-        padding: { xs: 0, md: "2.5rem" },
+        padding: { xs: "1rem", md: "2.5rem" },
         mt: { xs: "4.5rem", md: 1 },
       }}
     >
@@ -259,8 +368,9 @@ export default function EarnPage(): JSX.Element {
       <YieldSummary
         totalValue={totalValue}
         claimableRewards={claimableRewards}
-        onClaimAll={handleClaimAll}
+        onClaimAll={handleClaimAllClick}
       />
+
       <Box sx={{ mt: 3 }}></Box>
       {/* Tabs */}
       <Box sx={{ width: "100%" }}>
@@ -285,7 +395,7 @@ export default function EarnPage(): JSX.Element {
               flexShrink: 0,
               color: "var(--neutral-300, #D4D4D4)",
             },
-            maxWidth: "50%",
+            maxWidth: { xs: "100%", md: "50%" },
             borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
           }}
           TabIndicatorProps={{
@@ -327,6 +437,8 @@ export default function EarnPage(): JSX.Element {
                 showFilters={true}
                 isLoading={isLoading}
                 onViewDetails={handleViewStrategyDetails}
+                onBondClick={handleBondClick}
+                onUnbondClick={handleUnbondClick}
               />
             ) : (
               <StrategiesTable
@@ -335,11 +447,42 @@ export default function EarnPage(): JSX.Element {
                 showFilters={false}
                 isLoading={isLoading}
                 onViewDetails={handleViewStrategyDetails}
+                onBondClick={handleBondClick}
+                onUnbondClick={handleUnbondClick}
+                emptyStateMessage={
+                  walletAddress
+                    ? "You haven't joined any strategies yet. Discover strategies to start earning!"
+                    : "Connect your wallet to see your strategies"
+                }
               />
             )}
           </motion.div>
         </AnimatePresence>
       </Box>
+
+      {/* Modals */}
+      <BondModal
+        open={bondModalOpen}
+        onClose={handleCloseModals}
+        strategy={selectedStrategy}
+        onConfirm={handleConfirmBond}
+      />
+      <UnbondModal
+        open={unbondModalOpen}
+        onClose={handleCloseModals}
+        strategy={selectedStrategy}
+        maxAmount={selectedStrategy?.userStake || 0}
+        onConfirm={handleConfirmUnbond}
+      />
+      <ClaimAllModal
+        open={claimAllModalOpen}
+        onClose={() => {
+          handleCloseModals();
+          loadStrategies();
+        }}
+        claimableStrategies={claimableForModal}
+        onClaimStrategy={handleClaimStrategy}
+      />
     </Box>
   );
 }

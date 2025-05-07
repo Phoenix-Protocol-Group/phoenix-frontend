@@ -34,6 +34,9 @@ class StellarYieldStrategy implements Strategy {
     unbondTime: 0, // Instant
     category: "yield",
     available: true,
+    // Mock contract details
+    contractAddress: "CDLZXA6KCSMAPYOURMOCKstellarYIELDCONTRACTADDRESS", // Replace with actual mock/testnet address if available
+    contractType: "stake", // Assuming a generic stake contract type
   };
 
   // Mock user stakes storage
@@ -63,6 +66,7 @@ class StellarYieldStrategy implements Strategy {
     // Update TVL
     this.metadata.tvl += amount;
 
+    console.log(`[Mock StellarYield] Bond: ${amount} for ${walletAddress}`);
     return true;
   }
 
@@ -77,10 +81,12 @@ class StellarYieldStrategy implements Strategy {
     // Update TVL
     this.metadata.tvl -= amount;
 
+    console.log(`[Mock StellarYield] Unbond: ${amount} for ${walletAddress}`);
     return true;
   }
 
   async claim(walletAddress: string): Promise<boolean> {
+    console.log(`[Mock StellarYield] Claim for ${walletAddress}`);
     return this.hasUserJoined(walletAddress);
   }
 

@@ -27,6 +27,9 @@ class PhoenixBoostStrategy implements Strategy {
     unbondTime: 604800, // 7 days in seconds
     category: "staking",
     available: true,
+    // Mock contract details
+    contractAddress: "CDLZXA6KCSMAPYOURMOCKphoenixBOOSTCONTRACTADDRESS", // Replace with actual mock/testnet address if available
+    contractType: "stake", // Assuming a generic stake contract type
   };
 
   // Mock user stakes storage
@@ -66,6 +69,8 @@ class PhoenixBoostStrategy implements Strategy {
     // Update TVL
     this.metadata.tvl += amount;
 
+    console.log(`[Mock PhoenixBoost] Bond: ${amount} for ${walletAddress}`);
+
     return true;
   }
 
@@ -80,6 +85,8 @@ class PhoenixBoostStrategy implements Strategy {
     // Update TVL
     this.metadata.tvl -= amount;
 
+    console.log(`[Mock PhoenixBoost] Unbond: ${amount} for ${walletAddress}`);
+
     return true;
   }
 
@@ -89,6 +96,9 @@ class PhoenixBoostStrategy implements Strategy {
 
     // Reset rewards to 0 after claiming
     this.userRewards.set(walletAddress, 0);
+
+    console.log(`[Mock PhoenixBoost] Claim for ${walletAddress}`);
+
     return true;
   }
 }
@@ -100,7 +110,10 @@ export class PhoenixBoostProvider implements StrategyProvider {
   description = "Official staking strategies from Phoenix Protocol";
   icon = "/cryptoIcons/pho.svg";
 
-  private strategies: Strategy[] = [new PhoenixBoostStrategy()];
+  private strategies: Strategy[] = [
+    new PhoenixBoostStrategy(),
+    new PhoenixBoostStrategy(),
+  ];
 
   async getTVL(): Promise<number> {
     const strategyTVLs = await Promise.all(

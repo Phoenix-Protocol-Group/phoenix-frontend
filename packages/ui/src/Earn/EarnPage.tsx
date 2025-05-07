@@ -16,13 +16,14 @@ import {
   spacing,
   borderRadius,
 } from "../Theme/styleConstants";
+import { StrategyMetadata } from "@phoenix-protocol/strategies";
 
 interface EarnPageProps {
   isLoadingOverride?: boolean;
   onViewStrategyDetails?: (id: string) => void;
 }
 
-const EarnPage = ({
+export const EarnPage = ({
   isLoadingOverride,
   onViewStrategyDetails,
 }: EarnPageProps = {}) => {
@@ -48,7 +49,7 @@ const EarnPage = ({
     }
   };
 
-  const strategies = [
+  const strategies: StrategyMetadata[] = [
     {
       id: "stellar-yield-strategy",
       assets: [
@@ -56,11 +57,17 @@ const EarnPage = ({
           name: "XLM",
           address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
           icon: "/cryptoIcons/xlm.svg",
+          amount: 0,
+          category: "native",
+          usdValue: 0.11,
         },
         {
           name: "USDC",
           address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
           icon: "/cryptoIcons/usdc.svg",
+          amount: 0,
+          category: "token",
+          usdValue: 1.0,
         },
       ],
       name: "Stellar Yield",
@@ -71,6 +78,9 @@ const EarnPage = ({
         name: "PHO",
         address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
         icon: "/cryptoIcons/pho.svg",
+        amount: 0,
+        category: "phoenix",
+        usdValue: 0.02,
       },
       unbondTime: 0,
       isMobile: isMobile,
@@ -80,6 +90,9 @@ const EarnPage = ({
       hasJoined: true,
       userStake: 2500,
       userRewards: 12.5,
+      available: true,
+      contractAddress: "MOCK_CONTRACT_ADDRESS",
+      contractType: "stake",
     },
     {
       id: "phoenix-boost-strategy",
@@ -88,6 +101,9 @@ const EarnPage = ({
           name: "XLM",
           address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
           icon: "/cryptoIcons/xlm.svg",
+          amount: 0,
+          category: "native",
+          usdValue: 0.11,
         },
       ],
       name: "Phoenix Boost",
@@ -98,14 +114,19 @@ const EarnPage = ({
         name: "PHO",
         address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
         icon: "/cryptoIcons/pho.svg",
+        amount: 0,
+        category: "phoenix",
+        usdValue: 0.02,
       },
       unbondTime: 604800,
       isMobile: isMobile,
       link: "/earn/phoenix-boost-strategy",
       category: "staking",
       providerId: "phoenix",
+      available: true,
+      contractAddress: "MOCK_CONTRACT_ADDRESS",
+      contractType: "stake",
     },
-    // Add a third strategy for visual diversity
     {
       id: "liquidity-farming-strategy",
       assets: [
@@ -113,11 +134,17 @@ const EarnPage = ({
           name: "USDC",
           address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
           icon: "/cryptoIcons/usdc.svg",
+          amount: 0,
+          category: "token",
+          usdValue: 1.0,
         },
         {
           name: "PHO",
           address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
           icon: "/cryptoIcons/pho.svg",
+          amount: 0,
+          category: "phoenix",
+          usdValue: 0.02,
         },
       ],
       name: "Liquidity Farming",
@@ -129,12 +156,18 @@ const EarnPage = ({
         name: "PHO",
         address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
         icon: "/cryptoIcons/pho.svg",
+        amount: 0,
+        category: "phoenix",
+        usdValue: 0.02,
       },
       unbondTime: 259200, // 3 days
       isMobile: isMobile,
       link: "/earn/liquidity-farming-strategy",
       category: "farming",
       providerId: "phoenix",
+      available: true,
+      contractAddress: "MOCK_CONTRACT_PAIR",
+      contractType: "pair",
     },
   ];
 
@@ -148,6 +181,15 @@ const EarnPage = ({
   // Prepare filtered strategies for "Your Strategies" tab
   // For storybook, show strategies marked as "joined"
   const yourStrategies = strategies.filter((s) => s.hasJoined);
+
+  // Placeholder handlers for bond and unbond actions
+  const handleBondClick = (strategy: StrategyMetadata) => {
+    alert(`Bond clicked for ${strategy.name}`);
+  };
+
+  const handleUnbondClick = (strategy: StrategyMetadata) => {
+    alert(`Unbond clicked for ${strategy.name}`);
+  };
 
   return (
     <Container maxWidth="xl">
@@ -223,6 +265,8 @@ const EarnPage = ({
                 showFilters={true}
                 isLoading={isLoading}
                 onViewDetails={handleViewDetails}
+                onBondClick={handleBondClick}
+                onUnbondClick={handleUnbondClick}
               />
             ) : (
               <StrategiesTable
@@ -231,6 +275,8 @@ const EarnPage = ({
                 showFilters={false}
                 isLoading={isLoading}
                 onViewDetails={handleViewDetails}
+                onBondClick={handleBondClick}
+                onUnbondClick={handleUnbondClick}
               />
             )}
           </motion.div>
@@ -239,5 +285,3 @@ const EarnPage = ({
     </Container>
   );
 };
-
-export { EarnPage };
