@@ -7,6 +7,11 @@ import {
   useMediaQuery,
   useTheme,
   Link,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  Divider,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { Button } from "../../Button/Button";
@@ -16,7 +21,10 @@ import {
   spacing,
   borderRadius,
 } from "../../Theme/styleConstants";
-import { StrategyMetadata } from "@phoenix-protocol/strategies";
+import {
+  StrategyMetadata,
+  IndividualStake,
+} from "@phoenix-protocol/strategies";
 import CloseIcon from "@mui/icons-material/Close";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils"; // Assuming you have this utility
 
@@ -24,8 +32,8 @@ interface UnbondModalProps {
   open: boolean;
   onClose: () => void;
   strategy: StrategyMetadata | null;
-  maxAmount: number; // User's current stake in this strategy
-  onConfirm: (amount: number) => void;
+  maxAmount: number; // User's current total stake in this strategy (USD value)
+  onConfirm: (params: number | { lpAmount: bigint; timestamp: bigint }) => void;
 }
 
 export const UnbondModal = ({
@@ -66,7 +74,7 @@ export const UnbondModal = ({
     setError(""); // Clear error when setting max
   };
 
-  const handleConfirm = () => {
+  const handleConfirmAmount = () => {
     const numericAmount = parseFloat(amount);
     if (isNaN(numericAmount) || numericAmount <= 0) {
       setError("Please enter a valid positive amount.");
@@ -80,6 +88,12 @@ export const UnbondModal = ({
     onClose(); // Close after confirmation
   };
 
+  const handleConfirmSpecificStake = (stake: IndividualStake) => {
+    onConfirm({ lpAmount: stake.lpAmount, timestamp: stake.timestamp });
+    // Optionally close modal immediately or wait for parent component to do so after transaction
+    // onClose();
+  };
+
   const handleClose = () => {
     setAmount("");
     setError("");
@@ -87,6 +101,11 @@ export const UnbondModal = ({
   };
 
   if (!strategy) return null;
+
+  const showIndividualStakes =
+    strategy.contractType === "pair" &&
+    strategy.userIndividualStakes &&
+    strategy.userIndividualStakes.length > 0;
 
   return (
     <Modal
@@ -152,100 +171,172 @@ export const UnbondModal = ({
             </motion.div>
           </Box>
 
-          <Typography
-            id="unbond-modal-description"
-            sx={{ color: colors.neutral[300], mb: spacing.xs }}
-          >
-            Enter the amount you want to unbond.
-          </Typography>
-          <Typography
-            sx={{ color: colors.neutral[400], fontSize: "0.875rem", mb: 1 }}
-          >
-            Available to unbond:{" "}
-            <Link
-              component="button"
-              onClick={handleSetMax}
-              sx={{
-                color: colors.primary.main,
-                textDecoration: "underline",
-                cursor: "pointer",
-                fontSize: "inherit",
-                background: "none",
-                border: "none",
-                padding: 0,
-                fontFamily: "inherit",
-                "&:hover": { color: colors.primary.light },
-              }}
-            >
-              {formatCurrencyStatic.format(maxAmount)}{" "}
-              {strategy.assets.map((a) => a.name).join(" / ")}
-            </Link>
-          </Typography>
+          {showIndividualStakes ? (
+            <>
+              <Typography
+                id="unbond-modal-description"
+                sx={{ color: colors.neutral[300], mb: spacing.md }}
+              >
+                Select a stake to unbond its full amount.
+              </Typography>
+              {strategy.unbondTime > 0 && (
+                <Typography
+                  sx={{
+                    color: colors.warning[300],
+                    fontSize: "0.875rem",
+                    mb: spacing.md,
+                    background: "rgba(251, 191, 36, 0.1)",
+                    padding: "8px 12px",
+                    borderRadius: borderRadius.sm,
+                  }}
+                >
+                  Note: Unbonding period is approximately{" "}
+                  {Math.ceil(strategy.unbondTime / 86400)} days.
+                </Typography>
+              )}
+              <List
+                sx={{
+                  maxHeight: 300,
+                  overflow: "auto",
+                  mb: spacing.md,
+                  background: colors.neutral[800],
+                  borderRadius: borderRadius.sm,
+                }}
+              >
+                {strategy.userIndividualStakes!.map((stake, index) => (
+                  <React.Fragment
+                    key={`${stake.timestamp.toString()}-${index}`}
+                  >
+                    <ListItem
+                      secondaryAction={
+                        <Button
+                          size="small"
+                          onClick={() => handleConfirmSpecificStake(stake)}
+                        >
+                          Unbond
+                        </Button>
+                      }
+                      sx={{ paddingRight: "100px" }} // Ensure space for button
+                    >
+                      <ListItemText
+                        primaryTypographyProps={{
+                          sx: {
+                            color: colors.neutral[100],
+                            fontWeight: typography.fontWeights.medium,
+                          },
+                        }}
+                        secondaryTypographyProps={{
+                          sx: { color: colors.neutral[400] },
+                        }}
+                        primary={`${stake.displayAmount}`}
+                        secondary={`Staked on: ${stake.displayDate}`}
+                      />
+                    </ListItem>
+                    {index < strategy.userIndividualStakes!.length - 1 && (
+                      <Divider sx={{ borderColor: colors.neutral[700] }} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </List>
+            </>
+          ) : (
+            <>
+              <Typography
+                id="unbond-modal-description"
+                sx={{ color: colors.neutral[300], mb: spacing.xs }}
+              >
+                Enter the amount you want to unbond.
+              </Typography>
+              <Typography
+                sx={{ color: colors.neutral[400], fontSize: "0.875rem", mb: 1 }}
+              >
+                Available to unbond:{" "}
+                <Link
+                  component="button"
+                  onClick={handleSetMax}
+                  sx={{
+                    color: colors.primary.main,
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    fontSize: "inherit",
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    fontFamily: "inherit",
+                    "&:hover": { color: colors.primary.light },
+                  }}
+                >
+                  {formatCurrencyStatic.format(maxAmount)}{" "}
+                  {strategy.assets.map((a) => a.name).join(" / ")}
+                </Link>
+              </Typography>
 
-          {strategy.unbondTime > 0 && (
-            <Typography
-              sx={{
-                color: colors.warning[300],
-                fontSize: "0.875rem",
-                mb: spacing.md,
-                background: "rgba(251, 191, 36, 0.1)",
-                padding: "8px 12px",
-                borderRadius: borderRadius.sm,
-              }}
-            >
-              Note: Unbonding period is approximately{" "}
-              {Math.ceil(strategy.unbondTime / 86400)} days.
-            </Typography>
+              {strategy.unbondTime > 0 && (
+                <Typography
+                  sx={{
+                    color: colors.warning[300],
+                    fontSize: "0.875rem",
+                    mb: spacing.md,
+                    background: "rgba(251, 191, 36, 0.1)",
+                    padding: "8px 12px",
+                    borderRadius: borderRadius.sm,
+                  }}
+                >
+                  Note: Unbonding period is approximately{" "}
+                  {Math.ceil(strategy.unbondTime / 86400)} days.
+                </Typography>
+              )}
+
+              <TextField
+                fullWidth
+                variant="outlined"
+                label={`Amount to Unbond`}
+                value={amount}
+                onChange={handleAmountChange}
+                type="text"
+                inputMode="decimal"
+                error={!!error}
+                helperText={error}
+                sx={{
+                  mb: spacing.md,
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: colors.neutral[600],
+                    },
+                    "&:hover fieldset": {
+                      borderColor: colors.neutral[400],
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: colors.primary.main,
+                    },
+                    input: { color: colors.neutral[100] },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: colors.neutral[400],
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: colors.primary.main,
+                  },
+                  "& .MuiFormHelperText-root": {
+                    color: colors.error[500],
+                  },
+                }}
+              />
+
+              <Button
+                fullWidth
+                onClick={handleConfirmAmount}
+                disabled={
+                  !amount ||
+                  !!error ||
+                  parseFloat(amount) <= 0 ||
+                  parseFloat(amount) > maxAmount
+                }
+              >
+                Confirm Unbond
+              </Button>
+            </>
           )}
-
-          <TextField
-            fullWidth
-            variant="outlined"
-            label={`Amount to Unbond`}
-            value={amount}
-            onChange={handleAmountChange}
-            type="text"
-            inputMode="decimal"
-            error={!!error}
-            helperText={error}
-            sx={{
-              mb: spacing.md,
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: colors.neutral[600],
-                },
-                "&:hover fieldset": {
-                  borderColor: colors.neutral[400],
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: colors.primary.main,
-                },
-                input: { color: colors.neutral[100] },
-              },
-              "& .MuiInputLabel-root": {
-                color: colors.neutral[400],
-              },
-              "& .MuiInputLabel-root.Mui-focused": {
-                color: colors.primary.main,
-              },
-              "& .MuiFormHelperText-root": {
-                color: colors.error[500],
-              },
-            }}
-          />
-
-          <Button
-            fullWidth
-            onClick={handleConfirm}
-            disabled={
-              !amount ||
-              !!error ||
-              parseFloat(amount) <= 0 ||
-              parseFloat(amount) > maxAmount
-            }
-          >
-            Confirm Unbond
-          </Button>
         </motion.div>
       </Box>
     </Modal>

@@ -1,5 +1,12 @@
 "use client";
-import { Tab, Tabs, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Tab,
+  Tabs,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  Button,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
@@ -240,7 +247,7 @@ export default function EarnPage(): JSX.Element {
   );
 
   const handleConfirmUnbond = useCallback(
-    async (amount: number) => {
+    async (params: number | { lpAmount: bigint; timestamp: bigint }) => {
       if (!selectedStrategy || !walletAddress) return;
 
       const { contractAddress, contractType } = selectedStrategy;
@@ -255,8 +262,9 @@ export default function EarnPage(): JSX.Element {
 
       // Define transaction function based on contract type
       const transactionFunction = async (client: any) => {
-        if (contractType === "stake" || contractType === "pair") {
-          return strategyInstance.unbond(walletAddress, amount);
+        // For 'pair' type with specific stake, or 'stake' type with amount
+        if (contractType === "pair" || contractType === "stake") {
+          return strategyInstance.unbond(walletAddress, params);
         } else {
           throw new Error(
             `Unsupported contract type for unbonding: ${contractType}`
@@ -318,7 +326,12 @@ export default function EarnPage(): JSX.Element {
   );
 
   // Prepare data for UI components
-  const allStrategiesUI = allStrategies.map((s) => ({
+  const userStrategyIds = userStrategies.map((s) => s.metadata.id);
+  const discoverableRawStrategies = allStrategies.filter(
+    (s) => !userStrategyIds.includes(s.metadata.id)
+  );
+
+  const discoverStrategiesUI = discoverableRawStrategies.map((s) => ({
     ...s.metadata,
     isMobile,
   }));
@@ -431,15 +444,59 @@ export default function EarnPage(): JSX.Element {
             transition={{ duration: 0.3 }}
           >
             {tabValue === 0 ? (
-              <StrategiesTable
-                title="Discover Strategies"
-                strategies={allStrategiesUI}
-                showFilters={true}
-                isLoading={isLoading}
-                onViewDetails={handleViewStrategyDetails}
-                onBondClick={handleBondClick}
-                onUnbondClick={handleUnbondClick}
-              />
+              walletAddress &&
+              !isLoading &&
+              discoverStrategiesUI.length === 0 &&
+              userStrategies.length > 0 ? (
+                <Box sx={{ textAlign: "center", mt: 4, p: 3 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      mb: 2,
+                      color: "var(--neutral-50, #FAFAFA)",
+                      fontFamily: "Ubuntu",
+                      fontWeight: 500,
+                    }}
+                  >
+                    You've explored all available strategies!
+                  </Typography>
+                  <Typography
+                    sx={{
+                      mb: 3,
+                      color: "var(--neutral-300, #D4D4D4)",
+                      fontFamily: "Ubuntu",
+                    }}
+                  >
+                    All strategies are currently part of 'Your Strategies'.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() => setTabValue(1)}
+                    sx={{
+                      fontFamily: "Ubuntu",
+                      textTransform: "none",
+                      // Add other styles to match existing buttons if necessary
+                    }}
+                  >
+                    View Your Strategies
+                  </Button>
+                </Box>
+              ) : (
+                <StrategiesTable
+                  title="Discover Strategies"
+                  strategies={discoverStrategiesUI}
+                  showFilters={true}
+                  isLoading={isLoading}
+                  onViewDetails={handleViewStrategyDetails}
+                  onBondClick={handleBondClick}
+                  onUnbondClick={handleUnbondClick}
+                  emptyStateMessage={
+                    !walletAddress
+                      ? "Connect your wallet to discover strategies."
+                      : "No strategies available to discover at the moment."
+                  }
+                />
+              )
             ) : (
               <StrategiesTable
                 title="Your Strategies"

@@ -22,6 +22,9 @@ const meta: Meta<typeof StrategiesTable> = {
     showFilters: { control: "boolean" },
     isLoading: { control: "boolean" },
     onViewDetails: { action: "viewDetails" },
+    onBondClick: { action: "bondClicked" },
+    onUnbondClick: { action: "unbondClicked" },
+    emptyStateMessage: { control: "text" },
   },
 };
 
@@ -102,6 +105,8 @@ export const Default: Story = {
     showFilters: true,
     isLoading: false,
     onViewDetails: action("viewDetails"),
+    onBondClick: action("bondClicked"),
+    onUnbondClick: action("unbondClicked"),
   },
 };
 
@@ -185,6 +190,8 @@ export const WithUserData: Story = {
     showFilters: false,
     isLoading: false,
     onViewDetails: action("viewDetails"),
+    onBondClick: action("bondClicked"),
+    onUnbondClick: action("unbondClicked"),
   },
 };
 
@@ -196,6 +203,8 @@ export const Loading: Story = {
     showFilters: true,
     isLoading: true,
     onViewDetails: action("viewDetails"),
+    onBondClick: action("bondClicked"),
+    onUnbondClick: action("unbondClicked"),
   },
 };
 
@@ -207,5 +216,24 @@ export const Empty: Story = {
     showFilters: false,
     isLoading: false,
     onViewDetails: action("viewDetails"),
+    onBondClick: action("bondClicked"),
+    onUnbondClick: action("unbondClicked"),
+    emptyStateMessage:
+      "You haven't joined any strategies yet. Discover strategies to start earning!",
+  },
+};
+
+export const EmptyDiscover: Story = {
+  render: Template,
+  args: {
+    title: "Discover Strategies",
+    strategies: [],
+    showFilters: true,
+    isLoading: false,
+    onViewDetails: action("viewDetails"),
+    onBondClick: action("bondClicked"),
+    onUnbondClick: action("unbondClicked"),
+    emptyStateMessage:
+      "No new strategies to discover at the moment. Check back later!",
   },
 };

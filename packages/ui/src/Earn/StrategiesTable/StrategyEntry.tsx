@@ -72,39 +72,6 @@ const StrategyEntry = ({
     return "< 1 hour";
   };
 
-  // Decide which button to show
-  const ActionButton = () => {
-    if (hasJoined) {
-      return (
-        <Button
-          size="small"
-          type="secondary"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent triggering other click handlers if nested
-            onUnbondClick(strategy);
-          }}
-          sx={{ minWidth: isMobile ? "100%" : "100px", mt: isMobile ? 2 : 0 }}
-        >
-          Unbond
-        </Button>
-      );
-    } else {
-      return (
-        <Button
-          size="small"
-          type="primary"
-          onClick={(e) => {
-            e.stopPropagation();
-            onBondClick(strategy);
-          }}
-          sx={{ minWidth: isMobile ? "100%" : "100px", mt: isMobile ? 2 : 0 }}
-        >
-          Bond
-        </Button>
-      );
-    }
-  };
-
   return (
     // Removed motion.div and onClick from the outer Box to avoid conflicting clicks
     <Box sx={BoxStyle}>
@@ -335,8 +302,45 @@ const StrategyEntry = ({
             )}
           </Grid>
 
-          {/* Action Button */}
-          <ActionButton />
+          {/* Action Button - Updated for mobile */}
+          {hasJoined ? (
+            <Box sx={{ display: "flex", gap: spacing.sm, mt: spacing.md }}>
+              <Button
+                size="small"
+                type="primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onBondClick(strategy);
+                }}
+                sx={{ flex: 1 }}
+              >
+                Bond More
+              </Button>
+              <Button
+                size="small"
+                type="secondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUnbondClick(strategy);
+                }}
+                sx={{ flex: 1 }}
+              >
+                Unbond
+              </Button>
+            </Box>
+          ) : (
+            <Button
+              size="small"
+              type="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                onBondClick(strategy);
+              }}
+              sx={{ width: "100%", mt: spacing.md }}
+            >
+              Bond
+            </Button>
+          )}
         </Box>
       ) : (
         /* Desktop Layout */
@@ -524,9 +528,43 @@ const StrategyEntry = ({
             </Grid>
           )}
 
-          {/* Action Button Column */}
-          <Grid item md={1} sx={{ textAlign: "right" }}>
-            <ActionButton />
+          {/* Action Button Column - Updated for desktop */}
+          <Grid item md={2} sx={{ textAlign: "right" }}>
+            {hasJoined ? (
+              <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+                <Button
+                  size="small"
+                  type="primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onBondClick(strategy);
+                  }}
+                >
+                  Bond
+                </Button>
+                <Button
+                  size="small"
+                  type="secondary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onUnbondClick(strategy);
+                  }}
+                >
+                  Unbond
+                </Button>
+              </Box>
+            ) : (
+              <Button
+                size="small"
+                type="primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onBondClick(strategy);
+                }}
+              >
+                Bond
+              </Button>
+            )}
           </Grid>
         </Grid>
       )}

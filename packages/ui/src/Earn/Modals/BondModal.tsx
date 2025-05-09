@@ -72,37 +72,55 @@ export const BondModal = ({
 
   // Handle amount changes and maintain ratios for pair strategies
   const handleAmountChange = useCallback(
-    (index: number, value: string) => {
-      setAmounts((prevAmounts) => ({
-        ...prevAmounts,
-        [index]: value,
-      }));
+    (changedIndex: number, newValue: string) => {
+      const updatedAmounts = { ...amounts };
+      updatedAmounts[changedIndex] = newValue;
 
-      // If it's a pair strategy and we have valid ratios, maintain them
-      if (isPairStrategy && Object.keys(tokenRatios).length > 0) {
-        const numValue = parseFloat(value);
+      if (
+        isPairStrategy &&
+        strategy?.assets &&
+        Object.keys(tokenRatios).length > 0
+      ) {
+        const numValue = parseFloat(newValue);
 
-        if (!isNaN(numValue)) {
-          const newAmounts = { ...amounts };
-
-          // Update all other token amounts based on their ratio to this token
-          Object.keys(tokenRatios).forEach((tokenIndexStr) => {
-            const tokenIndex = parseInt(tokenIndexStr);
-            if (tokenIndex !== index) {
-              // Determine the new amount for this token based on the ratio
-              // (value * ratio between the changed token and this token)
-              const ratio = tokenRatios[index] / tokenRatios[tokenIndex];
-              newAmounts[tokenIndex] = (numValue * ratio).toFixed(6);
+        if (!isNaN(numValue) && numValue > 0) {
+          strategy.assets.forEach((_asset, tokenIdx) => {
+            if (tokenIdx !== changedIndex) {
+              // Calculate N_j = N_k * (ratios_j / ratios_k)
+              // N_k is numValue (amount of asset k, at changedIndex)
+              // N_j is amount of asset j (at tokenIdx)
+              // ratios_k is tokenRatios[changedIndex]
+              // ratios_j is tokenRatios[tokenIdx]
+              if (
+                tokenRatios[changedIndex] != null &&
+                tokenRatios[changedIndex] !== 0 &&
+                tokenRatios[tokenIdx] != null
+              ) {
+                const relativeRatio =
+                  tokenRatios[tokenIdx] / tokenRatios[changedIndex];
+                updatedAmounts[tokenIdx] = (numValue * relativeRatio).toFixed(
+                  6
+                );
+              } else {
+                // Fallback if ratios are not available or division by zero would occur
+                updatedAmounts[tokenIdx] = "";
+              }
             }
           });
-
-          setAmounts(newAmounts);
+        } else if (newValue === "" || numValue === 0) {
+          // If the input is cleared or set to 0, clear other fields in a pair strategy
+          strategy.assets.forEach((_asset, tokenIdx) => {
+            if (tokenIdx !== changedIndex) {
+              updatedAmounts[tokenIdx] = "";
+            }
+          });
         }
       }
 
+      setAmounts(updatedAmounts);
       setError(""); // Clear error when user types
     },
-    [isPairStrategy, tokenRatios, amounts]
+    [amounts, isPairStrategy, strategy?.assets, tokenRatios]
   );
 
   const handleConfirm = () => {

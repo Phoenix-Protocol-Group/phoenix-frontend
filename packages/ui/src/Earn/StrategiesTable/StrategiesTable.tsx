@@ -27,6 +27,7 @@ export interface StrategiesTableProps {
   onViewDetails?: (id: string) => void;
   onBondClick: (strategy: StrategyMetadata) => void;
   onUnbondClick: (strategy: StrategyMetadata) => void;
+  emptyStateMessage?: string;
 }
 
 type SortField = "tvl" | "apr" | null;
@@ -40,6 +41,7 @@ export const StrategiesTable = ({
   onViewDetails = () => {},
   onBondClick,
   onUnbondClick,
+  emptyStateMessage = "No strategies match your criteria.", // Default message
 }: StrategiesTableProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -202,8 +204,8 @@ export const StrategiesTable = ({
                 </Typography>
               </Grid>
 
-              {/* Strategy Name Column - 2-3/12 width (depends on if user has joined) */}
-              <Grid item md={hasAnyUserJoined(strategies) ? 2 : 3}>
+              {/* Strategy Name Column - 2/12 width */}
+              <Grid item md={2}>
                 <Typography
                   sx={{
                     color: colors.neutral[300],
@@ -222,7 +224,7 @@ export const StrategiesTable = ({
               {/* APR Column - sortable, 1/12 width */}
               {renderSortableHeader("apr", "APR", 1)}
 
-              {/* Reward Token Column - 1-2/12 width (depends on if user has joined) */}
+              {/* Reward Token Column - 1/12 or 2/12 width */}
               <Grid item md={hasAnyUserJoined(strategies) ? 1 : 2}>
                 <Typography
                   sx={{
@@ -284,8 +286,8 @@ export const StrategiesTable = ({
                 </Grid>
               )}
 
-              {/* Action Column - Renamed from Details */}
-              <Grid item md={1}>
+              {/* Action Column - Adjusted to md={2} */}
+              <Grid item md={2}>
                 <Typography
                   sx={{
                     color: colors.neutral[300],
@@ -360,10 +362,12 @@ export const StrategiesTable = ({
               borderRadius: borderRadius.md,
               background: colors.neutral[900],
               border: `1px solid ${colors.neutral[700]}`,
+              textAlign: "center",
+              padding: spacing.md,
             }}
           >
             <Typography sx={{ color: colors.neutral[300] }}>
-              No strategies found
+              {emptyStateMessage}
             </Typography>
           </Box>
         )}

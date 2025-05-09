@@ -24,6 +24,15 @@ export interface StrategyProvider {
   getStrategies(): Promise<Strategy[]>;
 }
 
+// Define the structure for an individual stake/bond
+export interface IndividualStake {
+  lpAmount: bigint; // Raw LP token amount for contract interaction
+  timestamp: bigint; // Raw timestamp for contract interaction
+  displayAmount: string; // User-friendly display of the amount (e.g., "123.45 LP")
+  displayDate: string; // User-friendly display of the stake date
+  // Potentially other identifiers or display info if needed
+}
+
 export interface StrategyMetadata {
   id: string;
   providerId: string;
@@ -44,6 +53,7 @@ export interface StrategyMetadata {
   // Add contract details for transactions
   contractAddress: string;
   contractType: ContractType;
+  userIndividualStakes?: IndividualStake[]; // For strategies with multiple, distinct stakes
   // UI state properties
   isMobile?: boolean; // For UI rendering
   userAssetMatch?: boolean; // Used in StrategiesTable filtering
@@ -62,6 +72,10 @@ export interface Strategy {
     amountB?: number
   ): Promise<boolean>;
 
-  unbond(walletAddress: string, amount: number): Promise<boolean>;
+  // Updated unbond signature to handle specific stakes or general amounts
+  unbond(
+    walletAddress: string,
+    params: number | { lpAmount: bigint; timestamp: bigint }
+  ): Promise<boolean>;
   claim(walletAddress: string): Promise<boolean>;
 }

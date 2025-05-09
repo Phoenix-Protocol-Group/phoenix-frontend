@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { Meta, StoryObj } from "@storybook/react";
 import { UnbondModal } from "./UnbondModal";
 import { Button } from "../../Button/Button";
-import { StrategyMetadata, ContractType } from "@phoenix-protocol/strategies";
+import {
+  StrategyMetadata,
+  ContractType,
+  IndividualStake,
+} from "@phoenix-protocol/strategies";
 
 const meta: Meta<typeof UnbondModal> = {
   title: "Earn/Modals/UnbondModal",
@@ -23,20 +27,39 @@ export default meta;
 
 type Story = StoryObj<typeof UnbondModal>;
 
+const mockStrategyAssets = [
+  {
+    name: "XLM",
+    icon: "/cryptoIcons/xlm.svg",
+    amount: 0,
+    category: "native",
+    usdValue: 0.11,
+  },
+];
+
+const mockLPAssets = [
+  {
+    name: "XLM",
+    icon: "/cryptoIcons/xlm.svg",
+    amount: 0,
+    category: "native",
+    usdValue: 0.11,
+  },
+  {
+    name: "USDC",
+    icon: "/cryptoIcons/usdc.svg",
+    amount: 0,
+    category: "token",
+    usdValue: 1.0,
+  },
+];
+
 const mockStrategy: StrategyMetadata = {
   id: "mock-strategy-1",
   providerId: "mock-provider",
   name: "Mock Yield Strategy",
   description: "A mock strategy for testing",
-  assets: [
-    {
-      name: "XLM",
-      icon: "/cryptoIcons/xlm.svg",
-      amount: 0,
-      category: "native",
-      usdValue: 0.11,
-    },
-  ],
+  assets: mockStrategyAssets,
   tvl: 100000,
   apr: 0.05,
   rewardToken: {
@@ -64,6 +87,51 @@ const mockStrategyWithLock: StrategyMetadata = {
   userStake: 500,
 };
 
+const mockLPStrategyWithIndividualStakes: StrategyMetadata = {
+  id: "mock-lp-strategy-individual",
+  providerId: "mock-provider",
+  name: "Mock LP Strategy",
+  description: "LP strategy with individual stakes",
+  assets: mockLPAssets,
+  tvl: 250000,
+  apr: 0.12,
+  rewardToken: {
+    name: "PHO",
+    icon: "/cryptoIcons/pho.svg",
+    amount: 0,
+    category: "phoenix",
+    usdValue: 0.02,
+  },
+  unbondTime: 0, // Instant for LP example
+  category: "liquidity",
+  available: true,
+  contractAddress: "MOCK_LP_CONTRACT_ADDRESS",
+  contractType: "pair" as ContractType,
+  userStake: 1500, // Total USD value of all stakes
+  userRewards: 25,
+  hasJoined: true,
+  userIndividualStakes: [
+    {
+      lpAmount: BigInt("1000000000"),
+      timestamp: BigInt(Math.floor(new Date("2023-01-15").getTime() / 1000)),
+      displayAmount: "100.00 LP",
+      displayDate: "2023-01-15",
+    },
+    {
+      lpAmount: BigInt("500000000"),
+      timestamp: BigInt(Math.floor(new Date("2023-02-20").getTime() / 1000)),
+      displayAmount: "50.00 LP",
+      displayDate: "2023-02-20",
+    },
+    {
+      lpAmount: BigInt("2000000000"),
+      timestamp: BigInt(Math.floor(new Date("2023-03-10").getTime() / 1000)),
+      displayAmount: "200.00 LP",
+      displayDate: "2023-03-10",
+    },
+  ],
+};
+
 const ModalWrapper = (args) => {
   const [open, setOpen] = useState(args.open || false);
 
@@ -72,9 +140,12 @@ const ModalWrapper = (args) => {
     setOpen(false);
     args.onClose();
   };
-  const handleConfirm = (amount: number) => {
-    args.onConfirm(amount);
-    setOpen(false);
+  const handleConfirm = (
+    params: number | { lpAmount: bigint; timestamp: bigint }
+  ) => {
+    args.onConfirm(params);
+    // Do not close modal here, let the parent (EarnPage) handle it after transaction.
+    // setOpen(false);
   };
 
   return (
@@ -122,5 +193,23 @@ export const ZeroMaxAmount: Story = {
   args: {
     strategy: mockStrategy,
     maxAmount: 0,
+  },
+};
+
+export const LPStrategyWithIndividualStakes: Story = {
+  render: ModalWrapper,
+  args: {
+    strategy: mockLPStrategyWithIndividualStakes,
+    maxAmount: mockLPStrategyWithIndividualStakes.userStake, // Total stake value
+    // open: false, // Default to closed
+  },
+};
+
+export const PreOpenedLPStrategyWithIndividualStakes: Story = {
+  render: ModalWrapper,
+  args: {
+    strategy: mockLPStrategyWithIndividualStakes,
+    maxAmount: mockLPStrategyWithIndividualStakes.userStake,
+    open: true,
   },
 };
