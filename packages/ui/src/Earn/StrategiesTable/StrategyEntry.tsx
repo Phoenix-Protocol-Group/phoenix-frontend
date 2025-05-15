@@ -537,6 +537,7 @@ const StrategyEntry = ({
                 </Button>
               </Box>
             ) : (
+              <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
               <Button
                 size="small"
                 type="primary"
@@ -547,6 +548,7 @@ const StrategyEntry = ({
               >
                 Bond
               </Button>
+              </Box>
             )}
           </Grid>
         </Grid>

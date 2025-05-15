@@ -3,7 +3,6 @@ import {
   Modal,
   Box,
   Typography,
-  Button,
   CircularProgress,
   List,
   ListItem,
@@ -25,6 +24,7 @@ import {
 } from "@mui/icons-material";
 import { Strategy, StrategyMetadata } from "@phoenix-protocol/strategies";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils";
+import { Button } from "../../Button/Button";
 
 type ClaimStatus = "pending" | "claiming" | "success" | "error";
 
@@ -293,9 +293,9 @@ export const ClaimAllModal = ({
         </Box>
 
         <Box sx={{ mb: 2 }}>
-          <Typography sx={{ fontFamily: "Inter, sans-serif", mb: 0.5 }}>
+          <Typography sx={{  mb: 0.5, fontFamily: "Ubuntu", fontSize: 12, fontWeight: 500, color: "#D4D4D4" }}>
             Total Rewards to Claim:{" "}
-            <Typography component="span" fontWeight="bold">
+            <Typography component="span" sx={{ color: "#F97316", fontSize: 18, fontWeight: 800, ml: 3}}>
               {formatCurrencyStatic.format(totalRewards)}
             </Typography>
           </Typography>
@@ -307,7 +307,7 @@ export const ClaimAllModal = ({
                 sx={{
                   textAlign: "right",
                   mt: 0.5,
-                  fontFamily: "Inter, sans-serif",
+                  fontFamily: "Ubuntu, sans-serif",
                 }}
               >
                 {claimedCount + errorCount} / {items.length} processed
