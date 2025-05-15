@@ -1,30 +1,29 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
-  Box,
   Modal,
+  Box,
   Typography,
+  Button,
   CircularProgress,
-  useMediaQuery,
-  useTheme,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Divider,
+  useTheme,
+  useMediaQuery,
+  IconButton,
+  Paper,
+  LinearProgress,
+  Alert,
 } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "../../Button/Button";
 import {
-  colors,
-  typography,
-  spacing,
-  borderRadius,
-} from "../../Theme/styleConstants";
+  CheckCircleOutline,
+  ErrorOutline,
+  HourglassEmpty,
+  Close as CloseIcon,
+  PlayCircleOutline as ClaimIcon,
+} from "@mui/icons-material";
 import { Strategy, StrategyMetadata } from "@phoenix-protocol/strategies";
-import CloseIcon from "@mui/icons-material/Close";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ErrorIcon from "@mui/icons-material/Error";
-import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils";
 
 type ClaimStatus = "pending" | "claiming" | "success" | "error";
@@ -59,104 +58,180 @@ export const ClaimAllModal = ({
 }: ClaimAllModalProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   const [items, setItems] = useState<ClaimableStrategyItem[]>([]);
+  const itemsRef = useRef<ClaimableStrategyItem[]>([]);
+
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const [isClaiming, setIsClaiming] = useState<boolean>(false);
   const [isComplete, setIsComplete] = useState<boolean>(false);
 
   useEffect(() => {
     if (open) {
-      // Initialize items with pending status when modal opens
-      setItems(
-        claimableStrategies.map((s) => ({
+      // Only re-initialize fully if not in an active claim cycle AND not in a "completed" state.
+      // A "completed" state should persist until the modal is closed or a new claim cycle is started.
+      if (!isClaiming && !isComplete) {
+        const initialItems = claimableStrategies.map((s) => ({
           ...s,
-          status: "pending",
-        }))
-      );
-      setCurrentIndex(-1);
+          status: "pending" as ClaimStatus,
+          error: undefined,
+        }));
+        setItems(initialItems);
+        itemsRef.current = initialItems;
+        setCurrentIndex(-1);
+        // isClaiming is false, isComplete is false, so no need to set them here.
+        // If opening for the first time or after a full close and reopen, isComplete would be false.
+      }
+    } else {
+      // When modal is closed, ensure all states are reset for the next opening.
+      // This helps if the modal is closed mid-operation or in a completed state.
       setIsClaiming(false);
       setIsComplete(false);
+      setCurrentIndex(-1);
+      // setItems([]); // Optionally clear items, or let the open condition repopulate.
+      // itemsRef.current = [];
     }
-  }, [open, claimableStrategies]);
+  }, [open, claimableStrategies, isClaiming, isComplete]); // Added isComplete to the dependency array
 
-  const startClaiming = useCallback(async () => {
-    if (isClaiming || items.length === 0) return;
-    setIsClaiming(true);
-    setIsComplete(false);
-    setCurrentIndex(0); // Start with the first item
-  }, [isClaiming, items.length]);
+  const handleCloseModal = () => {
+    setIsClaiming(false); // Stop any ongoing claiming process
+    onClose();
+  };
 
   useEffect(() => {
-    // Process the current strategy when currentIndex changes and claiming is active
-    const processClaim = async () => {
-      if (!isClaiming || currentIndex < 0 || currentIndex >= items.length) {
-        if (isClaiming && currentIndex >= items.length) {
-          setIsComplete(true); // All items processed
-          setIsClaiming(false);
+    if (!isClaiming || currentIndex < 0) {
+      return;
+    }
+
+    const currentCycleItems = itemsRef.current; // Use the ref for the logical list
+
+    if (currentIndex >= currentCycleItems.length) {
+      if (currentCycleItems.length > 0 || currentIndex > 0) {
+        setIsComplete(true);
+      }
+      setIsClaiming(false); // All items processed or list was empty
+      return;
+    }
+
+    const itemToProcess = currentCycleItems[currentIndex];
+    let mounted = true;
+
+    if (itemToProcess && itemToProcess.status === "pending") {
+      const doClaim = async (indexBeingProcessed: number) => {
+        // Update UI state to 'claiming' for the item at indexBeingProcessed
+        setItems((prevUIItems) =>
+          prevUIItems.map((uiItem, idx) => {
+            // Ensure we are matching by a stable ID if prevUIItems could be from a different source than itemsRef.current
+            // However, with the revised first useEffect, prevUIItems should be consistent with itemsRef for statuses.
+            if (uiItem.metadata.id === itemToProcess.metadata.id) {
+              // Match by ID
+              return { ...uiItem, status: "claiming" };
+            }
+            return uiItem;
+          })
+        );
+        // Update ref status to 'claiming'
+        if (itemsRef.current[indexBeingProcessed]) {
+          // Check bounds
+          itemsRef.current[indexBeingProcessed].status = "claiming";
         }
-        return;
+
+        let finalStatus: ClaimStatus;
+        let finalError: string | undefined;
+
+        try {
+          await onClaimStrategy(itemToProcess.strategy, itemToProcess.metadata);
+          finalStatus = "success";
+        } catch (error: any) {
+          finalStatus = "error";
+          finalError = error?.message || "An unknown error occurred";
+        }
+
+        if (mounted) {
+          // Update UI state with final status for the item at indexBeingProcessed
+          setItems((prevUIItems) =>
+            prevUIItems.map((uiItem, idx) => {
+              if (uiItem.metadata.id === itemToProcess.metadata.id) {
+                // Match by ID
+                return { ...uiItem, status: finalStatus, error: finalError };
+              }
+              return uiItem;
+            })
+          );
+          // Update ref with final status
+          if (itemsRef.current[indexBeingProcessed]) {
+            // Check bounds
+            itemsRef.current[indexBeingProcessed].status = finalStatus;
+            itemsRef.current[indexBeingProcessed].error = finalError;
+          }
+
+          if (isClaiming) {
+            setCurrentIndex((prev) => prev + 1);
+          }
+        }
+      };
+      doClaim(currentIndex);
+    } else if (
+      itemToProcess &&
+      itemToProcess.status !== "claiming" &&
+      isClaiming
+    ) {
+      // If item is not 'pending' (e.g. already success/error from a previous attempt in this cycle, or bad state)
+      // and not currently 'claiming', skip to next.
+      if (mounted) {
+        setCurrentIndex((prev) => prev + 1);
       }
+    }
 
-      const currentItem = items[currentIndex];
-
-      // Update status to 'claiming'
-      setItems((prev) =>
-        prev.map((item, index) =>
-          index === currentIndex ? { ...item, status: "claiming" } : item
-        )
-      );
-
-      try {
-        // Call the provided claim function (which uses useContractTransaction)
-        await onClaimStrategy(currentItem.strategy, currentItem.metadata);
-
-        // Update status to 'success'
-        setItems((prev) =>
-          prev.map((item, index) =>
-            index === currentIndex ? { ...item, status: "success" } : item
-          )
-        );
-      } catch (error: any) {
-        console.error("Claiming error:", error);
-        // Update status to 'error'
-        setItems((prev) =>
-          prev.map((item, index) =>
-            index === currentIndex
-              ? {
-                  ...item,
-                  status: "error",
-                  error: error.message || "An unknown error occurred",
-                }
-              : item
-          )
-        );
-      } finally {
-        // Move to the next item after a short delay for visual feedback
-        setTimeout(() => {
-          setCurrentIndex((prev) => prev + 1);
-        }, 500); // Adjust delay as needed
-      }
+    return () => {
+      mounted = false;
     };
+  }, [isClaiming, currentIndex, onClaimStrategy]);
 
-    processClaim();
-  }, [currentIndex, isClaiming, items, onClaimStrategy]);
+  const startClaiming = useCallback(() => {
+    // This re-initializes itemsRef.current and items state for a *new* claiming cycle
+    const freshCycleItems = claimableStrategies.map((s) => ({
+      ...s,
+      status: "pending" as ClaimStatus,
+      error: undefined,
+    }));
+    itemsRef.current = freshCycleItems;
+    setItems(freshCycleItems); // Also update UI state to reflect the fresh list
+
+    if (itemsRef.current.length === 0) {
+      setIsComplete(true);
+      setIsClaiming(false); // Ensure isClaiming is false if nothing to claim
+      return;
+    }
+    // Do not proceed if already claiming from a previous click.
+    // This check might be redundant if button is disabled, but good for safety.
+    if (isClaiming) return;
+
+    setIsComplete(false);
+    setCurrentIndex(0); // Start from the first item
+    setIsClaiming(true); // This will trigger the processing useEffect
+  }, [claimableStrategies, isClaiming]); // isClaiming is a dependency for the safety check
 
   const totalRewards = items.reduce((sum, item) => sum + item.rewards, 0);
   const claimedCount = items.filter((item) => item.status === "success").length;
   const errorCount = items.filter((item) => item.status === "error").length;
+  const progress =
+    items.length > 0 ? ((claimedCount + errorCount) / items.length) * 100 : 0;
 
   const renderStatusIcon = (status: ClaimStatus) => {
     switch (status) {
       case "pending":
-        return <HourglassTopIcon sx={{ color: colors.neutral[500] }} />;
+        return <HourglassEmpty sx={{ color: theme.palette.text.secondary }} />;
       case "claiming":
         return (
-          <CircularProgress size={20} sx={{ color: colors.primary.main }} />
+          <CircularProgress size={20} sx={{ color: theme.palette.info.main }} />
         );
       case "success":
-        return <CheckCircleIcon sx={{ color: colors.success[500] }} />;
+        return (
+          <CheckCircleOutline sx={{ color: theme.palette.success.main }} />
+        );
       case "error":
-        return <ErrorIcon sx={{ color: colors.error[500] }} />;
+        return <ErrorOutline sx={{ color: theme.palette.error.main }} />;
       default:
         return null;
     }
@@ -165,161 +240,186 @@ export const ClaimAllModal = ({
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={handleCloseModal}
       aria-labelledby="claim-all-modal-title"
       aria-describedby="claim-all-modal-description"
     >
-      <Box
+      <Paper
         sx={{
           position: "absolute",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: { xs: "95%", sm: "500px" },
-          maxHeight: "90vh",
-          bgcolor: colors.neutral[900],
-          border: `1px solid ${colors.neutral[700]}`,
-          borderRadius: borderRadius.lg,
+          width: isMobile ? "90%" : 500,
+          bgcolor: "var(--background-paper, #1E1E1E)",
+          color: "var(--text-primary, #FFFFFF)",
+          border: "1px solid var(--divider, rgba(255, 255, 255, 0.12))",
           boxShadow: 24,
-          p: spacing.lg,
-          outline: "none",
+          p: isMobile ? 2 : 3,
+          borderRadius: "8px",
+          maxHeight: "90vh",
           display: "flex",
           flexDirection: "column",
         }}
       >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
-          style={{ display: "flex", flexDirection: "column", flexGrow: 1 }}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: spacing.md,
-              flexShrink: 0,
-            }}
-          >
-            <Typography
-              id="claim-all-modal-title"
-              variant="h6"
-              component="h2"
-              sx={{
-                color: colors.neutral[50],
-                fontWeight: typography.fontWeights.bold,
-              }}
-            >
-              Claim All Rewards
-            </Typography>
-            <motion.div
-              whileHover={{ rotate: 90 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Box
-                sx={{
-                  cursor: "pointer",
-                  opacity: 0.7,
-                  color: colors.neutral[300],
-                  "&:hover": { opacity: 1 },
-                }}
-                onClick={onClose}
-              >
-                <CloseIcon />
-              </Box>
-            </motion.div>
-          </Box>
-
           <Typography
-            id="claim-all-modal-description"
-            sx={{ color: colors.neutral[300], mb: spacing.md, flexShrink: 0 }}
+            id="claim-all-modal-title"
+            variant="h6"
+            component="h2"
+            sx={{ fontFamily: "Ubuntu", fontWeight: 700 }}
           >
             {isComplete
-              ? `Claiming process complete. ${claimedCount} succeeded, ${errorCount} failed.`
+              ? "Claiming Complete"
               : isClaiming
-              ? `Claiming rewards sequentially... (${currentIndex + 1} / ${
-                  items.length
-                })`
-              : `You have rewards available from ${items.length} strategies. Claim them one by one.`}
+              ? currentIndex >= 0 && currentIndex < itemsRef.current.length // Use itemsRef for name consistency during cycle
+                ? `Claiming: ${
+                    itemsRef.current[currentIndex]?.metadata.name || // Get name from ref
+                    `Item ${currentIndex + 1}`
+                  }`
+                : "Claiming Rewards..."
+              : "Claim All Rewards"}
           </Typography>
+          <IconButton onClick={handleCloseModal} size="small">
+            <CloseIcon sx={{ color: "var(--text-secondary)" }} />
+          </IconButton>
+        </Box>
 
-          <Box sx={{ overflowY: "auto", flexGrow: 1, mb: spacing.md }}>
-            <List disablePadding>
-              {items.map((item, index) => (
-                <React.Fragment key={item.metadata.id}>
-                  <ListItem
-                    sx={{
-                      opacity: isClaiming && index !== currentIndex ? 0.6 : 1,
-                      transition: "opacity 0.3s ease",
-                      borderLeft:
-                        isClaiming && index === currentIndex
-                          ? `3px solid ${colors.primary.main}`
-                          : "none",
-                      pl: isClaiming && index === currentIndex ? 1.5 : 2,
-                    }}
-                  >
-                    <ListItemIcon sx={{ minWidth: "40px" }}>
-                      {renderStatusIcon(item.status)}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography
-                          sx={{
-                            color: colors.neutral[100],
-                            fontWeight: typography.fontWeights.medium,
-                          }}
-                        >
-                          {item.metadata.name}
-                        </Typography>
-                      }
-                      secondary={
-                        <Typography
-                          sx={{
-                            color:
-                              item.status === "error"
-                                ? colors.error[300]
-                                : colors.neutral[400],
-                            fontSize: "0.8rem",
-                          }}
-                        >
-                          {item.status === "error"
-                            ? item.error
-                            : `${formatCurrencyStatic.format(item.rewards)} ${
-                                item.metadata.rewardToken.name
-                              }`}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
-                  {index < items.length - 1 && (
-                    <Divider
-                      component="li"
-                      sx={{ borderColor: colors.neutral[800], ml: 2, mr: 2 }}
-                    />
-                  )}
-                </React.Fragment>
-              ))}
-            </List>
-          </Box>
-
-          <Box sx={{ mt: "auto", flexShrink: 0 }}>
-            {isComplete ? (
-              <Button fullWidth onClick={onClose} type="secondary">
-                Close
-              </Button>
-            ) : (
-              <Button
-                fullWidth
-                onClick={startClaiming}
-                disabled={isClaiming || items.length === 0}
+        <Box sx={{ mb: 2 }}>
+          <Typography sx={{ fontFamily: "Inter, sans-serif", mb: 0.5 }}>
+            Total Rewards to Claim:{" "}
+            <Typography component="span" fontWeight="bold">
+              {formatCurrencyStatic.format(totalRewards)}
+            </Typography>
+          </Typography>
+          {(isClaiming || isComplete) && (
+            <Box sx={{ width: "100%", mt: 1 }}>
+              <LinearProgress variant="determinate" value={progress} />
+              <Typography
+                variant="body2"
+                sx={{
+                  textAlign: "right",
+                  mt: 0.5,
+                  fontFamily: "Inter, sans-serif",
+                }}
               >
-                {isClaiming ? "Claiming..." : `Claim All (${items.length})`}
-              </Button>
+                {claimedCount + errorCount} / {items.length} processed
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        <Box sx={{ overflowY: "auto", flexGrow: 1, mb: 2 }}>
+          <List dense>
+            {items.map((item, index) => (
+              <ListItem
+                key={item.metadata.id}
+                divider
+                sx={{
+                  bgcolor:
+                    currentIndex === index && isClaiming
+                      ? "rgba(255,255,255,0.05)"
+                      : "transparent",
+                  borderRadius: "4px",
+                  mb: 0.5,
+                  p: 1,
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 32 }}>
+                  {renderStatusIcon(item.status)}
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography
+                      variant="body2"
+                      sx={{ fontFamily: "Inter, sans-serif", fontWeight: 500 }}
+                    >
+                      {item.metadata.name}
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontFamily: "Inter, sans-serif",
+                        color: theme.palette.text.secondary,
+                      }}
+                    >
+                      Rewards: {formatCurrencyStatic.format(item.rewards)}
+                      {item.status === "error" &&
+                        item.error &&
+                        ` - Error: ${item.error}`}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+
+        {!isClaiming && !isComplete && items.length > 0 && (
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={startClaiming}
+            disabled={isClaiming || items.length === 0} // items.length for button disable is fine
+            startIcon={<ClaimIcon />}
+            sx={{
+              fontFamily: "Ubuntu",
+              fontWeight: 700,
+              textTransform: "none",
+            }}
+          >
+            Start Claiming All ({items.length})
+          </Button>
+        )}
+        {isClaiming && !isComplete && (
+          <Alert severity="info" sx={{ fontFamily: "Inter, sans-serif" }}>
+            Please confirm each transaction in your wallet.
+          </Alert>
+        )}
+        {isComplete && (
+          <Box sx={{ textAlign: "center" }}>
+            <Typography sx={{ fontFamily: "Inter, sans-serif" }}>
+              Successfully claimed: {claimedCount} strategy(s).
+            </Typography>
+            {errorCount > 0 && (
+              <Typography
+                color="error"
+                sx={{ fontFamily: "Inter, sans-serif" }}
+              >
+                Failed to claim: {errorCount} strategy(s).
+              </Typography>
             )}
+            <Button
+              variant="outlined"
+              onClick={handleCloseModal}
+              sx={{ mt: 2, fontFamily: "Ubuntu", textTransform: "none" }}
+            >
+              Close
+            </Button>
           </Box>
-        </motion.div>
-      </Box>
+        )}
+        {items.length === 0 && !isClaiming && !isComplete && (
+          <Typography
+            sx={{
+              textAlign: "center",
+              fontFamily: "Inter, sans-serif",
+              color: theme.palette.text.secondary,
+            }}
+          >
+            No claimable rewards available.
+          </Typography>
+        )}
+      </Paper>
     </Modal>
   );
 };

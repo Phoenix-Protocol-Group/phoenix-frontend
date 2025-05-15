@@ -9,8 +9,10 @@ import {
 import {
   PhoenixPairContract,
   PhoenixStakeContract,
-  fetchPho,
+  fetchPho, // Ensure AssembledTransaction is available
 } from "@phoenix-protocol/contracts";
+
+import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract";
 
 // Needed constants and types
 const userWalletAddress = usePersistStore.getState().wallet;
@@ -306,77 +308,64 @@ class PhoenixPhoUsdcStrategy implements Strategy {
     walletAddress: string,
     amountA: number,
     amountB?: number
-  ): Promise<boolean> {
+  ): Promise<AssembledTransaction<any>> {
+    if (amountB === undefined) {
+      throw new Error(
+        "Amount B is required for providing liquidity to this pair."
+      );
+    }
     // For liquidity pairs, we expect both amounts
-    return this.provideLiquidity(walletAddress, amountA, amountB!);
+    return this.provideLiquidity(walletAddress, amountA, amountB);
   }
 
-  async unbond(walletAddress: string, amount: number): Promise<boolean> {
-    if (!this.stakeContract || amount <= 0) return false;
-
-    try {
-      // Get user's stakes
-      const stakesQuery = await this.stakeContract.query_staked(
-        { address: walletAddress },
-        { simulate: false }
-      );
-
-      const stakes = await stakesQuery.simulate({ restore: true });
-
-      if (!stakes?.result || stakes.result.stakes.length === 0) {
-        return false;
-      }
-
-      // Get the stake to unbond (using the first one as an example)
-      // In a real implementation, you might want to select a specific stake
-      const stake = stakes.result.stakes[0];
-
-      const response = await this.stakeContract.unbond(
-        {
-          sender: walletAddress,
-          stake_amount: BigInt(
-            (amount * 10 ** (this.lpToken?.decimals || 7)).toFixed(0)
-          ),
-          stake_timestamp: BigInt(stake.stake_timestamp),
-        },
-        { simulate: true }
-      );
-
-      // Execute contract call
-      await response.execute();
-
-      // Refresh user data
-      await this.fetchPoolDetails();
-      await this.fetchUserPosition(walletAddress);
-
-      return true;
-    } catch (error) {
-      console.error("Error unbonding:", error);
-      return false;
+  async unbond(
+    walletAddress: string,
+    amount: number
+  ): Promise<AssembledTransaction<any>> {
+    if (!this.stakeContract) {
+      throw new Error("Stake contract not initialized");
     }
+    if (amount <= 0) {
+      throw new Error("Unbond amount must be positive");
+    }
+
+    // Get user's stakes
+    const stakesQuery = await this.stakeContract.query_staked(
+      { address: walletAddress },
+      { simulate: false }
+    );
+
+    const stakes = await stakesQuery.simulate({ restore: true });
+
+    if (!stakes?.result || stakes.result.stakes.length === 0) {
+      throw new Error("No stakes found for this user to unbond");
+    }
+
+    // Get the stake to unbond (using the first one as an example)
+    const stake = stakes.result.stakes[0];
+
+    const assembledTx = await this.stakeContract.unbond(
+      {
+        sender: walletAddress,
+        stake_amount: BigInt(
+          (amount * 10 ** (this.lpToken?.decimals || 7)).toFixed(0)
+        ),
+        stake_timestamp: BigInt(stake.stake_timestamp),
+      },
+      { simulate: true }
+    );
+    return assembledTx;
   }
 
-  async claim(walletAddress: string): Promise<boolean> {
-    if (!this.stakeContract) return false;
-
-    try {
-      const response = await this.stakeContract.withdraw_rewards(
-        { sender: walletAddress },
-        { simulate: true }
-      );
-
-      // Execute contract call
-      await response.execute();
-
-      // Refresh user data
-      await this.fetchPoolDetails();
-      await this.fetchUserPosition(walletAddress);
-
-      return true;
-    } catch (error) {
-      console.error("Error claiming rewards:", error);
-      return false;
+  async claim(walletAddress: string): Promise<AssembledTransaction<any>> {
+    if (!this.stakeContract) {
+      throw new Error("Stake contract not initialized");
     }
+    const assembledTx = await this.stakeContract.withdraw_rewards(
+      { sender: walletAddress },
+      { simulate: true }
+    );
+    return assembledTx;
   }
 
   // Helper method to provide liquidity directly through this strategy
@@ -384,72 +373,50 @@ class PhoenixPhoUsdcStrategy implements Strategy {
     walletAddress: string,
     tokenAAmount: number,
     tokenBAmount: number
-  ): Promise<boolean> {
-    if (!this.pairContract) return false;
-
-    try {
-      const response = await this.pairContract.provide_liquidity(
-        {
-          sender: walletAddress,
-          desired_a: BigInt(
-            (tokenAAmount * 10 ** (this.tokenA?.decimals || 7)).toFixed(0)
-          ),
-          desired_b: BigInt(
-            (tokenBAmount * 10 ** (this.tokenB?.decimals || 7)).toFixed(0)
-          ),
-          min_a: undefined,
-          min_b: undefined,
-          custom_slippage_bps: undefined,
-          deadline: undefined,
-        },
-        { simulate: true }
-      );
-
-      // Execute contract call
-      await response.execute();
-
-      // Refresh pool data
-      await this.fetchPoolDetails();
-
-      return true;
-    } catch (error) {
-      console.error("Error providing liquidity:", error);
-      return false;
+  ): Promise<AssembledTransaction<any>> {
+    if (!this.pairContract) {
+      throw new Error("Pair contract not initialized");
     }
+    const assembledTx = await this.pairContract.provide_liquidity(
+      {
+        sender: walletAddress,
+        desired_a: BigInt(
+          (tokenAAmount * 10 ** (this.tokenA?.decimals || 7)).toFixed(0)
+        ),
+        desired_b: BigInt(
+          (tokenBAmount * 10 ** (this.tokenB?.decimals || 7)).toFixed(0)
+        ),
+        min_a: undefined,
+        min_b: undefined,
+        custom_slippage_bps: undefined,
+        deadline: undefined,
+      },
+      { simulate: true }
+    );
+    return assembledTx;
   }
 
   // Helper method to remove liquidity
   async removeLiquidity(
     walletAddress: string,
     lpAmount: number
-  ): Promise<boolean> {
-    if (!this.pairContract) return false;
-
-    try {
-      const response = await this.pairContract.withdraw_liquidity(
-        {
-          sender: walletAddress,
-          share_amount: BigInt(
-            (lpAmount * 10 ** (this.lpToken?.decimals || 7)).toFixed(0)
-          ),
-          min_a: BigInt(1),
-          min_b: BigInt(1),
-          deadline: undefined,
-        },
-        { simulate: true }
-      );
-
-      // Execute contract call
-      await response.execute();
-
-      // Refresh pool data
-      await this.fetchPoolDetails();
-
-      return true;
-    } catch (error) {
-      console.error("Error removing liquidity:", error);
-      return false;
+  ): Promise<AssembledTransaction<any>> {
+    if (!this.pairContract) {
+      throw new Error("Pair contract not initialized");
     }
+    const assembledTx = await this.pairContract.withdraw_liquidity(
+      {
+        sender: walletAddress,
+        share_amount: BigInt(
+          (lpAmount * 10 ** (this.lpToken?.decimals || 7)).toFixed(0)
+        ),
+        min_a: BigInt(1),
+        min_b: BigInt(1),
+        deadline: undefined,
+      },
+      { simulate: true }
+    );
+    return assembledTx;
   }
 }
 

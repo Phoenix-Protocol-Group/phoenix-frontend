@@ -95,23 +95,6 @@ const StrategyEntry = ({
         />
       ))}
 
-      {/* Show "joined" chip if user has stake */}
-      {hasJoined && (
-        <Chip
-          label="Joined"
-          size="small"
-          sx={{
-            position: "absolute",
-            top: spacing.sm,
-            right: spacing.sm,
-            background: colors.primary.main,
-            color: colors.neutral[50],
-            fontWeight: typography.fontWeights.medium,
-            fontSize: typography.fontSize.xs,
-          }}
-        />
-      )}
-
       {/* Mobile Layout */}
       {isMobile ? (
         <Box sx={{ display: "flex", flexDirection: "column", gap: spacing.md }}>

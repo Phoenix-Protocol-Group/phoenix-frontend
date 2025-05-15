@@ -196,46 +196,42 @@ export default function EarnPage(): JSX.Element {
     async (tokenAmounts: { token: Token; amount: number }[]) => {
       if (!selectedStrategy || !walletAddress) return;
 
-      const { contractAddress, contractType } = selectedStrategy;
       const strategyInstance = allStrategies.find(
         (s) => s.metadata.id === selectedStrategy.id
       )?.strategy;
 
       if (!strategyInstance) {
-        console.error("Strategy instance not found for bonding");
+        console.error("Strategy instance not found for bonding.");
+        // Potentially show a toast error to the user
         return;
       }
 
-      // Define transaction function based on contract type
-      const transactionFunction = async (client: any) => {
-        const tokenA = tokenAmounts[0]?.amount || 0;
-        const tokenB = tokenAmounts[1]?.amount || 0;
+      const amountA = tokenAmounts[0]?.amount;
+      const amountB =
+        tokenAmounts.length > 1 ? tokenAmounts[1]?.amount : undefined;
 
-        if (contractType === "stake" || contractType === "vesting") {
-          // For staking strategies, use single amount
-          return strategyInstance.bond(walletAddress, tokenA);
-        } else if (contractType === "pair") {
-          // For liquidity provision strategies, pass both amounts
-          return strategyInstance.bond(walletAddress, tokenA, tokenB);
-        } else {
-          throw new Error(
-            `Unsupported contract type for bonding: ${contractType}`
-          );
-        }
-      };
+      if (amountA === undefined) {
+        console.error("Amount A is undefined for bonding");
+        // Potentially show a toast error
+        return;
+      }
+      // Note: The strategy's bond method should internally check if amountB is required.
 
-      // Close modal before transaction
-      handleCloseModals();
-
-      // Execute transaction
       await executeContractTransaction({
-        contractAddress,
-        contractType,
-        transactionFunction,
+        contractType: selectedStrategy.contractType, // This is indicative; strategy uses its own client
+        contractAddress: selectedStrategy.contractAddress, // This is indicative
+        transactionFunction: async (_client, _restore) => {
+          // _client and _restore from useContractTransaction are ignored here.
+          // The strategyInstance.bond method now returns the AssembledTransaction.
+          return strategyInstance.bond(walletAddress!, amountA, amountB);
+        },
+        options: {
+          onSuccess: () => {
+            loadStrategies(); // Refresh data on success
+            handleCloseModals();
+          },
+        },
       });
-
-      // Reload data after transaction
-      await loadStrategies();
     },
     [
       selectedStrategy,
@@ -243,6 +239,7 @@ export default function EarnPage(): JSX.Element {
       executeContractTransaction,
       allStrategies,
       loadStrategies,
+      // handleCloseModals, // Added if it's stable or include its dependencies
     ]
   );
 
@@ -250,40 +247,28 @@ export default function EarnPage(): JSX.Element {
     async (params: number | { lpAmount: bigint; timestamp: bigint }) => {
       if (!selectedStrategy || !walletAddress) return;
 
-      const { contractAddress, contractType } = selectedStrategy;
       const strategyInstance = allStrategies.find(
         (s) => s.metadata.id === selectedStrategy.id
       )?.strategy;
 
       if (!strategyInstance) {
-        console.error("Strategy instance not found for unbonding");
+        console.error("Strategy instance not found for unbonding.");
         return;
       }
 
-      // Define transaction function based on contract type
-      const transactionFunction = async (client: any) => {
-        // For 'pair' type with specific stake, or 'stake' type with amount
-        if (contractType === "pair" || contractType === "stake") {
-          return strategyInstance.unbond(walletAddress, params);
-        } else {
-          throw new Error(
-            `Unsupported contract type for unbonding: ${contractType}`
-          );
-        }
-      };
-
-      // Close modal before transaction
-      handleCloseModals();
-
-      // Execute transaction
       await executeContractTransaction({
-        contractAddress,
-        contractType,
-        transactionFunction,
+        contractType: selectedStrategy.contractType, // Indicative
+        contractAddress: selectedStrategy.contractAddress, // Indicative
+        transactionFunction: async (_client, _restore) => {
+          return strategyInstance.unbond(walletAddress!, params);
+        },
+        options: {
+          onSuccess: () => {
+            loadStrategies();
+            handleCloseModals();
+          },
+        },
       });
-
-      // Reload data after transaction
-      await loadStrategies();
     },
     [
       selectedStrategy,
@@ -291,26 +276,49 @@ export default function EarnPage(): JSX.Element {
       executeContractTransaction,
       allStrategies,
       loadStrategies,
+      // handleCloseModals, // Added if it's stable or include its dependencies
     ]
   );
 
   const handleClaimStrategy = useCallback(
-    async (strategy: Strategy, metadata: StrategyMetadata) => {
-      if (!walletAddress) return;
+    (strategy: Strategy, metadata: StrategyMetadata): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        if (!walletAddress) {
+          console.warn(
+            "Claim attempt with no wallet address for strategy:",
+            metadata.id
+          );
+          reject(new Error("Wallet not connected. Cannot claim."));
+          return;
+        }
 
-      const { contractAddress, contractType } = metadata;
-
-      const transactionFunction = async (client: any) => {
-        return strategy.claim(walletAddress);
-      };
-
-      await executeContractTransaction({
-        contractAddress,
-        contractType,
-        transactionFunction,
+        executeContractTransaction({
+          contractType: metadata.contractType,
+          contractAddress: metadata.contractAddress,
+          transactionFunction: (_client, _restore) => {
+            // Ensure walletAddress is not null here, though checked above.
+            // The strategy.claim method itself should handle Soroban client interactions.
+            return strategy.claim(walletAddress!);
+          },
+          options: {
+            onSuccess: () => {
+              console.log(
+                `Claim successful for ${metadata.name}. Refreshing strategies.`
+              );
+              loadStrategies(); // Refresh data on success
+              resolve(); // Resolve the promise that ClaimAllModal is awaiting
+            },
+            // Errors from executeContractTransaction (e.g. user rejection, network issues)
+            // will be caught by the .catch() below.
+          },
+        }).catch((error) => {
+          // This catches rejections from the promise returned by executeContractTransaction.
+          console.error(`Claim failed for ${metadata.name}:`, error);
+          reject(error); // Reject the promise that ClaimAllModal is awaiting
+        });
       });
     },
-    [walletAddress, executeContractTransaction]
+    [walletAddress, executeContractTransaction, loadStrategies]
   );
 
   // Tab handling
@@ -458,7 +466,7 @@ export default function EarnPage(): JSX.Element {
                       fontWeight: 500,
                     }}
                   >
-                    You've explored all available strategies!
+                    You&apos;ve explored all available strategies!
                   </Typography>
                   <Typography
                     sx={{
@@ -467,7 +475,8 @@ export default function EarnPage(): JSX.Element {
                       fontFamily: "Ubuntu",
                     }}
                   >
-                    All strategies are currently part of 'Your Strategies'.
+                    All strategies are currently part of &apos;Your
+                    Strategies&apos;.
                   </Typography>
                   <Button
                     variant="contained"

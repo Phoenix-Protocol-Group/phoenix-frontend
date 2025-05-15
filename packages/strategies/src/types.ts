@@ -1,4 +1,5 @@
 import { Token as BaseToken } from "@phoenix-protocol/types";
+import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract";
 
 // Extend the Token interface to include address
 export interface Token extends BaseToken {
@@ -70,12 +71,12 @@ export interface Strategy {
     walletAddress: string,
     amountA: number,
     amountB?: number
-  ): Promise<boolean>;
+  ): Promise<AssembledTransaction<any>>;
 
   // Updated unbond signature to handle specific stakes or general amounts
   unbond(
     walletAddress: string,
     params: number | { lpAmount: bigint; timestamp: bigint }
-  ): Promise<boolean>;
-  claim(walletAddress: string): Promise<boolean>;
+  ): Promise<AssembledTransaction<any>>;
+  claim(walletAddress: string): Promise<AssembledTransaction<any>>;
 }

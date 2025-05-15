@@ -3,7 +3,12 @@ import { Box, Grid, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { Button } from "../../Button/Button";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils";
-import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
+import {
+  colors,
+  typography,
+  spacing,
+  borderRadius,
+} from "../../Theme/styleConstants";
 
 export interface YieldSummaryProps {
   totalValue: number;
@@ -36,16 +41,15 @@ export const YieldSummary = ({
         <Box
           sx={{
             position: "absolute",
-            right: "-5%",
+            right: "30%",
             top: "50%",
             transform: "translateY(-50%)",
             width: "300px",
             height: "300px",
-            backgroundImage: "url(/cryptoIcons/phoenix_watermark.svg)",
+            backgroundImage: "url(/plants.png)",
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
-            opacity: 0.03,
-            filter: "blur(1px)",
+            opacity: 0.45, // Increased from 0.03 for better visibility
             zIndex: 0,
           }}
         />
@@ -79,29 +83,30 @@ export const YieldSummary = ({
                   color: colors.neutral[300],
                 }}
               >
-                Stake your assets to earn passive income through various yield strategies
+                Stake your assets to earn passive income through various yield
+                strategies
               </Typography>
             </Box>
           </Grid>
 
-          <Grid 
-            item 
-            xs={12} 
-            md={6} 
-            sx={{ 
-              display: "flex", 
-              flexDirection: "column", 
+          <Grid
+            item
+            xs={12}
+            md={6}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
               justifyContent: "center",
-              alignItems: "flex-end" 
+              alignItems: "flex-end",
             }}
           >
-            <Box 
-              sx={{ 
-                display: "flex", 
-                flexDirection: "column", 
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
                 alignItems: "flex-end",
                 position: "relative",
-                zIndex: 1 
+                zIndex: 1,
               }}
             >
               <Typography
@@ -124,8 +129,8 @@ export const YieldSummary = ({
               >
                 {formatCurrencyStatic.format(claimableRewards)}
               </Typography>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 onClick={onClaimAll}
                 disabled={claimableRewards <= 0}
                 sx={{
@@ -133,9 +138,13 @@ export const YieldSummary = ({
                   transition: "all 0.2s ease",
                   opacity: claimableRewards <= 0 ? 0.7 : 1,
                   "&:hover": {
-                    transform: claimableRewards <= 0 ? "none" : "translateY(-2px)",
-                    boxShadow: claimableRewards <= 0 ? "none" : "0 4px 8px rgba(0,0,0,0.2)"
-                  }
+                    transform:
+                      claimableRewards <= 0 ? "none" : "translateY(-2px)",
+                    boxShadow:
+                      claimableRewards <= 0
+                        ? "none"
+                        : "0 4px 8px rgba(0,0,0,0.2)",
+                  },
                 }}
               >
                 Claim All Rewards

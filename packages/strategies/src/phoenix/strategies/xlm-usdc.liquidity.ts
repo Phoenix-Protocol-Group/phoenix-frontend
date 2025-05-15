@@ -11,6 +11,7 @@ import {
   PhoenixStakeContract,
   fetchPho,
 } from "@phoenix-protocol/contracts";
+import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract";
 
 // Needed constants and types
 const contractAddress =
@@ -324,127 +325,85 @@ class PhoenixXlmUsdcStrategy implements Strategy {
     walletAddress: string,
     amountA: number,
     amountB?: number
-  ): Promise<boolean> {
+  ): Promise<AssembledTransaction<any>> {
+    if (amountB === undefined) {
+      throw new Error(
+        "Amount B is required for providing liquidity to this pair."
+      );
+    }
     // For liquidity pairs, we expect both amounts
-    return this.provideLiquidity(walletAddress, amountA, amountB!);
+    return this.provideLiquidity(walletAddress, amountA, amountB);
   }
 
   async unbond(
     walletAddress: string,
     params: number | { lpAmount: bigint; timestamp: bigint }
-  ): Promise<boolean> {
-    if (!this.stakeContract) return false;
+  ): Promise<AssembledTransaction<any>> {
+    if (!this.stakeContract) {
+      throw new Error("Stake contract not initialized");
+    }
 
     let stakeAmountToUnbond: bigint;
     let stakeTimestampToUnbond: bigint;
 
     if (typeof params === "number") {
-      // This case handles general amount unbonding, typically for non-LP or if individual stakes aren't managed.
-      // For LP pools where individual stakes are listed, this path might be less used from the new UI.
-      // We need to find a suitable stake or convert the USD amount to an LP amount.
-      // For simplicity, if it's a number, it's assumed to be a USD value to unbond.
-      // This part needs careful handling if we want to support USD amount unbonding for LP.
-      // The current UI flow for LPs will pass the specific stake object.
-      if (this.userIndividualStakesDetailed.length === 0) return false; // No stakes to unbond
-
-      // Convert USD amount to LP amount (approximate)
-      if (this.lpTokenPrice <= 0) return false; // Cannot determine LP amount
+      if (this.userIndividualStakesDetailed.length === 0) {
+        throw new Error("No stakes available to unbond based on USD amount.");
+      }
+      if (this.lpTokenPrice <= 0) {
+        throw new Error(
+          "LP token price is not available to calculate unbond amount from USD."
+        );
+      }
       const lpAmountToUnbondNumber = params / this.lpTokenPrice;
       stakeAmountToUnbond = BigInt(
         (lpAmountToUnbondNumber * 10 ** (this.lpToken?.decimals || 7)).toFixed(
           0
         )
       );
-
-      // Find the first available stake to unbond from (this logic might need refinement for partial unbonds from specific stakes)
-      // For now, we'll use the first stake if a general amount is provided.
-      // This is a fallback and might not be ideal for the new UI flow for LPs.
+      // This logic for 'number' param might need to be more robust,
+      // e.g. selecting which stake to unbond from or ensuring sufficient balance.
+      // For now, using the first stake's timestamp if a general amount is given.
+      // The primary UI flow should use the object { lpAmount, timestamp }.
       const firstStake = this.userIndividualStakesDetailed[0];
       if (!firstStake || BigInt(firstStake.stake) < stakeAmountToUnbond) {
-        console.error(
+        throw new Error(
           "Not enough in the first stake or no stake available for general amount unbonding."
         );
-        return false;
       }
-      // If unbonding a general amount, we might need to pick a stake or sum them.
-      // For now, this path is less likely with the new UI for LPs.
-      // We'll assume the first stake is targeted if a number is passed, and it's large enough.
-      // This is a simplification. A more robust solution would involve selecting which stake or allowing partial unbonds.
       stakeTimestampToUnbond = BigInt(firstStake.stake_timestamp);
-      // Ensure the amount to unbond does not exceed the chosen stake's amount.
-      // This part is tricky if `params` (number) is a general amount not tied to a specific stake.
-      // The primary flow for LPs will use the object param.
-      console.warn(
-        "Unbonding a general amount for an LP strategy. This might not be the intended flow for the new UI."
-      );
-      // Let's assume for now if a number is passed, it's for non-LP strategies or a specific scenario.
-      // The core change is to handle the object { lpAmount, timestamp }.
-      // If this strategy is ONLY unbonded via specific stakes, the `number` case might be an error or for a different context.
-      // For now, we'll make it use the first stake if a number is passed, but this is not ideal.
-      // The primary path for LP unbonding will be the object.
-      if (this.userIndividualStakesDetailed.length > 0) {
-        stakeAmountToUnbond = BigInt(
-          this.userIndividualStakesDetailed[0].stake
-        ); // Unbond the whole first stake if a number is passed
-        stakeTimestampToUnbond = BigInt(
-          this.userIndividualStakesDetailed[0].stake_timestamp
-        );
-      } else {
-        return false; // No stakes
-      }
+      // Fallback: if a number is passed, unbond the whole first stake. This is a simplification.
+      // stakeAmountToUnbond = BigInt(this.userIndividualStakesDetailed[0].stake);
+      // stakeTimestampToUnbond = BigInt(this.userIndividualStakesDetailed[0].stake_timestamp);
     } else {
-      // This is the new path for unbonding a specific stake from an LP pool
       stakeAmountToUnbond = params.lpAmount;
       stakeTimestampToUnbond = params.timestamp;
     }
 
-    if (stakeAmountToUnbond <= BigInt(0)) return false;
-
-    try {
-      const response = await this.stakeContract.unbond(
-        {
-          sender: walletAddress,
-          stake_amount: stakeAmountToUnbond,
-          stake_timestamp: stakeTimestampToUnbond,
-        },
-        { simulate: true }
-      );
-
-      // Execute contract call
-      await response.execute();
-
-      // Refresh user data
-      await this.fetchPoolDetails();
-      await this.fetchUserPosition(walletAddress);
-
-      return true;
-    } catch (error) {
-      console.error("Error unbonding:", error);
-      return false;
+    if (stakeAmountToUnbond <= BigInt(0)) {
+      throw new Error("Unbond amount must be positive.");
     }
+
+    const assembledTx = await this.stakeContract.unbond(
+      {
+        sender: walletAddress,
+        stake_amount: stakeAmountToUnbond,
+        stake_timestamp: stakeTimestampToUnbond,
+      },
+      { simulate: true }
+    );
+    return assembledTx;
   }
 
-  async claim(walletAddress: string): Promise<boolean> {
-    if (!this.stakeContract) return false;
-
-    try {
-      const response = await this.stakeContract.withdraw_rewards(
-        { sender: walletAddress },
-        { simulate: true }
-      );
-
-      // Execute contract call
-      await response.execute();
-
-      // Refresh user data
-      await this.fetchPoolDetails();
-      await this.fetchUserPosition(walletAddress);
-
-      return true;
-    } catch (error) {
-      console.error("Error claiming rewards:", error);
-      return false;
+  async claim(walletAddress: string): Promise<AssembledTransaction<any>> {
+    if (!this.stakeContract) {
+      throw new Error("Stake contract not initialized");
     }
+    const assembledTx = await this.stakeContract.withdraw_rewards(
+      { sender: walletAddress },
+      { simulate: true }
+    );
+    return assembledTx;
   }
 
   // Helper method to provide liquidity directly through this strategy
@@ -452,72 +411,50 @@ class PhoenixXlmUsdcStrategy implements Strategy {
     walletAddress: string,
     tokenAAmount: number,
     tokenBAmount: number
-  ): Promise<boolean> {
-    if (!this.pairContract) return false;
-
-    try {
-      const response = await this.pairContract.provide_liquidity(
-        {
-          sender: walletAddress,
-          desired_a: BigInt(
-            (tokenAAmount * 10 ** (this.tokenA?.decimals || 7)).toFixed(0)
-          ),
-          desired_b: BigInt(
-            (tokenBAmount * 10 ** (this.tokenB?.decimals || 7)).toFixed(0)
-          ),
-          min_a: undefined,
-          min_b: undefined,
-          custom_slippage_bps: undefined,
-          deadline: undefined,
-        },
-        { simulate: true }
-      );
-
-      // Execute contract call
-      await response.execute();
-
-      // Refresh pool data
-      await this.fetchPoolDetails();
-
-      return true;
-    } catch (error) {
-      console.error("Error providing liquidity:", error);
-      return false;
+  ): Promise<AssembledTransaction<any>> {
+    if (!this.pairContract) {
+      throw new Error("Pair contract not initialized");
     }
+    const assembledTx = await this.pairContract.provide_liquidity(
+      {
+        sender: walletAddress,
+        desired_a: BigInt(
+          (tokenAAmount * 10 ** (this.tokenA?.decimals || 7)).toFixed(0)
+        ),
+        desired_b: BigInt(
+          (tokenBAmount * 10 ** (this.tokenB?.decimals || 7)).toFixed(0)
+        ),
+        min_a: undefined,
+        min_b: undefined,
+        custom_slippage_bps: undefined,
+        deadline: undefined,
+      },
+      { simulate: true }
+    );
+    return assembledTx;
   }
 
   // Helper method to remove liquidity
   async removeLiquidity(
     walletAddress: string,
     lpAmount: number
-  ): Promise<boolean> {
-    if (!this.pairContract) return false;
-
-    try {
-      const response = await this.pairContract.withdraw_liquidity(
-        {
-          sender: walletAddress,
-          share_amount: BigInt(
-            (lpAmount * 10 ** (this.lpToken?.decimals || 7)).toFixed(0)
-          ),
-          min_a: BigInt(1),
-          min_b: BigInt(1),
-          deadline: undefined,
-        },
-        { simulate: true }
-      );
-
-      // Execute contract call
-      await response.execute();
-
-      // Refresh pool data
-      await this.fetchPoolDetails();
-
-      return true;
-    } catch (error) {
-      console.error("Error removing liquidity:", error);
-      return false;
+  ): Promise<AssembledTransaction<any>> {
+    if (!this.pairContract) {
+      throw new Error("Pair contract not initialized");
     }
+    const assembledTx = await this.pairContract.withdraw_liquidity(
+      {
+        sender: walletAddress,
+        share_amount: BigInt(
+          (lpAmount * 10 ** (this.lpToken?.decimals || 7)).toFixed(0)
+        ),
+        min_a: BigInt(1),
+        min_b: BigInt(1),
+        deadline: undefined,
+      },
+      { simulate: true }
+    );
+    return assembledTx;
   }
 }
 
