@@ -49,6 +49,7 @@ import {
   TradingVolume,
 } from "@phoenix-protocol/utils/build/trade_api";
 import { LiquidityPoolInfo } from "@phoenix-protocol/contracts/build/phoenix-pair";
+import { isTestnet } from "@phoenix-protocol/utils/build/constants";
 
 export default function Page() {
   const theme = useTheme();
@@ -206,6 +207,7 @@ export default function Page() {
   useEffect(() => {
     const initData = async () => {
       try {
+
         setLoadingDashboard(true);
 
         // Fetch TVL
@@ -218,9 +220,13 @@ export default function Page() {
         const anchors = await getAllAnchors();
         setAnchors(anchors);
 
+
+
         // Fetch gainer and loser
         const { winner, loser } = await fetchBiggestWinnerAndLoser();
+
         const allTokens = await appStore.getAllTokens();
+
         const gainer = allTokens.find((token) => token.name === winner.symbol);
         const loserAsset = allTokens.find(
           (token) => token.name === loser.symbol
@@ -279,7 +285,8 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    if (walletAddress) {
+    if (walletAddress && !isTestnet) {
+      alert(isTestnet)
       queryVestingInfo();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

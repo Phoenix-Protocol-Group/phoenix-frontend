@@ -58,9 +58,9 @@ export const createConnectWalletActions = () => {
         network: "STANDALONE",
         networkPassphrase: "Public Global Stellar Network ; September 2015",
         networkUrl:
-          "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
+          "https://horizon-testnet.stellar.org",
         sorobanRpcUrl:
-          "https://bitter-alpha-layer.stellar-mainnet.quiknode.pro/54b50c548864e1470fd52dbd629b647d556b983e",
+          "https://horizon-testnet.stellar.org",
       };
 
       // Throw an error if the network is not supported.

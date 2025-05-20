@@ -64,7 +64,7 @@ export function hana(): Connector {
       return {
         ...(await freighterApi.getNetworkDetails()),
         networkUrl:
-          "https://mainnet.stellar.validationcloud.io/v1/YcyPYotN_b6-_656rpr0CabDwlGgkT42NCzPVIqcZh0",
+          "https://horizon-testnet.stellar.org",
       };
     },
     async isAvailable(): Promise<boolean> {

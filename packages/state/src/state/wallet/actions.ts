@@ -11,8 +11,9 @@ import {
   SorobanTokenContract,
 } from "@phoenix-protocol/contracts";
 import { usePersistStore } from "../store";
-import { constants, fetchTokenPrices, TradeAPi } from "@phoenix-protocol/utils";
+import { constants, fetchTokenPrices, Signer, TradeAPi } from "@phoenix-protocol/utils";
 import { LiquidityPoolInfo } from "@phoenix-protocol/contracts/build/phoenix-pair";
+import { signTransaction } from "@stellar/freighter-api";
 
 const getCategory = (name: string) => {
   switch (name.toLowerCase()) {
@@ -53,32 +54,35 @@ export const createWalletActions = (
       let parsedResults: LiquidityPoolInfo[];
       try {
         const publicKey = address || constants.TESTING_SOURCE.accountId();
-
+        console.log(1)
         // Factory contract
         const factoryContract = new PhoenixFactoryContract.Client({
           publicKey,
           contractId: constants.FACTORY_ADDRESS,
           networkPassphrase: constants.NETWORK_PASSPHRASE,
           rpcUrl: constants.RPC_URL,
+
         });
         // Fetch all available tokens from chain
         const allPoolsDetails = await factoryContract.query_all_pools_details();
-
+        console.log(2)
         // Parse results
         parsedResults = allPoolsDetails.result;
       } catch (e) {
         const publicKey = constants.TESTING_SOURCE.accountId();
-
+        console.log(3)
         // Factory contract
         const factoryContract = new PhoenixFactoryContract.Client({
           publicKey,
           contractId: constants.FACTORY_ADDRESS,
           networkPassphrase: constants.NETWORK_PASSPHRASE,
           rpcUrl: constants.RPC_URL,
+          signTransaction: (xdr: string) => new Signer().sign(xdr)
         });
         // Fetch all available tokens from chain
-        const allPoolsDetails = await factoryContract.query_all_pools_details();
-
+        const _allPoolsDetails = await factoryContract.query_all_pools_details({ simulate: false});
+        const allPoolsDetails = await _allPoolsDetails.simulate({restore: true});
+        console.log(4)
         // Parse results
         parsedResults = allPoolsDetails.result;
       }
