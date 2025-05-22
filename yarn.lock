@@ -3647,7 +3647,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@phoenix-protocol/contracts@workspace:^, @phoenix-protocol/contracts@workspace:packages/contracts":
+"@phoenix-protocol/contracts@*, @phoenix-protocol/contracts@workspace:^, @phoenix-protocol/contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/contracts@workspace:packages/contracts"
   dependencies:
@@ -3719,7 +3719,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@phoenix-protocol/state@workspace:^, @phoenix-protocol/state@workspace:packages/state":
+"@phoenix-protocol/state@*, @phoenix-protocol/state@workspace:^, @phoenix-protocol/state@workspace:packages/state":
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/state@workspace:packages/state"
   dependencies:
@@ -3740,7 +3740,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/strategies@workspace:packages/strategies"
   dependencies:
+    "@phoenix-protocol/contracts": "*"
+    "@phoenix-protocol/state": "*"
     "@phoenix-protocol/types": "*"
+    "@phoenix-protocol/utils": "*"
     typescript: ^5.0.0
   languageName: unknown
   linkType: soft
@@ -3831,7 +3834,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@phoenix-protocol/utils@workspace:^, @phoenix-protocol/utils@workspace:packages/utils":
+"@phoenix-protocol/utils@*, @phoenix-protocol/utils@workspace:^, @phoenix-protocol/utils@workspace:packages/utils":
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/utils@workspace:packages/utils"
   dependencies:

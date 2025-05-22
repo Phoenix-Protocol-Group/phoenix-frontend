@@ -9,7 +9,10 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@phoenix-protocol/types": "*"
+    "@phoenix-protocol/contracts": "*",
+    "@phoenix-protocol/state": "*",
+    "@phoenix-protocol/types": "*",
+    "@phoenix-protocol/utils": "*"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
