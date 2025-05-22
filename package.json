@@ -3,17 +3,20 @@
   "description": "The Phoenix Frontend is a TypeScript-based web application utilizing yarn workspaces. It includes a UI kit (MUI-based), state management, utility functions, and a core package for seamless integration. It's written to use it with phoenix-contracts on Stellar's soroban platform.",
   "version": "0.0.1",
   "scripts": {
-    "test": "yarn workspace @phoenix-protocol/utils run test --passWithNoTests",
-    "build": "yarn workspace @phoenix-protocol/types run build && yarn workspace @phoenix-protocol/utils run build && yarn workspace @phoenix-protocol/contracts run build && yarn workspace @phoenix-protocol/state run build && yarn workspace @phoenix-protocol/ui run build && yarn workspace @phoenix-protocol/core run build",
+    "test": "turbo run test",
+    "build": "turbo run build",
     "storybook": "yarn workspace @phoenix-protocol/ui storybook",
-    "dev": "yarn workspace @phoenix-protocol/core dev",
-    "build:core": "yarn workspace @phoenix-protocol/core build",
-    "build:contracts": "yarn workspace @phoenix-protocol/contracts build",
-    "build:state": "yarn workspace @phoenix-protocol/state build",
-    "build:ui": "yarn workspace @phoenix-protocol/ui build",
-    "build:utils": "yarn workspace @phoenix-protocol/utils build",
-    "build:types": "yarn workspace @phoenix-protocol/types build",
-    "build:strat": "yarn workspace @phoenix-protocol/strategies build"
+    "dev": "turbo run dev",
+    "dev:core": "turbo run dev --filter=@phoenix-protocol/core",
+    "dev:ui": "turbo run dev --filter=@phoenix-protocol/ui",
+    "dev:experimental": "yarn workspace @phoenix-protocol/core dev:experimental",
+    "build:core": "turbo run build --filter=@phoenix-protocol/core",
+    "build:contracts": "turbo run build --filter=@phoenix-protocol/contracts",
+    "build:state": "turbo run build --filter=@phoenix-protocol/state",
+    "build:ui": "turbo run build --filter=@phoenix-protocol/ui",
+    "build:utils": "turbo run build --filter=@phoenix-protocol/utils",
+    "build:types": "turbo run build --filter=@phoenix-protocol/types",
+    "build:strat": "turbo run build --filter=@phoenix-protocol/strategies"
   },
   "repository": {
     "type": "git",
@@ -37,7 +40,9 @@
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.2",
     "@types/jest": "^29.5.2",
-    "jest": "^29.5.0"
+    "concurrently": "^9.1.2",
+    "jest": "^29.5.0",
+    "turbo": "^2.5.3"
   },
   "packageManager": "yarn@3.6.4",
   "dependencies": {

@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "test": "tsc && jest",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc --watch"
   },
   "np": {
     "publish": false,

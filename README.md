@@ -30,6 +30,45 @@ The `Contracts` package provides generated contract classes and associated types
 
 ## Quick Start
 
+### Development with Turborepo
+
+This project uses Turborepo for efficient monorepo management. It optimizes builds, provides incremental builds, and manages dependencies between packages.
+
+```bash
+# Install dependencies
+yarn install
+
+# Start development with watch mode for all packages
+yarn dev
+
+# Run only the core app (Next.js)
+yarn dev:core
+
+# Run only the UI package development
+yarn dev:ui
+
+# Build all packages
+yarn build
+
+# Build a specific package
+yarn build:core  # or build:ui, build:types, etc.
+
+# Run Storybook for the UI package
+yarn storybook
+```
+
+#### Understanding the Development Process
+
+When you run `yarn dev`, Turborepo will:
+
+1. Build all necessary dependencies in the correct order
+2. Start watch mode for all packages, rebuilding them when files change
+3. Start the Next.js development server for the core package
+
+This means you can edit files in any package, and changes will automatically be reflected in the running application without manual rebuilds.
+
+### Legacy Quick Start
+
 1. Clone the repo locally.
 2. Make sure Node.js and yarn are installed.
 3. Cd into the project root.

@@ -6,7 +6,8 @@
   ],
   "scripts": {
     "test": "tsc && jest",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc --watch"
   },
   "main": "build/index.js",
   "types": "build/index.d.ts",

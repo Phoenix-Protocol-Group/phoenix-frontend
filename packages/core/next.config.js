@@ -3,7 +3,13 @@ const nextConfig = {
   experimental: {
     reactCompiler: true,
     turbo: {
-      // Remove the problematic resolveAlias configuration
+      resolveAlias: {
+        '@phoenix-protocol/types': '../types/src',
+        '@phoenix-protocol/utils': '../utils/src',
+        '@phoenix-protocol/contracts': '../contracts/src',
+        '@phoenix-protocol/state': '../state/src',
+        '@phoenix-protocol/strategies': '../strategies/src'
+      }
     }
   },
   webpack: (config) => {

@@ -12,6 +12,7 @@
     "build:main": "cross-env BABEL_ENV=production babel src --out-dir main --delete-dir-on-start --extensions \".tsx,.ts,.js\"",
     "build:module": "cross-env MODULE=true babel src --out-dir module --delete-dir-on-start  --extensions \".tsx,.ts,.js\"",
     "build": "yarn build:module && yarn build:main && tsc --emitDeclarationOnly",
+    "dev": "concurrently \"tsc --emitDeclarationOnly --watch\" \"cross-env MODULE=true babel src --out-dir module --extensions \\\".tsx,.ts,.js\\\" --watch\"",
     "prepublishOnly": "yarn build"
   },
   "np": {

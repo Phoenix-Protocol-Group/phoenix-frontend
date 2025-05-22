@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "dev:experimental": "next dev --experimental-https",
-    "build": "next build",
+    "dev": "SKIP_NODE_VERSION_CHECK=1 next dev --turbopack",
+    "dev:experimental": "SKIP_NODE_VERSION_CHECK=1 next dev --experimental-https",
+    "build": "SKIP_NODE_VERSION_CHECK=1 next build",
     "start": "next start",
     "lint": "next lint"
   },
