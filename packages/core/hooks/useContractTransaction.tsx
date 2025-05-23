@@ -26,7 +26,14 @@ type ContractType =
   | "vesting"
   | "token";
 
-// Add options interface with onSuccess callback
+/**
+ * Options for executing a transaction.
+ * 
+ * @property {() => void} [onSuccess] - A callback function that is invoked 
+ * after the transaction is successfully executed. This function should 
+ * handle any post-transaction logic, such as updating the UI or triggering 
+ * additional actions. It is optional and will not be called if not provided.
+ */
 interface TransactionOptions {
   onSuccess?: () => void;
 }
