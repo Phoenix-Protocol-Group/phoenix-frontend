@@ -19,11 +19,11 @@
   "author": "Phoenix Protocol Group",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@phoenix-protocol/types": "*",
     "jest": "^29.7.0",
     "jest-mock": "^29.7.0",
     "ts-jest": "^29.1.0",
-    "typescript": "^5.1.3",
-    "@phoenix-protocol/types": "*"
+    "typescript": "^5.1.3"
   },
   "dependencies": {
     "@apollo/client": "^3.9.0",
