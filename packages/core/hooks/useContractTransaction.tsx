@@ -28,14 +28,46 @@ type ContractType =
 
 /**
  * Options for executing a transaction.
- * 
- * @property {() => void} [onSuccess] - A callback function that is invoked 
- * after the transaction is successfully executed. This function should 
- * handle any post-transaction logic, such as updating the UI or triggering 
+ *
+ * @property {() => void} [onSuccess] - A callback function that is invoked
+ * after the transaction is successfully executed. This function should
+ * handle any post-transaction logic, such as updating the UI or triggering
  * additional actions. It is optional and will not be called if not provided.
+ *
+ * @property {number} [fee] - Custom transaction fee in stroops. If not provided,
+ * the default constants.PHOENIX_BASE_FEE (200 stroops) will be used.
+ *
+ * @example
+ * // Using custom fee in transaction
+ * executeContractTransaction({
+ *   contractType: "pair",
+ *   contractAddress: pairAddress,
+ *   transactionFunction: (client, restore, txOptions) => client.swap(
+ *     { sender: address, offer_asset: assetA, ask_asset: assetB, amount: amount.toString() },
+ *     { ...txOptions }  // This passes the fee to the contract method
+ *   ),
+ *   options: {
+ *     fee: 100000, // Custom fee in stroops (100,000 stroops = 0.01 XLM)
+ *     onSuccess: () => refetchData()
+ *   }
+ * });
+ *
+ * // Using default PHOENIX_BASE_FEE
+ * executeContractTransaction({
+ *   contractType: "pair",
+ *   contractAddress: pairAddress,
+ *   transactionFunction: (client, restore, txOptions) => client.swap(
+ *     { sender: address, offer_asset: assetA, ask_asset: assetB, amount: amount.toString() },
+ *     { ...txOptions }  // This passes the default fee to the contract method
+ *   ),
+ *   options: {
+ *     onSuccess: () => refetchData()
+ *   }
+ * });
  */
 interface TransactionOptions {
   onSuccess?: () => void;
+  fee?: number;
 }
 
 const contractClients = {
@@ -65,7 +97,8 @@ interface BaseExecuteContractTransactionParams<T extends ContractType> {
   contractAddress: string;
   transactionFunction: (
     client: ContractClientType<T>,
-    restore?: boolean
+    restore?: boolean,
+    txOptions?: { fee?: number }
   ) => Promise<AssembledTransaction<any>>;
   options?: TransactionOptions;
 }
@@ -97,7 +130,7 @@ const getContractClient = <T extends ContractType>(
   publicKey: string,
   storePersist: any
 ): ContractClientType<T> => {
-  console.log(1);
+  console.log(`Creating contract client for ${contractType} contract`);
   const signTransaction = getSignerFunction(signer, storePersist);
   const commonOptions = {
     publicKey: publicKey,
@@ -142,12 +175,29 @@ export const useContractTransaction = () => {
             rpcUrl,
             publicKey,
             storePersist
-          );
+          ); // Get transaction options with fee, using PHOENIX_BASE_FEE as default
+          const fee =
+            options.fee !== undefined
+              ? options.fee
+              : parseInt(constants.PHOENIX_BASE_FEE);
+          const txOptions = { fee };
 
+          // Log fee information
+          if (options.fee !== undefined) {
+            console.log(`Using custom transaction fee: ${fee} stroops`);
+          } else {
+            console.log(`Using default PHOENIX_BASE_FEE: ${fee} stroops`);
+          }
+
+          // Pass contract client and potential restore flag to transaction function
           const transaction = await transactionFunction(
             contractClient,
-            restore
+            restore,
+            txOptions
           );
+
+          // Store fee in outer scope for use in resolve callback
+          const transactionFee = fee;
 
           console.log("Attempting to sign and send transaction...");
 
@@ -162,6 +212,9 @@ export const useContractTransaction = () => {
                   resolve({});
                 } else {
                   const sentTransaction = await transaction.signAndSend();
+                  console.log(
+                    `Transaction sent with fee: ${transactionFee} stroops`
+                  );
                   options.onSuccess?.(); // Call onSuccess callback after successful transaction
                   resolve({
                     transactionId:
@@ -209,7 +262,7 @@ export const useContractTransaction = () => {
       // Start transaction execution
       return executeTransaction();
     },
-    [addAsyncToast, storePersist, openRestoreModal, closeRestoreModal]
+    [addAsyncToast, storePersist, appStore, openRestoreModal, closeRestoreModal]
   );
 
   return {
