@@ -360,7 +360,7 @@ const StrategyEntry = ({
           </Grid>
 
           {/* Strategy Name */}
-          <Grid item md={hasJoined ? 2 : 3}>
+          <Grid item md={2}>
             <Tooltip title={description || name} arrow placement="top">
               <Typography
                 sx={{
@@ -538,16 +538,16 @@ const StrategyEntry = ({
               </Box>
             ) : (
               <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-              <Button
-                size="small"
-                type="primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onBondClick(strategy);
-                }}
-              >
-                Bond
-              </Button>
+                <Button
+                  size="small"
+                  type="primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onBondClick(strategy);
+                  }}
+                >
+                  Bond
+                </Button>
               </Box>
             )}
           </Grid>
