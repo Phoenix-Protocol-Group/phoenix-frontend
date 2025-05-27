@@ -296,6 +296,7 @@ export default function Page(props: PoolPageProps) {
               min_b: undefined,
               custom_slippage_bps: undefined,
               deadline: undefined,
+              auto_stake: false,
             },
             { simulate: !restore }
           );
@@ -330,6 +331,7 @@ export default function Page(props: PoolPageProps) {
               min_a: BigInt(1),
               min_b: BigInt(1),
               deadline: undefined,
+              auto_unstake: false,
             },
             { simulate: !restore }
           );
