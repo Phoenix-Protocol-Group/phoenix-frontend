@@ -394,6 +394,7 @@ class PhoenixXlmPhoStrategy implements Strategy {
         min_b: undefined,
         custom_slippage_bps: undefined,
         deadline: undefined,
+        auto_stake: true, // Automatically stake LP tokens
       },
       { simulate: true }
     );
@@ -419,6 +420,7 @@ class PhoenixXlmPhoStrategy implements Strategy {
         min_a: BigInt(1), // Consider making these configurable or based on slippage
         min_b: BigInt(1), // Consider making these configurable or based on slippage
         deadline: undefined,
+        auto_unstake: true, // TODO: In our strategy UI, we need to show different stake buckets and let the user choose which stake to unbond from.
       },
       { simulate: true }
     );

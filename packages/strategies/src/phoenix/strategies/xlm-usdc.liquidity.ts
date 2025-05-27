@@ -428,6 +428,7 @@ class PhoenixXlmUsdcStrategy implements Strategy {
         min_b: undefined,
         custom_slippage_bps: undefined,
         deadline: undefined,
+        auto_stake: true,
       },
       { simulate: true }
     );
@@ -451,6 +452,7 @@ class PhoenixXlmUsdcStrategy implements Strategy {
         min_a: BigInt(1),
         min_b: BigInt(1),
         deadline: undefined,
+        auto_unstake: true, // TODO: In our strategy UI, we need to show different stake buckets and let the user choose which stake to unbond from.
       },
       { simulate: true }
     );
