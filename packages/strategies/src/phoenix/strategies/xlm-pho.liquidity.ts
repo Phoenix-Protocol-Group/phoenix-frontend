@@ -50,6 +50,7 @@ class PhoenixXlmPhoStrategy implements Strategy {
   private lpToken: any = null;
   private userStake: number = 0;
   private userRewards: any[] = [];
+  private userIndividualStakesDetailed: any[] = []; // Store raw stakes for unbonding
   private lpTokenPrice: number = 0;
 
   constructor() {
@@ -214,18 +215,35 @@ class PhoenixXlmPhoStrategy implements Strategy {
         { simulate: false }
       );
 
-      const stakes = await stakesQuery.simulate({ restore: true });
+      const stakesResult = await stakesQuery.simulate({ restore: true });
+      this.userIndividualStakesDetailed = stakesResult?.result?.stakes || []; // Store raw stakes
 
-      // Calculate total staked amount
-      if (stakes?.result && stakes.result.stakes.length > 0) {
-        const _stakes = stakes.result.stakes.reduce(
-          (total: number, stake: any) =>
-            total + Number(stake.stake) / 10 ** (this.lpToken?.decimals || 7),
-          0
-        );
-        this.userStake = this.lpTokenPrice * _stakes;
+      // Calculate total staked amount and populate userIndividualStakes for metadata
+      if (this.userIndividualStakesDetailed.length > 0) {
+        let totalLpStaked = BigInt(0);
+        this.metadata.userIndividualStakes =
+          this.userIndividualStakesDetailed.map((stake: any) => {
+            const lpAmountBigInt = BigInt(stake.stake);
+            totalLpStaked += lpAmountBigInt;
+            const lpAmountNumber =
+              Number(lpAmountBigInt) / 10 ** (this.lpToken?.decimals || 7);
+            return {
+              lpAmount: lpAmountBigInt,
+              timestamp: BigInt(stake.stake_timestamp),
+              displayAmount: `${lpAmountNumber.toFixed(
+                this.lpToken?.decimals || 7
+              )} LP`,
+              displayDate: new Date(
+                Number(stake.stake_timestamp) * 1000
+              ).toLocaleDateString(),
+            };
+          });
+        const totalLpStakedNumber =
+          Number(totalLpStaked) / 10 ** (this.lpToken?.decimals || 7);
+        this.userStake = this.lpTokenPrice * totalLpStakedNumber;
       } else {
         this.userStake = 0;
+        this.metadata.userIndividualStakes = [];
       }
 
       // Fetch user rewards
@@ -319,38 +337,56 @@ class PhoenixXlmPhoStrategy implements Strategy {
 
   async unbond(
     walletAddress: string,
-    amount: number
+    params: number | { lpAmount: bigint; timestamp: bigint }
   ): Promise<AssembledTransaction<any>> {
     if (!this.stakeContract) {
       throw new Error("Stake contract not initialized");
     }
-    if (amount <= 0) {
-      throw new Error("Unbond amount must be positive");
+
+    let stakeAmountToUnbond: bigint;
+    let stakeTimestampToUnbond: bigint;
+
+    if (typeof params === "number") {
+      if (this.userIndividualStakesDetailed.length === 0) {
+        throw new Error("No stakes available to unbond based on USD amount.");
+      }
+      if (this.lpTokenPrice <= 0) {
+        throw new Error(
+          "LP token price is not available to calculate unbond amount from USD."
+        );
+      }
+      const lpAmountToUnbondNumber = params / this.lpTokenPrice;
+      stakeAmountToUnbond = BigInt(
+        (lpAmountToUnbondNumber * 10 ** (this.lpToken?.decimals || 7)).toFixed(
+          0
+        )
+      );
+
+      // This logic for 'number' param might need to be more robust,
+      // e.g. selecting which stake to unbond from or ensuring sufficient balance.
+      // For now, using the first stake's timestamp if a general amount is given.
+      // The primary UI flow should use the object { lpAmount, timestamp }.
+      const firstStake = this.userIndividualStakesDetailed[0];
+      if (!firstStake || BigInt(firstStake.stake) < stakeAmountToUnbond) {
+        throw new Error(
+          "Not enough in the first stake or no stake available for general amount unbonding."
+        );
+      }
+      stakeTimestampToUnbond = BigInt(firstStake.stake_timestamp);
+    } else {
+      stakeAmountToUnbond = params.lpAmount;
+      stakeTimestampToUnbond = params.timestamp;
     }
 
-    // Get user's stakes
-    const stakesQuery = await this.stakeContract.query_staked(
-      { address: walletAddress },
-      { simulate: false }
-    );
-
-    const stakes = await stakesQuery.simulate({ restore: true });
-
-    if (!stakes?.result || stakes.result.stakes.length === 0) {
-      throw new Error("No stakes found for this user to unbond");
+    if (stakeAmountToUnbond <= BigInt(0)) {
+      throw new Error("Unbond amount must be positive.");
     }
-
-    // Get the stake to unbond (using the first one as an example)
-    // In a real implementation, you might want to select a specific stake
-    const stake = stakes.result.stakes[0];
 
     const assembledTx = await this.stakeContract.unbond(
       {
         sender: walletAddress,
-        stake_amount: BigInt(
-          (amount * 10 ** (this.lpToken?.decimals || 7)).toFixed(0)
-        ),
-        stake_timestamp: BigInt(stake.stake_timestamp),
+        stake_amount: stakeAmountToUnbond,
+        stake_timestamp: stakeTimestampToUnbond,
       },
       { simulate: true }
     );
