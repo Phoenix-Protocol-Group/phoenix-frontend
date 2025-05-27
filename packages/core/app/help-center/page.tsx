@@ -104,7 +104,7 @@ export default function Page() {
     } finally {
       appStore.setLoading(false);
     }
-  });
+  }, [appStore]);
 
   useEffect(() => {
     if (searchValue) {
