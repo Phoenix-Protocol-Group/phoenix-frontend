@@ -3736,7 +3736,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@phoenix-protocol/strategies@workspace:packages/strategies":
+"@phoenix-protocol/strategies@workspace:^, @phoenix-protocol/strategies@workspace:packages/strategies":
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/strategies@workspace:packages/strategies"
   dependencies:
@@ -3788,6 +3788,7 @@ __metadata:
     "@mui/icons-material": ^5.11.16
     "@mui/x-date-pickers": ^6.19.2
     "@phoenix-protocol/state": "workspace:^"
+    "@phoenix-protocol/strategies": "workspace:^"
     "@phoenix-protocol/types": "workspace:^"
     "@rollup/plugin-commonjs": ^25.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
