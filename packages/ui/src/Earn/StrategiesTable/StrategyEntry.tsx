@@ -396,7 +396,7 @@ const StrategyEntry = ({
                 color: colors.success[300],
               }}
             >
-              {(apr * 100).toFixed(1)}%
+              Up to {(apr * 100).toFixed(1)}%
             </Typography>
           </Grid>
 
