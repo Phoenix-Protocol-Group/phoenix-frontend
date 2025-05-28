@@ -233,12 +233,18 @@ const ConnectWallet = ({
 
   // Check which connectors are allowed (installed)
   useEffect(() => {
+    let isMounted = true;
+
     const checkConnectors = async () => {
+      if (!isMounted) return;
+
       setLoadingConnectors(true);
       const allowed: Connector[] = [];
       const disallowed: Connector[] = [];
 
       for (const connector of connectors) {
+        if (!isMounted) break;
+
         try {
           const isAllowed = await connector.isConnected();
           if (isAllowed) {
@@ -251,15 +257,23 @@ const ConnectWallet = ({
         }
       }
 
-      setAllowedConnectors(allowed);
-      setDisallowedConnectors(disallowed);
-      setLoadingConnectors(false);
+      if (isMounted) {
+        setAllowedConnectors(allowed);
+        setDisallowedConnectors(disallowed);
+        setLoadingConnectors(false);
+      }
     };
 
     if (open) {
+      // Use a stable reference to the connectors array
+      const connectorsCopy = [...connectors];
       checkConnectors();
     }
-  }, [connectors, open]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [open]); // Remove connectors from dependency array to prevent re-renders
 
   // Handle connecting to a wallet
   const handleConnect = useCallback(
@@ -269,13 +283,14 @@ const ConnectWallet = ({
 
       try {
         await connect(connector);
-        // Success will be handled by the parent component closing the modal
+        // Close the modal after successful connection
+        setOpen(false);
       } catch (error) {
         console.error("Wallet connection failed:", error);
         setLoading(false);
       }
     },
-    [connect]
+    [connect, setOpen]
   );
 
   // Handle going back from the loading screen
@@ -292,6 +307,10 @@ const ConnectWallet = ({
     setTimeout(() => {
       setLoading(false);
       setSelected(undefined);
+      // Reset connector states to prevent stale data
+      setAllowedConnectors([]);
+      setDisallowedConnectors([]);
+      setLoadingConnectors(true);
     }, 300);
   }, [setOpen]);
 
