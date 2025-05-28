@@ -184,7 +184,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   // Memoize the style objects to prevent unnecessary re-renders
   const swapPageStyle = useMemo(
     () => ({
-      background: "linear-gradient(to bottom, #151719, #0A0B0C)",
+      background:
+        "radial-gradient(ellipse at center, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.1) 35%, #171717 75%)", // Added an intermediate color stop
       paddingBottom: "50px",
       width: {
         xs: "100vw",

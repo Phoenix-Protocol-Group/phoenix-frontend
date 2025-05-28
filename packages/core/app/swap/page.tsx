@@ -625,7 +625,6 @@ export default function SwapPage(): JSX.Element {
             width: "100%",
             maxWidth: "1440px",
             mt: 12,
-            background: "linear-gradient(to bottom, #151719, #0A0B0C)",
           }}
         >
           <Box>
