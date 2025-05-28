@@ -295,6 +295,7 @@ export default function Page() {
     if (newFilters.dateRange.to) {
       to = (newFilters.dateRange.to.getTime() / 1000).toFixed(0);
     }
+
     const trades = await fetchAllTrades(
       appStore,
       pageSize,
@@ -303,8 +304,57 @@ export default function Page() {
       to,
       activeView === "personal" ? appStorePersist.wallet.address : undefined
     );
-    setHistory(trades);
-    console.log(trades[0]);
+
+    // Apply client-side filtering for tradeSize and tradeValue
+    let filteredTrades = trades;
+
+    if (
+      newFilters.tradeSize.from !== undefined ||
+      newFilters.tradeSize.to !== undefined
+    ) {
+      filteredTrades = filteredTrades.filter((trade) => {
+        // Use fromAmount as the trade size
+        const size = trade.fromAmount;
+        if (
+          newFilters.tradeSize.from !== undefined &&
+          newFilters.tradeSize.to !== undefined
+        ) {
+          return (
+            size >= newFilters.tradeSize.from && size <= newFilters.tradeSize.to
+          );
+        } else if (newFilters.tradeSize.from !== undefined) {
+          return size >= newFilters.tradeSize.from;
+        } else if (newFilters.tradeSize.to !== undefined) {
+          return size <= newFilters.tradeSize.to;
+        }
+        return true;
+      });
+    }
+
+    if (
+      newFilters.tradeValue.from !== undefined ||
+      newFilters.tradeValue.to !== undefined
+    ) {
+      filteredTrades = filteredTrades.filter((trade) => {
+        const value = parseFloat(trade.tradeValue);
+        if (
+          newFilters.tradeValue.from !== undefined &&
+          newFilters.tradeValue.to !== undefined
+        ) {
+          return (
+            value >= newFilters.tradeValue.from &&
+            value <= newFilters.tradeValue.to
+          );
+        } else if (newFilters.tradeValue.from !== undefined) {
+          return value >= newFilters.tradeValue.from;
+        } else if (newFilters.tradeValue.to !== undefined) {
+          return value <= newFilters.tradeValue.to;
+        }
+        return true;
+      });
+    }
+
+    setHistory(filteredTrades);
     setHistoryLoading(false);
   };
 

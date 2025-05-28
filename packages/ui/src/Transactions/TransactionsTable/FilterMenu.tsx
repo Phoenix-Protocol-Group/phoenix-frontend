@@ -254,9 +254,219 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
           </Box>
         </Box>
         <Divider sx={{ my: spacing.sm, background: colors.neutral[700] }} />
+
+        {/* Trade Size Filter */}
+        <Box>
+          <Typography
+            sx={{
+              color: colors.neutral[50],
+              fontFamily: typography.fontFamily,
+              fontSize: typography.fontSize.sm,
+              fontWeight: typography.fontWeights.bold,
+              lineHeight: "140%",
+              mb: 1,
+            }}
+          >
+            Trade Size
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: spacing.sm,
+            }}
+          >
+            <Box flex={1}>
+              <Typography
+                sx={{
+                  color: colors.neutral[400],
+                  fontFamily: typography.fontFamily,
+                  fontSize: typography.fontSize.xs,
+                  fontWeight: typography.fontWeights.regular,
+                  lineHeight: "140%",
+                  opacity: 0.6,
+                }}
+              >
+                From
+              </Typography>
+              <input
+                type="number"
+                value={tradeSize.from !== undefined ? tradeSize.from : ""}
+                onChange={(e) =>
+                  setTradeSize({
+                    ...tradeSize,
+                    from:
+                      e.target.value === ""
+                        ? undefined
+                        : Number(e.target.value),
+                  })
+                }
+                placeholder="Min"
+                style={{
+                  width: "100%",
+                  background: colors.neutral[900],
+                  border: `1px solid ${colors.neutral[700]}`,
+                  color: colors.neutral[300],
+                  padding: "8px 12px",
+                  borderRadius: borderRadius.lg,
+                  fontFamily: typography.fontFamily,
+                  fontSize: typography.fontSize.sm,
+                  outline: "none",
+                }}
+              />
+            </Box>
+            <Box flex={1}>
+              <Typography
+                sx={{
+                  color: colors.neutral[400],
+                  fontFamily: typography.fontFamily,
+                  fontSize: typography.fontSize.xs,
+                  fontWeight: typography.fontWeights.regular,
+                  lineHeight: "140%",
+                  opacity: 0.6,
+                }}
+              >
+                To
+              </Typography>
+              <input
+                type="number"
+                value={tradeSize.to !== undefined ? tradeSize.to : ""}
+                onChange={(e) =>
+                  setTradeSize({
+                    ...tradeSize,
+                    to:
+                      e.target.value === ""
+                        ? undefined
+                        : Number(e.target.value),
+                  })
+                }
+                placeholder="Max"
+                style={{
+                  width: "100%",
+                  background: colors.neutral[900],
+                  border: `1px solid ${colors.neutral[700]}`,
+                  color: colors.neutral[300],
+                  padding: "8px 12px",
+                  borderRadius: borderRadius.lg,
+                  fontFamily: typography.fontFamily,
+                  fontSize: typography.fontSize.sm,
+                  outline: "none",
+                }}
+              />
+            </Box>
+          </Box>
+        </Box>
+
         <Divider sx={{ my: spacing.sm, background: colors.neutral[700] }} />
-        <Divider sx={{ my: spacing.sm, background: colors.neutral[700] }} />
-        <Button label="Apply" onClick={updateFilters} />
+
+        {/* Trade Value Filter */}
+        <Box>
+          <Typography
+            sx={{
+              color: colors.neutral[50],
+              fontFamily: typography.fontFamily,
+              fontSize: typography.fontSize.sm,
+              fontWeight: typography.fontWeights.bold,
+              lineHeight: "140%",
+              mb: 1,
+            }}
+          >
+            Trade Value (USD)
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: spacing.sm,
+            }}
+          >
+            <Box flex={1}>
+              <Typography
+                sx={{
+                  color: colors.neutral[400],
+                  fontFamily: typography.fontFamily,
+                  fontSize: typography.fontSize.xs,
+                  fontWeight: typography.fontWeights.regular,
+                  lineHeight: "140%",
+                  opacity: 0.6,
+                }}
+              >
+                From
+              </Typography>
+              <input
+                type="number"
+                value={tradeValue.from !== undefined ? tradeValue.from : ""}
+                onChange={(e) =>
+                  setTradeValue({
+                    ...tradeValue,
+                    from:
+                      e.target.value === ""
+                        ? undefined
+                        : Number(e.target.value),
+                  })
+                }
+                placeholder="Min"
+                style={{
+                  width: "100%",
+                  background: colors.neutral[900],
+                  border: `1px solid ${colors.neutral[700]}`,
+                  color: colors.neutral[300],
+                  padding: "8px 12px",
+                  borderRadius: borderRadius.lg,
+                  fontFamily: typography.fontFamily,
+                  fontSize: typography.fontSize.sm,
+                  outline: "none",
+                }}
+              />
+            </Box>
+            <Box flex={1}>
+              <Typography
+                sx={{
+                  color: colors.neutral[400],
+                  fontFamily: typography.fontFamily,
+                  fontSize: typography.fontSize.xs,
+                  fontWeight: typography.fontWeights.regular,
+                  lineHeight: "140%",
+                  opacity: 0.6,
+                }}
+              >
+                To
+              </Typography>
+              <input
+                type="number"
+                value={tradeValue.to !== undefined ? tradeValue.to : ""}
+                onChange={(e) =>
+                  setTradeValue({
+                    ...tradeValue,
+                    to:
+                      e.target.value === ""
+                        ? undefined
+                        : Number(e.target.value),
+                  })
+                }
+                placeholder="Max"
+                style={{
+                  width: "100%",
+                  background: colors.neutral[900],
+                  border: `1px solid ${colors.neutral[700]}`,
+                  color: colors.neutral[300],
+                  padding: "8px 12px",
+                  borderRadius: borderRadius.lg,
+                  fontFamily: typography.fontFamily,
+                  fontSize: typography.fontSize.sm,
+                  outline: "none",
+                }}
+              />
+            </Box>
+          </Box>
+        </Box>
+
+        <Box sx={{ display: "flex", gap: spacing.sm, mt: spacing.md }}>
+          <Button label="Apply" onClick={updateFilters} type="primary" />
+          <Button label="Reset" onClick={resetFilters} type="secondary" />
+        </Box>
       </Menu>
     </div>
   );
