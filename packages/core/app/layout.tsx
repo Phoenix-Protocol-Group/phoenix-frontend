@@ -22,6 +22,7 @@ import { ToastProvider } from "@/providers/ToastProvider";
 import { RestoreModalProvider } from "@/providers/RestoreModalProvider";
 import Loader from "@/components/Loader/Loader";
 import TemporaryWarningBar from "@/components/TemporaryWarningBar";
+import MaintenanceScreen from "@/components/MaintenanceScreen";
 
 const HiddenInputChecker = () => {
   const [value, setValue] = useState("Phoenix DeFi Hub");
@@ -67,6 +68,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     useState<boolean>(false);
   const [version, setVersion] = useState(0);
 
+  // Show maintenance screen for V2 upgrade
+  const [isMaintenanceMode] = useState<boolean>(false);
+
   // useEffect to set navigation state based on screen size without animation on initial load
   useEffect(() => {
     if (navOpen !== largerThanMd) {
@@ -108,7 +112,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         persistStore.disconnectWallet();
       }
     }
-  }, []);
+  }, [persistStore]);
 
   useEffect(() => {
     if (!persistStore.disclaimer.accepted) {
@@ -202,59 +206,68 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <RestoreModalProvider>
               <style>{css}</style>
 
-              {/* Side Navigation Component with smooth animation, disabled on initial load */}
+              {/* Show maintenance screen or regular layout */}
+              {isMaintenanceMode ? (
+                <MaintenanceScreen />
+              ) : (
+                <>
+                  {/* Side Navigation Component with smooth animation, disabled on initial load */}
+                  <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
 
-              <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
-              {/* If loading */}
+                  {/* Top Navigation Bar with motion */}
+                  <motion.div
+                    initial={{ y: -50 }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                  >
+                    <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
+                  </motion.div>
 
-              {/* Top Navigation Bar with motion */}
-              <motion.div
-                initial={{ y: -50 }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-              >
-                <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
-              </motion.div>
+                  <DisclaimerModal
+                    open={!persistStore.disclaimer.accepted}
+                    onAccepted={onAcceptDisclaimer}
+                  />
 
-              <DisclaimerModal
-                open={!persistStore.disclaimer.accepted}
-                onAccepted={onAcceptDisclaimer}
-              />
-
-              {/* Main Content Area */}
-              <Box
-                sx={{
-                  marginLeft: largerThanMd ? (navOpen ? "240px" : "60px") : "0",
-                  minHeight: "100vh",
-                  transition: "all 0.2s ease-in-out",
-                  display: "flex",
-                  justifyContent: "center",
-                  padding: "16px",
-                  ...swapPageStyle,
-                }}
-              >
-                {appStore.loading && (
+                  {/* Main Content Area */}
                   <Box
                     sx={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
+                      marginLeft: largerThanMd
+                        ? navOpen
+                          ? "240px"
+                          : "60px"
+                        : "0",
+                      minHeight: "100vh",
+                      transition: "all 0.2s ease-in-out",
                       display: "flex",
                       justifyContent: "center",
-                      alignItems: "center",
-                      background:
-                        "linear-gradient(to bottom, #1F2123, #131517)",
-
-                      zIndex: 10, // Ensure it's on top
+                      padding: "16px",
+                      ...swapPageStyle,
                     }}
                   >
-                    <Loader />
+                    {appStore.loading && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          background:
+                            "linear-gradient(to bottom, #1F2123, #131517)",
+
+                          zIndex: 10, // Ensure it's on top
+                        }}
+                      >
+                        <Loader />
+                      </Box>
+                    )}
+                    {children}
                   </Box>
-                )}
-                {children}
-              </Box>
+                </>
+              )}
             </RestoreModalProvider>
           </ToastProvider>
         </body>
