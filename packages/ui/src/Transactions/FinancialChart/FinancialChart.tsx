@@ -10,7 +10,12 @@ import {
 import { Box, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { PriceHistoryResponse } from "@phoenix-protocol/utils";
-import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
+import {
+  colors,
+  typography,
+  spacing,
+  borderRadius,
+} from "../../Theme/styleConstants";
 
 type HistoricalPrice = {
   price: number;
@@ -246,7 +251,7 @@ const FinancialChart = ({
   const formattedData = formatData(historicalPrices);
 
   return (
-    <Box>
+    <Box sx={{ width: "100%", height: "100%" }}>
       <GlowingChart
         data={formattedData}
         selected={period}

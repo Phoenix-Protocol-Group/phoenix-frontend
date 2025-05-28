@@ -365,8 +365,8 @@ export default function Page() {
             <Box
               sx={{
                 height: "100%",
-                display: "inline-flex",
-                justifyContent: "stretch",
+                display: "flex",
+                width: "100%",
               }}
             >
               <FinancialChart
