@@ -11,7 +11,12 @@ import {
   SorobanTokenContract,
 } from "@phoenix-protocol/contracts";
 import { usePersistStore } from "../store";
-import { constants, fetchTokenPrices, TradeAPi } from "@phoenix-protocol/utils";
+import {
+  constants,
+  fetchTokenPrices,
+  Signer,
+  TradeAPi,
+} from "@phoenix-protocol/utils";
 import { LiquidityPoolInfo } from "@phoenix-protocol/contracts/build/phoenix-pair";
 
 const getCategory = (name: string) => {
@@ -60,9 +65,15 @@ export const createWalletActions = (
           contractId: constants.FACTORY_ADDRESS,
           networkPassphrase: constants.NETWORK_PASSPHRASE,
           rpcUrl: constants.RPC_URL,
+          signTransaction: (tx: string) => new Signer().sign(tx),
         });
         // Fetch all available tokens from chain
-        const allPoolsDetails = await factoryContract.query_all_pools_details();
+        const allPoolsDetails = await factoryContract.query_all_pools_details({
+          simulate: false,
+        });
+        const _allPoolsDetails = await allPoolsDetails.simulate({
+          restore: true,
+        });
 
         // Parse results
         parsedResults = allPoolsDetails.result;
