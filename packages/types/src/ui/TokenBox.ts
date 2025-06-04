@@ -1,4 +1,5 @@
 import { Token } from "../general";
+import { Chain } from "./AssetSelector";
 
 export interface TokenBoxProps {
   token: Token;
@@ -8,4 +9,5 @@ export interface TokenBoxProps {
   value: string | undefined;
   disabled?: boolean;
   loadingValues?: boolean;
+  chain?: Chain;
 }
