@@ -11,7 +11,8 @@ import {
 } from "../../Theme/styleConstants";
 import { StrategyMetadata } from "@phoenix-protocol/strategies";
 import CloseIcon from "@mui/icons-material/Close";
-import { Token } from "@phoenix-protocol/types";
+import { Token, StateToken } from "@phoenix-protocol/types";
+import { useAppStore } from "@phoenix-protocol/state";
 
 interface BondModalProps {
   open: boolean;
@@ -28,10 +29,15 @@ export const BondModal = ({
 }: BondModalProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const appStore = useAppStore();
 
   // Track amounts for all assets with an object keyed by token index
   const [amounts, setAmounts] = useState<{ [key: number]: string }>({});
   const [error, setError] = useState<string>("");
+  // Track user token balances with actual wallet amounts
+  const [userTokenBalances, setUserTokenBalances] = useState<{
+    [key: string]: StateToken;
+  }>({});
 
   const isPairStrategy =
     strategy?.contractType === "pair" && strategy.assets.length > 1;
@@ -47,6 +53,69 @@ export const BondModal = ({
       setError("");
     }
   }, [open, strategy]);
+
+  // Fetch user token balances when modal opens
+  useEffect(() => {
+    const fetchUserBalances = async () => {
+      if (open && strategy?.assets) {
+        const balances: { [key: string]: StateToken } = {};
+
+        // For each asset in the strategy, fetch the user's actual token balance
+        await Promise.all(
+          strategy.assets.map(async (asset) => {
+            // Use the asset name/symbol to identify the token
+            const tokenIdentifier = asset.name;
+
+            try {
+              // Fetch the user's actual token balance from their wallet
+              const userToken = await appStore.fetchTokenInfo(tokenIdentifier);
+              if (userToken) {
+                balances[tokenIdentifier] = userToken;
+              }
+            } catch (error) {
+              console.error(
+                `Error fetching user balance for ${asset.name}:`,
+                error
+              );
+            }
+          })
+        );
+
+        setUserTokenBalances(balances);
+      }
+    };
+
+    fetchUserBalances();
+  }, [open, strategy, appStore]);
+
+  // Create tokens with user balances for display
+  const tokensWithUserBalances = useMemo(() => {
+    if (!strategy?.assets) return [];
+
+    return strategy.assets.map((asset) => {
+      const userToken = userTokenBalances[asset.name];
+
+      if (userToken) {
+        // Convert StateToken balance to displayable amount
+        const userBalance =
+          Number(userToken.balance) / 10 ** userToken.decimals;
+
+        // Create a Token object with user's actual balance
+        const tokenWithUserBalance: Token = {
+          ...asset,
+          amount: userBalance, // Use actual user balance instead of pool amount
+        };
+
+        return tokenWithUserBalance;
+      }
+
+      // Fallback to original asset if user balance not found, but set amount to 0
+      return {
+        ...asset,
+        amount: 0,
+      };
+    });
+  }, [strategy?.assets, userTokenBalances]);
 
   // Calculate token ratios for pair strategies
   const tokenRatios = useMemo(() => {
@@ -142,6 +211,17 @@ export const BondModal = ({
 
     if (invalidAmount) {
       setError("Please enter valid positive amounts for all required tokens.");
+      return;
+    }
+
+    // Validate that user has sufficient balance for each token
+    const insufficientBalance = tokenAmounts.some(({ amount }, index) => {
+      const tokenWithBalance = tokensWithUserBalances[index];
+      return tokenWithBalance && amount > tokenWithBalance.amount;
+    });
+
+    if (insufficientBalance) {
+      setError("Insufficient balance for one or more tokens.");
       return;
     }
 
@@ -268,12 +348,15 @@ export const BondModal = ({
           </Typography>
 
           {/* Token inputs for all assets */}
-          {strategy.assets.map((asset, index) => (
-            <Box key={asset.name} sx={{ mt: index > 0 ? spacing.md : 0 }}>
+          {tokensWithUserBalances.map((tokenWithBalance, index) => (
+            <Box
+              key={tokenWithBalance.name}
+              sx={{ mt: index > 0 ? spacing.md : 0 }}
+            >
               <TokenBox
                 value={amounts[index] || ""}
                 onChange={(value) => handleAmountChange(index, value)}
-                token={asset}
+                token={tokenWithBalance}
                 hideDropdownButton
               />
             </Box>
