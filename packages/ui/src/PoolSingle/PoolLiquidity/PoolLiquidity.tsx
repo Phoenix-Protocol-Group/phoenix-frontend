@@ -33,8 +33,8 @@ const GlowingChart = ({ data }: { data: number[][] }) => (
             </feMerge>
           </filter>
           <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#64748B" stopOpacity={0.2} />
-            <stop offset="95%" stopColor="#64748B" stopOpacity={0.02} />
+            <stop offset="5%" stopColor="#F97316" stopOpacity={0.2} />
+            <stop offset="95%" stopColor="#F97316" stopOpacity={0.02} />
           </linearGradient>
         </defs>
         <YAxis
@@ -45,7 +45,7 @@ const GlowingChart = ({ data }: { data: number[][] }) => (
         <Area
           type="monotone"
           dataKey={(v) => v[1]}
-          stroke="#64748B"
+          stroke="#F97316"
           strokeWidth={2}
           filter="url(#neonGlow)"
           fill="url(#chartFill)"
