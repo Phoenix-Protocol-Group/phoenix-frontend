@@ -637,7 +637,13 @@ export default function Page(props: PoolPageProps) {
 
   if (!params.poolAddress || poolNotFound) {
     return (
-      <Box sx={{ mt: { xs: 12, md: 0 }, maxWidth: "1440px" }}>
+      <Box
+        sx={{
+          mt: { xs: "70px", md: 0 },
+          maxWidth: "1440px",
+          px: { xs: 2, sm: 3, md: 4 },
+        }}
+      >
         <Typography>{"The pool you're looking for doesn't exist."}</Typography>
         <Typography>
           Return <Link href="/">Home</Link>
@@ -648,14 +654,15 @@ export default function Page(props: PoolPageProps) {
   return (
     <Box
       sx={{
-        mt: { xs: 12, md: 0 },
+        mt: { xs: "70px", md: 0 },
         maxWidth: "1440px",
         background:
           "linear-gradient(135deg, rgba(249, 115, 22, 0.03) 0%, rgba(251, 146, 60, 0.02) 50%, rgba(0, 0, 0, 0.1) 100%)",
         borderRadius: { xs: 0, md: "24px" },
         border: { xs: "none", md: "1px solid rgba(249, 115, 22, 0.1)" },
         backdropFilter: "blur(20px)",
-        p: { xs: 2, md: 4 },
+        p: { xs: 1, sm: 2, md: 4 },
+        pb: { xs: 2, sm: 3, md: 4 },
         position: "relative",
         overflow: "hidden",
         "&::before": {

@@ -7,7 +7,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { format } from "date-fns";
 import { PriceHistoryResponse } from "@phoenix-protocol/utils";
 import {
@@ -68,131 +68,183 @@ const GlowingChart = ({
   data: DataPoint[];
   selected: string;
   setSelected: (value: string) => void;
-}) => (
-  <Box
-    sx={{
-      display: "flex",
-      width: "100%",
-      padding: spacing.lg,
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "flex-start",
-      gap: spacing.lg,
-      borderRadius: borderRadius.lg,
-      background: colors.neutral[900],
-      border: `1px solid ${colors.neutral[700]}`,
-      height: "100%",
-    }}
-  >
+}) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isSmallMobile = useMediaQuery("(max-width:350px)");
+
+  return (
     <Box
       sx={{
         display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
         width: "100%",
+        padding: spacing.lg,
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "flex-start",
+        gap: spacing.lg,
+        borderRadius: borderRadius.lg,
+        background: colors.neutral[900],
+        border: `1px solid ${colors.neutral[700]}`,
+        height: "100%",
       }}
     >
-      <Box>
-        <Typography
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "flex-start", sm: "center" },
+          width: "100%",
+          gap: { xs: 2, sm: 1, md: 0 },
+        }}
+      >
+        <Box sx={{ flex: 1, width: { xs: "100%", sm: "auto" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: {
+                xs: isSmallMobile ? "column" : "row",
+                sm: "row",
+                md: "row",
+              },
+              alignItems: {
+                xs: isSmallMobile ? "flex-start" : "center",
+                sm: "center",
+              },
+              gap: { xs: isSmallMobile ? 1 : 2, sm: 2 },
+              mb: isSmallMobile ? 1 : 0,
+              width: "100%",
+            }}
+          >
+            <Typography
+              sx={{
+                color: colors.neutral[400],
+                fontFamily: typography.fontFamily,
+                fontSize: { xs: "0.75rem", sm: "0.8rem" },
+                fontWeight: typography.fontWeights.regular,
+                opacity: 0.6,
+                whiteSpace: "nowrap",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Box
+                component="img"
+                sx={{ height: "1rem", width: "1rem" }}
+                src="/cryptoIcons/pho.svg"
+              />
+              Current Price (USDC)
+            </Typography>
+          </Box>
+          <Typography
+            sx={{
+              color: colors.neutral[50],
+              fontFamily: typography.fontFamily,
+              fontSize: { xs: "1.25rem", sm: typography.fontSize.xl },
+              fontWeight: typography.fontWeights.bold,
+            }}
+          >
+            ${data[data.length - 1].price.toFixed(2)}
+          </Typography>
+        </Box>
+        <Box
           sx={{
-            color: colors.neutral[400],
-            fontFamily: typography.fontFamily,
-            fontSize: typography.fontSize.sm,
-            fontWeight: typography.fontWeights.regular,
-            opacity: 0.6,
+            display: "flex",
+            gap: 1,
+            alignItems: "center",
+            flexWrap: "wrap",
+            justifyContent: { xs: "flex-start", sm: "flex-end" },
+            width: { xs: "100%", sm: "auto" },
+            mt: { xs: 1, sm: 0 },
           }}
         >
           <Box
-            component="img"
-            sx={{ height: "1rem", width: "1rem" }}
-            src="/cryptoIcons/pho.svg"
-          />{" "}
-          Current Price (USDC)
-        </Typography>
-        <Typography
-          sx={{
-            color: colors.neutral[50],
-            fontFamily: typography.fontFamily,
-            fontSize: typography.fontSize.xl,
-            fontWeight: typography.fontWeights.bold,
-          }}
-        >
-          ${data[data.length - 1].price.toFixed(2)}
-        </Typography>
-      </Box>
-      <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between" }}>
-        <Box
-          sx={
-            selected === "W"
-              ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-              : tabUnselectedStyles
-          }
-          onClick={() => setSelected("W")}
-        >
-          W
-        </Box>
-        <Box
-          sx={
-            selected === "M"
-              ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-              : tabUnselectedStyles
-          }
-          onClick={() => setSelected("M")}
-        >
-          M
-        </Box>
-        <Box
-          sx={
-            selected === "Y"
-              ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-              : tabUnselectedStyles
-          }
-          onClick={() => setSelected("Y")}
-        >
-          A
+            sx={
+              selected === "W"
+                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                : tabUnselectedStyles
+            }
+            onClick={() => setSelected("W")}
+          >
+            W
+          </Box>
+          <Box
+            sx={
+              selected === "M"
+                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                : tabUnselectedStyles
+            }
+            onClick={() => setSelected("M")}
+          >
+            M
+          </Box>
+          <Box
+            sx={
+              selected === "Y"
+                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                : tabUnselectedStyles
+            }
+            onClick={() => setSelected("Y")}
+          >
+            A
+          </Box>
         </Box>
       </Box>
+      <ResponsiveContainer width="100%" height={isMobile ? 150 : 200}>
+        <AreaChart
+          data={data}
+          margin={
+            isMobile
+              ? { top: 0, right: -5, left: -5, bottom: 0 }
+              : { top: 0, right: -10, left: -10, bottom: 0 }
+          }
+        >
+          <defs>
+            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#E2491A" stopOpacity={0.2} />
+              <stop offset="95%" stopColor="#E2491A" stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
+          <YAxis
+            hide={false}
+            dataKey="price"
+            domain={[0, "dataMax + 0.1"]}
+            tickFormatter={(tick) => tick.toFixed(2)}
+            tick={{ fontSize: isMobile ? 10 : 12 }}
+            width={isMobile ? 35 : 45}
+          />
+          <XAxis
+            hide={false}
+            dataKey="timeStamp"
+            interval={Math.ceil(data.length / (isMobile ? 3 : 5))}
+            domain={["dataMin", "dataMax"]}
+            tickFormatter={(tick) => format(new Date(tick), "MM/dd/yy")}
+            tick={{ fontSize: isMobile ? 10 : 12 }}
+            tickMargin={isMobile ? 5 : 10}
+          />
+          <Area
+            type="monotone"
+            dataKey="price"
+            stroke="#E2491A"
+            strokeWidth={2}
+            isAnimationActive={true}
+            fillOpacity={1}
+            fill="url(#colorUv)"
+          />
+          <Tooltip content={<CustomTooltip />} />
+        </AreaChart>
+      </ResponsiveContainer>
     </Box>
-    <ResponsiveContainer width="100%" height={200}>
-      <AreaChart
-        data={data}
-        margin={{ top: 0, right: -10, left: -10, bottom: 0 }}
-      >
-        <defs>
-          <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#E2491A" stopOpacity={0.2} />
-            <stop offset="95%" stopColor="#E2491A" stopOpacity={0.02} />
-          </linearGradient>
-        </defs>
-        <YAxis
-          hide={false}
-          dataKey="price"
-          domain={["dataMin - 0.2", "dataMax + 0.1"]}
-          tickFormatter={(tick) => tick.toFixed(2)}
-        />
-        <XAxis
-          hide={false}
-          dataKey="timeStamp"
-          interval={Math.ceil(data.length / 5)}
-          domain={["dataMin", "dataMax"]}
-          tickFormatter={(tick) => format(new Date(tick), "MM/dd/yy")}
-        />
-        <Area
-          type="monotone"
-          dataKey="price"
-          stroke="#E2491A"
-          strokeWidth={2}
-          isAnimationActive={true}
-          fillOpacity={1}
-          fill="url(#colorUv)"
-        />
-        <Tooltip content={<CustomTooltip />} />
-      </AreaChart>
-    </ResponsiveContainer>
-  </Box>
-);
+  );
+};
 
 const CustomTooltip = ({ active, payload, label }: any) => {
+  // Get access to theme and media queries
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   if (active && payload && payload.length) {
     return (
       <Box
@@ -200,10 +252,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
           border: "1px solid #292B2C",
           borderRadius: "0.5rem",
-          padding: "10px",
+          padding: isMobile ? "8px" : "10px",
           color: "white",
           boxShadow:
             "-3px 3px 10px 0px rgba(25, 13, 1, 0.10),-12px 13px 18px 0px rgba(25, 13, 1, 0.09),-26px 30px 24px 0px rgba(25, 13, 1, 0.05),-46px 53px 28px 0px rgba(25, 13, 1, 0.02),-73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
+          maxWidth: isMobile ? "160px" : "200px",
         }}
       >
         <Typography
@@ -211,7 +264,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           sx={{
             margin: 0,
             color: "white",
-            fontSize: "0.875rem",
+            fontSize: isMobile ? "0.8rem" : "0.875rem",
             fontWeight: 600,
           }}
         >{`Value: ${Number(payload[0].value).toFixed(2)}`}</Typography>
@@ -220,7 +273,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           sx={{
             margin: 0,
             color: "white",
-            fontSize: "0.875rem",
+            fontSize: isMobile ? "0.8rem" : "0.875rem",
           }}
         >{`Date: ${new Date(
           payload[0].payload.timeStamp
@@ -230,7 +283,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           sx={{
             margin: 0,
             color: "white",
-            fontSize: "0.875rem",
+            fontSize: isMobile ? "0.8rem" : "0.875rem",
           }}
         >{`Time: ${new Date(
           payload[0].payload.timeStamp

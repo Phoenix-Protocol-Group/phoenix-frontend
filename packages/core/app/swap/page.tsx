@@ -726,7 +726,7 @@ export default function SwapPage(): JSX.Element {
           sx={{
             width: "100%",
             maxWidth: "1440px",
-            mt: { xs: 8, md: 12 },
+            mt: { xs: "0px", md: 12 },
             px: { xs: 2, sm: 3, md: 4 },
             mx: "auto",
             display: "flex",

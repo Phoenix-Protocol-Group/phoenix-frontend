@@ -1,5 +1,5 @@
 "use client";
-import { NoSsr } from "@mui/material";
+import { NoSsr, useMediaQuery, useTheme } from "@mui/material";
 import {
   freighter,
   lobstr,
@@ -11,6 +11,7 @@ import {
 } from "@phoenix-protocol/state";
 import { AppBar, ConnectWallet } from "@phoenix-protocol/ui";
 import React, { useEffect } from "react";
+import { useScrollDirection } from "../../hooks/useScrollDirection";
 
 const TopBar = ({
   navOpen,
@@ -21,6 +22,9 @@ const TopBar = ({
 }) => {
   const store = useAppStore();
   const storePersist = usePersistStore();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { scrollDirection, isAtTop } = useScrollDirection();
 
   const connect = async (connector: any) => {
     await storePersist.connectWallet(connector.id);
@@ -55,11 +59,14 @@ const TopBar = ({
     <NoSsr>
       <AppBar
         mobileNavOpen={navOpen}
+        sidebarOpen={navOpen}
         toggleMobileNav={(open) => setNavOpen(open)}
         balance={tokenBalance}
         walletAddress={storePersist.wallet.address}
         connectWallet={() => store.setWalletModalOpen(true)}
         disconnectWallet={disconnectWallet}
+        scrollDirection={isMobile ? scrollDirection : null}
+        isAtTop={isAtTop}
       />
       <ConnectWallet
         open={store.walletModalOpen}

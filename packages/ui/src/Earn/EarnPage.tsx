@@ -193,7 +193,13 @@ export const EarnPage = ({
 
   return (
     <Container maxWidth="xl">
-      <Box sx={{ padding: isMobile ? spacing.md : spacing.xl }}>
+      <Box
+        sx={{
+          padding: { xs: spacing.sm, sm: spacing.md, md: spacing.xl },
+          pt: { xs: spacing.md, md: spacing.xl },
+          pb: { xs: spacing.lg, md: spacing.xl },
+        }}
+      >
         <YieldSummary
           totalValue={5000}
           claimableRewards={100}

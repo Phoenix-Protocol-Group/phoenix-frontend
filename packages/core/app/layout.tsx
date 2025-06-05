@@ -183,15 +183,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         "radial-gradient(ellipse at center, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.1) 35%, #171717 75%)", // Added an intermediate color stop
       paddingBottom: "50px",
       width: {
-        xs: "100vw",
-        md: largerThanMd
-          ? navOpen
-            ? "calc(100% - 240px)"
-            : "calc(100% - 60px)"
-          : "100%",
+        xs: "100%",
+        md: "100%", // Full width since margin handles positioning
       },
     }),
-    [largerThanMd, navOpen]
+    [] // Remove unnecessary dependencies
   );
 
   const loaderOverlayStyle = useMemo(
@@ -200,12 +196,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       top: 0,
       left: 0,
       width: "100%",
-      height: "100%",
+      height: "100vh",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      background: "linear-gradient(to bottom, #1F2123, #131517)",
+      background:
+        "linear-gradient(#171717, #171717) padding-box, radial-gradient(ellipse at center, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.1) 35%, #171717 75%) border-box",
       zIndex: 10, // Ensure it's on top of content
+      // The following ensures the solid color is under the gradient
+      backgroundBlendMode: "normal, lighten",
     }),
     []
   );
@@ -213,14 +212,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const mainContentStyle = useMemo(
     () => ({
       position: "relative", // Add relative positioning for absolute loader overlay
-      marginLeft: largerThanMd ? (navOpen ? "240px" : "60px") : "0",
-      minHeight: "100vh",
+      marginLeft: largerThanMd ? "320px" : 0, // Fixed sidebar width
+      marginTop: { xs: "12px", md: "80px" }, // Add top margin for fixed TopBar on both mobile and desktop
+      minHeight: { xs: "calc(100vh - 70px)", md: "calc(100vh - 80px)" }, // Account for fixed TopBar height
       transition: "all 0.2s ease-in-out",
       display: "flex",
       justifyContent: "center",
-      mt: 3,
-      padding: "16px",
+      padding: { xs: "16px 8px", sm: "20px 12px", md: "24px 16px" }, // Improved padding
+      maxWidth: "none", // Remove any max-width constraints
+      // Override swapPageStyle width and force components to think this is the full width for responsive behavior
       ...swapPageStyle,
+      width: largerThanMd
+        ? `calc(100vw - ${navOpen ? "480px" : "160px"})`
+        : "100vw", // Full width on mobile
     }),
     [largerThanMd, navOpen, swapPageStyle]
   );

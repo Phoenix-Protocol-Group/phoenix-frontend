@@ -368,8 +368,9 @@ export default function EarnPage(): JSX.Element {
       sx={{
         width: "100%",
         maxWidth: "1440px",
-        mt: { xs: 8, md: 12 },
-        px: { xs: 2, sm: 3, md: 4 },
+        mt: { xs: "70px", md: 12 },
+        px: { xs: 1, sm: 2, md: 4 },
+        pb: { xs: 2, sm: 3, md: 4 },
         mx: "auto",
         minHeight: "calc(100vh - 200px)",
       }}
