@@ -323,17 +323,6 @@ const AppBar = ({
               }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             />
-            {largerThenMd && (
-              <Box
-                sx={{
-                  height: "28px", // Slightly taller
-                  width: "1px",
-                  background:
-                    "linear-gradient(180deg, transparent 0%, rgba(249, 115, 22, 0.4) 50%, transparent 100%)",
-                  mx: 1.5, // More spacing
-                }}
-              />
-            )}
           </Box>
           <Box
             sx={{
