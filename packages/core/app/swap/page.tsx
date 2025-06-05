@@ -80,6 +80,7 @@ export default function SwapPage(): JSX.Element {
 
   const [trustlineAssetAmount, setTrustlineAssetAmount] = useState<number>(0);
   const [allPools, setAllPools] = useState<any[]>([]);
+  const [operationsStableHash, setOperationsStableHash] = useState<string>("");
 
   // Using the store
   const storePersist = usePersistStore();
@@ -93,6 +94,7 @@ export default function SwapPage(): JSX.Element {
   const prevOperations = useRef<string>("");
   const simulationRequestRef = useRef<NodeJS.Timeout | null>(null);
   const tokenLoadCount = useRef(0);
+  const operationsHash = useRef<string>("");
 
   const [fromAmount] = useDebounce<number>(tokenAmounts[0], 500);
 
@@ -282,7 +284,7 @@ export default function SwapPage(): JSX.Element {
     } finally {
       setLoadingSimulate(false);
     }
-  }, [fromToken, toToken, operations, tokenAmounts[0], loadingSimulate]);
+  }, [fromToken?.name, toToken?.name, operations.length, tokenAmounts[0]]);
 
   /**
    * Handles user selecting a token from the asset selector.
@@ -325,6 +327,9 @@ export default function SwapPage(): JSX.Element {
       setAssetSelectorOpen(false);
       // Reset simulation flags when token changes
       operationsUpdateComplete.current = false;
+      prevOperations.current = "";
+      operationsHash.current = "";
+      setOperationsStableHash("");
     },
     [fromToken, toToken, isFrom]
   );
@@ -471,13 +476,20 @@ export default function SwapPage(): JSX.Element {
       )
       .filter(Boolean);
 
-    // Update operations and swap route
-    setOperations(_operations);
-    setSwapRoute(`${fromToken.name} -> ${_swapRoute.join(" -> ")}`);
+    // Create operations hash to prevent unnecessary simulation triggers
+    const operationsString = JSON.stringify(_operations);
+    const currentOperationsHash = btoa(operationsString).slice(0, 16); // Only update if operations have actually changed
+    if (operationsHash.current !== currentOperationsHash) {
+      // Update operations and swap route
+      setOperations(_operations);
+      setSwapRoute(`${fromToken.name} -> ${_swapRoute.join(" -> ")}`);
 
-    // Mark that operations have been updated and save current pair
-    prevOperations.current = currentPairKey;
-    operationsUpdateComplete.current = true;
+      // Update hash references
+      operationsHash.current = currentOperationsHash;
+      setOperationsStableHash(currentOperationsHash);
+      prevOperations.current = currentPairKey;
+      operationsUpdateComplete.current = true;
+    }
 
     // Check trustline if wallet is connected
     if (storePersist.wallet.address && toTokenContractID) {
@@ -534,9 +546,75 @@ export default function SwapPage(): JSX.Element {
     }
 
     simulationRequestRef.current = setTimeout(() => {
-      doSimulateSwap();
+      // Call simulation directly instead of using doSimulateSwap callback
+      if (
+        !fromToken ||
+        !toToken ||
+        !operations.length ||
+        tokenAmounts[0] === 0
+      ) {
+        setTokenAmounts((prevAmounts) => [prevAmounts[0], 0]);
+        setExchangeRate("");
+        setNetworkFee("");
+        return;
+      }
+
+      // Prevent simulation if already simulating
+      if (loadingSimulate) return;
+
+      setLoadingSimulate(true);
+
+      const runSimulation = async () => {
+        try {
+          const contract = new PhoenixMultihopContract.Client({
+            contractId: constants.MULTIHOP_ADDRESS,
+            networkPassphrase: constants.NETWORK_PASSPHRASE,
+            rpcUrl: constants.RPC_URL,
+          });
+
+          const tx = await contract.simulate_swap({
+            operations,
+            amount: BigInt(tokenAmounts[0] * 10 ** 7),
+            pool_type: 0,
+          });
+
+          if (tx.result.ask_amount && tx.result.commission_amounts) {
+            const askAmount = Number(tx.result.ask_amount);
+            const commissionAmount = Number(tx.result.commission_amounts[0][1]);
+            const netAmount = askAmount - commissionAmount;
+            const _exchangeRate = netAmount / Number(tokenAmounts[0]);
+
+            setExchangeRate(
+              `1 ${fromToken.name} = ${(_exchangeRate / 10 ** 7).toFixed(6)} ${
+                toToken.name
+              }`
+            );
+            setNetworkFee(
+              `${(commissionAmount / 10 ** 7).toFixed(6)} ${fromToken.name}`
+            );
+
+            // Only update if the amount has actually changed
+            const newToTokenAmount = askAmount / 10 ** 7;
+            setTokenAmounts((prevAmounts) => {
+              if (Math.abs(prevAmounts[1] - newToTokenAmount) > 0.000001) {
+                return [prevAmounts[0], newToTokenAmount];
+              }
+              return prevAmounts;
+            });
+          }
+        } catch (e) {
+          console.error("Simulation error:", e);
+          setExchangeRate("");
+          setNetworkFee("");
+          setTokenAmounts((prevAmounts) => [prevAmounts[0], 0]);
+        } finally {
+          setLoadingSimulate(false);
+        }
+      };
+
+      runSimulation();
       simulationRequestRef.current = null;
-    }, 500);
+    }, 300); // Reduced timeout for better responsiveness
 
     // Cleanup on unmount or when dependencies change
     return () => {
@@ -545,7 +623,13 @@ export default function SwapPage(): JSX.Element {
         simulationRequestRef.current = null;
       }
     };
-  }, [fromAmount, fromToken?.name, toToken?.name, operations, isClient]);
+  }, [
+    fromAmount,
+    fromToken?.name,
+    toToken?.name,
+    operationsStableHash,
+    isClient,
+  ]);
 
   // Memoized swap container props to prevent unnecessary re-renders
   const swapContainerProps = useMemo(
@@ -558,6 +642,8 @@ export default function SwapPage(): JSX.Element {
         // Reset flags when tokens are swapped
         operationsUpdateComplete.current = false;
         prevOperations.current = "";
+        operationsHash.current = "";
+        setOperationsStableHash("");
       },
       fromTokenValue: tokenAmounts[0].toString()!,
       toTokenValue: tokenAmounts[1].toString()!,

@@ -290,6 +290,8 @@ const SwapContainer = ({
                 networkFee={networkFee}
                 route={route}
                 slippageTolerance={slippageTolerance}
+                fromToken={fromToken}
+                toToken={toToken}
               />
             </Box>
           </CardContainer>
