@@ -32,7 +32,7 @@ export const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const getResponsivePadding = () => {
-    if (noPadding) return 0;
+    if (noPadding) return { xs: 0, sm: 0, md: 0 };
 
     if (compactMobile) {
       return {
