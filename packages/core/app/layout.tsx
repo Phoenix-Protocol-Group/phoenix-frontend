@@ -129,12 +129,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       isFirstMount.current = false;
       appStore.setLoading(true);
     } else {
-      const timer = setTimeout(() => {
-        // Set loading with slight delay to avoid rapid loading state changes
-        appStore.setLoading(true);
-      }, 50);
-
-      return () => clearTimeout(timer);
+      // Set loading immediately on route change to prevent flash of content
+      appStore.setLoading(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
@@ -210,13 +206,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       justifyContent: "center",
       alignItems: "center",
       background: "linear-gradient(to bottom, #1F2123, #131517)",
-      zIndex: 10, // Ensure it's on top
+      zIndex: 10, // Ensure it's on top of content
     }),
     []
   );
 
   const mainContentStyle = useMemo(
     () => ({
+      position: "relative", // Add relative positioning for absolute loader overlay
       marginLeft: largerThanMd ? (navOpen ? "240px" : "60px") : "0",
       minHeight: "100vh",
       transition: "all 0.2s ease-in-out",

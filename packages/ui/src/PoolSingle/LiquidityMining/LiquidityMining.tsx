@@ -403,11 +403,7 @@ const ClaimRewards = ({
           )}
         </Box>
 
-        <motion.div
-          whileHover={{ scale: rewards.length > 0 ? 1.02 : 1 }}
-          whileTap={{ scale: rewards.length > 0 ? 0.98 : 1 }}
-          style={{ height: "100px" }}
-        >
+        <motion.div style={{ height: "100px" }}>
           <Button
             // @ts-ignore
             variant="primary"
