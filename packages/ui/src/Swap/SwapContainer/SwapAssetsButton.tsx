@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "../../Button/Button";
-import { colors, borderRadius, shadows } from "../../Theme/styleConstants";
+import { colors } from "../../Theme/styleConstants";
 
 interface SwapAssetsButtonProps {
   onClick: () => void;
@@ -19,36 +18,43 @@ export const SwapAssetsButton = ({ onClick }: SwapAssetsButtonProps) => {
   };
 
   return (
-    <Button
+    <motion.div
       onClick={handleClick}
       className="swap-assets-button"
-      sx={{
-        padding: "4px",
-        borderRadius: borderRadius.md,
-        minWidth: 0,
-        top: "25%",
-        position: "absolute",
+      style={{
+        width: "32px",
+        height: "32px",
+        borderRadius: "50%",
         background: colors.primary.gradient,
-        transform: "translate(-50%, -50%)",
-        left: "50%",
-        boxShadow: shadows.card,
-        transition: "transform 0.3s ease-in-out",
-        "&:hover": {
-          transform: "translate(-50%, -50%) scale(1.15)",
-          background: colors.primary.gradient,
-        },
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        border: "none",
+        boxShadow: `0 2px 8px rgba(249, 115, 22, 0.3)`,
+        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
+      whileHover={{
+        scale: 1.1,
+        boxShadow: `0 4px 12px rgba(249, 115, 22, 0.4)`,
+      }}
+      whileTap={{ scale: 0.95 }}
     >
       <motion.img
         src="/ArrowsDownUp.svg"
         alt="Swap"
+        width={16}
+        height={16}
         animate={{ rotate: isSpinning ? 360 : 0 }}
         transition={{
           duration: 1,
           ease: "linear",
           repeat: isSpinning ? Infinity : 0,
         }}
+        style={{
+          filter: "brightness(0) invert(1)", // Make the icon white
+        }}
       />
-    </Button>
+    </motion.div>
   );
 };

@@ -251,24 +251,22 @@ export default function SwapPage(): JSX.Element {
       });
 
       if (tx.result.ask_amount && tx.result.commission_amounts) {
-        const _exchangeRate =
-          (Number(tx.result.ask_amount) -
-            Number(tx.result.commission_amounts[0][1])) /
-          Number(tokenAmounts[0]);
+        const askAmount = Number(tx.result.ask_amount);
+        const commissionAmount = Number(tx.result.commission_amounts[0][1]);
+        const netAmount = askAmount - commissionAmount;
+        const _exchangeRate = netAmount / Number(tokenAmounts[0]);
 
         setExchangeRate(
-          `${(_exchangeRate / 10 ** 7).toFixed(2)} ${toToken?.name} per ${
-            fromToken?.name
+          `1 ${fromToken.name} = ${(_exchangeRate / 10 ** 7).toFixed(6)} ${
+            toToken.name
           }`
         );
         setNetworkFee(
-          `${Number(tx.result.commission_amounts[0][1]) / 10 ** 7} ${
-            fromToken?.name
-          }`
+          `${(commissionAmount / 10 ** 7).toFixed(6)} ${fromToken.name}`
         );
 
         // Only update if the amount has actually changed
-        const newToTokenAmount = Number(tx.result.ask_amount) / 10 ** 7;
+        const newToTokenAmount = askAmount / 10 ** 7;
         setTokenAmounts((prevAmounts) => {
           if (Math.abs(prevAmounts[1] - newToTokenAmount) > 0.000001) {
             return [prevAmounts[0], newToTokenAmount];
@@ -277,7 +275,10 @@ export default function SwapPage(): JSX.Element {
         });
       }
     } catch (e) {
-      console.log(e);
+      console.error("Simulation error:", e);
+      setExchangeRate("");
+      setNetworkFee("");
+      setTokenAmounts((prevAmounts) => [prevAmounts[0], 0]);
     } finally {
       setLoadingSimulate(false);
     }
@@ -583,10 +584,15 @@ export default function SwapPage(): JSX.Element {
       estSellPrice: "TODO",
       minSellPrice: "TODO",
       slippageTolerance: `${maxSpread}%`,
-      swapButtonDisabled: tokenAmounts[0] <= 0 || !storePersist.wallet.address,
+      swapButtonDisabled:
+        tokenAmounts[0] <= 0 ||
+        !storePersist.wallet.address ||
+        !operations.length ||
+        loadingSimulate ||
+        txBroadcasting,
       trustlineButtonActive,
       trustlineAssetName: trustlineTokenSymbol,
-      trustlineButtonDisabled: trustlineAssetAmount < 0.5,
+      trustlineButtonDisabled: trustlineAssetAmount < 0.5 || txBroadcasting,
       onTrustlineButtonClick: addTrustLine,
     }),
     [
@@ -602,6 +608,8 @@ export default function SwapPage(): JSX.Element {
       trustlineTokenSymbol,
       trustlineAssetAmount,
       storePersist.wallet.address,
+      operations.length,
+      txBroadcasting,
       doSwap,
       handleSelectorOpen,
       addTrustLine,
@@ -616,7 +624,15 @@ export default function SwapPage(): JSX.Element {
       )}
 
       {isLoading || !isClient ? (
-        <Box sx={{ width: "100%", maxWidth: "1440px", mt: 12 }}>
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: "1440px",
+            mt: { xs: 8, md: 12 },
+            px: { xs: 2, sm: 3, md: 4 },
+            mx: "auto",
+          }}
+        >
           <Skeleton.Swap />
         </Box>
       ) : (
@@ -624,50 +640,55 @@ export default function SwapPage(): JSX.Element {
           sx={{
             width: "100%",
             maxWidth: "1440px",
-            mt: 12,
+            mt: { xs: 8, md: 12 },
+            px: { xs: 2, sm: 3, md: 4 },
+            mx: "auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            minHeight: "calc(100vh - 200px)",
           }}
         >
-          <Box>
+          <Box sx={{ width: "100%", maxWidth: "600px" }}>
             {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
               >
                 <SwapContainer {...swapContainerProps} />
               </motion.div>
             )}
             {optionsOpen && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
               >
-                <Box sx={{ maxWidth: "600px", margin: "auto" }}>
-                  <SlippageSettings
-                    options={[1, 3, 5]}
-                    selectedOption={maxSpread}
-                    onClose={() => setOptionsOpen(false)}
-                    onChange={(option: number) => setMaxSpread(option)}
-                  />
-                </Box>
+                <SlippageSettings
+                  options={[1, 3, 5]}
+                  selectedOption={maxSpread}
+                  onClose={() => setOptionsOpen(false)}
+                  onChange={(option: number) => setMaxSpread(option)}
+                />
               </motion.div>
             )}
             {assetSelectorOpen && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
               >
                 {tokens.length > 0 ? (
-                  <Box sx={{ maxWidth: "600px", margin: "auto" }}>
-                    <AssetSelector
-                      tokens={tokens}
-                      tokensAll={tokens}
-                      onClose={() => setAssetSelectorOpen(false)}
-                      onTokenClick={handleTokenClick}
-                    />
-                  </Box>
+                  <AssetSelector
+                    tokens={tokens}
+                    tokensAll={tokens}
+                    onClose={() => setAssetSelectorOpen(false)}
+                    onTokenClick={handleTokenClick}
+                  />
                 ) : (
                   <Skeleton.AssetSelector
                     onClose={() => setAssetSelectorOpen(false)}
