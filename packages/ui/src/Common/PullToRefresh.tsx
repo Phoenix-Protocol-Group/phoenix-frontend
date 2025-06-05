@@ -140,6 +140,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
     >
       {/* Pull to refresh indicator */}
       <Box
