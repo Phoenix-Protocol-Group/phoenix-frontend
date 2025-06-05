@@ -12,6 +12,7 @@ const CryptoCTA = ({ onClick }: CryptoCTAProps) => {
         p: "1.5rem",
         height: "26rem",
         background: "rgba(226, 73, 26, 0.10)",
+        mt: "1.5rem",
       }}
     >
       <Box

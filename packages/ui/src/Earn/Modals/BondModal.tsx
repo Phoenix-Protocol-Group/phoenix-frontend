@@ -73,6 +73,7 @@ export const BondModal = ({
                 balances[tokenIdentifier] = userToken;
               }
             } catch (error) {
+              console.log(asset)
               console.error(
                 `Error fetching user balance for ${asset.name}:`,
                 error

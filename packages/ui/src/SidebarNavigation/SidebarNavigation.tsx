@@ -247,86 +247,127 @@ const ItemList = ({
   return (
     <>
       {items.map((item) => (
-        <ListItem
+        <motion.div
           key={item.label}
-          disablePadding
-          className={item.label}
-          sx={{
-            margin: open ? `0 ${spacing.sm}` : "0 auto",
-            width: open ? "unset" : "80%",
-            borderRadius: borderRadius.lg,
-            overflow: "hidden",
-            border: item.active
-              ? open
-                ? `2px solid ${colors.primary.main}`
-                : `none`
-              : "none",
-            background: item.active
-              ? open
-                ? `rgba(${colors.primary.gradient}, 0.1)`
-                : `rgba(${colors.primary.gradient}, 0.05)`
-              : "transparent",
-            height: "auto", // Changed from fixed height
-            marginBottom: spacing.xs,
-            marginTop: spacing.xs,
-            padding: open ? 0 : spacing.xs,
-            transition: "all 0.2s ease",
-            "&:hover": {
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, delay: items.indexOf(item) * 0.05 }}
+          whileHover={{ scale: open ? 1.02 : 1.05 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <ListItem
+            disablePadding
+            className={item.label}
+            sx={{
+              margin: open ? `0 ${spacing.sm}` : "0 auto",
+              width: open ? "unset" : "80%",
+              borderRadius: borderRadius.lg,
+              overflow: "hidden",
+              position: "relative",
+              border: item.active
+                ? open
+                  ? `2px solid ${colors.primary.main}`
+                  : `2px solid ${colors.primary.main}`
+                : "2px solid transparent",
               background: item.active
                 ? open
-                  ? `rgba(${colors.primary.gradient}, 0.2)`
-                  : `rgba(${colors.primary.gradient}, 0.1)`
-                : open
-                ? colors.neutral[800]
-                : colors.neutral[800],
-            },
-          }}
-        >
-          <ListItemButton
-            onClick={() => {
-              if (!largerThenMd) {
-                setOpen(false);
-              }
-              onNavClick(item.href, item.target);
-            }}
-            sx={{
+                  ? `linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(249, 115, 22, 0.05) 100%)`
+                  : `linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.1) 100%)`
+                : "transparent",
+              height: "auto",
+              marginBottom: spacing.sm,
+              marginTop: spacing.sm,
               padding: open ? 0 : spacing.xs,
-              justifyContent: open ? "flex-start" : "center",
-              minHeight: "40px",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              cursor: "pointer",
+              "&:hover": {
+                background: item.active
+                  ? open
+                    ? `linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(249, 115, 22, 0.1) 100%)`
+                    : `linear-gradient(135deg, rgba(249, 115, 22, 0.3) 0%, rgba(249, 115, 22, 0.15) 100%)`
+                  : open
+                  ? `linear-gradient(135deg, ${colors.neutral[800]} 0%, ${colors.neutral[850]} 100%)`
+                  : `linear-gradient(135deg, ${colors.neutral[700]} 0%, ${colors.neutral[800]} 100%)`,
+                borderColor: item.active
+                  ? colors.primary.main
+                  : colors.neutral[600],
+                transform: open ? "translateX(4px)" : "scale(1.05)",
+                boxShadow: item.active
+                  ? `0 4px 20px rgba(249, 115, 22, 0.3)`
+                  : `0 4px 15px rgba(0, 0, 0, 0.2)`,
+              },
+              "&:active": {
+                transform: "scale(0.98)",
+              },
+              // Enhanced focus styles for accessibility
+              "&:focus-within": {
+                outline: `2px solid ${colors.primary.main}`,
+                outlineOffset: "2px",
+              },
+              // Add subtle glow effect for active items
+              ...(item.active && {
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: `linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, transparent 50%)`,
+                  borderRadius: borderRadius.lg,
+                  pointerEvents: "none",
+                },
+              }),
             }}
           >
-            <ListItemIcon
+            <ListItemButton
+              onClick={() => {
+                if (!largerThenMd) {
+                  setOpen(false);
+                }
+                onNavClick(item.href, item.target);
+              }}
               sx={{
-                minWidth: open ? "32px" : "24px",
-                width: open ? "32px" : "24px",
-                marginLeft: open ? spacing.lg : 0,
-                marginRight: open ? spacing.sm : 0,
-                justifyContent: "center",
-                color: item.active ? colors.primary.main : colors.neutral[400],
-                transition: "color 0.2s ease",
+                padding: open ? 0 : spacing.xs,
+                justifyContent: open ? "flex-start" : "center",
+                minHeight: "40px",
               }}
             >
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText
-              primaryTypographyProps={{
-                fontSize: typography.fontSize.sm,
-                fontWeight: item.active
-                  ? typography.fontWeights.medium
-                  : typography.fontWeights.regular,
-                lineHeight: "20px",
-                fontFamily: typography.fontFamily,
-                color: item.active ? colors.neutral[50] : colors.neutral[300],
-              }}
-              sx={{
-                padding: `${spacing.md} ${spacing.lg} ${spacing.md} ${spacing.md}`,
-                opacity: 1,
-                display: open ? "block" : "none",
-              }}
-              primary={item.label}
-            />
-          </ListItemButton>
-        </ListItem>
+              <ListItemIcon
+                sx={{
+                  minWidth: open ? "32px" : "24px",
+                  width: open ? "32px" : "24px",
+                  marginLeft: open ? spacing.lg : 0,
+                  marginRight: open ? spacing.sm : 0,
+                  justifyContent: "center",
+                  color: item.active
+                    ? colors.primary.main
+                    : colors.neutral[400],
+                  transition: "color 0.2s ease",
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText
+                primaryTypographyProps={{
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: item.active
+                    ? typography.fontWeights.medium
+                    : typography.fontWeights.regular,
+                  lineHeight: "20px",
+                  fontFamily: typography.fontFamily,
+                  color: item.active ? colors.neutral[50] : colors.neutral[300],
+                }}
+                sx={{
+                  padding: `${spacing.md} ${spacing.lg} ${spacing.md} ${spacing.md}`,
+                  opacity: 1,
+                  display: open ? "block" : "none",
+                }}
+                primary={item.label}
+              />
+            </ListItemButton>
+          </ListItem>
+        </motion.div>
       ))}
     </>
   );

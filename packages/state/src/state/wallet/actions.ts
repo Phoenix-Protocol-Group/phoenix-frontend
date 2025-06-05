@@ -26,6 +26,8 @@ const getCategory = (name: string) => {
     case "eurc":
     case "veur":
     case "vchf":
+    case "eurx":
+    case "gbpx":
       return "Stable";
 
     default:

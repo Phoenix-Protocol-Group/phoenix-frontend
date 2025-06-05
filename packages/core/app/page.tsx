@@ -119,7 +119,7 @@ export default function Page() {
     []
   );
 
-  const tradeApi = new TradeAPI(constants.TRADING_API_URL);
+  const tradeApi = useMemo(() => new TradeAPI(constants.TRADING_API_URL), []);
 
   const get24hVolume = async () => {
     // Define start and end timestamps
@@ -285,6 +285,225 @@ export default function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletAddress]);
 
+  const fetchTokenInfo = useCallback(
+    async (tokenId: string) => {
+      setLoadingAssetInfo(true);
+      setTokenInfoOpen(true);
+
+      try {
+        const TokenContract = new SorobanTokenContract.Client({
+          contractId: tokenId,
+          networkPassphrase: constants.NETWORK_PASSPHRASE,
+          rpcUrl: constants.RPC_URL,
+        });
+        const tokenName = (await TokenContract.name()).result
+          .toLowerCase()
+          .replace(":", "-");
+
+        const fetchedInfo = await (
+          await fetch(
+            `https://api.stellar.expert/explorer/public/asset?search=${tokenName}`
+          )
+        ).json();
+
+        const info = fetchedInfo._embedded.records.find(
+          (el: any) =>
+            el.asset.toUpperCase() === tokenName.toUpperCase() ||
+            el.asset.toUpperCase() === tokenName.toUpperCase() + "-1" ||
+            el.asset.toUpperCase() === tokenName.toUpperCase() + "-2"
+        );
+
+        const fetchPool = async (poolAddress: string) => {
+          try {
+            const PairContract = new PhoenixPairContract.Client({
+              contractId: poolAddress,
+              networkPassphrase: constants.NETWORK_PASSPHRASE,
+              rpcUrl: constants.RPC_URL,
+            });
+
+            const [pairConfig, pairInfo] = await Promise.all([
+              PairContract.query_config(),
+              PairContract.query_pool_info(),
+            ]);
+
+            if (pairConfig?.result && pairInfo?.result) {
+              const [tokenA, tokenB] = await Promise.all([
+                appStore.fetchTokenInfo(pairConfig.result.token_a),
+                appStore.fetchTokenInfo(pairConfig.result.token_b),
+              ]);
+
+              // Fetch prices and calculate TVL
+              const [priceA, priceB] = await Promise.all([
+                API.getPrice(tokenA?.symbol || ""),
+                API.getPrice(tokenB?.symbol || ""),
+              ]);
+
+              const tvl =
+                (priceA * Number(pairInfo.result.asset_a.amount)) /
+                  10 ** Number(tokenA?.decimals) +
+                (priceB * Number(pairInfo.result.asset_b.amount)) /
+                  10 ** Number(tokenB?.decimals);
+
+              const stakingAddress = pairInfo.result.stake_address;
+
+              const StakeContract = new PhoenixStakeContract.Client({
+                contractId: stakingAddress,
+                networkPassphrase: constants.NETWORK_PASSPHRASE,
+                rpcUrl: constants.RPC_URL,
+              });
+
+              const [stakingInfo, allPoolDetails] = await Promise.all([
+                StakeContract.query_total_staked(),
+                new PhoenixFactoryContract.Client({
+                  contractId: constants.FACTORY_ADDRESS,
+                  networkPassphrase: constants.NETWORK_PASSPHRASE,
+                  rpcUrl: constants.RPC_URL,
+                }).query_all_pools_details(),
+              ]);
+
+              const totalStaked = Number(stakingInfo.result);
+              const totalTokens = Number(
+                allPoolDetails.result.find(
+                  (pool: any) => pool.pool_address === poolAddress
+                )?.pool_response.asset_lp_share.amount
+              );
+
+              const ratioStaked = totalStaked / totalTokens;
+              const valueStaked = tvl * ratioStaked;
+
+              // Calculate APR based on incentives
+              const poolIncentives = [
+                {
+                  address:
+                    "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX",
+                  amount: 12500,
+                },
+                {
+                  address:
+                    "CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH",
+                  amount: 25000,
+                },
+                {
+                  address:
+                    "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA",
+                  amount: 18750,
+                },
+              ];
+
+              const poolIncentive = poolIncentives.find(
+                (incentive) => incentive.address === poolAddress
+              );
+
+              const phoprice = await fetchPho();
+              const _apr =
+                ((poolIncentive?.amount || 0 * phoprice) / valueStaked) *
+                100 *
+                6;
+
+              const apr = isNaN(_apr) ? 0 : _apr;
+
+              // Construct and return pool object if all fetches are successful
+              return {
+                tokens: [
+                  {
+                    name: tokenA?.symbol || "",
+                    icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
+                    amount:
+                      Number(pairInfo.result.asset_a.amount) /
+                      10 ** Number(tokenA?.decimals),
+                    category: "",
+                    usdValue: 0,
+                    address: tokenA?.id,
+                  },
+                  {
+                    name: tokenB?.symbol || "",
+                    icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
+                    amount:
+                      Number(pairInfo.result.asset_b.amount) /
+                      10 ** Number(tokenB?.decimals),
+                    category: "",
+                    usdValue: 0,
+                    address: tokenB?.id,
+                  },
+                ],
+                tvl,
+                maxApr: `${(apr / 2).toFixed(2)}`,
+                userLiquidity: 0,
+                poolAddress: poolAddress,
+              };
+            }
+          } catch (e) {
+            console.log(e);
+          }
+          return;
+        };
+
+        const FactoryContract = new PhoenixFactoryContract.Client({
+          contractId: constants.FACTORY_ADDRESS,
+          networkPassphrase: constants.NETWORK_PASSPHRASE,
+          rpcUrl: constants.RPC_URL,
+        });
+
+        const pools = await FactoryContract.query_pools({});
+
+        const poolWithData =
+          pools && Array.isArray(pools.result)
+            ? await Promise.all(
+                pools.result.map(async (pool: string) => {
+                  return await fetchPool(pool);
+                })
+              )
+            : [];
+
+        const poolsFiltered: Pool[] = poolWithData.filter(
+          (el: any) =>
+            el !== undefined &&
+            el.tokens.length >= 2 &&
+            el.tokens.some((token: any) => token.address === tokenId)
+        );
+
+        // Grab volume  and price of token from last 7d
+        const tokenPrice = await tradeApi.getTokenPrices(
+          tokenId,
+          Number(((Date.now() - 604800000) / 1000).toFixed(0))
+        );
+
+        let prices7d: [number, number][];
+
+        if (!tokenPrice.prices) {
+          prices7d = [];
+        } else {
+          prices7d = tokenPrice.prices.map((price) => [
+            Number(price.txTime) * 1000,
+            price.price,
+          ]);
+        }
+
+        const volumes = poolsFiltered.map((pool) => {
+          const volume7d = tradeApi.getTradingVolumePerDay(
+            pool.poolAddress,
+            Number(((Date.now() - 604800000) / 1000).toFixed(0))
+          );
+          return volume7d;
+        });
+
+        const d7d = tradeApi.sumTradingVolumesByBucket(
+          await Promise.all(volumes)
+        );
+        info.price7d = prices7d;
+        setTradingVolume7d(d7d.tradingVolume);
+
+        setSelectedAssetPools(poolsFiltered);
+        setSelectedTokenForInfo(info);
+      } catch (error) {
+        console.error("Error fetching token info:", error);
+      } finally {
+        setLoadingAssetInfo(false);
+      }
+    },
+    [appStore, tradeApi]
+  );
+
   // Memoized props for child components
   const args = useMemo(
     () => ({
@@ -326,225 +545,12 @@ export default function Page() {
       xlmPriceChart,
       phoPriceChart,
       vestingInfo,
+      fetchTokenInfo,
     ]
   );
 
-  const fetchTokenInfo = async (tokenId: string) => {
-    setLoadingAssetInfo(true);
-    setTokenInfoOpen(true);
-
-    try {
-      const TokenContract = new SorobanTokenContract.Client({
-        contractId: tokenId,
-        networkPassphrase: constants.NETWORK_PASSPHRASE,
-        rpcUrl: constants.RPC_URL,
-      });
-      const tokenName = (await TokenContract.name()).result
-        .toLowerCase()
-        .replace(":", "-");
-
-      const fetchedInfo = await (
-        await fetch(
-          `https://api.stellar.expert/explorer/public/asset?search=${tokenName}`
-        )
-      ).json();
-
-      const info = fetchedInfo._embedded.records.find(
-        (el: any) =>
-          el.asset.toUpperCase() === tokenName.toUpperCase() ||
-          el.asset.toUpperCase() === tokenName.toUpperCase() + "-1" ||
-          el.asset.toUpperCase() === tokenName.toUpperCase() + "-2"
-      );
-
-      const fetchPool = async (poolAddress: string) => {
-        try {
-          const PairContract = new PhoenixPairContract.Client({
-            contractId: poolAddress,
-            networkPassphrase: constants.NETWORK_PASSPHRASE,
-            rpcUrl: constants.RPC_URL,
-          });
-
-          const [pairConfig, pairInfo] = await Promise.all([
-            PairContract.query_config(),
-            PairContract.query_pool_info(),
-          ]);
-
-          if (pairConfig?.result && pairInfo?.result) {
-            const [tokenA, tokenB] = await Promise.all([
-              appStore.fetchTokenInfo(pairConfig.result.token_a),
-              appStore.fetchTokenInfo(pairConfig.result.token_b),
-            ]);
-
-            // Fetch prices and calculate TVL
-            const [priceA, priceB] = await Promise.all([
-              API.getPrice(tokenA?.symbol || ""),
-              API.getPrice(tokenB?.symbol || ""),
-            ]);
-
-            const tvl =
-              (priceA * Number(pairInfo.result.asset_a.amount)) /
-                10 ** Number(tokenA?.decimals) +
-              (priceB * Number(pairInfo.result.asset_b.amount)) /
-                10 ** Number(tokenB?.decimals);
-
-            const stakingAddress = pairInfo.result.stake_address;
-
-            const StakeContract = new PhoenixStakeContract.Client({
-              contractId: stakingAddress,
-              networkPassphrase: constants.NETWORK_PASSPHRASE,
-              rpcUrl: constants.RPC_URL,
-            });
-
-            const [stakingInfo, allPoolDetails] = await Promise.all([
-              StakeContract.query_total_staked(),
-              new PhoenixFactoryContract.Client({
-                contractId: constants.FACTORY_ADDRESS,
-                networkPassphrase: constants.NETWORK_PASSPHRASE,
-                rpcUrl: constants.RPC_URL,
-              }).query_all_pools_details(),
-            ]);
-
-            const totalStaked = Number(stakingInfo.result);
-            const totalTokens = Number(
-              allPoolDetails.result.find(
-                (pool: any) => pool.pool_address === poolAddress
-              )?.pool_response.asset_lp_share.amount
-            );
-
-            const ratioStaked = totalStaked / totalTokens;
-            const valueStaked = tvl * ratioStaked;
-
-            // Calculate APR based on incentives
-            const poolIncentives = [
-              {
-                address:
-                  "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX",
-                amount: 12500,
-              },
-              {
-                address:
-                  "CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH",
-                amount: 25000,
-              },
-              {
-                address:
-                  "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA",
-                amount: 18750,
-              },
-            ];
-
-            const poolIncentive = poolIncentives.find(
-              (incentive) => incentive.address === poolAddress
-            );
-
-            const phoprice = await fetchPho();
-            const _apr =
-              ((poolIncentive?.amount || 0 * phoprice) / valueStaked) * 100 * 6;
-
-            const apr = isNaN(_apr) ? 0 : _apr;
-
-            // Construct and return pool object if all fetches are successful
-            return {
-              tokens: [
-                {
-                  name: tokenA?.symbol || "",
-                  icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
-                  amount:
-                    Number(pairInfo.result.asset_a.amount) /
-                    10 ** Number(tokenA?.decimals),
-                  category: "",
-                  usdValue: 0,
-                  address: tokenA?.id,
-                },
-                {
-                  name: tokenB?.symbol || "",
-                  icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
-                  amount:
-                    Number(pairInfo.result.asset_b.amount) /
-                    10 ** Number(tokenB?.decimals),
-                  category: "",
-                  usdValue: 0,
-                  address: tokenB?.id,
-                },
-              ],
-              tvl,
-              maxApr: `${(apr / 2).toFixed(2)}`,
-              userLiquidity: 0,
-              poolAddress: poolAddress,
-            };
-          }
-        } catch (e) {
-          console.log(e);
-        }
-        return;
-      };
-
-      const FactoryContract = new PhoenixFactoryContract.Client({
-        contractId: constants.FACTORY_ADDRESS,
-        networkPassphrase: constants.NETWORK_PASSPHRASE,
-        rpcUrl: constants.RPC_URL,
-      });
-
-      const pools = await FactoryContract.query_pools({});
-
-      const poolWithData =
-        pools && Array.isArray(pools.result)
-          ? await Promise.all(
-              pools.result.map(async (pool: string) => {
-                return await fetchPool(pool);
-              })
-            )
-          : [];
-
-      const poolsFiltered: Pool[] = poolWithData.filter(
-        (el: any) =>
-          el !== undefined &&
-          el.tokens.length >= 2 &&
-          el.tokens.some((token: any) => token.address === tokenId)
-      );
-
-      // Grab volume  and price of token from last 7d
-      const tokenPrice = await tradeApi.getTokenPrices(
-        tokenId,
-        Number(((Date.now() - 604800000) / 1000).toFixed(0))
-      );
-
-      let prices7d: [number, number][];
-
-      if (!tokenPrice.prices) {
-        prices7d = [];
-      } else {
-        prices7d = tokenPrice.prices.map((price) => [
-          Number(price.txTime) * 1000,
-          price.price,
-        ]);
-      }
-
-      const volumes = poolsFiltered.map((pool) => {
-        const volume7d = tradeApi.getTradingVolumePerDay(
-          pool.poolAddress,
-          Number(((Date.now() - 604800000) / 1000).toFixed(0))
-        );
-        return volume7d;
-      });
-
-      const d7d = tradeApi.sumTradingVolumesByBucket(
-        await Promise.all(volumes)
-      );
-      info.price7d = prices7d;
-      setTradingVolume7d(d7d.tradingVolume);
-
-      setSelectedAssetPools(poolsFiltered);
-      setSelectedTokenForInfo(info);
-    } catch (error) {
-      console.error("Error fetching token info:", error);
-    } finally {
-      setLoadingAssetInfo(false);
-    }
-  };
-
   return (
-    <Box sx={{ marginTop: { md: 0, xs: 12 } }}>
+    <Box sx={{ marginTop: { md: 4, xs: 12 } }}>
       {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
       <input type="hidden" value="Phoenix DeFi Hub - Dashboard" />
 
@@ -560,243 +566,398 @@ export default function Page() {
         />
       )}
 
-      <Grid container spacing={3} sx={{ mt: 4, maxWidth: 1440 }}>
-        {/* Phoenix-styled Welcome Banner */}
-        <Grid item xs={12}>
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+      {/* Main Container with improved spacing and responsive layout */}
+      <Box
+        sx={{
+          maxWidth: 1440,
+          mx: "auto",
+          px: { xs: 2, sm: 3, md: 4 },
+          mt: { xs: 2, md: 4 },
+        }}
+      >
+        {/* Phoenix-styled Welcome Banner with modern design */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <Box
+            sx={{
+              background:
+                "linear-gradient(135deg, #292B2C 0%, #1F2123 50%, #1A1C1D 100%)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+              borderRadius: { xs: "12px", sm: "16px", md: "20px" },
+              boxShadow: "0px 8px 32px rgba(0, 0, 0, 0.4)",
+              overflow: "hidden",
+              position: "relative",
+              mb: { xs: 3, md: 4 },
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "1px",
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)",
+              },
+            }}
           >
+            {/* Enhanced background decoration */}
             <Box
               sx={{
-                background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
-                border: "1px solid rgba(255, 255, 255, 0.05)",
-                borderRadius: "16px",
-                boxShadow: "0px 4px 24px rgba(0, 0, 0, 0.2)",
-                overflow: "hidden",
+                position: "absolute",
+                top: { xs: -50, md: -30 },
+                right: { xs: -50, md: -30 },
+                width: { xs: 150, sm: 200, md: 250 },
+                height: { xs: 150, sm: 200, md: 250 },
+                opacity: { xs: 0.6, md: 0.8 },
+                backgroundImage: "url('/3d.png')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                filter: "blur(1px)",
+                zIndex: 0,
+              }}
+            />
+
+            {/* Gradient overlay for better text readability */}
+            <Box
+              sx={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(135deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%)",
+                zIndex: 1,
+              }}
+            />
+
+            <Box
+              sx={{
+                padding: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
                 position: "relative",
+                zIndex: 2,
               }}
             >
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  left: { md: 0, xs: "auto" },
-                  right: { md: "auto", xs: 0 },
-                  width: 200,
-                  height: 200,
-                  opacity: 0.8,
-                  backgroundImage: "url('/3d.png')",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  zIndex: 0,
-                }}
-              />
-              <Box
-                sx={{
-                  padding: { xs: "1.5rem", md: "2rem" },
-                  position: "relative",
-                  zIndex: 1,
-                }}
-              >
-                <Grid container alignItems="center" spacing={3}>
-                  <Grid item xs={0} md={2} />
-                  <Grid item xs={12} md={5}>
-                    <Typography
+              <Grid container alignItems="center" spacing={{ xs: 2, md: 3 }}>
+                <Grid item xs={12} md={7}>
+                  <Typography
+                    sx={{
+                      color: "#FFFFFF",
+                      fontSize: { xs: "1.75rem", sm: "2rem", md: "2.25rem" },
+                      fontWeight: 800,
+                      mb: { xs: 1, md: 1.5 },
+                      background:
+                        "linear-gradient(135deg, #FFFFFF 0%, #E2491A 100%)",
+                      backgroundClip: "text",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    Welcome to Phoenix!
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: "1rem", md: "1.125rem" },
+                      color: "rgba(255, 255, 255, 0.8)",
+                      maxWidth: { xs: "100%", md: "85%" },
+                      lineHeight: 1.6,
+                      mb: { xs: 2, md: 0 },
+                    }}
+                  >
+                    Your comprehensive DeFi hub on Stellar. Trade, earn, and
+                    explore the future of decentralized finance.
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={5}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
+                      gap: { xs: 1.5, sm: 2 },
+                      justifyContent: { xs: "stretch", md: "flex-end" },
+                    }}
+                  >
+                    <Button
+                      type="primary"
+                      onClick={() => router.push("/swap")}
                       sx={{
-                        color: "#FFFFFF",
-                        fontSize: { xs: "1.5rem", md: "1.75rem" },
-                        fontWeight: 700,
-                        mb: 1,
-                      }}
-                    >
-                      Welcome to Phoenix!
-                    </Typography>
-                    <Typography
-                      sx={{
+                        minWidth: { xs: "100%", sm: "140px" },
+                        py: 1.5,
                         fontSize: "1rem",
-                        color: "rgba(255, 255, 255, 0.7)",
-                        maxWidth: "90%",
+                        fontWeight: 600,
                       }}
                     >
-                      Your one-stop shop for all things DeFi on Stellar.
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={5}>
+                      Start Trading
+                    </Button>
+                    <Button
+                      type="secondary"
+                      onClick={() => router.push("/pools")}
+                      sx={{
+                        minWidth: { xs: "100%", sm: "140px" },
+                        py: 1.5,
+                        fontSize: "1rem",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Explore Pools
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
+        </motion.div>
+
+        {/* Main content grid with improved responsive design */}
+        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+          {/* Dashboard Stats - Full width */}
+          <Grid item xs={12}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              {loadingDashboard ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: { xs: "20px", md: "24px" },
+                    backgroundColor: "var(--neutral-900, #171717)",
+                    borderRadius: { xs: "12px", md: "16px" },
+                    border: "1px solid var(--neutral-700, #404040)",
+                    minHeight: { xs: "120px", md: "140px" },
+                  }}
+                >
+                  <CircularProgress sx={{ color: "#E2491A" }} />
+                </Box>
+              ) : (
+                <DashboardStats {...args.dashboardStatsArgs} />
+              )}
+            </motion.div>
+          </Grid>
+
+          {/* Main Content Area */}
+          <Grid item xs={12} lg={9}>
+            <Grid container spacing={{ xs: 2, sm: 3, md: 3 }}>
+              {/* Price Charts - Responsive layout */}
+              <Grid item xs={12} md={6}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  {loadingDashboard ? (
                     <Box
                       sx={{
+                        height: { xs: "200px", md: "240px" },
                         display: "flex",
-                        flexWrap: { xs: "wrap", sm: "nowrap" },
-                        gap: 2,
-                        justifyContent: { xs: "flex-start", md: "flex-end" },
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "var(--neutral-900, #171717)",
+                        borderRadius: { xs: "12px", md: "16px" },
+                        border: "1px solid var(--neutral-700, #404040)",
                       }}
                     >
-                      <Button
-                        type="primary"
-                        onClick={() => router.push("/swap")}
-                      >
-                        Trade Tokens
-                      </Button>
-                      <Button
-                        type="secondary"
-                        onClick={() => router.push("/pools")}
-                      >
-                        Explore Pools
-                      </Button>
+                      <CircularProgress sx={{ color: "#E2491A" }} />
                     </Box>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Box>
-          </motion.div>
-        </Grid>
-        <Grid item container lg={9} spacing={3}>
-          {/* Dashboard Stats */}
-          <Grid item xs={12}>
-            {loadingDashboard ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "20px",
-                  backgroundColor: "#1d1f21",
-                  borderRadius: "12px",
-                }}
-              >
-                <CircularProgress sx={{ color: "#E2491A" }} />
-              </Box>
-            ) : (
-              <DashboardStats {...args.dashboardStatsArgs} />
-            )}
-          </Grid>
-          {/* Price Charts */}
-          <Grid item xs={12} lg={6}>
-            {loadingDashboard ? (
-              <Box
-                sx={{
-                  height: "200px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: "#1d1f21",
-                  borderRadius: "12px",
-                }}
-              >
-                <CircularProgress sx={{ color: "#E2491A" }} />
-              </Box>
-            ) : (
-              <DashboardPriceCharts {...args.dashboardArgs1} />
-            )}
-          </Grid>
-          <Grid item xs={12} lg={6}>
-            {loadingDashboard ? (
-              <Box
-                sx={{
-                  height: "200px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: "#1d1f21",
-                  borderRadius: "12px",
-                }}
-              >
-                <CircularProgress sx={{ color: "#E2491A" }} />
-              </Box>
-            ) : (
-              <DashboardPriceCharts {...args.dashboardArgs2} />
-            )}
-          </Grid>
-          {/* Wallet Balance Table */}
-          <Grid item xs={12} sx={{ mt: 3 }}>
-            {loadingBalances ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "200px",
-                  backgroundColor: "#1d1f21",
-                  borderRadius: "12px",
-                }}
-              >
-                <CircularProgress sx={{ color: "#E2491A" }} />
-              </Box>
-            ) : allTokens.length ? (
-              <WalletBalanceTable {...args.walletBalanceArgs} />
-            ) : (
-              <Typography
-                sx={{
-                  color: "#FFF",
-                  fontSize: "14px",
-                  textAlign: "center",
-                  padding: "20px",
-                  backgroundColor: "#1d1f21",
-                  borderRadius: "12px",
-                }}
-              >
-                Looks like you haven{"'"}t acquired any tokens.
-              </Typography>
-            )}
-          </Grid>
-          <Grid item xs={12} sx={{ overflow: "hidden" }}>
-            <NftCarouselPlaceholder />
-          </Grid>
-        </Grid>
-        <Grid item container lg={3}>
-          {/* Crypto CTA */}
-          <Grid
-            item
-            xs={12}
-            sx={{ display: "flex", flexDirection: "column", gap: 4 }}
-          >
-            <Tile
-              value={formatCurrencyStatic.format(dailyVolume)}
-              title="Volume (24h)"
-              link=""
-            />
-            <Tile
-              value={formatCurrencyStatic.format(tvl)}
-              title="Total Value Locked"
-              link=""
-            />
-            <Box sx={{ mt: 5 }}>
-              <CryptoCTA
-                onClick={() => window.open("https://app.kado.money")}
-              />
-            </Box>
-          </Grid>
-        </Grid>
-      </Grid>
-      {/* Asset Info Modal */}
+                  ) : (
+                    <DashboardPriceCharts {...args.dashboardArgs1} />
+                  )}
+                </motion.div>
+              </Grid>
 
-      <AssetInfoModal
-        open={tokenInfoOpen}
-        onClose={() => {
-          setTokenInfoOpen(false);
-          if (loadingAssetInfo) {
-            setLoadingAssetInfo(false);
-          }
-        }}
-        asset={selectedTokenForInfo || emptyAssetPlaceholder}
-        userBalance={0}
-        pools={selectedAssetPools}
-        // @ts-ignore
-        tradingVolume7d={tradingVolume7d}
-        loading={loadingAssetInfo}
-      />
+              <Grid item xs={12} md={6}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                >
+                  {loadingDashboard ? (
+                    <Box
+                      sx={{
+                        height: { xs: "200px", md: "240px" },
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "var(--neutral-900, #171717)",
+                        borderRadius: { xs: "12px", md: "16px" },
+                        border: "1px solid var(--neutral-700, #404040)",
+                      }}
+                    >
+                      <CircularProgress sx={{ color: "#E2491A" }} />
+                    </Box>
+                  ) : (
+                    <DashboardPriceCharts {...args.dashboardArgs2} />
+                  )}
+                </motion.div>
+              </Grid>
 
-      {/* Vesting Modal */}
-      {vestingInfo.length > 0 && (
-        <VestingTokensModal
-          open={vestingModalOpen}
-          onClose={() => setVestingModalOpen(false)}
-          vestingInfo={vestingInfo}
-          queryAvailableToClaim={(index) => queryAvailableToClaim(index)}
-          claim={(index) => claim(index)}
+              {/* Wallet Balance Table - Enhanced */}
+              <Grid item xs={12}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  <Box sx={{ mt: { xs: 1, md: 2 } }}>
+                    {loadingBalances ? (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          minHeight: { xs: "200px", md: "240px" },
+                          backgroundColor: "var(--neutral-900, #171717)",
+                          borderRadius: { xs: "12px", md: "16px" },
+                          border: "1px solid var(--neutral-700, #404040)",
+                        }}
+                      >
+                        <CircularProgress sx={{ color: "#E2491A" }} />
+                      </Box>
+                    ) : allTokens.length ? (
+                      <WalletBalanceTable {...args.walletBalanceArgs} />
+                    ) : (
+                      <Box
+                        sx={{
+                          textAlign: "center",
+                          padding: { xs: "32px 20px", md: "40px 24px" },
+                          backgroundColor: "var(--neutral-900, #171717)",
+                          borderRadius: { xs: "12px", md: "16px" },
+                          border: "1px solid var(--neutral-700, #404040)",
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            color: "var(--neutral-300, #D4D4D4)",
+                            fontSize: { xs: "14px", md: "16px" },
+                            fontWeight: 500,
+                            mb: 2,
+                          }}
+                        >
+                          No tokens found in your wallet
+                        </Typography>
+                        <Typography
+                          sx={{
+                            color: "var(--neutral-400, #A3A3A3)",
+                            fontSize: { xs: "12px", md: "14px" },
+                            mb: 3,
+                          }}
+                        >
+                          Start trading to see your token balances here
+                        </Typography>
+                        <Button
+                          type="primary"
+                          onClick={() => router.push("/swap")}
+                          sx={{
+                            px: { xs: 3, md: 4 },
+                            py: { xs: 1, md: 1.5 },
+                          }}
+                        >
+                          Start Trading
+                        </Button>
+                      </Box>
+                    )}
+                  </Box>
+                </motion.div>
+              </Grid>
+
+              {/* NFT Preview Section - Enhanced */}
+              <Grid item xs={12}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                >
+                  <Box sx={{ mt: { xs: 2, md: 0 }, overflow: "hidden" }}>
+                    <NftCarouselPlaceholder />
+                  </Box>
+                </motion.div>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          {/* Sidebar - Now properly aligned */}
+          <Grid item xs={12} lg={3}>
+            <Grid container spacing={{ xs: 2, md: 3 }}>
+              {/* Volume Tile */}
+              <Grid item xs={12} sm={6} lg={12}>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                >
+                  <Tile
+                    value={formatCurrencyStatic.format(dailyVolume)}
+                    title="Volume (24h)"
+                    link=""
+                  />
+                </motion.div>
+              </Grid>
+
+              {/* TVL Tile */}
+              <Grid item xs={12} sm={6} lg={12}>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  <Tile
+                    value={formatCurrencyStatic.format(tvl)}
+                    title="Total Value Locked"
+                    link=""
+                  />
+                </motion.div>
+              </Grid>
+
+              {/* CryptoCTA */}
+              <Grid item xs={12}>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                >
+                  <Box sx={{ mt: { xs: 1, md: 2 } }}>
+                    <CryptoCTA
+                      onClick={() => window.open("https://app.kado.money")}
+                    />
+                  </Box>
+                </motion.div>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+        {/* Asset Info Modal */}
+
+        <AssetInfoModal
+          open={tokenInfoOpen}
+          onClose={() => {
+            setTokenInfoOpen(false);
+            if (loadingAssetInfo) {
+              setLoadingAssetInfo(false);
+            }
+          }}
+          asset={selectedTokenForInfo || emptyAssetPlaceholder}
+          userBalance={0}
+          pools={selectedAssetPools}
+          // @ts-ignore
+          tradingVolume7d={tradingVolume7d}
+          loading={loadingAssetInfo}
         />
-      )}
+
+        {/* Vesting Modal */}
+        {vestingInfo.length > 0 && (
+          <VestingTokensModal
+            open={vestingModalOpen}
+            onClose={() => setVestingModalOpen(false)}
+            vestingInfo={vestingInfo}
+            queryAvailableToClaim={(index) => queryAvailableToClaim(index)}
+            claim={(index) => claim(index)}
+          />
+        )}
+      </Box>
     </Box>
   );
 }
