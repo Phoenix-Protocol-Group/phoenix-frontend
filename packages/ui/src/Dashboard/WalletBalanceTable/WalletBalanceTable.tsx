@@ -265,6 +265,7 @@ const ListItem = ({
   onVestingClick,
 }: ListItemProps) => {
   const [favorites, setFavorites] = useState<string[]>([]);
+  const isXLM = name === "XLM";
 
   useEffect(() => {
     const storedFavorites = JSON.parse(
@@ -279,8 +280,8 @@ const ListItem = ({
 
   return (
     <motion.div
-      whileHover={{ scale: 0.98 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={!isXLM ? { scale: 0.98 } : {}}
+      whileTap={!isXLM ? { scale: 0.95 } : {}}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
@@ -293,10 +294,10 @@ const ListItem = ({
           border: "1px solid var(--neutral-700, #404040)",
           mb: 2,
           "&:hover": {
-            cursor: "pointer",
+            cursor: isXLM ? "default" : "pointer",
           },
         }}
-        onClick={() => onTokenClick(contractId)}
+        onClick={!isXLM ? () => onTokenClick(contractId) : undefined}
       >
         <Grid container alignItems="center" spacing={1}>
           <Grid item xs={6} md={3} display="flex" alignItems="center">
