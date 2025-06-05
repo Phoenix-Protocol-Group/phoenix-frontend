@@ -250,12 +250,14 @@ export default function Page() {
   return (
     <Box
       sx={{
-        mt: { xs: 12, md: 0 },
+        mt: { xs: "70px", md: 0 },
         width: "100%",
         maxWidth: "1440px",
         minHeight: "100vh",
         position: "relative",
         overflow: "hidden",
+        px: { xs: 1, sm: 2, md: 3 },
+        pb: { xs: 2, sm: 3, md: 4 },
       }}
     >
       {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}

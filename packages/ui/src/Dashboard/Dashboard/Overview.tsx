@@ -133,7 +133,9 @@ export default function Overview() {
             ? "0"
             : "100%",
           transition: "all 0.2s ease-in-out",
-          mt: 5,
+          mt: { xs: "70px", md: 5 },
+          px: { xs: 1, sm: 2, md: 3 },
+          pb: { xs: 2, sm: 3, md: 4 },
         }}
         container
         spacing={largerThenMd ? 3 : 1}

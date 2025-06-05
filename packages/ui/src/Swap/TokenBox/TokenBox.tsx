@@ -2,7 +2,12 @@ import React, { useState, useMemo, useCallback } from "react";
 import { Box, Button, Grid, Input, Skeleton, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { Token, TokenBoxProps } from "@phoenix-protocol/types";
-import { colors, borderRadius, typography, spacing } from "../../Theme/styleConstants";
+import {
+  colors,
+  borderRadius,
+  typography,
+  spacing,
+} from "../../Theme/styleConstants";
 
 /**
  * AssetButton
@@ -27,8 +32,8 @@ const AssetButton = ({
     <Button
       onClick={onClick}
       sx={{
-        fontSize: typography.fontSize.xs,
-        padding: spacing.xs,
+        fontSize: { xs: typography.fontSize.xs, sm: typography.fontSize.sm },
+        padding: { xs: spacing.xs, sm: spacing.sm },
         borderRadius: borderRadius.sm,
         background: hideDropdownButton ? "none" : colors.neutral[900],
         border: hideDropdownButton
@@ -36,17 +41,23 @@ const AssetButton = ({
           : `1px solid ${colors.neutral[700]}`,
         color: colors.neutral[300],
         "&:hover": {
-          background: hideDropdownButton
-            ? "none"
-            : colors.neutral[800],
+          background: hideDropdownButton ? "none" : colors.neutral[800],
         },
         cursor: hideDropdownButton ? "auto" : "pointer",
         pointerEvents: hideDropdownButton ? "none" : "auto",
-        minWidth: "96px",
+        minWidth: { xs: "80px", sm: "96px" }, // Slightly smaller mobile min-width
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         gap: spacing.xs,
+        // Enhanced mobile touch targets
+        minHeight: { xs: "32px", sm: "auto" }, // Smaller mobile height
+        "&:active": !hideDropdownButton
+          ? {
+              transform: "scale(0.98)",
+              transition: "all 0.1s ease",
+            }
+          : {},
       }}
     >
       {token.icon && (
@@ -61,11 +72,9 @@ const AssetButton = ({
           }}
         />
       )}
-      
-      <Box sx={{ fontWeight: typography.fontWeights.medium }}>
-        {token.name}
-      </Box>
-      
+
+      <Box sx={{ fontWeight: typography.fontWeights.medium }}>{token.name}</Box>
+
       {!hideDropdownButton && (
         <Box
           component="img"
@@ -126,11 +135,16 @@ const TokenBox = ({
     >
       <Box
         sx={{
-          background: "var(--neutral-900, #171717)", // Adjusted background
-          padding: "8px 12px", // Adjusted padding
-          borderRadius: "12px", // Adjusted border radius
-          border: "1px solid var(--neutral-700, #404040)", // Adjusted border
-          boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.15)", // Adjusted shadow
+          background: "var(--neutral-900, #171717)",
+          padding: { xs: "8px 10px", sm: "12px 16px" }, // Reduced mobile padding
+          borderRadius: { xs: "10px", sm: "12px" },
+          border: "1px solid var(--neutral-700, #404040)",
+          boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.15)",
+          transition: "all 0.2s ease",
+          "&:hover": {
+            border: `1px solid ${colors.neutral[600]}`,
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+          },
         }}
       >
         <Grid container>
@@ -152,26 +166,24 @@ const TokenBox = ({
                 type="number"
                 placeholder="0.00"
                 sx={{
-                  color: "var(--neutral-300, #D4D4D4)", // Adjusted color
-                  fontSize: "18px", // Adjusted font size
-                  fontWeight: 500, // Adjusted font weight
+                  color: "var(--neutral-300, #D4D4D4)",
+                  fontSize: { xs: "16px", sm: "18px" },
+                  fontWeight: 500,
                   lineHeight: "140%",
                   width: "100%",
                   "&:before, &:after": {
                     content: "none",
                   },
                   "& .MuiInput-input": {
-                    padding: "4px 0", // Adjusted padding
+                    padding: { xs: "4px 0", sm: "8px 0" }, // Reduced mobile padding
                   },
                   "& input[type=number]": {
                     MozAppearance: "textfield",
-                    /* Firefox */
                     "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button":
                       {
                         WebkitAppearance: "none",
                         margin: 0,
                       },
-                    /* Chrome, Safari, Edge, Opera */
                     "-moz-appearance": "textfield",
                   },
                 }}

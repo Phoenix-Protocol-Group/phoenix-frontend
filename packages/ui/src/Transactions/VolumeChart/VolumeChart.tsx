@@ -1,4 +1,11 @@
-import { Box, Typography, MenuItem, TextField } from "@mui/material";
+import {
+  Box,
+  Typography,
+  MenuItem,
+  TextField,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import React, { useMemo, useRef, useState } from "react";
 import {
   BarChart,
@@ -12,7 +19,12 @@ import {
 } from "recharts";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils";
 import { CustomDropdown } from "../../Common/CustomDropdown";
-import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
+import {
+  colors,
+  typography,
+  spacing,
+  borderRadius,
+} from "../../Theme/styleConstants";
 
 type Pool = {
   tokenA: { icon: string; symbol: string };
@@ -105,6 +117,9 @@ const VolumeChart = ({
   // Find the maximum value in the data array
   const maxValue = Math.max(...data.map((item) => item.volume));
   const [searchTerm, setSearchTerm] = useState("");
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isSmallMobile = useMediaQuery("(max-width:350px)");
 
   const filteredPools = useMemo(() => {
     if (!searchTerm) return pools;
@@ -141,27 +156,42 @@ const VolumeChart = ({
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", sm: "row" }, // Stack on small screens
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: { xs: "flex-start", sm: "center" },
           width: "100%",
+          gap: { xs: 2, sm: 1, md: 0 },
         }}
       >
-        <Box>
+        <Box sx={{ flex: 1, width: { xs: "100%", sm: "auto" } }}>
           <Box
             sx={{
               display: "flex",
-              alignItems: "center",
-              gap: 2,
-              justifyContent: "space-between",
+              flexDirection: {
+                xs: isSmallMobile ? "column" : "row",
+                sm: "row",
+                md: "row",
+              },
+              alignItems: {
+                xs: isSmallMobile ? "flex-start" : "center",
+                sm: "center",
+              },
+              gap: { xs: isSmallMobile ? 1 : 2, sm: 3, md: 4 },
+              justifyContent: { xs: "space-between", sm: "flex-start" },
+              mb: isSmallMobile ? 1 : 0,
+              width: "100%",
             }}
           >
             <Typography
               sx={{
                 color: colors.neutral[400], // Adjusted color
                 fontFamily: typography.fontFamily,
-                fontSize: "0.75rem",
+                fontSize: { xs: "0.75rem", sm: "0.8rem" },
                 fontWeight: 400,
                 opacity: 0.6,
+                whiteSpace: "nowrap",
+                minWidth: { xs: "auto", sm: "140px", md: "auto" },
+                mr: { xs: 0, sm: 2, md: 2 },
               }}
             >
               Volume {resolveSelectedVolume(selectedTab)} (USD)
@@ -176,14 +206,24 @@ const VolumeChart = ({
             sx={{
               color: colors.neutral[50], // Adjusted color
               fontFamily: typography.fontFamily,
-              fontSize: "1.5rem",
+              fontSize: { xs: "1.25rem", sm: "1.5rem" },
             }}
           >
             {formatCurrencyStatic.format(totalVolume)}
           </Typography>
         </Box>
 
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            alignItems: "center",
+            flexWrap: "wrap",
+            justifyContent: { xs: "flex-start", sm: "flex-end" },
+            width: { xs: "100%", sm: "auto" },
+            mt: { xs: 1, sm: 0 },
+          }}
+        >
           <Box
             sx={
               selectedTab === "D"
@@ -216,8 +256,16 @@ const VolumeChart = ({
           </Box>
         </Box>
       </Box>
-      <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={data} barCategoryGap={2}>
+      <ResponsiveContainer width="100%" height={isMobile ? 150 : 200}>
+        <BarChart
+          data={data}
+          barCategoryGap={isMobile ? 1 : 2}
+          margin={
+            isMobile
+              ? { top: 5, right: 10, bottom: 5, left: 0 }
+              : { top: 5, right: 30, bottom: 5, left: 0 }
+          }
+        >
           <defs>
             <linearGradient id="highGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#E23F1C" />
@@ -243,7 +291,11 @@ const VolumeChart = ({
             strokeWidth={3}
             vertical={false}
           />
-          <XAxis dataKey="timestamp" />
+          <XAxis
+            dataKey="timestamp"
+            tick={{ fontSize: isMobile ? 10 : 12 }}
+            tickMargin={isMobile ? 5 : 10}
+          />
           <Tooltip
             content={({ active, payload, label }) => {
               if (active && payload && payload.length) {

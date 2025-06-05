@@ -25,9 +25,11 @@ const MenuButton = ({
   const center = {
     closed: {
       opacity: 1,
+      scaleX: 1,
     },
     opened: {
       opacity: 0,
+      scaleX: 0.3,
     },
   };
   const bottom = {

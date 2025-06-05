@@ -47,37 +47,45 @@ const SwapContainer = ({
           width: "100%",
           display: "flex",
           flexDirection: "column",
-          gap: { xs: spacing.lg, md: spacing.xl },
+          gap: { xs: spacing.sm, sm: spacing.md, md: spacing.lg },
           alignItems: "center",
-          px: { xs: spacing.md, sm: spacing.lg },
+          px: { xs: spacing.xs, sm: spacing.sm, md: spacing.md },
+          mt: { xs: "70px", md: 0 }, // Account for fixed mobile AppBar
         }}
       >
         {/* Header Section */}
         <Box
           sx={{
             textAlign: "center",
-            mb: { xs: spacing.sm, md: spacing.md },
+            mb: { xs: spacing.xs, sm: spacing.sm, md: spacing.md },
+            px: { xs: spacing.sm, sm: 0 }, // Better mobile padding
           }}
         >
           <Typography
             sx={{
               fontSize: {
-                xs: typography.fontSize.xl,
+                xs: typography.fontSize.lg,
+                sm: typography.fontSize.xl,
                 md: typography.fontSize.xxl,
               },
               fontWeight: typography.fontWeights.bold,
               color: colors.neutral[50],
-              mb: spacing.xs,
+              mb: { xs: spacing.xs, sm: spacing.sm },
               letterSpacing: "-0.02em",
+              lineHeight: 1.2,
             }}
           >
             Swap tokens instantly
           </Typography>
           <Typography
             sx={{
-              fontSize: typography.fontSize.sm,
+              fontSize: {
+                xs: typography.fontSize.xs,
+                sm: typography.fontSize.sm,
+              },
               color: colors.neutral[400],
               fontWeight: typography.fontWeights.regular,
+              px: { xs: spacing.sm, sm: 0 },
             }}
           >
             Trade tokens with minimal slippage and low fees
@@ -89,15 +97,16 @@ const SwapContainer = ({
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: { xs: spacing.lg, md: spacing.xl },
+            gap: { xs: spacing.sm, sm: spacing.md, md: spacing.lg },
             width: "100%",
-            maxWidth: "600px",
+            maxWidth: { xs: "100%", sm: "520px", md: "600px" },
           }}
         >
           {/* Swap Form Section */}
           <CardContainer
             sx={{
               position: "relative",
+              padding: { xs: spacing.sm, sm: spacing.md },
               background: `linear-gradient(145deg, ${colors.neutral[800]} 0%, ${colors.neutral[850]} 100%)`,
               border: `1px solid ${colors.neutral[700]}`,
               boxShadow: `0 8px 25px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.1)`,
@@ -109,7 +118,13 @@ const SwapContainer = ({
               transition: "all 0.3s ease-in-out",
             }}
           >
-            <Box sx={{ position: "relative", width: "100%", p: spacing.lg }}>
+            <Box
+              sx={{
+                position: "relative",
+                width: "100%",
+                p: { xs: 0, sm: spacing.lg }, // Reduced mobile padding
+              }}
+            >
               <div
                 className="token-box"
                 style={{
@@ -126,11 +141,11 @@ const SwapContainer = ({
                   onChange={(value) => onInputChange(true, value)}
                 />
 
-                {/* Improved Swap Assets Button */}
+                {/* Enhanced Mobile-Optimized Swap Assets Button */}
                 <Box
                   sx={{
-                    height: "48px",
-                    width: "48px",
+                    height: { xs: "44px", sm: "48px" },
+                    width: { xs: "44px", sm: "48px" },
                     position: "absolute",
                     top: "50%",
                     left: "50%",
@@ -144,11 +159,32 @@ const SwapContainer = ({
                     justifyContent: "center",
                     boxShadow: `0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2)`,
                     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    cursor: "pointer",
+                    // Enhanced mobile touch targets
+                    minHeight: { xs: "44px", sm: "48px" },
+                    minWidth: { xs: "44px", sm: "48px" },
                     "&:hover": {
                       borderColor: colors.primary.main,
                       background: `linear-gradient(145deg, ${colors.primary.main}20, ${colors.neutral[700]} 100%)`,
                       transform: "translate(-50%, -50%) scale(1.05)",
                       boxShadow: `0 8px 20px rgba(249, 115, 22, 0.3), 0 4px 10px rgba(0, 0, 0, 0.2)`,
+                    },
+                    // Mobile-specific touch states
+                    "&:active": {
+                      transform: "translate(-50%, -50%) scale(0.95)",
+                      transition: "all 0.1s ease",
+                    },
+                    // Improve touch area for mobile
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      top: "-8px",
+                      left: "-8px",
+                      right: "-8px",
+                      bottom: "-8px",
+                      borderRadius: "50%",
+                      // Invisible touch area extension for mobile
+                      pointerEvents: "auto",
                     },
                   }}
                 >
@@ -168,23 +204,34 @@ const SwapContainer = ({
               {/* Settings and Action Buttons */}
               <Box
                 sx={{
-                  mt: spacing.lg,
+                  mt: { xs: spacing.md, sm: spacing.lg },
                   display: "flex",
                   flexDirection: "column",
-                  gap: spacing.md,
+                  gap: { xs: spacing.sm, sm: spacing.md },
                 }}
               >
                 <Typography
                   onClick={onOptionsClick}
                   sx={{
                     color: colors.primary.main,
-                    fontSize: typography.fontSize.sm,
+                    fontSize: {
+                      xs: typography.fontSize.xs,
+                      sm: typography.fontSize.sm,
+                    },
                     textDecoration: "underline",
                     cursor: "pointer",
                     textAlign: "right",
                     transition: "color 0.2s ease",
+                    padding: { xs: spacing.xs, sm: 0 },
+                    minHeight: { xs: "32px", sm: "auto" },
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
                     "&:hover": {
                       color: colors.primary[400],
+                    },
+                    "&:active": {
+                      color: colors.primary[500],
                     },
                   }}
                 >
@@ -208,9 +255,18 @@ const SwapContainer = ({
                       }
                       sx={{
                         width: "100%",
-                        height: "56px",
-                        fontSize: typography.fontSize.md,
+                        height: { xs: "52px", sm: "56px" },
+                        fontSize: {
+                          xs: typography.fontSize.sm,
+                          sm: typography.fontSize.md,
+                        },
                         fontWeight: typography.fontWeights.semiBold,
+                        // Mobile-optimized touch targets
+                        minHeight: { xs: "52px", sm: "56px" },
+                        borderRadius: {
+                          xs: borderRadius.md,
+                          sm: borderRadius.lg,
+                        },
                       }}
                     />
                   </motion.div>
@@ -227,9 +283,18 @@ const SwapContainer = ({
                       label="Swap"
                       sx={{
                         width: "100%",
-                        height: "56px",
-                        fontSize: typography.fontSize.md,
+                        height: { xs: "52px", sm: "56px" },
+                        fontSize: {
+                          xs: typography.fontSize.sm,
+                          sm: typography.fontSize.md,
+                        },
                         fontWeight: typography.fontWeights.semiBold,
+                        // Mobile-optimized touch targets
+                        minHeight: { xs: "52px", sm: "56px" },
+                        borderRadius: {
+                          xs: borderRadius.md,
+                          sm: borderRadius.lg,
+                        },
                         background: swapButtonDisabled
                           ? `linear-gradient(145deg, ${colors.neutral[700]} 0%, ${colors.neutral[800]} 100%)`
                           : `linear-gradient(135deg, ${
@@ -238,7 +303,6 @@ const SwapContainer = ({
                         border: swapButtonDisabled
                           ? `1px solid ${colors.neutral[600]}`
                           : `1px solid ${colors.primary.main}`,
-                        borderRadius: borderRadius.lg,
                         boxShadow: swapButtonDisabled
                           ? "none"
                           : `0 4px 15px rgba(249, 115, 22, 0.3), 0 2px 8px rgba(249, 115, 22, 0.2)`,
@@ -261,6 +325,15 @@ const SwapContainer = ({
                               boxShadow: `0 4px 15px rgba(249, 115, 22, 0.3), 0 2px 8px rgba(249, 115, 22, 0.2)`,
                             }
                           : {},
+                        // Enhanced mobile touch feedback
+                        "@media (max-width: 768px)": {
+                          "&:active": !swapButtonDisabled
+                            ? {
+                                transform: "scale(0.98)",
+                                transition: "all 0.1s ease",
+                              }
+                            : {},
+                        },
                         transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                       }}
                     />
@@ -284,7 +357,7 @@ const SwapContainer = ({
               transition: "all 0.3s ease-in-out",
             }}
           >
-            <Box sx={{ p: spacing.lg }}>
+            <Box sx={{ p: { xs: 0, sm: spacing.lg } }}>
               <SwapDetails
                 exchangeRate={exchangeRate}
                 networkFee={networkFee}

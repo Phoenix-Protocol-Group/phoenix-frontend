@@ -119,6 +119,9 @@ const PoolsOverview = () => {
           transition: "all 0.2s ease-in-out",
           display: "flex",
           justifyContent: "center",
+          mt: { xs: "70px", md: 0 },
+          px: { xs: 1, sm: 2, md: 3 },
+          pb: { xs: 2, sm: 3, md: 4 },
         }}
       >
         <Pools

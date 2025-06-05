@@ -160,6 +160,8 @@ const SwapPage = () => {
           transition: "all 0.2s ease-in-out",
           display: "flex",
           justifyContent: "center",
+          minHeight: { xs: "calc(100vh - 70px)", md: "100vh" },
+          px: { xs: "8px", sm: "16px", md: "24px" },
         }}
       >
         {!optionsOpen && !assetSelectorOpen && (

@@ -32,9 +32,19 @@ const openedMixin = (theme: Theme): CSSObject => ({
   }),
   overflowX: "hidden",
   [theme.breakpoints.down("md")]: {
-    width: "100%",
-    top: "70px",
-    paddingTop: spacing.md,
+    width: "100vw", // Full viewport width
+    top: 0, // Fullscreen mobile navigation
+    paddingTop: 0, // Remove extra padding since we have the header
+    position: "fixed",
+    height: "100vh", // Fullscreen height
+    left: 0, // Ensure it starts from the left edge
+    background:
+      "linear-gradient(135deg, rgba(15, 15, 15, 0.98) 0%, rgba(25, 25, 25, 0.98) 100%)",
+    backdropFilter: "blur(20px)",
+    zIndex: 1350, // Ensure it's above overlay and AppBar
+    // Enhanced mobile styles
+    borderRight: "none", // Remove border on full width
+    boxShadow: "none", // Remove shadow on full width
   },
 });
 
@@ -49,7 +59,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
     width: `calc(${theme.spacing(10)} + 1px)`, // Increased from 8 to 10
   },
   [theme.breakpoints.down("md")]: {
-    top: "70px",
+    top: "70px", // Account for mobile TopBar
   },
 });
 
@@ -98,6 +108,11 @@ const SidebarNavigation = ({
     } else {
       document.body.style.overflow = "unset";
     }
+
+    // Clean up on unmount
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [largerThenMd, open]);
 
   const toggleDrawer = () => {
@@ -105,129 +120,239 @@ const SidebarNavigation = ({
   };
 
   return (
-    <DrawerMotion
-      initial={{ width: 0 }}
-      animate={{ width: open ? drawerWidth : largerThenMd ? 80 : 0 }} // Explicit width when closed
-      transition={{ type: "spring", stiffness: 400, damping: 40 }}
-      open={open}
-    >
-      <MuiDrawer
-        PaperProps={{
-          sx: {
-            background: colors.neutral[900],
-            boxShadow: `0 0 1px 0 ${colors.neutral[700]}`,
-            maxWidth: "100vw",
-          },
+    <>
+      {/* Mobile Overlay */}
+      {!largerThenMd && open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0, 0, 0, 0.7)",
+            backdropFilter: "blur(8px)",
+            zIndex: 1299, // Below navigation
+          }}
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      <DrawerMotion
+        initial={{
+          width: largerThenMd ? 0 : "100vw",
+          x: largerThenMd ? -drawerWidth : "-100vw",
         }}
-        variant="permanent"
+        animate={{
+          width: open
+            ? largerThenMd
+              ? drawerWidth
+              : "100vw"
+            : largerThenMd
+            ? 80
+            : "100vw",
+          x: largerThenMd ? 0 : open ? 0 : "-100vw",
+        }}
+        transition={
+          largerThenMd
+            ? {
+                type: "spring",
+                stiffness: 400,
+                damping: 40,
+                duration: 0.4,
+              }
+            : {
+                type: "tween",
+                ease: [0.4, 0, 0.2, 1], // Custom cubic-bezier for smooth mobile animation
+                duration: 0.3,
+              }
+        }
         open={open}
       >
-        {largerThenMd && (
-          <DrawerHeader
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: open ? spacing.xl : spacing.md,
-              minHeight: "64px", // Ensure consistent height
-            }}
-          >
-            <Box
-              component="img"
-              alt="Phoenix Logo"
-              sx={
-                open
-                  ? { maxWidth: "128px" }
-                  : {
-                      width: "40px",
-                      height: "40px",
-                      objectFit: "contain",
-                      margin: "0 0 0 -13px",
-                    }
-              }
-              src={open ? "/logo.png" : "/logo_icon.svg"}
-            />
-            {open && (
-              <IconButton
-                onClick={toggleDrawer}
-                sx={{
-                  borderRadius: borderRadius.md,
-                  background: `linear-gradient(180deg, ${colors.neutral[800]} 0%, ${colors.neutral[900]} 100%)`,
-                  transform: open ? "none" : "rotate(180deg)",
-                  marginTop: open ? 0 : spacing.sm,
-                  marginLeft: spacing.sm,
-                  padding: spacing.xs,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    background: colors.neutral[800],
-                  },
-                }}
-              >
-                <Box component="img" alt="arrow" src="/arrow.svg" />
-              </IconButton>
-            )}
-          </DrawerHeader>
-        )}
-        <List>
-          <ListSubheader
-            sx={{
-              paddingLeft: spacing.xxl,
-              background: "transparent",
-              fontSize: typography.fontSize.sm,
-              lineHeight: "16px",
-              marginBottom: spacing.lg,
-              display: open ? "block" : "none",
-              color: colors.neutral[400],
-            }}
-          >
-            Menu
-          </ListSubheader>
-          <ItemList
-            items={items}
-            setOpen={setOpen}
-            largerThenMd={largerThenMd}
-            onNavClick={onNavClick}
-            open={open}
-          />
-          {!open && (
-            <ListItem
+        <MuiDrawer
+          PaperProps={{
+            sx: {
+              background: largerThenMd
+                ? colors.neutral[900]
+                : "linear-gradient(135deg, rgba(15, 15, 15, 0.98) 0%, rgba(25, 25, 25, 0.98) 100%)",
+              boxShadow: largerThenMd
+                ? `0 0 1px 0 ${colors.neutral[700]}`
+                : "0 8px 32px rgba(0, 0, 0, 0.4)",
+              maxWidth: "100vw",
+              width: "100%",
+              border: "none",
+              backdropFilter: !largerThenMd ? "blur(20px)" : "none",
+              zIndex: !largerThenMd ? 1350 : "auto", // Ensure mobile drawer is above overlay and AppBar
+              willChange: !largerThenMd ? "transform" : "auto", // Optimize for mobile animations
+            },
+          }}
+          variant="permanent"
+          open={open}
+        >
+          {/* Mobile Header with Close Button */}
+          {!largerThenMd && open && (
+            <DrawerHeader
               sx={{
-                justifyContent: "center",
-                marginTop: spacing.md,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: `${spacing.lg} ${spacing.xl}`,
+                minHeight: "70px", // Match AppBar height
+                borderBottom: `1px solid rgba(249, 115, 22, 0.2)`,
+                marginBottom: spacing.md,
               }}
             >
+              <Box
+                component="img"
+                alt="Phoenix Logo"
+                sx={{ maxWidth: "128px" }}
+                src="/logo.png"
+              />
               <IconButton
-                onClick={toggleDrawer}
+                onClick={() => setOpen(false)}
                 sx={{
-                  borderRadius: borderRadius.md,
-                  background: `linear-gradient(180deg, ${colors.neutral[800]} 0%, ${colors.neutral[900]} 100%)`,
-                  transform: "rotate(180deg)",
-                  padding: spacing.sm,
+                  color: "#FAFAFA",
+                  padding: { xs: "6px", md: "8px" },
+                  background: "rgba(249, 115, 22, 0.1)",
+                  border: "1px solid rgba(249, 115, 22, 0.2)",
+                  borderRadius: "8px",
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    background: colors.neutral[800],
+                    background: "rgba(249, 115, 22, 0.2)",
+                    borderColor: "rgba(249, 115, 22, 0.4)",
+                    transform: "scale(1.05)",
                   },
                 }}
               >
-                <Box component="img" alt="arrow" src="/arrow.svg" />
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </IconButton>
-            </ListItem>
+            </DrawerHeader>
           )}
-        </List>
-        {bottomItems && (
-          <List
-            sx={{ position: "absolute", bottom: spacing.lg, width: "100%" }}
-          >
+
+          {/* Desktop Header */}
+          {largerThenMd && (
+            <DrawerHeader
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: open ? spacing.xl : spacing.md,
+                minHeight: "64px", // Ensure consistent height
+              }}
+            >
+              <Box
+                component="img"
+                alt="Phoenix Logo"
+                sx={
+                  open
+                    ? { maxWidth: "128px" }
+                    : {
+                        width: "40px",
+                        height: "40px",
+                        objectFit: "contain",
+                        margin: "0 0 0 -13px",
+                      }
+                }
+                src={open ? "/logo.png" : "/logo_icon.svg"}
+              />
+              {open && (
+                <IconButton
+                  onClick={toggleDrawer}
+                  sx={{
+                    borderRadius: borderRadius.md,
+                    background: `linear-gradient(180deg, ${colors.neutral[800]} 0%, ${colors.neutral[900]} 100%)`,
+                    transform: open ? "none" : "rotate(180deg)",
+                    marginTop: open ? 0 : spacing.sm,
+                    marginLeft: spacing.sm,
+                    padding: spacing.xs,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      background: colors.neutral[800],
+                    },
+                  }}
+                >
+                  <Box component="img" alt="arrow" src="/arrow.svg" />
+                </IconButton>
+              )}
+            </DrawerHeader>
+          )}
+          <List>
+            <ListSubheader
+              sx={{
+                paddingLeft: spacing.xxl,
+                background: "transparent",
+                fontSize: typography.fontSize.sm,
+                lineHeight: "16px",
+                marginBottom: spacing.lg,
+                display: open ? "block" : "none",
+                color: colors.neutral[400],
+              }}
+            >
+              Menu
+            </ListSubheader>
             <ItemList
-              items={bottomItems}
+              items={items}
               setOpen={setOpen}
               largerThenMd={largerThenMd}
               onNavClick={onNavClick}
               open={open}
             />
+            {!open && (
+              <ListItem
+                sx={{
+                  justifyContent: "center",
+                  marginTop: spacing.md,
+                }}
+              >
+                <IconButton
+                  onClick={toggleDrawer}
+                  sx={{
+                    borderRadius: borderRadius.md,
+                    background: `linear-gradient(180deg, ${colors.neutral[800]} 0%, ${colors.neutral[900]} 100%)`,
+                    transform: "rotate(180deg)",
+                    padding: spacing.sm,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      background: colors.neutral[800],
+                    },
+                  }}
+                >
+                  <Box component="img" alt="arrow" src="/arrow.svg" />
+                </IconButton>
+              </ListItem>
+            )}
           </List>
-        )}
-      </MuiDrawer>
-    </DrawerMotion>
+          {bottomItems && (
+            <List
+              sx={{ position: "absolute", bottom: spacing.lg, width: "100%" }}
+            >
+              <ItemList
+                items={bottomItems}
+                setOpen={setOpen}
+                largerThenMd={largerThenMd}
+                onNavClick={onNavClick}
+                open={open}
+              />
+            </List>
+          )}
+        </MuiDrawer>
+      </DrawerMotion>
+    </>
   );
 };
 
@@ -330,7 +455,14 @@ const ItemList = ({
               sx={{
                 padding: open ? 0 : spacing.xs,
                 justifyContent: open ? "flex-start" : "center",
-                minHeight: "40px",
+                // Enhanced mobile touch area
+                minHeight: { xs: "48px", md: "40px" },
+                borderRadius: borderRadius.md,
+                // Add subtle haptic feedback simulation on mobile
+                "&:active": {
+                  transform: !largerThenMd ? "scale(0.95)" : "scale(0.98)",
+                  transition: "transform 0.1s ease",
+                },
               }}
             >
               <ListItemIcon

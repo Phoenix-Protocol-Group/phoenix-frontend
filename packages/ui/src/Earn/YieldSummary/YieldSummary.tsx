@@ -145,7 +145,43 @@ export const YieldSummary = ({
                   backgroundClip: "text",
                 }}
               >
-                {formatCurrencyStatic.format(claimableRewards)}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  {/* Replace with your PHO icon, example below uses a placeholder SVG */}
+                  <Box
+                    component="span"
+                    sx={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      height: 28,
+                      width: 28,
+                      mr: 0.5,
+                    }}
+                  >
+                    {/* Example PHO icon SVG */}
+                    <Box
+                      component="img"
+                      src="/cryptoIcons/pho.svg"
+                      alt="PHO Icon"
+                      sx={{
+                        height: "100%",
+                        width: "100%",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  </Box>
+                  <span>
+                    {claimableRewards / 10 ** 7}
+                    <span
+                      style={{
+                        marginLeft: 6,
+                        fontWeight: 600,
+                        letterSpacing: 1,
+                      }}
+                    >
+                      PHO
+                    </span>
+                  </span>
+                </Box>
               </Typography>
               <Button
                 type="primary"

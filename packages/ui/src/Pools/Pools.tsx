@@ -137,7 +137,7 @@ export const PoolItem = React.memo(
       >
         <Box
           sx={{
-            padding: spacing.xl,
+            padding: { xs: spacing.md, sm: spacing.lg, md: spacing.xl },
             borderRadius: borderRadius.xl,
             background: `linear-gradient(145deg, ${colors.neutral[900]} 0%, ${colors.neutral[850]} 100%)`,
             border: `1px solid ${colors.neutral[700]}`,
@@ -765,7 +765,7 @@ const Pools = ({
       )}
 
       {/* Pools Grid */}
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
         {filteredAndSortedPools.map((pool, index) => (
           <PoolItem
             key={`${pool.poolAddress}-${index}`}
