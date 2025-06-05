@@ -29,7 +29,6 @@ import { motion } from "framer-motion";
 import { ToastProvider } from "@/providers/ToastProvider";
 import { RestoreModalProvider } from "@/providers/RestoreModalProvider";
 import Loader from "@/components/Loader/Loader";
-import TemporaryWarningBar from "@/components/TemporaryWarningBar";
 
 // Client-side only component for title updates
 const HiddenInputChecker = () => {
