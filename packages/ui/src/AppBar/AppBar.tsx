@@ -233,7 +233,11 @@ const AppBar = ({
   toggleMobileNav,
 }: AppBarProps) => {
   const theme = useTheme();
-  const largerThenMd = useMediaQuery(theme.breakpoints.up("md"));
+
+  const largerThenMd = useMediaQuery("(min-width: 960px)", {
+    noSsr: true, // Disable server-side rendering for this query
+    defaultMatches: true, // Default to true for SSR compatibility
+  });
 
   return (
     <NoSsr>

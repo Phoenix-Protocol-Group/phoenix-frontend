@@ -70,8 +70,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const theme = useTheme();
 
   // Media query to check screen size
-  const largerThanMd = useMediaQuery(theme.breakpoints.up("md"));
 
+  const largerThanMd = useMediaQuery("(min-width: 960px)", {
+    noSsr: true, // Disable server-side rendering for this query
+    defaultMatches: true, // Default to true for SSR compatibility
+  });
   // State to manage navigation open/close status, initializing based on screen size
   const [navOpen, setNavOpen] = useState<boolean>(false); // Start with false for SSR compatibility
 
@@ -212,7 +215,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const mainContentStyle = useMemo(
     () => ({
       position: "relative", // Add relative positioning for absolute loader overlay
-      marginLeft: largerThanMd ? "320px" : 0, // Fixed sidebar width
+      marginLeft: largerThanMd ? "246px" : 0, // Fixed sidebar width
       marginTop: { xs: "12px", md: "80px" }, // Add top margin for fixed TopBar on both mobile and desktop
       minHeight: { xs: "calc(100vh - 70px)", md: "calc(100vh - 80px)" }, // Account for fixed TopBar height
       transition: "all 0.2s ease-in-out",
@@ -222,9 +225,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       maxWidth: "none", // Remove any max-width constraints
       // Override swapPageStyle width and force components to think this is the full width for responsive behavior
       ...swapPageStyle,
-      width: largerThanMd
-        ? `calc(100vw - ${navOpen ? "480px" : "160px"})`
-        : "100vw", // Full width on mobile
+      width: largerThanMd ? `auto` : "100vw", // Full width on mobile
     }),
     [largerThanMd, navOpen, swapPageStyle]
   );
@@ -303,12 +304,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
               {/* Main Content Area */}
               <Box sx={mainContentStyle}>
-                {appStore.loading && (
-                  <Box sx={loaderOverlayStyle}>
-                    <Loader />
-                  </Box>
-                )}
-                <Fragment>{children}</Fragment>
+                <Box sx={{ marginLeft: -"246px", width: "100%" }}>
+                  {appStore.loading && (
+                    <Box sx={loaderOverlayStyle}>
+                      <Loader />
+                    </Box>
+                  )}
+                  <Fragment>{children}</Fragment>
+                </Box>
               </Box>
             </RestoreModalProvider>
           </ToastProvider>

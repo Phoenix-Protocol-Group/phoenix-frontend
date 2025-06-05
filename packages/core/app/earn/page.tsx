@@ -1,12 +1,5 @@
 "use client";
-import {
-  Tab,
-  Tabs,
-  Typography,
-  useMediaQuery,
-  useTheme,
-  Button,
-} from "@mui/material";
+import { Tab, Tabs, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Box } from "@mui/system";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import {
@@ -15,6 +8,7 @@ import {
   BondModal,
   UnbondModal,
   ClaimAllModal,
+  Button,
 } from "@phoenix-protocol/ui";
 
 // Fix the imports to properly import StrategyRegistry
@@ -533,11 +527,11 @@ export default function EarnPage(): JSX.Element {
                         Strategies&apos;.
                       </Typography>
                       <Button
-                        variant="contained"
                         onClick={() => setTabValue(1)}
                         sx={{
                           fontFamily: "Ubuntu",
                           textTransform: "none",
+                          maxWidth: "300px",
                           background:
                             "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
                           "&:hover": {
