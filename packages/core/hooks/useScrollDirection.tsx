@@ -38,7 +38,7 @@ export const useScrollDirection = () => {
     window.addEventListener("scroll", onScroll);
 
     return () => window.removeEventListener("scroll", onScroll);
-  }, [scrollDirection]);
+  }, []);
 
   return { scrollDirection, isAtTop };
 };
