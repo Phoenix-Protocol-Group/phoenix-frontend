@@ -3,21 +3,7 @@ import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
 import { StakingListEntry as Entry } from "@phoenix-protocol/types";
 import { motion } from "framer-motion";
 import { ArrowBack } from "@mui/icons-material";
-import { colors } fro          <Typography
-            sx={{
-              fontSize: { xs: "1.5rem", md: "1.75rem" },
-              fontWeight: 700,
-              background: "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              fontFamily: "Ubuntu, sans-serif",
-              position: "relative",
-              zIndex: 1,
-            }}
-          >
-            Your Staked Assets
-          </Typography>styleConstants";
+import { colors } from "../../Theme/styleConstants";
 
 /**
  * StakingEntry Component
@@ -49,8 +35,9 @@ const StakingEntry = ({ entry }: { entry: Entry }) => {
             left: 0,
             right: 0,
             height: "1px",
-            background:
-              `linear-gradient(90deg, transparent, rgba(${colors.neutral[600].slice(1)}, 0.4), transparent)`,
+            background: `linear-gradient(90deg, transparent, rgba(${colors.neutral[600].slice(
+              1
+            )}, 0.4), transparent)`,
           },
           "&:hover": {
             border: `1px solid ${colors.primary.main}`,
@@ -67,8 +54,7 @@ const StakingEntry = ({ entry }: { entry: Entry }) => {
             left: 0,
             right: 0,
             height: "100%",
-            background:
-              `radial-gradient(ellipse at center top, ${colors.neutral[700]}1A 0%, transparent 70%)`,
+            background: `radial-gradient(ellipse at center top, ${colors.neutral[700]}1A 0%, transparent 70%)`,
             pointerEvents: "none",
           }}
         />
@@ -86,8 +72,7 @@ const StakingEntry = ({ entry }: { entry: Entry }) => {
                 height: 40,
                 borderRadius: "50%",
                 border: `2px solid ${colors.neutral[600]}`,
-                background:
-                  `linear-gradient(135deg, ${colors.neutral[800]} 0%, ${colors.neutral[700]} 100%)`,
+                background: `linear-gradient(135deg, ${colors.neutral[800]} 0%, ${colors.neutral[700]} 100%)`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -208,15 +193,13 @@ const StakingEntry = ({ entry }: { entry: Entry }) => {
                   color: "#FFFFFF",
                   borderRadius: "16px",
                   border: `1px solid ${colors.neutral[600]}`,
-                  background:
-                    `linear-gradient(135deg, ${colors.neutral[800]} 0%, ${colors.neutral[700]} 100%)`,
+                  background: `linear-gradient(135deg, ${colors.neutral[800]} 0%, ${colors.neutral[700]} 100%)`,
                   backdropFilter: "blur(10px)",
                   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                   px: 2,
                   py: 1,
                   "&:hover": {
-                    background:
-                      `linear-gradient(135deg, ${colors.primary.main}33 0%, ${colors.primary.main}22 100%)`,
+                    background: `linear-gradient(135deg, ${colors.primary.main}33 0%, ${colors.primary.main}22 100%)`,
                     border: `1px solid ${colors.primary.main}`,
                     boxShadow: `0 8px 32px ${colors.primary.main}33`,
                   },
@@ -263,8 +246,7 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
             mb: 4,
             p: 3,
             borderRadius: "20px",
-            background:
-              `linear-gradient(145deg, ${colors.neutral[900]} 0%, ${colors.neutral[850]} 100%)`,
+            background: `linear-gradient(145deg, ${colors.neutral[900]} 0%, ${colors.neutral[850]} 100%)`,
             border: `1px solid ${colors.neutral[700]}`,
             backdropFilter: "blur(20px)",
             position: "relative",
@@ -276,8 +258,7 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
               left: 0,
               right: 0,
               height: "1px",
-              background:
-                `linear-gradient(90deg, transparent, ${colors.neutral[600]}66, transparent)`,
+              background: `linear-gradient(90deg, transparent, ${colors.neutral[600]}66, transparent)`,
             },
           }}
         >
@@ -289,8 +270,7 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
               left: 0,
               right: 0,
               height: "100%",
-              background:
-                `radial-gradient(ellipse at center top, ${colors.neutral[700]}1A 0%, transparent 70%)`,
+              background: `radial-gradient(ellipse at center top, ${colors.neutral[700]}1A 0%, transparent 70%)`,
               pointerEvents: "none",
             }}
           />
@@ -349,8 +329,7 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
               sx={{
                 p: 4,
                 borderRadius: "20px",
-                background:
-                  `linear-gradient(145deg, ${colors.neutral[900]} 0%, ${colors.neutral[850]} 100%)`,
+                background: `linear-gradient(145deg, ${colors.neutral[900]} 0%, ${colors.neutral[850]} 100%)`,
                 border: `1px dashed ${colors.neutral[600]}`,
                 textAlign: "center",
                 position: "relative",
@@ -362,14 +341,13 @@ const StakingList = ({ entries }: { entries: Entry[] }) => {
                   width: 64,
                   height: 64,
                   borderRadius: "50%",
-                  background:
-                    "linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 146, 60, 0.1) 100%)",
+                  background: `linear-gradient(135deg, ${colors.neutral[800]} 0%, ${colors.neutral[700]} 100%)`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   mx: "auto",
                   mb: 2,
-                  border: "2px solid rgba(249, 115, 22, 0.2)",
+                  border: `2px solid ${colors.neutral[600]}`,
                 }}
               >
                 <Typography
