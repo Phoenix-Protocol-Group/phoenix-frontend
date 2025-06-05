@@ -630,9 +630,7 @@ export default function Page(props: PoolPageProps) {
 
   // Fetch pool data when address changes
   useEffect(() => {
-    if (storePersist.wallet.address) {
-      getPool();
-    }
+    getPool();
   }, [storePersist.wallet.address]);
 
   if (!params.poolAddress || poolNotFound) {
