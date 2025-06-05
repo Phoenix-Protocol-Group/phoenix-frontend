@@ -1,4 +1,5 @@
 import { Buffer } from "buffer";
+import { Address } from "@stellar/stellar-sdk";
 import {
   AssembledTransaction,
   Client as ContractClient,
@@ -9,10 +10,16 @@ import {
 } from "@stellar/stellar-sdk/contract";
 import type {
   u32,
+  i32,
   u64,
   i64,
+  u128,
   i128,
+  u256,
+  i256,
   Option,
+  Typepoint,
+  Duration,
 } from "@stellar/stellar-sdk/contract";
 export * from "@stellar/stellar-sdk";
 export * as contract from "@stellar/stellar-sdk/contract";
@@ -23,73 +30,42 @@ if (typeof window !== "undefined") {
   window.Buffer = window.Buffer || Buffer;
 }
 
-export const Errors = {
+export const ContractError = {
   300: { message: "SpreadExceedsLimit" },
-
   301: { message: "ProvideLiquiditySlippageToleranceTooHigh" },
-
   302: { message: "ProvideLiquidityAtLeastOneTokenMustBeBiggerThenZero" },
-
   303: { message: "WithdrawLiquidityMinimumAmountOfAOrBIsNotSatisfied" },
-
   304: { message: "SplitDepositBothPoolsAndDepositMustBePositive" },
-
   305: { message: "ValidateFeeBpsTotalFeesCantBeGreaterThan100" },
-
   306: { message: "GetDepositAmountsMinABiggerThenDesiredA" },
-
   307: { message: "GetDepositAmountsMinBBiggerThenDesiredB" },
-
   308: { message: "GetDepositAmountsAmountABiggerThenDesiredA" },
-
   309: { message: "GetDepositAmountsAmountALessThenMinA" },
-
   310: { message: "GetDepositAmountsAmountBBiggerThenDesiredB" },
-
   311: { message: "GetDepositAmountsAmountBLessThenMinB" },
-
   312: { message: "TotalSharesEqualZero" },
-
   313: { message: "DesiredAmountsBelowOrEqualZero" },
-
   314: { message: "MinAmountsBelowZero" },
-
   315: { message: "AssetNotInPool" },
-
   316: { message: "AlreadyInitialized" },
-
   317: { message: "TokenABiggerThanTokenB" },
-
   318: { message: "InvalidBps" },
-
   319: { message: "SlippageInvalid" },
-
   320: { message: "SwapMinReceivedBiggerThanReturn" },
-
   321: { message: "TransactionAfterTimestampDeadline" },
-
   322: { message: "CannotConvertU256ToI128" },
-
   323: { message: "UserDeclinesPoolFee" },
-
   324: { message: "SwapFeeBpsOverLimit" },
-
   325: { message: "NotEnoughSharesToBeMinted" },
-
   326: { message: "NotEnoughLiquidityProvided" },
-
   327: { message: "AdminNotSet" },
-
   328: { message: "ContractMathError" },
-
   329: { message: "NegativeInputProvided" },
-
   330: { message: "SameAdmin" },
-
   331: { message: "NoAdminChangeInPlace" },
-
   332: { message: "AdminChangeExpired" },
 };
+
 export enum PairType {
   Xyk = 0,
 }
@@ -694,6 +670,26 @@ export interface Client {
   }) => Promise<AssembledTransaction<Result<string>>>;
 
   /**
+   * Construct and simulate a query_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  query_admin: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<string>>>;
+
+  /**
    * Construct and simulate a query_version transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
   query_version: (options?: {
@@ -755,7 +751,7 @@ export class Client extends ContractClient {
       default_slippage_bps: i64;
       max_allowed_fee_bps: i64;
     },
-    /** Options for initalizing a Client as well as for calling a method, with extras specific to deploying. */
+    /** Options for initializing a Client as well as for calling a method, with extras specific to deploying. */
     options: MethodOptions &
       Omit<ContractClientOptions, "contractId"> & {
         /** The hash of the Wasm blob, which must already be installed on-chain. */
@@ -801,6 +797,7 @@ export class Client extends ContractClient {
         "AAAAAAAAAAAAAAANcHJvcG9zZV9hZG1pbgAAAAAAAAIAAAAAAAAACW5ld19hZG1pbgAAAAAAABMAAAAAAAAACnRpbWVfbGltaXQAAAAAA+gAAAAGAAAAAQAAA+kAAAATAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
         "AAAAAAAAAAAAAAATcmV2b2tlX2FkbWluX2NoYW5nZQAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
         "AAAAAAAAAAAAAAAMYWNjZXB0X2FkbWluAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+        "AAAAAAAAAAAAAAALcXVlcnlfYWRtaW4AAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
         "AAAAAAAAAAAAAAANX19jb25zdHJ1Y3RvcgAAAAAAAAgAAAAAAAAAD3N0YWtlX3dhc21faGFzaAAAAAPuAAAAIAAAAAAAAAAPdG9rZW5fd2FzbV9oYXNoAAAAA+4AAAAgAAAAAAAAAAxscF9pbml0X2luZm8AAAfQAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAAAAAAMZmFjdG9yeV9hZGRyAAAAEwAAAAAAAAAQc2hhcmVfdG9rZW5fbmFtZQAAABAAAAAAAAAAEnNoYXJlX3Rva2VuX3N5bWJvbAAAAAAAEAAAAAAAAAAUZGVmYXVsdF9zbGlwcGFnZV9icHMAAAAHAAAAAAAAABNtYXhfYWxsb3dlZF9mZWVfYnBzAAAAAAcAAAAA",
         "AAAAAAAAAAAAAAANcXVlcnlfdmVyc2lvbgAAAAAAAAAAAAABAAAAEA==",
         "AAAAAAAAAAAAAAAWYWRkX25ld19rZXlfdG9fc3RvcmFnZQAAAAAAAAAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
@@ -843,6 +840,7 @@ export class Client extends ContractClient {
     propose_admin: this.txFromJSON<Result<string>>,
     revoke_admin_change: this.txFromJSON<Result<void>>,
     accept_admin: this.txFromJSON<Result<string>>,
+    query_admin: this.txFromJSON<Result<string>>,
     query_version: this.txFromJSON<string>,
     add_new_key_to_storage: this.txFromJSON<Result<void>>,
   };

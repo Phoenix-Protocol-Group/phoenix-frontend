@@ -121,12 +121,27 @@ export const UnbondModal = ({
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: { xs: "90%", sm: "450px" },
-          bgcolor: colors.neutral[900],
-          border: `1px solid ${colors.neutral[700]}`,
+          background:
+            "linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 146, 60, 0.15) 50%, rgba(254, 215, 170, 0.15) 100%)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(249, 115, 22, 0.3)",
           borderRadius: borderRadius.lg,
-          boxShadow: 24,
+          boxShadow:
+            "0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(249, 115, 22, 0.1)",
           p: spacing.lg,
           outline: "none",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              "linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(251, 146, 60, 0.1) 100%)",
+            borderRadius: borderRadius.lg,
+            zIndex: -1,
+          },
         }}
       >
         <motion.div
@@ -147,22 +162,36 @@ export const UnbondModal = ({
               variant="h6"
               component="h2"
               sx={{
-                color: colors.neutral[50],
+                background: "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
                 fontWeight: typography.fontWeights.bold,
+                fontSize: "1.25rem",
               }}
             >
               Unbond from {strategy.name}
             </Typography>
             <motion.div
-              whileHover={{ rotate: 90 }}
+              whileHover={{
+                rotate: 90,
+                scale: 1.1,
+              }}
+              whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
             >
               <Box
                 sx={{
                   cursor: "pointer",
-                  opacity: 0.7,
+                  padding: "8px",
+                  borderRadius: "50%",
+                  background: "rgba(249, 115, 22, 0.1)",
                   color: colors.neutral[300],
-                  "&:hover": { opacity: 1 },
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    background: "rgba(249, 115, 22, 0.2)",
+                    color: "#F97316",
+                  },
                 }}
                 onClick={handleClose}
               >
@@ -175,65 +204,130 @@ export const UnbondModal = ({
             <>
               <Typography
                 id="unbond-modal-description"
-                sx={{ color: colors.neutral[300], mb: spacing.md }}
+                sx={{
+                  color: colors.neutral[300],
+                  mb: spacing.md,
+                  fontSize: "0.95rem",
+                  lineHeight: 1.6,
+                }}
               >
                 Select a stake to unbond its full amount.
               </Typography>
               {strategy.unbondTime > 0 && (
-                <Typography
-                  sx={{
-                    color: colors.warning[300],
-                    fontSize: "0.875rem",
-                    mb: spacing.md,
-                    background: "rgba(251, 191, 36, 0.1)",
-                    padding: "8px 12px",
-                    borderRadius: borderRadius.sm,
-                  }}
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
                 >
-                  Note: Unbonding period is approximately{" "}
-                  {Math.ceil(strategy.unbondTime / 86400)} days.
-                </Typography>
+                  <Typography
+                    sx={{
+                      color: "#FB923C",
+                      fontSize: "0.875rem",
+                      mb: spacing.md,
+                      background:
+                        "linear-gradient(135deg, rgba(251, 146, 60, 0.15) 0%, rgba(254, 215, 170, 0.1) 100%)",
+                      backdropFilter: "blur(10px)",
+                      padding: "12px 16px",
+                      borderRadius: borderRadius.md,
+                      border: "1px solid rgba(251, 146, 60, 0.3)",
+                      fontWeight: typography.fontWeights.medium,
+                    }}
+                  >
+                    ⏱️ Unbonding period: approximately{" "}
+                    {Math.ceil(strategy.unbondTime / 86400)} days
+                  </Typography>
+                </motion.div>
               )}
               <List
                 sx={{
                   maxHeight: 300,
                   overflow: "auto",
                   mb: spacing.md,
-                  background: colors.neutral[800],
-                  borderRadius: borderRadius.sm,
+                  background:
+                    "linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(251, 146, 60, 0.05) 100%)",
+                  backdropFilter: "blur(10px)",
+                  borderRadius: borderRadius.md,
+                  border: "1px solid rgba(249, 115, 22, 0.2)",
+                  "&::-webkit-scrollbar": {
+                    width: "6px",
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    background: "transparent",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "rgba(249, 115, 22, 0.3)",
+                    borderRadius: "3px",
+                  },
                 }}
               >
                 {strategy.userIndividualStakes!.map((stake, index) => (
                   <React.Fragment
                     key={`${stake.timestamp.toString()}-${index}`}
                   >
-                    <ListItem
-                      secondaryAction={
-                        <Button
-                          size="small"
-                          onClick={() => handleConfirmSpecificStake(stake)}
-                        >
-                          Unbond
-                        </Button>
-                      }
-                      sx={{ paddingRight: "100px" }} // Ensure space for button
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
                     >
-                      <ListItemText
-                        primaryTypographyProps={{
-                          sx: {
-                            color: colors.neutral[100],
-                            fontWeight: typography.fontWeights.medium,
+                      <ListItem
+                        secondaryAction={
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <Button
+                              size="small"
+                              onClick={() => handleConfirmSpecificStake(stake)}
+                              sx={{
+                                background:
+                                  "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
+                                color: "white",
+                                fontWeight: typography.fontWeights.semiBold,
+                                "&:hover": {
+                                  background:
+                                    "linear-gradient(135deg, #EA580C 0%, #F97316 100%)",
+                                  transform: "translateY(-1px)",
+                                  boxShadow:
+                                    "0 4px 12px rgba(249, 115, 22, 0.4)",
+                                },
+                              }}
+                            >
+                              Unbond
+                            </Button>
+                          </motion.div>
+                        }
+                        sx={{
+                          paddingRight: "100px",
+                          borderRadius: borderRadius.sm,
+                          mb: 1,
+                          "&:hover": {
+                            background: "rgba(249, 115, 22, 0.1)",
                           },
                         }}
-                        secondaryTypographyProps={{
-                          sx: { color: colors.neutral[400] },
-                        }}
-                        primary={`${stake.displayAmount}`}
-                        secondary={`Staked on: ${stake.displayDate}`}
-                      />
-                    </ListItem>
+                      >
+                        <ListItemText
+                          primaryTypographyProps={{
+                            sx: {
+                              color: colors.neutral[100],
+                              fontWeight: typography.fontWeights.medium,
+                              fontSize: "0.95rem",
+                            },
+                          }}
+                          secondaryTypographyProps={{
+                            sx: {
+                              color: colors.neutral[400],
+                              fontSize: "0.85rem",
+                            },
+                          }}
+                          primary={`${stake.displayAmount}`}
+                          secondary={`Staked on: ${stake.displayDate}`}
+                        />
+                      </ListItem>
+                    </motion.div>
                     {index < strategy.userIndividualStakes!.length - 1 && (
-                      <Divider sx={{ borderColor: colors.neutral[700] }} />
+                      <Divider
+                        sx={{ borderColor: "rgba(249, 115, 22, 0.2)", mx: 2 }}
+                      />
                     )}
                   </React.Fragment>
                 ))}
@@ -243,19 +337,22 @@ export const UnbondModal = ({
             <>
               <Typography
                 id="unbond-modal-description"
-                sx={{ color: colors.neutral[300], mb: spacing.xs }}
+                sx={{
+                  color: colors.neutral[300],
+                  mb: spacing.xs,
+                  fontSize: "0.95rem",
+                  lineHeight: 1.6,
+                }}
               >
                 Enter the amount you want to unbond.
               </Typography>
               <Typography
-                sx={{ color: colors.neutral[400], fontSize: "0.875rem", mb: 1 }}
-              >
-                Available to unbond:{" "}
-                <Link
-                  component="button"
-                  onClick={handleSetMax}
-                  sx={{
-                    color: colors.primary.main,
+                sx={{
+                  color: colors.neutral[400],
+                  fontSize: "0.875rem",
+                  mb: 1,
+                  "& .max-link": {
+                    color: "#F97316",
                     textDecoration: "underline",
                     cursor: "pointer",
                     fontSize: "inherit",
@@ -263,8 +360,19 @@ export const UnbondModal = ({
                     border: "none",
                     padding: 0,
                     fontFamily: "inherit",
-                    "&:hover": { color: colors.primary.light },
-                  }}
+                    fontWeight: typography.fontWeights.medium,
+                    transition: "color 0.2s ease",
+                    "&:hover": {
+                      color: "#FB923C",
+                    },
+                  },
+                }}
+              >
+                Available to unbond:{" "}
+                <Link
+                  component="button"
+                  onClick={handleSetMax}
+                  className="max-link"
                 >
                   {formatCurrencyStatic.format(maxAmount)}{" "}
                   {strategy.assets.map((a) => a.name).join(" / ")}
@@ -272,69 +380,123 @@ export const UnbondModal = ({
               </Typography>
 
               {strategy.unbondTime > 0 && (
-                <Typography
-                  sx={{
-                    color: colors.warning[300],
-                    fontSize: "0.875rem",
-                    mb: spacing.md,
-                    background: "rgba(251, 191, 36, 0.1)",
-                    padding: "8px 12px",
-                    borderRadius: borderRadius.sm,
-                  }}
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
                 >
-                  Note: Unbonding period is approximately{" "}
-                  {Math.ceil(strategy.unbondTime / 86400)} days.
-                </Typography>
+                  <Typography
+                    sx={{
+                      color: "#FB923C",
+                      fontSize: "0.875rem",
+                      mb: spacing.md,
+                      background:
+                        "linear-gradient(135deg, rgba(251, 146, 60, 0.15) 0%, rgba(254, 215, 170, 0.1) 100%)",
+                      backdropFilter: "blur(10px)",
+                      padding: "12px 16px",
+                      borderRadius: borderRadius.md,
+                      border: "1px solid rgba(251, 146, 60, 0.3)",
+                      fontWeight: typography.fontWeights.medium,
+                    }}
+                  >
+                    ⏱️ Unbonding period: approximately{" "}
+                    {Math.ceil(strategy.unbondTime / 86400)} days
+                  </Typography>
+                </motion.div>
               )}
 
-              <TextField
-                fullWidth
-                variant="outlined"
-                label={`Amount to Unbond`}
-                value={amount}
-                onChange={handleAmountChange}
-                type="text"
-                inputMode="decimal"
-                error={!!error}
-                helperText={error}
-                sx={{
-                  mb: spacing.md,
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: colors.neutral[600],
-                    },
-                    "&:hover fieldset": {
-                      borderColor: colors.neutral[400],
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: colors.primary.main,
-                    },
-                    input: { color: colors.neutral[100] },
-                  },
-                  "& .MuiInputLabel-root": {
-                    color: colors.neutral[400],
-                  },
-                  "& .MuiInputLabel-root.Mui-focused": {
-                    color: colors.primary.main,
-                  },
-                  "& .MuiFormHelperText-root": {
-                    color: colors.error[500],
-                  },
-                }}
-              />
-
-              <Button
-                fullWidth
-                onClick={handleConfirmAmount}
-                disabled={
-                  !amount ||
-                  !!error ||
-                  parseFloat(amount) <= 0 ||
-                  parseFloat(amount) > maxAmount
-                }
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
               >
-                Confirm Unbond
-              </Button>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label={`Amount to Unbond`}
+                  value={amount}
+                  onChange={handleAmountChange}
+                  type="text"
+                  inputMode="decimal"
+                  error={!!error}
+                  helperText={error}
+                  sx={{
+                    mb: spacing.md,
+                    "& .MuiOutlinedInput-root": {
+                      background:
+                        "linear-gradient(135deg, rgba(249, 115, 22, 0.05) 0%, rgba(251, 146, 60, 0.05) 100%)",
+                      backdropFilter: "blur(10px)",
+                      "& fieldset": {
+                        borderColor: "rgba(249, 115, 22, 0.3)",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "rgba(249, 115, 22, 0.5)",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#F97316",
+                        borderWidth: "2px",
+                      },
+                      input: {
+                        color: colors.neutral[100],
+                        fontSize: "1rem",
+                        fontWeight: typography.fontWeights.medium,
+                      },
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: colors.neutral[400],
+                      fontWeight: typography.fontWeights.medium,
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#F97316",
+                    },
+                    "& .MuiFormHelperText-root": {
+                      color: colors.error[500],
+                      fontWeight: typography.fontWeights.medium,
+                    },
+                  }}
+                />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  fullWidth
+                  onClick={handleConfirmAmount}
+                  disabled={
+                    !amount ||
+                    !!error ||
+                    parseFloat(amount) <= 0 ||
+                    parseFloat(amount) > maxAmount
+                  }
+                  sx={{
+                    background:
+                      "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
+                    color: "white",
+                    fontWeight: typography.fontWeights.semiBold,
+                    fontSize: "1rem",
+                    padding: "12px 24px",
+                    borderRadius: borderRadius.md,
+                    textTransform: "none",
+                    "&:hover": {
+                      background:
+                        "linear-gradient(135deg, #EA580C 0%, #F97316 100%)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 8px 25px rgba(249, 115, 22, 0.4)",
+                    },
+                    "&:disabled": {
+                      background: "rgba(249, 115, 22, 0.3)",
+                      color: "rgba(255, 255, 255, 0.5)",
+                    },
+                  }}
+                >
+                  Confirm Unbond
+                </Button>
+              </motion.div>
             </>
           )}
         </motion.div>

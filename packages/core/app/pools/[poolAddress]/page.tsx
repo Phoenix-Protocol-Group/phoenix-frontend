@@ -57,7 +57,11 @@ interface PoolPageProps {
 const overviewStyles = (
   <GlobalStyles
     styles={{
-      body: { background: "linear-gradient(180deg, #1F2123 0%, #131517 100%)" },
+      body: {
+        background:
+          "linear-gradient(135deg, #0F0F0F 0%, #1A1A1A 50%, #0D1117 100%)",
+        minHeight: "100vh",
+      },
     }}
   />
 );
@@ -331,7 +335,7 @@ export default function Page(props: PoolPageProps) {
               min_a: BigInt(1),
               min_b: BigInt(1),
               deadline: undefined,
-              auto_unstake: false,
+              auto_unstake: undefined,
             },
             { simulate: !restore }
           );
@@ -642,21 +646,101 @@ export default function Page(props: PoolPageProps) {
     );
   }
   return (
-    <Box sx={{ mt: { xs: 12, md: 0 }, maxWidth: "1440px" }}>
+    <Box
+      sx={{
+        mt: { xs: 12, md: 0 },
+        maxWidth: "1440px",
+        background:
+          "linear-gradient(135deg, rgba(249, 115, 22, 0.03) 0%, rgba(251, 146, 60, 0.02) 50%, rgba(0, 0, 0, 0.1) 100%)",
+        borderRadius: { xs: 0, md: "24px" },
+        border: { xs: "none", md: "1px solid rgba(249, 115, 22, 0.1)" },
+        backdropFilter: "blur(20px)",
+        p: { xs: 2, md: 4 },
+        position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "1px",
+          background:
+            "linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.5), transparent)",
+        },
+      }}
+    >
       {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
       <input type="hidden" value={`Phoenix DeFi Hub - Pool`} />
       {overviewStyles}
       {loading && <Loading open={loading} setOpen={setLoading} />}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+
+      {/* Enhanced Pool Header */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          mb: 4,
+          p: 3,
+          borderRadius: "20px",
+          background:
+            "linear-gradient(135deg, rgba(249, 115, 22, 0.08) 0%, rgba(251, 146, 60, 0.05) 100%)",
+          border: "1px solid rgba(249, 115, 22, 0.15)",
+          backdropFilter: "blur(10px)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Glow effect */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "100%",
+            background:
+              "radial-gradient(ellipse at center top, rgba(249, 115, 22, 0.1) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+
         {tokenA?.icon ? (
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+            sx={{ display: "flex", alignItems: "center", position: "relative" }}
+          >
             <Box
-              sx={{ height: "2.5rem", width: "2.5rem" }}
+              sx={{
+                height: "3rem",
+                width: "3rem",
+                borderRadius: "50%",
+                border: "2px solid rgba(249, 115, 22, 0.3)",
+                background:
+                  "linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%)",
+                p: 0.5,
+                transition: "transform 0.3s ease",
+                "&:hover": {
+                  transform: "scale(1.1)",
+                },
+              }}
               component="img"
               src={tokenA?.icon}
             />
             <Box
-              sx={{ ml: -1, height: "2.5rem", width: "2.5rem" }}
+              sx={{
+                ml: -1,
+                height: "3rem",
+                width: "3rem",
+                borderRadius: "50%",
+                border: "2px solid rgba(251, 146, 60, 0.3)",
+                background:
+                  "linear-gradient(135deg, rgba(251, 146, 60, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%)",
+                p: 0.5,
+                transition: "transform 0.3s ease",
+                "&:hover": {
+                  transform: "scale(1.1)",
+                },
+              }}
               component="img"
               src={tokenB?.icon}
             />
@@ -669,16 +753,38 @@ export default function Page(props: PoolPageProps) {
         )}
 
         {tokenA?.name ? (
-          <Typography sx={{ fontSize: "2rem", fontWeight: 700, ml: 1 }}>
-            {tokenA?.name}-{tokenB?.name}
-          </Typography>
+          <Box sx={{ ml: 2 }}>
+            <Typography
+              sx={{
+                fontSize: { xs: "1.5rem", md: "2rem" },
+                fontWeight: 700,
+                background: "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontFamily: "Ubuntu, sans-serif",
+              }}
+            >
+              {tokenA?.name}-{tokenB?.name}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "0.875rem",
+                color: "rgba(255, 255, 255, 0.6)",
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 400,
+              }}
+            >
+              Liquidity Pool
+            </Typography>
+          </Box>
         ) : (
           <Skeleton width={210} height={60}></Skeleton>
         )}
       </Box>
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
-          <Box sx={{ mb: 2 }}>
+          <Box sx={{ mb: 3 }}>
             <PoolStats
               stats={[
                 {

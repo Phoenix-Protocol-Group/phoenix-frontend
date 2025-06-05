@@ -29,19 +29,17 @@ export const YieldSummary = ({
     >
       <Box
         sx={{
-          borderRadius: borderRadius.lg,
-          background: colors.neutral[900],
-          border: `1px solid ${colors.neutral[700]}`,
-          padding: spacing.lg,
+          padding: { xs: spacing.lg, md: "2rem 0" },
           position: "relative",
           overflow: "hidden",
+          mb: 2,
         }}
       >
-        {/* Background graphic */}
+        {/* Background graphic - more subtle */}
         <Box
           sx={{
             position: "absolute",
-            right: "30%",
+            right: "-10%",
             top: "50%",
             transform: "translateY(-50%)",
             width: "300px",
@@ -49,13 +47,14 @@ export const YieldSummary = ({
             backgroundImage: "url(/plants.png)",
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
-            opacity: 0.45, // Increased from 0.03 for better visibility
+            opacity: 0.08,
             zIndex: 0,
+            filter: "hue-rotate(10deg) saturate(1.2)",
           }}
         />
 
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
+        <Grid container spacing={4} alignItems="center">
+          <Grid item xs={12} md={8}>
             <Box sx={{ position: "relative", zIndex: 1 }}>
               <Typography
                 sx={{
@@ -63,27 +62,36 @@ export const YieldSummary = ({
                   color: colors.neutral[400],
                   marginBottom: spacing.xs,
                   fontWeight: typography.fontWeights.medium,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
                 }}
               >
-                Total Value Staked
+                Your Staked Assets
               </Typography>
               <Typography
                 sx={{
-                  fontSize: typography.fontSize.xxl,
+                  fontSize: { xs: "2rem", md: "2.75rem" },
                   color: colors.neutral[50],
                   fontWeight: typography.fontWeights.bold,
-                  marginBottom: spacing.md,
+                  marginBottom: spacing.sm,
+                  background:
+                    "linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
                 }}
               >
                 {formatCurrencyStatic.format(totalValue)}
               </Typography>
               <Typography
                 sx={{
-                  fontSize: typography.fontSize.sm,
+                  fontSize: typography.fontSize.md,
                   color: colors.neutral[300],
+                  lineHeight: 1.5,
+                  maxWidth: "600px",
                 }}
               >
-                Stake your assets to earn passive income through various yield
+                Track and manage your active positions across all yield
                 strategies
               </Typography>
             </Box>
@@ -92,21 +100,22 @@ export const YieldSummary = ({
           <Grid
             item
             xs={12}
-            md={6}
+            md={4}
             sx={{
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
-              alignItems: "flex-end",
+              alignItems: { xs: "center", md: "flex-end" },
             }}
           >
             <Box
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "flex-end",
+                alignItems: { xs: "center", md: "flex-end" },
                 position: "relative",
                 zIndex: 1,
+                textAlign: { xs: "center", md: "right" },
               }}
             >
               <Typography
@@ -115,16 +124,25 @@ export const YieldSummary = ({
                   color: colors.neutral[400],
                   marginBottom: spacing.xs,
                   fontWeight: typography.fontWeights.medium,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
                 }}
               >
                 Claimable Rewards
               </Typography>
               <Typography
                 sx={{
-                  fontSize: typography.fontSize.xl,
-                  color: colors.neutral[50],
+                  fontSize: { xs: "1.5rem", md: "1.75rem" },
+                  color: claimableRewards > 0 ? "#F97316" : colors.neutral[50],
                   fontWeight: typography.fontWeights.bold,
                   marginBottom: spacing.md,
+                  background:
+                    claimableRewards > 0
+                      ? "linear-gradient(135deg, #F97316 0%, #FB923C 100%)"
+                      : "linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
                 }}
               >
                 {formatCurrencyStatic.format(claimableRewards)}
@@ -134,16 +152,33 @@ export const YieldSummary = ({
                 onClick={onClaimAll}
                 disabled={claimableRewards <= 0}
                 sx={{
-                  minWidth: "150px",
-                  transition: "all 0.2s ease",
-                  opacity: claimableRewards <= 0 ? 0.7 : 1,
+                  minWidth: "160px",
+                  height: "44px",
+                  borderRadius: "12px",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  background:
+                    claimableRewards > 0
+                      ? "linear-gradient(135deg, #F97316 0%, #FB923C 100%)"
+                      : "rgba(115, 115, 115, 0.3)",
+                  border:
+                    claimableRewards > 0
+                      ? "1px solid rgba(249, 115, 22, 0.3)"
+                      : "1px solid rgba(115, 115, 115, 0.3)",
+                  transition: "all 0.3s ease",
+                  opacity: claimableRewards <= 0 ? 0.5 : 1,
                   "&:hover": {
                     transform:
                       claimableRewards <= 0 ? "none" : "translateY(-2px)",
                     boxShadow:
                       claimableRewards <= 0
                         ? "none"
-                        : "0 4px 8px rgba(0,0,0,0.2)",
+                        : "0 8px 25px rgba(249, 115, 22, 0.3)",
+                    background:
+                      claimableRewards > 0
+                        ? "linear-gradient(135deg, #EA580C 0%, #F97316 100%)"
+                        : "rgba(115, 115, 115, 0.3)",
                   },
                 }}
               >

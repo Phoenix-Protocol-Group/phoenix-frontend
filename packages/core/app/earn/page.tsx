@@ -366,165 +366,225 @@ export default function EarnPage(): JSX.Element {
   return (
     <Box
       sx={{
-        maxWidth: "1440px",
         width: "100%",
-        padding: { xs: "1rem", md: "2.5rem" },
-        mt: { xs: "4.5rem", md: 1 },
+        maxWidth: "1440px",
+        mt: { xs: 8, md: 12 },
+        px: { xs: 2, sm: 3, md: 4 },
+        mx: "auto",
+        minHeight: "calc(100vh - 200px)",
       }}
     >
       <input type="hidden" value="Phoenix DeFi Hub - Earn" />
-      <Typography
-        sx={{
-          color: "#FFF",
-          fontFamily: "Ubuntu",
-          fontSize: "2rem",
-          fontStyle: "normal",
-          fontWeight: 700,
-          lineHeight: "normal",
-          mb: "1.5rem",
-        }}
-      >
-        Earn
-      </Typography>
-      <YieldSummary
-        totalValue={totalValue}
-        claimableRewards={claimableRewards}
-        onClaimAll={handleClaimAllClick}
-      />
 
-      <Box sx={{ mt: 3 }}></Box>
-      {/* Tabs */}
-      <Box sx={{ width: "100%" }}>
-        <Tabs
-          value={tabValue}
-          onChange={handleChange}
-          aria-label="strategies-tabs"
-          variant="scrollable"
-          scrollButtons="auto"
+      {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <Box
           sx={{
-            "& .MuiTab-root.Mui-selected": {
-              fontSize: "1.125rem",
-              fontWeight: 700,
-              color: "var(--neutral-50, #FAFAFA)",
-            },
-            "& .MuiTab-root": {
-              textTransform: "none",
-              height: "40px",
-              minHeight: "40px",
-              lineHeight: "40px",
-              alignItems: "center",
-              flexShrink: 0,
-              color: "var(--neutral-300, #D4D4D4)",
-            },
-            maxWidth: { xs: "100%", md: "50%" },
-            borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-          }}
-          TabIndicatorProps={{
-            style: {
-              background:
-                "linear-gradient(137deg, #F97316 0%, #F97316 17.08%, #F97316 42.71%, #F97316 100%)",
-              height: "3px",
-            },
+            textAlign: "center",
+            mb: 6,
+            position: "relative",
           }}
         >
-          <Tab
-            label="Discover Strategies"
+          <Typography
+            variant="h1"
             sx={{
-              mr: 2,
-              ":hover": { color: "#FAFAFA" },
+              fontSize: { xs: "2.5rem", md: "3.5rem" },
+              fontWeight: 800,
+              background: "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              mb: 2,
+              fontFamily: "Ubuntu",
             }}
-          />
-          <Tab
-            label="Your Strategies"
-            sx={{
-              mr: 2,
-              ":hover": { color: "#FAFAFA" },
-            }}
-          />
-        </Tabs>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={tabValue}
-            initial={{ opacity: 0, x: tabValue === 0 ? -20 : 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: tabValue === 0 ? 20 : -20 }}
-            transition={{ duration: 0.3 }}
           >
-            {tabValue === 0 ? (
-              walletAddress &&
-              !isLoading &&
-              discoverStrategiesUI.length === 0 &&
-              userStrategies.length > 0 ? (
-                <Box sx={{ textAlign: "center", mt: 4, p: 3 }}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      mb: 2,
-                      color: "var(--neutral-50, #FAFAFA)",
-                      fontFamily: "Ubuntu",
-                      fontWeight: 500,
-                    }}
-                  >
-                    You&apos;ve explored all available strategies!
-                  </Typography>
-                  <Typography
-                    sx={{
-                      mb: 3,
-                      color: "var(--neutral-300, #D4D4D4)",
-                      fontFamily: "Ubuntu",
-                    }}
-                  >
-                    All strategies are currently part of &apos;Your
-                    Strategies&apos;.
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    onClick={() => setTabValue(1)}
-                    sx={{
-                      fontFamily: "Ubuntu",
-                      textTransform: "none",
-                      // Add other styles to match existing buttons if necessary
-                    }}
-                  >
-                    View Your Strategies
-                  </Button>
-                </Box>
-              ) : (
-                <StrategiesTable
-                  title="Discover Strategies"
-                  strategies={discoverStrategiesUI}
-                  showFilters={true}
-                  isLoading={isLoading}
-                  onViewDetails={handleViewStrategyDetails}
-                  onBondClick={handleBondClick}
-                  onUnbondClick={handleUnbondClick}
-                  emptyStateMessage={
-                    !walletAddress
-                      ? "Connect your wallet to discover strategies."
-                      : "No strategies available to discover at the moment."
-                  }
-                />
-              )
-            ) : (
-              <StrategiesTable
-                title="Your Strategies"
-                strategies={userStrategiesUI}
-                showFilters={false}
-                isLoading={isLoading}
-                onViewDetails={handleViewStrategyDetails}
-                onBondClick={handleBondClick}
-                onUnbondClick={handleUnbondClick}
-                emptyStateMessage={
-                  walletAddress
-                    ? "You haven't joined any strategies yet. Discover strategies to start earning!"
-                    : "Connect your wallet to see your strategies"
-                }
+            Earn
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: { xs: "1.125rem", md: "1.25rem" },
+              color: "#A3A3A3",
+              fontFamily: "Ubuntu",
+              maxWidth: "600px",
+              mx: "auto",
+              mb: 4,
+            }}
+          >
+            Maximize your yields with advanced DeFi strategies. Stake, farm, and
+            earn passive income on your crypto assets.
+          </Typography>
+        </Box>
+      </motion.div>
+      {/* Yield Summary - Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.6 }}
+      >
+        <YieldSummary
+          totalValue={totalValue}
+          claimableRewards={claimableRewards}
+          onClaimAll={handleClaimAllClick}
+        />
+      </motion.div>
+
+      {/* Strategies Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.6 }}
+      >
+        <Box sx={{ mt: 4 }}>
+          {/* Tabs */}
+          <Box sx={{ width: "100%" }}>
+            <Tabs
+              value={tabValue}
+              onChange={handleChange}
+              aria-label="strategies-tabs"
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{
+                "& .MuiTab-root.Mui-selected": {
+                  fontSize: "1.125rem",
+                  fontWeight: 700,
+                  color: "#FAFAFA",
+                },
+                "& .MuiTab-root": {
+                  textTransform: "none",
+                  height: "48px",
+                  minHeight: "48px",
+                  lineHeight: "48px",
+                  alignItems: "center",
+                  flexShrink: 0,
+                  color: "#A3A3A3",
+                  fontFamily: "Ubuntu",
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    color: "#FAFAFA",
+                  },
+                },
+                maxWidth: { xs: "100%", md: "60%" },
+                borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                mb: 3,
+              }}
+              TabIndicatorProps={{
+                style: {
+                  background:
+                    "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
+                  height: "3px",
+                  borderRadius: "2px",
+                },
+              }}
+            >
+              <Tab
+                label="Discover Strategies"
+                sx={{
+                  mr: 3,
+                }}
               />
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </Box>
+              <Tab
+                label="Your Strategies"
+                sx={{
+                  mr: 3,
+                }}
+              />
+            </Tabs>
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={tabValue}
+                initial={{ opacity: 0, x: tabValue === 0 ? -20 : 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: tabValue === 0 ? 20 : -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {tabValue === 0 ? (
+                  walletAddress &&
+                  !isLoading &&
+                  discoverStrategiesUI.length === 0 &&
+                  userStrategies.length > 0 ? (
+                    <Box sx={{ textAlign: "center", mt: 4, p: 3 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          mb: 2,
+                          color: "#FAFAFA",
+                          fontFamily: "Ubuntu",
+                          fontWeight: 500,
+                        }}
+                      >
+                        You&apos;ve explored all available strategies!
+                      </Typography>
+                      <Typography
+                        sx={{
+                          mb: 3,
+                          color: "#A3A3A3",
+                          fontFamily: "Ubuntu",
+                        }}
+                      >
+                        All strategies are currently part of &apos;Your
+                        Strategies&apos;.
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        onClick={() => setTabValue(1)}
+                        sx={{
+                          fontFamily: "Ubuntu",
+                          textTransform: "none",
+                          background:
+                            "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
+                          "&:hover": {
+                            background:
+                              "linear-gradient(135deg, #EA580C 0%, #F97316 100%)",
+                          },
+                        }}
+                      >
+                        View Your Strategies
+                      </Button>
+                    </Box>
+                  ) : (
+                    <StrategiesTable
+                      title="Discover Strategies"
+                      strategies={discoverStrategiesUI}
+                      showFilters={true}
+                      isLoading={isLoading}
+                      onViewDetails={handleViewStrategyDetails}
+                      onBondClick={handleBondClick}
+                      onUnbondClick={handleUnbondClick}
+                      emptyStateMessage={
+                        !walletAddress
+                          ? "Connect your wallet to discover strategies."
+                          : "No strategies available to discover at the moment."
+                      }
+                    />
+                  )
+                ) : (
+                  <StrategiesTable
+                    title="Your Strategies"
+                    strategies={userStrategiesUI}
+                    showFilters={false}
+                    isLoading={isLoading}
+                    onViewDetails={handleViewStrategyDetails}
+                    onBondClick={handleBondClick}
+                    onUnbondClick={handleUnbondClick}
+                    emptyStateMessage={
+                      walletAddress
+                        ? "You haven't joined any strategies yet. Discover strategies to start earning!"
+                        : "Connect your wallet to see your strategies"
+                    }
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </Box>
+        </Box>
+      </motion.div>
 
       {/* Modals */}
       <BondModal

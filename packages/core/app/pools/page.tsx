@@ -5,6 +5,7 @@ import {
   PhoenixFactoryContract,
   PhoenixPairContract,
   PhoenixStakeContract,
+  SorobanTokenContract,
 } from "@phoenix-protocol/contracts";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
 import { Pools, Skeleton } from "@phoenix-protocol/ui";
@@ -64,9 +65,10 @@ export default function Page() {
         ]);
 
         if (pairConfig?.result && pairInfo?.result) {
-          const [tokenA, tokenB] = await Promise.all([
+          const [tokenA, tokenB, lpToken] = await Promise.all([
             store.fetchTokenInfo(pairConfig.result.token_a),
             store.fetchTokenInfo(pairConfig.result.token_b),
+            store.fetchTokenInfo(pairConfig.result.share_token, true),
           ]);
 
           // Fetch prices and calculate TVL
@@ -89,13 +91,11 @@ export default function Page() {
             rpcUrl: constants.RPC_URL,
           });
 
-          const [stakingInfo, allPoolDetails] = await Promise.all([
+          const [stakingInfo, userStake] = await Promise.all([
             StakeContract.query_total_staked(),
-            new PhoenixFactoryContract.Client({
-              contractId: FACTORY_ADDRESS,
-              networkPassphrase: constants.NETWORK_PASSPHRASE,
-              rpcUrl: constants.RPC_URL,
-            }).query_all_pools_details(),
+            StakeContract.query_staked({
+              address: storePersist.wallet.address!,
+            }),
           ]);
 
           const totalStaked = Number(stakingInfo.result);
@@ -103,13 +103,34 @@ export default function Page() {
             (totalStaked / 10 ** 7) *
             (tvl / (Number(pairInfo.result.asset_lp_share.amount) / 10 ** 7));
 
-          const poolIncentives = allPoolDetails.result;
+          const poolIncentives = [
+            {
+              // XLM / USDC
+              address:
+                "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX",
+              amount: 12500,
+            },
+            // XLM/PHO
+            {
+              address:
+                "CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH",
+              amount: 25000,
+            },
+            {
+              // PHO/USDC
+              address:
+                "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA",
+              amount: 18750,
+            },
+          ];
           const poolIncentive = poolIncentives.find(
             (incentive: any) => incentive.address === poolAddress
           )!;
           const phoprice = await fetchPho();
-          const apr =
+          const _apr =
             ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
+
+          const apr = isNaN(_apr) ? 0 : _apr;
 
           return {
             tokens: [
@@ -134,7 +155,10 @@ export default function Page() {
             ],
             tvl: formatCurrency("USD", tvl.toString(), navigator.language),
             maxApr: `${(apr / 2).toFixed(2)}%`,
-            userLiquidity: 0,
+            userLiquidity:
+              (lpToken && lpToken.balance > 0) || userStake.total_stake > 0
+                ? 1
+                : 0,
             poolAddress: poolAddress,
           };
         }

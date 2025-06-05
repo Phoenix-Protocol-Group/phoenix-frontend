@@ -181,12 +181,14 @@ export const StrategiesTable = ({
         {!isMobile && (
           <Box
             sx={{
-              padding: spacing.md,
-              borderRadius: borderRadius.md,
-              background: colors.neutral[900],
-              border: `1px solid ${colors.neutral[700]}`,
-              mb: 2,
+              padding: spacing.lg,
+              borderRadius: "16px",
+              background:
+                "linear-gradient(135deg, rgba(15, 15, 15, 0.8) 0%, rgba(25, 25, 25, 0.8) 100%)",
+              border: "1px solid rgba(249, 115, 22, 0.1)",
+              mb: 3,
               cursor: "default",
+              backdropFilter: "blur(10px)",
             }}
           >
             <Grid container spacing={3} alignItems="center">
@@ -325,22 +327,39 @@ export const StrategiesTable = ({
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              height: "200px",
-              borderRadius: borderRadius.md,
-              background: colors.neutral[900],
-              border: `1px solid ${colors.neutral[700]}`,
+              height: "300px",
+              borderRadius: "16px",
+              background:
+                "linear-gradient(135deg, rgba(15, 15, 15, 0.8) 0%, rgba(25, 25, 25, 0.8) 100%)",
+              border: "1px solid rgba(249, 115, 22, 0.1)",
+              backdropFilter: "blur(10px)",
             }}
           >
-            <CircularProgress sx={{ color: colors.primary.main }} />
+            <Box sx={{ textAlign: "center" }}>
+              <CircularProgress
+                sx={{
+                  color: "#F97316",
+                  mb: 2,
+                }}
+              />
+              <Typography
+                sx={{
+                  color: colors.neutral[300],
+                  fontSize: typography.fontSize.sm,
+                }}
+              >
+                Loading strategies...
+              </Typography>
+            </Box>
           </Box>
         ) : filteredStrategies.length > 0 ? (
-          <Box>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {filteredStrategies.map((strategy, index) => (
               <motion.div
                 key={strategy.id || index}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
               >
                 <StrategyEntry
                   strategy={strategy}
@@ -356,17 +375,57 @@ export const StrategiesTable = ({
           <Box
             sx={{
               display: "flex",
+              flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              height: "200px",
-              borderRadius: borderRadius.md,
-              background: colors.neutral[900],
-              border: `1px solid ${colors.neutral[700]}`,
+              height: "300px",
+              borderRadius: "16px",
+              background:
+                "linear-gradient(135deg, rgba(15, 15, 15, 0.8) 0%, rgba(25, 25, 25, 0.8) 100%)",
+              border: "1px solid rgba(115, 115, 115, 0.2)",
               textAlign: "center",
-              padding: spacing.md,
+              padding: spacing.xl,
+              backdropFilter: "blur(10px)",
             }}
           >
-            <Typography sx={{ color: colors.neutral[300] }}>
+            <Box
+              sx={{
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                background: "rgba(249, 115, 22, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 3,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: "2rem",
+                  color: "#F97316",
+                }}
+              >
+                📊
+              </Typography>
+            </Box>
+            <Typography
+              sx={{
+                color: colors.neutral[100],
+                fontSize: typography.fontSize.lg,
+                fontWeight: typography.fontWeights.medium,
+                mb: 1,
+              }}
+            >
+              No strategies found
+            </Typography>
+            <Typography
+              sx={{
+                color: colors.neutral[400],
+                fontSize: typography.fontSize.sm,
+                maxWidth: "400px",
+              }}
+            >
               {emptyStateMessage}
             </Typography>
           </Box>

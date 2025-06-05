@@ -73,7 +73,7 @@ export const BondModal = ({
                 balances[tokenIdentifier] = userToken;
               }
             } catch (error) {
-              console.log(asset)
+              console.log(asset);
               console.error(
                 `Error fetching user balance for ${asset.name}:`,
                 error
@@ -277,35 +277,56 @@ export const BondModal = ({
       onClose={handleClose}
       aria-labelledby="bond-modal-title"
       aria-describedby="bond-modal-description"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1300,
+      }}
     >
       <Box
         sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: { xs: "90%", sm: "450px" },
+          position: "relative",
+          width: { xs: "90%", sm: "500px" },
           maxHeight: "90vh",
           overflow: "auto",
-          bgcolor: colors.neutral[900],
-          border: `1px solid ${colors.neutral[700]}`,
-          borderRadius: borderRadius.lg,
-          boxShadow: 24,
-          p: spacing.lg,
+          borderRadius: "20px",
+          background:
+            "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)",
+          border: "1px solid rgba(71, 85, 105, 0.3)",
+          padding: { xs: spacing.lg, md: "2rem" },
+          backdropFilter: "blur(20px)",
+          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
           outline: "none",
         }}
       >
+        {/* Subtle gradient overlay */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              "linear-gradient(135deg, rgba(71, 85, 105, 0.02) 0%, rgba(148, 163, 184, 0.01) 50%, rgba(71, 85, 105, 0.02) 100%)",
+            borderRadius: "20px",
+            zIndex: 0,
+          }}
+        />
+
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
+          style={{ position: "relative", zIndex: 1 }}
         >
           <Box
             sx={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              mb: spacing.md,
+              mb: spacing.lg,
             }}
           >
             <Typography
@@ -315,12 +336,17 @@ export const BondModal = ({
               sx={{
                 color: colors.neutral[50],
                 fontWeight: typography.fontWeights.bold,
+                fontSize: { xs: "1.25rem", md: "1.5rem" },
+                background: "linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
               }}
             >
               {isPairStrategy ? "Provide Liquidity" : "Bond to"} {strategy.name}
             </Typography>
             <motion.div
-              whileHover={{ rotate: 90 }}
+              whileHover={{ rotate: 90, scale: 1.1 }}
               transition={{ duration: 0.2 }}
             >
               <Box
@@ -328,7 +354,14 @@ export const BondModal = ({
                   cursor: "pointer",
                   opacity: 0.7,
                   color: colors.neutral[300],
-                  "&:hover": { opacity: 1 },
+                  p: 1,
+                  borderRadius: "8px",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    opacity: 1,
+                    backgroundColor: "rgba(71, 85, 105, 0.2)",
+                    color: colors.neutral[100],
+                  },
                 }}
                 onClick={handleClose}
               >
@@ -339,63 +372,138 @@ export const BondModal = ({
 
           <Typography
             id="bond-modal-description"
-            sx={{ color: colors.neutral[300], mb: spacing.md }}
+            sx={{
+              color: colors.neutral[300],
+              mb: spacing.lg,
+              fontSize: typography.fontSize.md,
+              lineHeight: 1.5,
+            }}
           >
             {isPairStrategy
-              ? `Enter the amount of tokens you want to provide as liquidity.`
+              ? `Enter the amount of tokens you want to provide as liquidity to earn rewards.`
               : `Enter the amount of ${
                   strategy.assets[0]?.name || "tokens"
-                } you want to bond.`}
+                } you want to bond to start earning.`}
           </Typography>
 
           {/* Token inputs for all assets */}
           {tokensWithUserBalances.map((tokenWithBalance, index) => (
             <Box
               key={tokenWithBalance.name}
-              sx={{ mt: index > 0 ? spacing.md : 0 }}
+              sx={{
+                mt: index > 0 ? spacing.md : 0,
+                mb: spacing.sm,
+              }}
             >
-              <TokenBox
-                value={amounts[index] || ""}
-                onChange={(value) => handleAmountChange(index, value)}
-                token={tokenWithBalance}
-                hideDropdownButton
-              />
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <TokenBox
+                  value={amounts[index] || ""}
+                  onChange={(value) => handleAmountChange(index, value)}
+                  token={tokenWithBalance}
+                  hideDropdownButton
+                />
+              </motion.div>
             </Box>
           ))}
 
           {isPairStrategy && (
-            <Typography
+            <Box
               sx={{
-                fontSize: typography.fontSize.xs,
-                color: colors.neutral[400],
-                textAlign: "center",
-                mt: spacing.sm,
+                background: "rgba(71, 85, 105, 0.1)",
+                border: "1px solid rgba(71, 85, 105, 0.3)",
+                borderRadius: "12px",
+                p: spacing.md,
+                mt: spacing.md,
                 mb: spacing.md,
+                position: "relative",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "2px",
+                  background:
+                    "linear-gradient(90deg, transparent 0%, rgba(249, 115, 22, 0.5) 50%, transparent 100%)",
+                  borderRadius: "12px 12px 0 0",
+                },
               }}
             >
-              The ratio of tokens will be automatically maintained.
-            </Typography>
+              <Typography
+                sx={{
+                  fontSize: typography.fontSize.sm,
+                  color: colors.neutral[300],
+                  textAlign: "center",
+                  fontWeight: typography.fontWeights.medium,
+                }}
+              >
+                💡 The ratio of tokens will be automatically maintained for
+                optimal liquidity provision.
+              </Typography>
+            </Box>
           )}
 
           {error && (
-            <Typography
-              sx={{
-                color: colors.error[500],
-                fontSize: typography.fontSize.xs,
-                mb: spacing.sm,
-                mt: 1,
-                textAlign: "center",
-              }}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
             >
-              {error}
-            </Typography>
+              <Box
+                sx={{
+                  background: "rgba(239, 68, 68, 0.1)",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  borderRadius: "12px",
+                  p: spacing.md,
+                  mb: spacing.md,
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: "#EF4444",
+                    fontSize: typography.fontSize.sm,
+                    textAlign: "center",
+                    fontWeight: typography.fontWeights.medium,
+                  }}
+                >
+                  {error}
+                </Typography>
+              </Box>
+            </motion.div>
           )}
 
           <Button
             fullWidth
             onClick={handleConfirm}
             disabled={!isFormValid}
-            sx={{ mt: spacing.md }}
+            sx={{
+              mt: spacing.lg,
+              height: "48px",
+              borderRadius: "12px",
+              fontSize: "1rem",
+              fontWeight: 600,
+              textTransform: "none",
+              background: isFormValid
+                ? "linear-gradient(135deg, #F97316 0%, #FB923C 100%)"
+                : "rgba(115, 115, 115, 0.3)",
+              border: isFormValid
+                ? "1px solid rgba(249, 115, 22, 0.3)"
+                : "1px solid rgba(115, 115, 115, 0.3)",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                transform: isFormValid ? "translateY(-2px)" : "none",
+                boxShadow: isFormValid
+                  ? "0 8px 25px rgba(249, 115, 22, 0.3)"
+                  : "none",
+                background: isFormValid
+                  ? "linear-gradient(135deg, #EA580C 0%, #F97316 100%)"
+                  : "rgba(115, 115, 115, 0.3)",
+              },
+            }}
           >
             {isPairStrategy ? "Provide Liquidity" : "Confirm Bond"}
           </Button>

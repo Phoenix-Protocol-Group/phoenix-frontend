@@ -23,19 +23,21 @@ export interface StrategyEntryProps {
 }
 
 const BoxStyle = {
-  p: spacing.md,
-  borderRadius: borderRadius.md,
-  background: colors.neutral[900],
-  border: `1px solid ${colors.neutral[700]}`,
+  p: { xs: spacing.md, md: spacing.lg },
+  borderRadius: "16px",
+  background:
+    "linear-gradient(135deg, rgba(15, 15, 15, 0.9) 0%, rgba(25, 25, 25, 0.9) 100%)",
+  border: "1px solid rgba(249, 115, 22, 0.1)",
   position: "relative",
   overflow: "hidden",
-  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
-  marginTop: spacing.sm,
-  transition: "all 0.3s ease",
+  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+  marginTop: spacing.md,
+  transition: "all 0.4s ease",
+  backdropFilter: "blur(10px)",
   "&:hover": {
-    boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.25)",
-    borderColor: colors.neutral[600],
-    // cursor: "pointer", // Remove default cursor pointer for the whole box
+    transform: "translateY(-4px)",
+    boxShadow: "0 8px 32px rgba(249, 115, 22, 0.2)",
+    borderColor: "rgba(249, 115, 22, 0.3)",
   },
 };
 
@@ -85,255 +87,32 @@ const StrategyEntry = ({
           sx={{
             position: "absolute",
             top: "50%",
-            width: "15%",
+            width: "20%",
             height: "auto",
-            opacity: 0.08,
+            opacity: 0.12,
             transform: "translateY(-50%)",
-            left: `${-40 + index * 60}px`,
-            filter: "grayscale(80%)",
+            right: `${-20 + index * 80}px`,
+            filter: "grayscale(60%) brightness(1.2)",
+            zIndex: 0,
           }}
         />
       ))}
 
-      {/* Mobile Layout */}
-      {isMobile ? (
-        <Box sx={{ display: "flex", flexDirection: "column", gap: spacing.md }}>
-          {/* Header with assets and name */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: spacing.sm }}>
-            <Box sx={{ display: "flex", gap: 1 }}>
-              {assets.map((asset, idx) => (
-                <Box
-                  key={idx}
-                  component="img"
-                  src={asset.icon}
-                  alt={asset.name}
-                  sx={{
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-                  }}
-                />
-              ))}
-            </Box>
-            <Typography
-              sx={{
-                color: colors.neutral[50],
-                fontSize: typography.fontSize.sm,
-                fontWeight: typography.fontWeights.bold,
-                flex: 1,
-              }}
+      {/* Content wrapper with z-index */}
+      <Box sx={{ position: "relative", zIndex: 1 }}>
+        {/* Mobile Layout */}
+        {isMobile ? (
+          <Box
+            sx={{ display: "flex", flexDirection: "column", gap: spacing.md }}
+          >
+            {/* Header with assets and name */}
+            <Box
+              sx={{ display: "flex", alignItems: "center", gap: spacing.sm }}
             >
-              {name}
-            </Typography>
-          </Box>
-
-          {/* Description if available */}
-          {description && (
-            <Typography
-              sx={{
-                color: colors.neutral[400],
-                fontSize: typography.fontSize.xs,
-                marginBottom: spacing.xs,
-              }}
-            >
-              {description}
-            </Typography>
-          )}
-
-          {/* Strategy details */}
-          <Grid container spacing={1}>
-            <Grid item xs={6}>
-              <Typography
-                sx={{
-                  color: colors.neutral[400],
-                  fontSize: typography.fontSize.xs,
-                }}
-              >
-                TVL
-              </Typography>
-              <Typography
-                sx={{
-                  color: colors.neutral[300],
-                  fontSize: typography.fontSize.xs,
-                  fontWeight: typography.fontWeights.medium,
-                }}
-              >
-                {formatCurrencyStatic.format(tvl)}
-              </Typography>
-            </Grid>
-
-            <Grid item xs={6}>
-              <Typography
-                sx={{
-                  color: colors.neutral[400],
-                  fontSize: typography.fontSize.xs,
-                }}
-              >
-                APR
-              </Typography>
-              <Typography
-                sx={{
-                  color: colors.success[300],
-                  fontSize: typography.fontSize.xs,
-                  fontWeight: typography.fontWeights.bold,
-                }}
-              >
-                up to {(apr * 100).toFixed(1)}%
-              </Typography>
-            </Grid>
-
-            {/* User stake - only show if user has joined */}
-            {hasJoined && (
-              <>
-                <Grid item xs={6}>
-                  <Typography
-                    sx={{
-                      color: colors.primary[300],
-                      fontSize: typography.fontSize.xs,
-                      fontWeight: typography.fontWeights.medium,
-                    }}
-                  >
-                    {formatCurrencyStatic.format(userStake)}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={6}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Box
-                      component="img"
-                      src={rewardToken.icon}
-                      alt={rewardToken.name}
-                      sx={{
-                        width: "16px",
-                        height: "16px",
-                        borderRadius: "50%",
-                      }}
-                    />
-                    <Typography
-                      sx={{
-                        color:
-                          userRewards > 0
-                            ? colors.success[300]
-                            : colors.neutral[300],
-                        fontSize: typography.fontSize.xs,
-                        fontWeight: typography.fontWeights.medium,
-                      }}
-                    >
-                      {userRewards.toFixed(2)} {rewardToken.name}
-                    </Typography>
-                  </Box>
-                </Grid>
-              </>
-            )}
-
-            {!hasJoined && (
-              <>
-                <Grid item xs={6}>
-                  <Typography
-                    sx={{
-                      color: colors.neutral[400],
-                      fontSize: typography.fontSize.xs,
-                    }}
-                  >
-                    Reward
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Box
-                      component="img"
-                      src={rewardToken.icon}
-                      alt={rewardToken.name}
-                      sx={{
-                        width: "16px",
-                        height: "16px",
-                        borderRadius: "50%",
-                      }}
-                    />
-                    <Typography
-                      sx={{
-                        color: colors.neutral[300],
-                        fontSize: typography.fontSize.xs,
-                      }}
-                    >
-                      {rewardToken.name}
-                    </Typography>
-                  </Box>
-                </Grid>
-
-                <Grid item xs={6}>
-                  <Typography
-                    sx={{
-                      color: colors.neutral[400],
-                      fontSize: typography.fontSize.xs,
-                    }}
-                  >
-                    Unbond Time
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color:
-                        unbondTime === 0
-                          ? colors.success[300]
-                          : colors.neutral[300],
-                      fontSize: typography.fontSize.xs,
-                    }}
-                  >
-                    {formatUnbondTime(unbondTime)}
-                  </Typography>
-                </Grid>
-              </>
-            )}
-          </Grid>
-
-          {/* Action Button - Updated for mobile */}
-          {hasJoined ? (
-            <Box sx={{ display: "flex", gap: spacing.sm, mt: spacing.md }}>
-              <Button
-                size="small"
-                type="primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onBondClick(strategy);
-                }}
-                sx={{ flex: 1 }}
-              >
-                Bond More
-              </Button>
-              <Button
-                size="small"
-                type="secondary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUnbondClick(strategy);
-                }}
-                sx={{ flex: 1 }}
-              >
-                Unbond
-              </Button>
-            </Box>
-          ) : (
-            <Button
-              size="small"
-              type="primary"
-              onClick={(e) => {
-                e.stopPropagation();
-                onBondClick(strategy);
-              }}
-              sx={{ width: "100%", mt: spacing.md }}
-            >
-              Bond
-            </Button>
-          )}
-        </Box>
-      ) : (
-        /* Desktop Layout */
-        <Grid container alignItems="center" spacing={3}>
-          {/* Assets Column */}
-          <Grid item md={2}>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              {assets.map((asset, idx) => (
-                <Box key={idx} sx={{ display: "flex", alignItems: "center" }}>
+              <Box sx={{ display: "flex", gap: 1 }}>
+                {assets.map((asset, idx) => (
                   <Box
+                    key={idx}
                     component="img"
                     src={asset.icon}
                     alt={asset.name}
@@ -344,177 +123,180 @@ const StrategyEntry = ({
                       boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
                     }}
                   />
-                  <Typography
-                    sx={{
-                      color: colors.neutral[300],
-                      fontSize: typography.fontSize.sm,
-                      fontWeight: typography.fontWeights.bold,
-                      marginLeft: spacing.xs,
-                    }}
-                  >
-                    {asset.name}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          </Grid>
-
-          {/* Strategy Name */}
-          <Grid item md={2}>
-            <Tooltip title={description || name} arrow placement="top">
+                ))}
+              </Box>
               <Typography
                 sx={{
                   color: colors.neutral[50],
-                  fontSize: typography.fontSize.md,
-                  fontWeight: typography.fontWeights.medium,
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.bold,
+                  flex: 1,
                 }}
               >
                 {name}
               </Typography>
-            </Tooltip>
-          </Grid>
+            </Box>
 
-          {/* TVL */}
-          <Grid item md={1}>
-            <Typography
-              sx={{
-                fontSize: typography.fontSize.sm,
-                fontWeight: typography.fontWeights.regular,
-                color: colors.neutral[300],
-              }}
-            >
-              {formatCurrencyStatic.format(tvl)}
-            </Typography>
-          </Grid>
-
-          {/* APR */}
-          <Grid item md={1}>
-            <Typography
-              sx={{
-                fontSize: typography.fontSize.sm,
-                fontWeight: typography.fontWeights.bold,
-                color: colors.success[300],
-              }}
-            >
-              Up to {(apr * 100).toFixed(1)}%
-            </Typography>
-          </Grid>
-
-          {/* Reward Token */}
-          <Grid
-            item
-            md={hasJoined ? 1 : 2}
-            sx={{ display: "flex", alignItems: "center" }}
-          >
-            <Box
-              component="img"
-              src={rewardToken.icon}
-              alt={rewardToken.name}
-              sx={{
-                width: "24px",
-                height: "24px",
-                borderRadius: "50%",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-              }}
-            />
-            <Typography
-              sx={{
-                color: colors.neutral[300],
-                fontSize: typography.fontSize.sm,
-                fontWeight: typography.fontWeights.medium,
-                marginLeft: spacing.xs,
-              }}
-            >
-              {rewardToken.name}
-            </Typography>
-          </Grid>
-
-          {/* Your Stake - only show if joined */}
-          {hasJoined && (
-            <Grid item md={1}>
+            {/* Description if available */}
+            {description && (
               <Typography
                 sx={{
                   color: colors.neutral[400],
                   fontSize: typography.fontSize.xs,
-                  mb: 0.5,
+                  marginBottom: spacing.xs,
                 }}
               >
-                Your Stake
+                {description}
               </Typography>
-              <Typography
-                sx={{
-                  fontSize: typography.fontSize.sm,
-                  fontWeight: typography.fontWeights.medium,
-                  color: colors.primary[300],
-                }}
-              >
-                {formatCurrencyStatic.format(userStake)}
-              </Typography>
-            </Grid>
-          )}
+            )}
 
-          {/* Claimable rewards - only show if joined */}
-          {hasJoined && (
-            <Grid item md={2}>
-              <Typography
-                sx={{
-                  color: colors.neutral[400],
-                  fontSize: typography.fontSize.xs,
-                  mb: 0.5,
-                }}
-              >
-                Claimable
-              </Typography>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box
-                  component="img"
-                  src={rewardToken.icon}
-                  alt={rewardToken.name}
-                  sx={{
-                    width: "16px",
-                    height: "16px",
-                    borderRadius: "50%",
-                    mr: 0.5,
-                  }}
-                />
+            {/* Strategy details */}
+            <Grid container spacing={1}>
+              <Grid item xs={6}>
                 <Typography
                   sx={{
-                    fontSize: typography.fontSize.sm,
-                    fontWeight: typography.fontWeights.medium,
-                    color:
-                      userRewards > 0
-                        ? colors.success[300]
-                        : colors.neutral[300],
+                    color: colors.neutral[400],
+                    fontSize: typography.fontSize.xs,
                   }}
                 >
-                  {userRewards.toFixed(2)} {rewardToken.name}
+                  TVL
                 </Typography>
-              </Box>
-            </Grid>
-          )}
+                <Typography
+                  sx={{
+                    color: colors.neutral[300],
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.medium,
+                  }}
+                >
+                  {formatCurrencyStatic.format(tvl)}
+                </Typography>
+              </Grid>
 
-          {/* Unbond Time - only show if not joined */}
-          {!hasJoined && (
-            <Grid item md={2}>
-              <Typography
-                sx={{
-                  fontSize: typography.fontSize.sm,
-                  fontWeight: typography.fontWeights.regular,
-                  color:
-                    unbondTime === 0
-                      ? colors.success[300]
-                      : colors.neutral[300],
-                }}
-              >
-                {formatUnbondTime(unbondTime)}
-              </Typography>
-            </Grid>
-          )}
+              <Grid item xs={6}>
+                <Typography
+                  sx={{
+                    color: colors.neutral[400],
+                    fontSize: typography.fontSize.xs,
+                  }}
+                >
+                  APR
+                </Typography>
+                <Typography
+                  sx={{
+                    color: colors.success[300],
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.bold,
+                  }}
+                >
+                  up to {(apr * 100).toFixed(1)}%
+                </Typography>
+              </Grid>
 
-          {/* Action Button Column - Updated for desktop */}
-          <Grid item md={2} sx={{ textAlign: "right" }}>
+              {/* User stake - only show if user has joined */}
+              {hasJoined && (
+                <>
+                  <Grid item xs={6}>
+                    <Typography
+                      sx={{
+                        color: colors.primary[300],
+                        fontSize: typography.fontSize.xs,
+                        fontWeight: typography.fontWeights.medium,
+                      }}
+                    >
+                      {formatCurrencyStatic.format(userStake)}
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box
+                        component="img"
+                        src={rewardToken.icon}
+                        alt={rewardToken.name}
+                        sx={{
+                          width: "16px",
+                          height: "16px",
+                          borderRadius: "50%",
+                        }}
+                      />
+                      <Typography
+                        sx={{
+                          color:
+                            userRewards > 0
+                              ? colors.success[300]
+                              : colors.neutral[300],
+                          fontSize: typography.fontSize.xs,
+                          fontWeight: typography.fontWeights.medium,
+                        }}
+                      >
+                        {userRewards.toFixed(2)} {rewardToken.name}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </>
+              )}
+
+              {!hasJoined && (
+                <>
+                  <Grid item xs={6}>
+                    <Typography
+                      sx={{
+                        color: colors.neutral[400],
+                        fontSize: typography.fontSize.xs,
+                      }}
+                    >
+                      Reward
+                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box
+                        component="img"
+                        src={rewardToken.icon}
+                        alt={rewardToken.name}
+                        sx={{
+                          width: "16px",
+                          height: "16px",
+                          borderRadius: "50%",
+                        }}
+                      />
+                      <Typography
+                        sx={{
+                          color: colors.neutral[300],
+                          fontSize: typography.fontSize.xs,
+                        }}
+                      >
+                        {rewardToken.name}
+                      </Typography>
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Typography
+                      sx={{
+                        color: colors.neutral[400],
+                        fontSize: typography.fontSize.xs,
+                      }}
+                    >
+                      Unbond Time
+                    </Typography>
+                    <Typography
+                      sx={{
+                        color:
+                          unbondTime === 0
+                            ? colors.success[300]
+                            : colors.neutral[300],
+                        fontSize: typography.fontSize.xs,
+                      }}
+                    >
+                      {formatUnbondTime(unbondTime)}
+                    </Typography>
+                  </Grid>
+                </>
+              )}
+            </Grid>
+
+            {/* Action Button - Updated for mobile */}
             {hasJoined ? (
-              <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+              <Box sx={{ display: "flex", gap: spacing.sm, mt: spacing.md }}>
                 <Button
                   size="small"
                   type="primary"
@@ -522,8 +304,9 @@ const StrategyEntry = ({
                     e.stopPropagation();
                     onBondClick(strategy);
                   }}
+                  sx={{ flex: 1 }}
                 >
-                  Bond
+                  Bond More
                 </Button>
                 <Button
                   size="small"
@@ -532,27 +315,258 @@ const StrategyEntry = ({
                     e.stopPropagation();
                     onUnbondClick(strategy);
                   }}
+                  sx={{ flex: 1 }}
                 >
                   Unbond
                 </Button>
               </Box>
             ) : (
-              <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-                <Button
-                  size="small"
-                  type="primary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onBondClick(strategy);
+              <Button
+                size="small"
+                type="primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onBondClick(strategy);
+                }}
+                sx={{ width: "100%", mt: spacing.md }}
+              >
+                Bond
+              </Button>
+            )}
+          </Box>
+        ) : (
+          /* Desktop Layout */
+          <Grid container alignItems="center" spacing={3}>
+            {/* Assets Column */}
+            <Grid item md={2}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {assets.map((asset, idx) => (
+                  <Box key={idx} sx={{ display: "flex", alignItems: "center" }}>
+                    <Box
+                      component="img"
+                      src={asset.icon}
+                      alt={asset.name}
+                      sx={{
+                        width: "24px",
+                        height: "24px",
+                        borderRadius: "50%",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        color: colors.neutral[300],
+                        fontSize: typography.fontSize.sm,
+                        fontWeight: typography.fontWeights.bold,
+                        marginLeft: spacing.xs,
+                      }}
+                    >
+                      {asset.name}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+
+            {/* Strategy Name */}
+            <Grid item md={2}>
+              <Tooltip title={description || name} arrow placement="top">
+                <Typography
+                  sx={{
+                    color: colors.neutral[50],
+                    fontSize: typography.fontSize.md,
+                    fontWeight: typography.fontWeights.medium,
                   }}
                 >
-                  Bond
-                </Button>
-              </Box>
+                  {name}
+                </Typography>
+              </Tooltip>
+            </Grid>
+
+            {/* TVL */}
+            <Grid item md={1}>
+              <Typography
+                sx={{
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.regular,
+                  color: colors.neutral[300],
+                }}
+              >
+                {formatCurrencyStatic.format(tvl)}
+              </Typography>
+            </Grid>
+
+            {/* APR */}
+            <Grid item md={1}>
+              <Typography
+                sx={{
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.bold,
+                  color: colors.success[300],
+                }}
+              >
+                Up to {(apr * 100).toFixed(1)}%
+              </Typography>
+            </Grid>
+
+            {/* Reward Token */}
+            <Grid
+              item
+              md={hasJoined ? 1 : 2}
+              sx={{ display: "flex", alignItems: "center" }}
+            >
+              <Box
+                component="img"
+                src={rewardToken.icon}
+                alt={rewardToken.name}
+                sx={{
+                  width: "24px",
+                  height: "24px",
+                  borderRadius: "50%",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                }}
+              />
+              <Typography
+                sx={{
+                  color: colors.neutral[300],
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.medium,
+                  marginLeft: spacing.xs,
+                }}
+              >
+                {rewardToken.name}
+              </Typography>
+            </Grid>
+
+            {/* Your Stake - only show if joined */}
+            {hasJoined && (
+              <Grid item md={1}>
+                <Typography
+                  sx={{
+                    color: colors.neutral[400],
+                    fontSize: typography.fontSize.xs,
+                    mb: 0.5,
+                  }}
+                >
+                  Your Stake
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: typography.fontSize.sm,
+                    fontWeight: typography.fontWeights.medium,
+                    color: colors.primary[300],
+                  }}
+                >
+                  {formatCurrencyStatic.format(userStake)}
+                </Typography>
+              </Grid>
             )}
+
+            {/* Claimable rewards - only show if joined */}
+            {hasJoined && (
+              <Grid item md={2}>
+                <Typography
+                  sx={{
+                    color: colors.neutral[400],
+                    fontSize: typography.fontSize.xs,
+                    mb: 0.5,
+                  }}
+                >
+                  Claimable
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Box
+                    component="img"
+                    src={rewardToken.icon}
+                    alt={rewardToken.name}
+                    sx={{
+                      width: "16px",
+                      height: "16px",
+                      borderRadius: "50%",
+                      mr: 0.5,
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontSize: typography.fontSize.sm,
+                      fontWeight: typography.fontWeights.medium,
+                      color:
+                        userRewards > 0
+                          ? colors.success[300]
+                          : colors.neutral[300],
+                    }}
+                  >
+                    {userRewards.toFixed(2)} {rewardToken.name}
+                  </Typography>
+                </Box>
+              </Grid>
+            )}
+
+            {/* Unbond Time - only show if not joined */}
+            {!hasJoined && (
+              <Grid item md={2}>
+                <Typography
+                  sx={{
+                    fontSize: typography.fontSize.sm,
+                    fontWeight: typography.fontWeights.regular,
+                    color:
+                      unbondTime === 0
+                        ? colors.success[300]
+                        : colors.neutral[300],
+                  }}
+                >
+                  {formatUnbondTime(unbondTime)}
+                </Typography>
+              </Grid>
+            )}
+
+            {/* Action Button Column - Updated for desktop */}
+            <Grid item md={2} sx={{ textAlign: "right" }}>
+              {hasJoined ? (
+                <Box
+                  sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}
+                >
+                  <Button
+                    size="small"
+                    type="primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onBondClick(strategy);
+                    }}
+                  >
+                    Bond
+                  </Button>
+                  <Button
+                    size="small"
+                    type="secondary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUnbondClick(strategy);
+                    }}
+                  >
+                    Unbond
+                  </Button>
+                </Box>
+              ) : (
+                <Box
+                  sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}
+                >
+                  <Button
+                    size="small"
+                    type="primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onBondClick(strategy);
+                    }}
+                  >
+                    Bond
+                  </Button>
+                </Box>
+              )}
+            </Grid>
           </Grid>
-        </Grid>
-      )}
+        )}
+      </Box>
     </Box>
   );
 };
