@@ -1,6 +1,14 @@
 "use client";
 
-import React, { ReactNode, useEffect, useState, useCallback } from "react";
+import React, {
+  ReactNode,
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+  Fragment,
+} from "react";
 import { useTheme } from "@mui/material/styles";
 import {
   Box,
@@ -21,14 +29,23 @@ import { motion } from "framer-motion";
 import { ToastProvider } from "@/providers/ToastProvider";
 import { RestoreModalProvider } from "@/providers/RestoreModalProvider";
 import Loader from "@/components/Loader/Loader";
-import TemporaryWarningBar from "@/components/TemporaryWarningBar";
-import MaintenanceScreen from "@/components/MaintenanceScreen";
 
+// Client-side only component for title updates
 const HiddenInputChecker = () => {
   const [value, setValue] = useState("Phoenix DeFi Hub");
   const pathName = usePathname();
 
+  // Use a ref to track initial render
+  const initialRender = useRef(true);
+
   useEffect(() => {
+    // Skip the first render to prevent unnecessary DOM access
+    if (initialRender.current) {
+      initialRender.current = false;
+      return;
+    }
+
+    // This logic now only runs on subsequent route changes
     const hiddenInput = document.querySelector(
       'input[type="hidden"]'
     ) as HTMLInputElement;
@@ -51,37 +68,44 @@ const HiddenInputChecker = () => {
 export default function RootLayout({ children }: { children: ReactNode }) {
   // Use theme for responsive design
   const theme = useTheme();
+
   // Media query to check screen size
   const largerThanMd = useMediaQuery(theme.breakpoints.up("md"));
+
   // State to manage navigation open/close status, initializing based on screen size
-  const [navOpen, setNavOpen] = useState<boolean>(largerThanMd);
+  const [navOpen, setNavOpen] = useState<boolean>(false); // Start with false for SSR compatibility
+
+  // State for client-side rendering detection
+  const [isClient, setIsClient] = useState(false);
+
   // Layout store
   const appStore = useAppStore();
 
-  // Pathname
+  // Pathname for navigation
   const pathname = usePathname();
 
   // Get PersistStore
   const persistStore = usePersistStore();
-  // State to handle disclaimer modal
-  const [disclaimerModalOpen, setDisclaimerModalOpen] =
-    useState<boolean>(false);
+
+  // For wallet address changes, generate new version key to avoid hydration mismatch
   const [version, setVersion] = useState(0);
 
-  // Show maintenance screen for V2 upgrade
-  const [isMaintenanceMode] = useState<boolean>(true);
+  // Handle disclaimer modal - initialize closed for SSR
+  const [disclaimerModalOpen, setDisclaimerModalOpen] =
+    useState<boolean>(false);
 
-  // useEffect to set navigation state based on screen size without animation on initial load
+  // Mark client-side rendering and initialize nav state based on screen size
   useEffect(() => {
-    if (navOpen !== largerThanMd) {
-      setNavOpen(largerThanMd);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setIsClient(true);
+    setNavOpen(largerThanMd);
   }, [largerThanMd]);
 
+  // Update version when wallet address changes - client-side only
   useEffect(() => {
-    setVersion((prev) => prev + 1);
-  }, [persistStore.wallet.address]);
+    if (isClient) {
+      setVersion((prev) => prev + 1);
+    }
+  }, [persistStore.wallet.address, isClient]);
 
   // Disable Scrolling while loading
   useEffect(() => {
@@ -96,69 +120,117 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     };
   }, [appStore.loading]);
 
-  // Use effect to handle route changes and set loading state
+  // Use effect to handle route changes and set loading state - run once per route change
+  const isFirstMount = useRef(true);
+
   useEffect(() => {
-    appStore.setLoading(true);
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      appStore.setLoading(true);
+    } else {
+      // Set loading immediately on route change to prevent flash of content
+      appStore.setLoading(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  // Use effect hook to prune the persist store on page load if wallet-connect
+  // Clean up wallet-connect sessions on page load - client-side only
   useEffect(() => {
-    const appStorageValue = localStorage?.getItem("app-storage");
-    if (appStorageValue !== null) {
-      const parsedValue = JSON.parse(appStorageValue);
-      const walletType = parsedValue?.state?.wallet?.walletType;
-      if (walletType === "wallet-connect") {
-        persistStore.disconnectWallet();
+    if (isClient) {
+      try {
+        const appStorageValue = localStorage?.getItem("app-storage");
+        if (appStorageValue !== null) {
+          const parsedValue = JSON.parse(appStorageValue);
+          const walletType = parsedValue?.state?.wallet?.walletType;
+          if (walletType === "wallet-connect") {
+            persistStore.disconnectWallet();
+          }
+        }
+      } catch (error) {
+        console.error("Error checking wallet connection:", error);
       }
     }
-  }, [persistStore]);
+  }, [persistStore, isClient]); // Add isClient dependency
 
+  // Update disclaimer modal state - client-side only
   useEffect(() => {
-    if (!persistStore.disclaimer.accepted) {
-      setDisclaimerModalOpen(true);
+    if (isClient) {
+      setDisclaimerModalOpen(!persistStore.disclaimer.accepted);
     }
-  }, [persistStore.disclaimer.accepted]);
+  }, [persistStore.disclaimer.accepted, isClient]);
+
   /**
    * Handles accepting or rejecting the disclaimer.
    *
    * @param {boolean} accepted - Whether the disclaimer was accepted.
    */
-  const onAcceptDisclaimer = (accepted: boolean) => {
-    if (accepted) {
-      persistStore.setDisclaimerAccepted(true);
-      setDisclaimerModalOpen(false);
-    } else {
-      window.location.assign("http://google.com");
-    }
-  };
-
-  // Styles for different pages
-  const swapPageStyle = {
-    //backgroundImage: `url("/swapBg.png")`,
-    //backgroundRepeat: "no-repeat",
-    //backgroundAttachment: "fixed",
-    //backgroundPosition: "center",
-    //backgroundSize: { xs: "cover", md: "50% 100%" },
-    background: "linear-gradient(to bottom, #1F2123, #131517)",
-
-    paddingBottom: "50px",
-    width: {
-      xs: "100vw",
-      md: largerThanMd
-        ? navOpen
-          ? "calc(100% - 240px)"
-          : "calc(100% - 60px)"
-        : "100%",
+  const onAcceptDisclaimer = useCallback(
+    (accepted: boolean) => {
+      if (accepted) {
+        persistStore.setDisclaimerAccepted(true);
+        setDisclaimerModalOpen(false);
+      } else {
+        window.location.assign("http://google.com");
+      }
     },
-  };
+    [persistStore]
+  );
+
+  // Memoize the style objects to prevent unnecessary re-renders
+  const swapPageStyle = useMemo(
+    () => ({
+      background:
+        "radial-gradient(ellipse at center, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.1) 35%, #171717 75%)", // Added an intermediate color stop
+      paddingBottom: "50px",
+      width: {
+        xs: "100vw",
+        md: largerThanMd
+          ? navOpen
+            ? "calc(100% - 240px)"
+            : "calc(100% - 60px)"
+          : "100%",
+      },
+    }),
+    [largerThanMd, navOpen]
+  );
+
+  const loaderOverlayStyle = useMemo(
+    () => ({
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      background: "linear-gradient(to bottom, #1F2123, #131517)",
+      zIndex: 10, // Ensure it's on top of content
+    }),
+    []
+  );
+
+  const mainContentStyle = useMemo(
+    () => ({
+      position: "relative", // Add relative positioning for absolute loader overlay
+      marginLeft: largerThanMd ? (navOpen ? "240px" : "60px") : "0",
+      minHeight: "100vh",
+      transition: "all 0.2s ease-in-out",
+      display: "flex",
+      justifyContent: "center",
+      mt: 3,
+      padding: "16px",
+      ...swapPageStyle,
+    }),
+    [largerThanMd, navOpen, swapPageStyle]
+  );
 
   // Hacky way to avoid overflows
   const css = `
-      body {
-        overflow-x: hidden!important;
-      }
-    `;
+    body {
+      overflow-x: hidden!important;
+    }
+  `;
 
   return (
     <html lang="en">
@@ -197,7 +269,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Additional tags for responsiveness and browser compatibility */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <HiddenInputChecker />
+        {isClient && <HiddenInputChecker />}
       </head>
       {/* Wrap components with Providers for context availability */}
       <Providers>
@@ -206,68 +278,34 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <RestoreModalProvider>
               <style>{css}</style>
 
-              {/* Show maintenance screen or regular layout */}
-              {isMaintenanceMode ? (
-                <MaintenanceScreen />
-              ) : (
-                <>
-                  {/* Side Navigation Component with smooth animation, disabled on initial load */}
-                  <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
+              {/* Side Navigation Component with smooth animation, disabled on initial load */}
+              <SideNav navOpen={navOpen} setNavOpen={setNavOpen} />
 
-                  {/* Top Navigation Bar with motion */}
-                  <motion.div
-                    initial={{ y: -50 }}
-                    animate={{ y: 0 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                  >
-                    <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
-                  </motion.div>
+              {/* Top Navigation Bar with motion */}
+              <motion.div
+                initial={isClient ? { y: -50 } : false}
+                animate={isClient ? { y: 0 } : false}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
+                <TopBar navOpen={navOpen} setNavOpen={setNavOpen} />
+              </motion.div>
 
-                  <DisclaimerModal
-                    open={!persistStore.disclaimer.accepted}
-                    onAccepted={onAcceptDisclaimer}
-                  />
-
-                  {/* Main Content Area */}
-                  <Box
-                    sx={{
-                      marginLeft: largerThanMd
-                        ? navOpen
-                          ? "240px"
-                          : "60px"
-                        : "0",
-                      minHeight: "100vh",
-                      transition: "all 0.2s ease-in-out",
-                      display: "flex",
-                      justifyContent: "center",
-                      padding: "16px",
-                      ...swapPageStyle,
-                    }}
-                  >
-                    {appStore.loading && (
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          width: "100%",
-                          height: "100%",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          background:
-                            "linear-gradient(to bottom, #1F2123, #131517)",
-
-                          zIndex: 10, // Ensure it's on top
-                        }}
-                      >
-                        <Loader />
-                      </Box>
-                    )}
-                    {children}
-                  </Box>
-                </>
+              {isClient && (
+                <DisclaimerModal
+                  open={disclaimerModalOpen}
+                  onAccepted={onAcceptDisclaimer}
+                />
               )}
+
+              {/* Main Content Area */}
+              <Box sx={mainContentStyle}>
+                {appStore.loading && (
+                  <Box sx={loaderOverlayStyle}>
+                    <Loader />
+                  </Box>
+                )}
+                <Fragment>{children}</Fragment>
+              </Box>
             </RestoreModalProvider>
           </ToastProvider>
         </body>

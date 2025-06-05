@@ -30,63 +30,42 @@ if (typeof window !== "undefined") {
   window.Buffer = window.Buffer || Buffer;
 }
 
-export const Errors = {
-  1: { message: "SpreadExceedsLimit" },
-
-  2: { message: "ProvideLiquiditySlippageToleranceTooHigh" },
-
-  3: { message: "ProvideLiquidityAtLeastOneTokenMustBeBiggerThenZero" },
-
-  4: { message: "WithdrawLiquidityMinimumAmountOfAOrBIsNotSatisfied" },
-
-  5: { message: "SplitDepositBothPoolsAndDepositMustBePositive" },
-
-  6: { message: "ValidateFeeBpsTotalFeesCantBeGreaterThan100" },
-
-  7: { message: "GetDepositAmountsMinABiggerThenDesiredA" },
-
-  8: { message: "GetDepositAmountsMinBBiggerThenDesiredB" },
-
-  9: { message: "GetDepositAmountsAmountABiggerThenDesiredA" },
-
-  10: { message: "GetDepositAmountsAmountALessThenMinA" },
-
-  11: { message: "GetDepositAmountsAmountBBiggerThenDesiredB" },
-
-  12: { message: "GetDepositAmountsAmountBLessThenMinB" },
-
-  13: { message: "TotalSharesEqualZero" },
-
-  14: { message: "DesiredAmountsBelowOrEqualZero" },
-
-  15: { message: "MinAmountsBelowZero" },
-
-  16: { message: "AssetNotInPool" },
-
-  17: { message: "AlreadyInitialized" },
-
-  18: { message: "TokenABiggerThanTokenB" },
-
-  19: { message: "InvalidBps" },
-
-  20: { message: "SlippageInvalid" },
-
-  21: { message: "SwapMinReceivedBiggerThanReturn" },
-
-  22: { message: "TransactionAfterTimestampDeadline" },
-
-  23: { message: "CannotConvertU256ToI128" },
-
-  24: { message: "UserDeclinesPoolFee" },
-
-  25: { message: "SwapFeeBpsOverLimit" },
-
-  26: { message: "NotEnoughSharesToBeMinted" },
-
-  27: { message: "NotEnoughLiquidityProvided" },
-
-  28: { message: "AdminNotSet" },
+export const ContractError = {
+  300: { message: "SpreadExceedsLimit" },
+  301: { message: "ProvideLiquiditySlippageToleranceTooHigh" },
+  302: { message: "ProvideLiquidityAtLeastOneTokenMustBeBiggerThenZero" },
+  303: { message: "WithdrawLiquidityMinimumAmountOfAOrBIsNotSatisfied" },
+  304: { message: "SplitDepositBothPoolsAndDepositMustBePositive" },
+  305: { message: "ValidateFeeBpsTotalFeesCantBeGreaterThan100" },
+  306: { message: "GetDepositAmountsMinABiggerThenDesiredA" },
+  307: { message: "GetDepositAmountsMinBBiggerThenDesiredB" },
+  308: { message: "GetDepositAmountsAmountABiggerThenDesiredA" },
+  309: { message: "GetDepositAmountsAmountALessThenMinA" },
+  310: { message: "GetDepositAmountsAmountBBiggerThenDesiredB" },
+  311: { message: "GetDepositAmountsAmountBLessThenMinB" },
+  312: { message: "TotalSharesEqualZero" },
+  313: { message: "DesiredAmountsBelowOrEqualZero" },
+  314: { message: "MinAmountsBelowZero" },
+  315: { message: "AssetNotInPool" },
+  316: { message: "AlreadyInitialized" },
+  317: { message: "TokenABiggerThanTokenB" },
+  318: { message: "InvalidBps" },
+  319: { message: "SlippageInvalid" },
+  320: { message: "SwapMinReceivedBiggerThanReturn" },
+  321: { message: "TransactionAfterTimestampDeadline" },
+  322: { message: "CannotConvertU256ToI128" },
+  323: { message: "UserDeclinesPoolFee" },
+  324: { message: "SwapFeeBpsOverLimit" },
+  325: { message: "NotEnoughSharesToBeMinted" },
+  326: { message: "NotEnoughLiquidityProvided" },
+  327: { message: "AdminNotSet" },
+  328: { message: "ContractMathError" },
+  329: { message: "NegativeInputProvided" },
+  330: { message: "SameAdmin" },
+  331: { message: "NoAdminChangeInPlace" },
+  332: { message: "AdminChangeExpired" },
 };
+
 export enum PairType {
   Xyk = 0,
 }
@@ -225,55 +204,22 @@ export interface LiquidityPoolInitInfo {
   token_init_info: TokenInitInfo;
 }
 
+export interface AdminChange {
+  new_admin: string;
+  time_limit: Option<u64>;
+}
+
+export interface AutoUnstakeInfo {
+  stake_amount: i128;
+  stake_timestamp: u64;
+}
+
 export enum PoolType {
   Xyk = 0,
   Stable = 1,
 }
 
 export interface Client {
-  /**
-   * Construct and simulate a initialize transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
-   */
-  initialize: (
-    {
-      stake_wasm_hash,
-      token_wasm_hash,
-      lp_init_info,
-      factory_addr,
-      share_token_decimals,
-      share_token_name,
-      share_token_symbol,
-      default_slippage_bps,
-      max_allowed_fee_bps,
-    }: {
-      stake_wasm_hash: Buffer;
-      token_wasm_hash: Buffer;
-      lp_init_info: LiquidityPoolInitInfo;
-      factory_addr: string;
-      share_token_decimals: u32;
-      share_token_name: string;
-      share_token_symbol: string;
-      default_slippage_bps: i64;
-      max_allowed_fee_bps: i64;
-    },
-    options?: {
-      /**
-       * The fee to pay for the transaction. Default: BASE_FEE
-       */
-      fee?: number;
-
-      /**
-       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
-       */
-      timeoutInSeconds?: number;
-
-      /**
-       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
-       */
-      simulate?: boolean;
-    }
-  ) => Promise<AssembledTransaction<null>>;
-
   /**
    * Construct and simulate a provide_liquidity transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
@@ -286,6 +232,7 @@ export interface Client {
       min_b,
       custom_slippage_bps,
       deadline,
+      auto_stake,
     }: {
       sender: string;
       desired_a: Option<i128>;
@@ -294,6 +241,7 @@ export interface Client {
       min_b: Option<i128>;
       custom_slippage_bps: Option<i64>;
       deadline: Option<u64>;
+      auto_stake: boolean;
     },
     options?: {
       /**
@@ -362,12 +310,14 @@ export interface Client {
       min_a,
       min_b,
       deadline,
+      auto_unstake,
     }: {
       sender: string;
       share_amount: i128;
       min_a: i128;
       min_b: i128;
       deadline: Option<u64>;
+      auto_unstake: Option<AutoUnstakeInfo>;
     },
     options?: {
       /**
@@ -428,10 +378,7 @@ export interface Client {
    * Construct and simulate a upgrade transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
   upgrade: (
-    {
-      new_wasm_hash,
-      new_default_slippage_bps,
-    }: { new_wasm_hash: Buffer; new_default_slippage_bps: i64 },
+    { new_wasm_hash }: { new_wasm_hash: Buffer },
     options?: {
       /**
        * The fee to pay for the transaction. Default: BASE_FEE
@@ -660,10 +607,10 @@ export interface Client {
   }) => Promise<AssembledTransaction<Result<void>>>;
 
   /**
-   * Construct and simulate a update transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   * Construct and simulate a propose_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
-  update: (
-    { new_wasm_hash }: { new_wasm_hash: Buffer },
+  propose_admin: (
+    { new_admin, time_limit }: { new_admin: string; time_limit: Option<u64> },
     options?: {
       /**
        * The fee to pay for the transaction. Default: BASE_FEE
@@ -680,11 +627,131 @@ export interface Client {
        */
       simulate?: boolean;
     }
-  ) => Promise<AssembledTransaction<null>>;
+  ) => Promise<AssembledTransaction<Result<string>>>;
+
+  /**
+   * Construct and simulate a revoke_admin_change transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  revoke_admin_change: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<void>>>;
+
+  /**
+   * Construct and simulate a accept_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  accept_admin: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<string>>>;
+
+  /**
+   * Construct and simulate a query_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  query_admin: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<string>>>;
+
+  /**
+   * Construct and simulate a query_version transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  query_version: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<string>>;
+
+  /**
+   * Construct and simulate a add_new_key_to_storage transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  add_new_key_to_storage: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<void>>>;
 }
 export class Client extends ContractClient {
   static async deploy<T = Client>(
-    /** Options for initalizing a Client as well as for calling a method, with extras specific to deploying. */
+    /** Constructor/Initialization Args for the contract's `__constructor` method */
+    {
+      stake_wasm_hash,
+      token_wasm_hash,
+      lp_init_info,
+      factory_addr,
+      share_token_name,
+      share_token_symbol,
+      default_slippage_bps,
+      max_allowed_fee_bps,
+    }: {
+      stake_wasm_hash: Buffer;
+      token_wasm_hash: Buffer;
+      lp_init_info: LiquidityPoolInitInfo;
+      factory_addr: string;
+      share_token_name: string;
+      share_token_symbol: string;
+      default_slippage_bps: i64;
+      max_allowed_fee_bps: i64;
+    },
+    /** Options for initializing a Client as well as for calling a method, with extras specific to deploying. */
     options: MethodOptions &
       Omit<ContractClientOptions, "contractId"> & {
         /** The hash of the Wasm blob, which must already be installed on-chain. */
@@ -695,17 +762,28 @@ export class Client extends ContractClient {
         format?: "hex" | "base64";
       }
   ): Promise<AssembledTransaction<T>> {
-    return ContractClient.deploy(null, options);
+    return ContractClient.deploy(
+      {
+        stake_wasm_hash,
+        token_wasm_hash,
+        lp_init_info,
+        factory_addr,
+        share_token_name,
+        share_token_symbol,
+        default_slippage_bps,
+        max_allowed_fee_bps,
+      },
+      options
+    );
   }
   constructor(public readonly options: ContractClientOptions) {
     super(
       new ContractSpec([
-        "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAACQAAAAAAAAAPc3Rha2Vfd2FzbV9oYXNoAAAAA+4AAAAgAAAAAAAAAA90b2tlbl93YXNtX2hhc2gAAAAD7gAAACAAAAAAAAAADGxwX2luaXRfaW5mbwAAB9AAAAAVTGlxdWlkaXR5UG9vbEluaXRJbmZvAAAAAAAAAAAAAAxmYWN0b3J5X2FkZHIAAAATAAAAAAAAABRzaGFyZV90b2tlbl9kZWNpbWFscwAAAAQAAAAAAAAAEHNoYXJlX3Rva2VuX25hbWUAAAAQAAAAAAAAABJzaGFyZV90b2tlbl9zeW1ib2wAAAAAABAAAAAAAAAAFGRlZmF1bHRfc2xpcHBhZ2VfYnBzAAAABwAAAAAAAAATbWF4X2FsbG93ZWRfZmVlX2JwcwAAAAAHAAAAAA==",
-        "AAAAAAAAAAAAAAARcHJvdmlkZV9saXF1aWRpdHkAAAAAAAAHAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAACWRlc2lyZWRfYQAAAAAAA+gAAAALAAAAAAAAAAVtaW5fYQAAAAAAA+gAAAALAAAAAAAAAAlkZXNpcmVkX2IAAAAAAAPoAAAACwAAAAAAAAAFbWluX2IAAAAAAAPoAAAACwAAAAAAAAATY3VzdG9tX3NsaXBwYWdlX2JwcwAAAAPoAAAABwAAAAAAAAAIZGVhZGxpbmUAAAPoAAAABgAAAAA=",
+        "AAAAAAAAAAAAAAARcHJvdmlkZV9saXF1aWRpdHkAAAAAAAAIAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAACWRlc2lyZWRfYQAAAAAAA+gAAAALAAAAAAAAAAVtaW5fYQAAAAAAA+gAAAALAAAAAAAAAAlkZXNpcmVkX2IAAAAAAAPoAAAACwAAAAAAAAAFbWluX2IAAAAAAAPoAAAACwAAAAAAAAATY3VzdG9tX3NsaXBwYWdlX2JwcwAAAAPoAAAABwAAAAAAAAAIZGVhZGxpbmUAAAPoAAAABgAAAAAAAAAKYXV0b19zdGFrZQAAAAAAAQAAAAA=",
         "AAAAAAAAAAAAAAAEc3dhcAAAAAcAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAALb2ZmZXJfYXNzZXQAAAAAEwAAAAAAAAAMb2ZmZXJfYW1vdW50AAAACwAAAAAAAAAUYXNrX2Fzc2V0X21pbl9hbW91bnQAAAPoAAAACwAAAAAAAAAObWF4X3NwcmVhZF9icHMAAAAAA+gAAAAHAAAAAAAAAAhkZWFkbGluZQAAA+gAAAAGAAAAAAAAABNtYXhfYWxsb3dlZF9mZWVfYnBzAAAAA+gAAAAHAAAAAQAAAAs=",
-        "AAAAAAAAAAAAAAASd2l0aGRyYXdfbGlxdWlkaXR5AAAAAAAFAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAADHNoYXJlX2Ftb3VudAAAAAsAAAAAAAAABW1pbl9hAAAAAAAACwAAAAAAAAAFbWluX2IAAAAAAAALAAAAAAAAAAhkZWFkbGluZQAAA+gAAAAGAAAAAQAAA+0AAAACAAAACwAAAAs=",
+        "AAAAAAAAAAAAAAASd2l0aGRyYXdfbGlxdWlkaXR5AAAAAAAGAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAADHNoYXJlX2Ftb3VudAAAAAsAAAAAAAAABW1pbl9hAAAAAAAACwAAAAAAAAAFbWluX2IAAAAAAAALAAAAAAAAAAhkZWFkbGluZQAAA+gAAAAGAAAAAAAAAAxhdXRvX3Vuc3Rha2UAAAPoAAAH0AAAAA9BdXRvVW5zdGFrZUluZm8AAAAAAQAAA+0AAAACAAAACwAAAAs=",
         "AAAAAAAAAAAAAAANdXBkYXRlX2NvbmZpZwAAAAAAAAYAAAAAAAAACW5ld19hZG1pbgAAAAAAA+gAAAATAAAAAAAAAA10b3RhbF9mZWVfYnBzAAAAAAAD6AAAAAcAAAAAAAAADWZlZV9yZWNpcGllbnQAAAAAAAPoAAAAEwAAAAAAAAAYbWF4X2FsbG93ZWRfc2xpcHBhZ2VfYnBzAAAD6AAAAAcAAAAAAAAAFm1heF9hbGxvd2VkX3NwcmVhZF9icHMAAAAAA+gAAAAHAAAAAAAAABBtYXhfcmVmZXJyYWxfYnBzAAAD6AAAAAcAAAAA",
-        "AAAAAAAAAAAAAAAHdXBncmFkZQAAAAACAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAAAAAAGG5ld19kZWZhdWx0X3NsaXBwYWdlX2JwcwAAAAcAAAAA",
+        "AAAAAAAAAAAAAAAHdXBncmFkZQAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
         "AAAAAAAAAAAAAAAMcXVlcnlfY29uZmlnAAAAAAAAAAEAAAfQAAAABkNvbmZpZwAA",
         "AAAAAAAAAAAAAAAZcXVlcnlfc2hhcmVfdG9rZW5fYWRkcmVzcwAAAAAAAAAAAAABAAAAEw==",
         "AAAAAAAAAAAAAAAccXVlcnlfc3Rha2VfY29udHJhY3RfYWRkcmVzcwAAAAAAAAABAAAAEw==",
@@ -716,8 +794,14 @@ export class Client extends ContractClient {
         "AAAAAAAAAAAAAAALcXVlcnlfc2hhcmUAAAAAAQAAAAAAAAAGYW1vdW50AAAAAAALAAAAAQAAA+0AAAACAAAH0AAAAAVBc3NldAAAAAAAB9AAAAAFQXNzZXQAAAA=",
         "AAAAAAAAAAAAAAAVcXVlcnlfdG90YWxfaXNzdWVkX2xwAAAAAAAAAAAAAAEAAAAL",
         "AAAAAAAAAAAAAAARbWlncmF0ZV9hZG1pbl9rZXkAAAAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
-        "AAAAAAAAAAAAAAAGdXBkYXRlAAAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
-        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAcAAAAAAAAABJTcHJlYWRFeGNlZWRzTGltaXQAAAAAAAEAAAAAAAAAKFByb3ZpZGVMaXF1aWRpdHlTbGlwcGFnZVRvbGVyYW5jZVRvb0hpZ2gAAAACAAAAAAAAADNQcm92aWRlTGlxdWlkaXR5QXRMZWFzdE9uZVRva2VuTXVzdEJlQmlnZ2VyVGhlblplcm8AAAAAAwAAAAAAAAAyV2l0aGRyYXdMaXF1aWRpdHlNaW5pbXVtQW1vdW50T2ZBT3JCSXNOb3RTYXRpc2ZpZWQAAAAAAAQAAAAAAAAALVNwbGl0RGVwb3NpdEJvdGhQb29sc0FuZERlcG9zaXRNdXN0QmVQb3NpdGl2ZQAAAAAAAAUAAAAAAAAAK1ZhbGlkYXRlRmVlQnBzVG90YWxGZWVzQ2FudEJlR3JlYXRlclRoYW4xMDAAAAAABgAAAAAAAAAnR2V0RGVwb3NpdEFtb3VudHNNaW5BQmlnZ2VyVGhlbkRlc2lyZWRBAAAAAAcAAAAAAAAAJ0dldERlcG9zaXRBbW91bnRzTWluQkJpZ2dlclRoZW5EZXNpcmVkQgAAAAAIAAAAAAAAACpHZXREZXBvc2l0QW1vdW50c0Ftb3VudEFCaWdnZXJUaGVuRGVzaXJlZEEAAAAAAAkAAAAAAAAAJEdldERlcG9zaXRBbW91bnRzQW1vdW50QUxlc3NUaGVuTWluQQAAAAoAAAAAAAAAKkdldERlcG9zaXRBbW91bnRzQW1vdW50QkJpZ2dlclRoZW5EZXNpcmVkQgAAAAAACwAAAAAAAAAkR2V0RGVwb3NpdEFtb3VudHNBbW91bnRCTGVzc1RoZW5NaW5CAAAADAAAAAAAAAAUVG90YWxTaGFyZXNFcXVhbFplcm8AAAANAAAAAAAAAB5EZXNpcmVkQW1vdW50c0JlbG93T3JFcXVhbFplcm8AAAAAAA4AAAAAAAAAE01pbkFtb3VudHNCZWxvd1plcm8AAAAADwAAAAAAAAAOQXNzZXROb3RJblBvb2wAAAAAABAAAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAAAEQAAAAAAAAAWVG9rZW5BQmlnZ2VyVGhhblRva2VuQgAAAAAAEgAAAAAAAAAKSW52YWxpZEJwcwAAAAAAEwAAAAAAAAAPU2xpcHBhZ2VJbnZhbGlkAAAAABQAAAAAAAAAH1N3YXBNaW5SZWNlaXZlZEJpZ2dlclRoYW5SZXR1cm4AAAAAFQAAAAAAAAAhVHJhbnNhY3Rpb25BZnRlclRpbWVzdGFtcERlYWRsaW5lAAAAAAAAFgAAAAAAAAAXQ2Fubm90Q29udmVydFUyNTZUb0kxMjgAAAAAFwAAAAAAAAATVXNlckRlY2xpbmVzUG9vbEZlZQAAAAAYAAAAAAAAABNTd2FwRmVlQnBzT3ZlckxpbWl0AAAAABkAAAAAAAAAGU5vdEVub3VnaFNoYXJlc1RvQmVNaW50ZWQAAAAAAAAaAAAAAAAAABpOb3RFbm91Z2hMaXF1aWRpdHlQcm92aWRlZAAAAAAAGwAAAAAAAAALQWRtaW5Ob3RTZXQAAAAAHA==",
+        "AAAAAAAAAAAAAAANcHJvcG9zZV9hZG1pbgAAAAAAAAIAAAAAAAAACW5ld19hZG1pbgAAAAAAABMAAAAAAAAACnRpbWVfbGltaXQAAAAAA+gAAAAGAAAAAQAAA+kAAAATAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+        "AAAAAAAAAAAAAAATcmV2b2tlX2FkbWluX2NoYW5nZQAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+        "AAAAAAAAAAAAAAAMYWNjZXB0X2FkbWluAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+        "AAAAAAAAAAAAAAALcXVlcnlfYWRtaW4AAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+        "AAAAAAAAAAAAAAANX19jb25zdHJ1Y3RvcgAAAAAAAAgAAAAAAAAAD3N0YWtlX3dhc21faGFzaAAAAAPuAAAAIAAAAAAAAAAPdG9rZW5fd2FzbV9oYXNoAAAAA+4AAAAgAAAAAAAAAAxscF9pbml0X2luZm8AAAfQAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAAAAAAMZmFjdG9yeV9hZGRyAAAAEwAAAAAAAAAQc2hhcmVfdG9rZW5fbmFtZQAAABAAAAAAAAAAEnNoYXJlX3Rva2VuX3N5bWJvbAAAAAAAEAAAAAAAAAAUZGVmYXVsdF9zbGlwcGFnZV9icHMAAAAHAAAAAAAAABNtYXhfYWxsb3dlZF9mZWVfYnBzAAAAAAcAAAAA",
+        "AAAAAAAAAAAAAAANcXVlcnlfdmVyc2lvbgAAAAAAAAAAAAABAAAAEA==",
+        "AAAAAAAAAAAAAAAWYWRkX25ld19rZXlfdG9fc3RvcmFnZQAAAAAAAAAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
+        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAhAAAAAAAAABJTcHJlYWRFeGNlZWRzTGltaXQAAAAAASwAAAAAAAAAKFByb3ZpZGVMaXF1aWRpdHlTbGlwcGFnZVRvbGVyYW5jZVRvb0hpZ2gAAAEtAAAAAAAAADNQcm92aWRlTGlxdWlkaXR5QXRMZWFzdE9uZVRva2VuTXVzdEJlQmlnZ2VyVGhlblplcm8AAAABLgAAAAAAAAAyV2l0aGRyYXdMaXF1aWRpdHlNaW5pbXVtQW1vdW50T2ZBT3JCSXNOb3RTYXRpc2ZpZWQAAAAAAS8AAAAAAAAALVNwbGl0RGVwb3NpdEJvdGhQb29sc0FuZERlcG9zaXRNdXN0QmVQb3NpdGl2ZQAAAAAAATAAAAAAAAAAK1ZhbGlkYXRlRmVlQnBzVG90YWxGZWVzQ2FudEJlR3JlYXRlclRoYW4xMDAAAAABMQAAAAAAAAAnR2V0RGVwb3NpdEFtb3VudHNNaW5BQmlnZ2VyVGhlbkRlc2lyZWRBAAAAATIAAAAAAAAAJ0dldERlcG9zaXRBbW91bnRzTWluQkJpZ2dlclRoZW5EZXNpcmVkQgAAAAEzAAAAAAAAACpHZXREZXBvc2l0QW1vdW50c0Ftb3VudEFCaWdnZXJUaGVuRGVzaXJlZEEAAAAAATQAAAAAAAAAJEdldERlcG9zaXRBbW91bnRzQW1vdW50QUxlc3NUaGVuTWluQQAAATUAAAAAAAAAKkdldERlcG9zaXRBbW91bnRzQW1vdW50QkJpZ2dlclRoZW5EZXNpcmVkQgAAAAABNgAAAAAAAAAkR2V0RGVwb3NpdEFtb3VudHNBbW91bnRCTGVzc1RoZW5NaW5CAAABNwAAAAAAAAAUVG90YWxTaGFyZXNFcXVhbFplcm8AAAE4AAAAAAAAAB5EZXNpcmVkQW1vdW50c0JlbG93T3JFcXVhbFplcm8AAAAAATkAAAAAAAAAE01pbkFtb3VudHNCZWxvd1plcm8AAAABOgAAAAAAAAAOQXNzZXROb3RJblBvb2wAAAAAATsAAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAABPAAAAAAAAAAWVG9rZW5BQmlnZ2VyVGhhblRva2VuQgAAAAABPQAAAAAAAAAKSW52YWxpZEJwcwAAAAABPgAAAAAAAAAPU2xpcHBhZ2VJbnZhbGlkAAAAAT8AAAAAAAAAH1N3YXBNaW5SZWNlaXZlZEJpZ2dlclRoYW5SZXR1cm4AAAABQAAAAAAAAAAhVHJhbnNhY3Rpb25BZnRlclRpbWVzdGFtcERlYWRsaW5lAAAAAAABQQAAAAAAAAAXQ2Fubm90Q29udmVydFUyNTZUb0kxMjgAAAABQgAAAAAAAAATVXNlckRlY2xpbmVzUG9vbEZlZQAAAAFDAAAAAAAAABNTd2FwRmVlQnBzT3ZlckxpbWl0AAAAAUQAAAAAAAAAGU5vdEVub3VnaFNoYXJlc1RvQmVNaW50ZWQAAAAAAAFFAAAAAAAAABpOb3RFbm91Z2hMaXF1aWRpdHlQcm92aWRlZAAAAAABRgAAAAAAAAALQWRtaW5Ob3RTZXQAAAABRwAAAAAAAAARQ29udHJhY3RNYXRoRXJyb3IAAAAAAAFIAAAAAAAAABVOZWdhdGl2ZUlucHV0UHJvdmlkZWQAAAAAAAFJAAAAAAAAAAlTYW1lQWRtaW4AAAAAAAFKAAAAAAAAABROb0FkbWluQ2hhbmdlSW5QbGFjZQAAAUsAAAAAAAAAEkFkbWluQ2hhbmdlRXhwaXJlZAAAAAABTA==",
         "AAAAAwAAAAAAAAAAAAAACFBhaXJUeXBlAAAAAQAAAAAAAAADWHlrAAAAAAA=",
         "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAACgAAAAAAAAANZmVlX3JlY2lwaWVudAAAAAAAABMAAABUVGhlIG1heGltdW0gYW1vdW50IG9mIHNsaXBwYWdlIChpbiBicHMpIHRoYXQgaXMgdG9sZXJhdGVkIGR1cmluZyBwcm92aWRpbmcgbGlxdWlkaXR5AAAAGG1heF9hbGxvd2VkX3NsaXBwYWdlX2JwcwAAAAcAAABDVGhlIG1heGltdW0gYW1vdW50IG9mIHNwcmVhZCAoaW4gYnBzKSB0aGF0IGlzIHRvbGVyYXRlZCBkdXJpbmcgc3dhcAAAAAAWbWF4X2FsbG93ZWRfc3ByZWFkX2JwcwAAAAAABwAAADhUaGUgbWF4aW11bSBhbGxvd2VkIHBlcmNlbnRhZ2UgKGluIGJwcykgZm9yIHJlZmVycmFsIGZlZQAAABBtYXhfcmVmZXJyYWxfYnBzAAAABwAAAAAAAAAJcG9vbF90eXBlAAAAAAAH0AAAAAhQYWlyVHlwZQAAAAAAAAALc2hhcmVfdG9rZW4AAAAAEwAAAAAAAAAOc3Rha2VfY29udHJhY3QAAAAAABMAAAAAAAAAB3Rva2VuX2EAAAAAEwAAAAAAAAAHdG9rZW5fYgAAAAATAAAAZFRoZSB0b3RhbCBmZWVzIChpbiBicHMpIGNoYXJnZWQgYnkgYSBwb29sIG9mIHRoaXMgdHlwZS4KSW4gcmVsYXRpb24gdG8gdGhlIHJldHVybmVkIGFtb3VudCBvZiB0b2tlbnMAAAANdG90YWxfZmVlX2JwcwAAAAAAAAc=",
         "AAAAAQAAAAAAAAAAAAAABUFzc2V0AAAAAAAAAgAAABRBZGRyZXNzIG9mIHRoZSBhc3NldAAAAAdhZGRyZXNzAAAAABMAAAAsVGhlIHRvdGFsIGFtb3VudCBvZiB0aG9zZSB0b2tlbnMgaW4gdGhlIHBvb2wAAAAGYW1vdW50AAAAAAAL",
@@ -730,13 +814,14 @@ export class Client extends ContractClient {
         "AAAAAQAAAAAAAAAAAAAADVRva2VuSW5pdEluZm8AAAAAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
         "AAAAAQAAAAAAAAAAAAAADVN0YWtlSW5pdEluZm8AAAAAAAAEAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAADm1heF9jb21wbGV4aXR5AAAAAAAEAAAAAAAAAAhtaW5fYm9uZAAAAAsAAAAAAAAACm1pbl9yZXdhcmQAAAAAAAs=",
         "AAAAAQAAAAAAAAAAAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAkAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAUZGVmYXVsdF9zbGlwcGFnZV9icHMAAAAHAAAAAAAAAA1mZWVfcmVjaXBpZW50AAAAAAAAEwAAAAAAAAAYbWF4X2FsbG93ZWRfc2xpcHBhZ2VfYnBzAAAABwAAAAAAAAAWbWF4X2FsbG93ZWRfc3ByZWFkX2JwcwAAAAAABwAAAAAAAAAQbWF4X3JlZmVycmFsX2JwcwAAAAcAAAAAAAAAD3N0YWtlX2luaXRfaW5mbwAAAAfQAAAADVN0YWtlSW5pdEluZm8AAAAAAAAAAAAADHN3YXBfZmVlX2JwcwAAAAcAAAAAAAAAD3Rva2VuX2luaXRfaW5mbwAAAAfQAAAADVRva2VuSW5pdEluZm8AAAA=",
+        "AAAAAQAAAAAAAAAAAAAAC0FkbWluQ2hhbmdlAAAAAAIAAAAAAAAACW5ld19hZG1pbgAAAAAAABMAAAAAAAAACnRpbWVfbGltaXQAAAAAA+gAAAAG",
+        "AAAAAQAAAAAAAAAAAAAAD0F1dG9VbnN0YWtlSW5mbwAAAAACAAAAAAAAAAxzdGFrZV9hbW91bnQAAAALAAAAAAAAAA9zdGFrZV90aW1lc3RhbXAAAAAABg==",
         "AAAAAwAAAAAAAAAAAAAACFBvb2xUeXBlAAAAAgAAAAAAAAADWHlrAAAAAAAAAAAAAAAABlN0YWJsZQAAAAAAAQ==",
       ]),
       options
     );
   }
   public readonly fromJSON = {
-    initialize: this.txFromJSON<null>,
     provide_liquidity: this.txFromJSON<null>,
     swap: this.txFromJSON<i128>,
     withdraw_liquidity: this.txFromJSON<readonly [i128, i128]>,
@@ -752,6 +837,11 @@ export class Client extends ContractClient {
     query_share: this.txFromJSON<readonly [Asset, Asset]>,
     query_total_issued_lp: this.txFromJSON<i128>,
     migrate_admin_key: this.txFromJSON<Result<void>>,
-    update: this.txFromJSON<null>,
+    propose_admin: this.txFromJSON<Result<string>>,
+    revoke_admin_change: this.txFromJSON<Result<void>>,
+    accept_admin: this.txFromJSON<Result<string>>,
+    query_admin: this.txFromJSON<Result<string>>,
+    query_version: this.txFromJSON<string>,
+    add_new_key_to_storage: this.txFromJSON<Result<void>>,
   };
 }

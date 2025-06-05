@@ -67,11 +67,7 @@ export default function Page() {
     []
   );
 
-  useEffect(() => {
-    init();
-  }, []);
-
-  const init = async () => {
+  const init = React.useCallback(async () => {
     try {
       // Fetch categories
       const fetchCategories = await HelpCenter.getAllCategories();
@@ -108,7 +104,7 @@ export default function Page() {
     } finally {
       appStore.setLoading(false);
     }
-  };
+  }, [appStore]);
 
   useEffect(() => {
     if (searchValue) {

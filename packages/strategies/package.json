@@ -1,0 +1,20 @@
+{
+  "name": "@phoenix-protocol/strategies",
+  "version": "0.1.0",
+  "description": "Strategy provider registry for Phoenix DeFi",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@phoenix-protocol/contracts": "*",
+    "@phoenix-protocol/state": "*",
+    "@phoenix-protocol/types": "*",
+    "@phoenix-protocol/utils": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.3"
+  }
+}

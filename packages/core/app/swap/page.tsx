@@ -7,6 +7,7 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  useRef,
   type JSX,
 } from "react";
 import { useDebounce } from "use-debounce";
@@ -40,6 +41,7 @@ import {
 } from "@phoenix-protocol/utils";
 import { LoadingSwap, SwapError, SwapSuccess } from "@/components/Modal/Modal";
 import { Box } from "@mui/material";
+import ClientOnly from "@/providers/ClientOnlyProvider";
 
 /**
  * SwapPage Component
@@ -49,6 +51,9 @@ import { Box } from "@mui/material";
  * @component
  */
 export default function SwapPage(): JSX.Element {
+  // State for client-side rendering detection
+  const [isClient, setIsClient] = useState(false);
+
   // State variables declaration and initialization
   const [optionsOpen, setOptionsOpen] = useState<boolean>(false);
   const [assetSelectorOpen, setAssetSelectorOpen] = useState<boolean>(false);
@@ -75,20 +80,104 @@ export default function SwapPage(): JSX.Element {
 
   const [trustlineAssetAmount, setTrustlineAssetAmount] = useState<number>(0);
   const [allPools, setAllPools] = useState<any[]>([]);
+  const [operationsStableHash, setOperationsStableHash] = useState<string>("");
 
   // Using the store
   const storePersist = usePersistStore();
   const appStore = useAppStore();
 
+  // Flags to prevent multiple initializations and rerenders
+  const initialSetupComplete = useRef(false);
+  const operationsUpdateComplete = useRef(false);
+  const hasTokensLoaded = useRef(false);
+  const hasPoolsLoaded = useRef(false);
+  const prevOperations = useRef<string>("");
+  const simulationRequestRef = useRef<NodeJS.Timeout | null>(null);
+  const tokenLoadCount = useRef(0);
+  const operationsHash = useRef<string>("");
+
   const [fromAmount] = useDebounce<number>(tokenAmounts[0], 500);
 
   const { executeContractTransaction } = useContractTransaction();
 
+  // Mark component as client-side rendered on mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  /**
+   * Fetches token balances after a transaction completes
+   */
+  const refreshTokenBalances = useCallback(async () => {
+    if (fromToken?.name) {
+      await appStore.fetchTokenInfo(fromToken.name);
+    }
+    if (toToken?.name) {
+      await appStore.fetchTokenInfo(toToken.name);
+    }
+  }, [appStore, fromToken?.name, toToken?.name]);
+
+  /**
+   * Handles adding a trustline for a token.
+   */
+  const handleTrustLine = useCallback(
+    async (tokenAddress: string): Promise<void> => {
+      if (!storePersist.wallet.address || !tokenAddress) return;
+
+      try {
+        const trust = await checkTrustline(
+          storePersist.wallet.address,
+          tokenAddress
+        );
+
+        setTrustlineButtonActive(!trust.exists);
+        setTrustlineTokenSymbol(trust.asset?.code || "");
+
+        // Only fetch trustline asset if needed
+        if (!trust.exists) {
+          const tlAsset = await appStore.fetchTokenInfo(
+            "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA"
+          );
+          if (tlAsset?.decimals) {
+            setTrustlineAssetAmount(
+              Number(tlAsset.balance) / 10 ** tlAsset.decimals
+            );
+          }
+        }
+
+        setTrustlineTokenName(trust.asset?.contract || "");
+      } catch (error) {
+        console.error("Error checking trustline:", error);
+      }
+    },
+    [storePersist.wallet.address, appStore]
+  );
+
+  /**
+   * Adds a trustline for the specified token.
+   */
+  const addTrustLine = useCallback(async (): Promise<void> => {
+    if (!storePersist.wallet.address || !trustlineTokenName) return;
+
+    try {
+      setTxBroadcasting(true);
+      await fetchAndIssueTrustline(
+        storePersist.wallet.address,
+        trustlineTokenName
+      );
+      setTrustlineButtonActive(false);
+
+      // Refresh token balances after creating trustline
+      setTimeout(refreshTokenBalances, 7000);
+    } catch (e) {
+      console.log("Error creating trustline:", e);
+    } finally {
+      setTxBroadcasting(false);
+    }
+  }, [storePersist.wallet.address, trustlineTokenName, refreshTokenBalances]);
+
   /**
    * Executes the swap transaction.
-   * This function signs and sends the transaction using WalletConnect or Signer.
-   *
-   * @async
    */
   const doSwap = useCallback(async (): Promise<void> => {
     try {
@@ -110,325 +199,574 @@ export default function SwapPage(): JSX.Element {
             { simulate: !restore }
           );
         },
+        options: {
+          onSuccess: () => {
+            setTimeout(refreshTokenBalances, 7000);
+          },
+        },
       });
-
-      // Wait for the next block and fetch token balances
-      setTimeout(async () => {
-        await appStore.fetchTokenInfo(fromToken?.name!);
-        await appStore.fetchTokenInfo(toToken?.name!);
-      }, 7000);
     } catch (error) {
       console.log("Error during swap transaction", error);
     }
   }, [
-    appStore,
-    fromToken?.name,
     maxSpread,
     operations,
-    storePersist,
-    toToken?.name,
+    storePersist.wallet.address,
     tokenAmounts,
     executeContractTransaction,
+    refreshTokenBalances,
   ]);
 
   /**
-   * Simulates the swap transaction to determine the exchange rate and network fee.
-   *
-   * @async
+   * Simulates the swap transaction with throttling to prevent excessive API calls
    */
   const doSimulateSwap = useCallback(async (): Promise<void> => {
-    if (fromToken && toToken) {
-      if (tokenAmounts[0] === 0) {
-        setTokenAmounts([0, 0]);
-        setExchangeRate("");
-        setNetworkFee("");
-        return;
-      }
+    // Clear any pending simulation requests
+    if (simulationRequestRef.current) {
+      clearTimeout(simulationRequestRef.current);
+      simulationRequestRef.current = null;
+    }
 
-      setLoadingSimulate(true);
-      try {
-        const contract = new PhoenixMultihopContract.Client({
-          contractId: constants.MULTIHOP_ADDRESS,
-          networkPassphrase: constants.NETWORK_PASSPHRASE,
-          rpcUrl: constants.RPC_URL,
-        });
+    // Guard clauses to prevent unnecessary simulation
+    if (!fromToken || !toToken || !operations.length || tokenAmounts[0] === 0) {
+      setTokenAmounts((prevAmounts) => [prevAmounts[0], 0]);
+      setExchangeRate("");
+      setNetworkFee("");
+      return;
+    }
 
-        const tx = await contract.simulate_swap({
-          operations,
-          amount: BigInt(tokenAmounts[0] * 10 ** 7),
-          pool_type: 0,
-        });
+    // Prevent simulation if already simulating
+    if (loadingSimulate) return;
 
-        if (tx.result.ask_amount && tx.result.commission_amounts) {
-          const _exchangeRate =
-            (Number(tx.result.ask_amount) -
-              Number(tx.result.commission_amounts[0][1])) /
-            Number(tokenAmounts[0]);
+    setLoadingSimulate(true);
+    try {
+      const contract = new PhoenixMultihopContract.Client({
+        contractId: constants.MULTIHOP_ADDRESS,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
 
-          setExchangeRate(
-            `${(_exchangeRate / 10 ** 7).toFixed(2)} ${toToken?.name} per ${
-              fromToken?.name
-            }`
-          );
-          setNetworkFee(
-            `${Number(tx.result.commission_amounts[0][1]) / 10 ** 7} ${
-              fromToken?.name
-            }`
-          );
+      const tx = await contract.simulate_swap({
+        operations,
+        amount: BigInt(tokenAmounts[0] * 10 ** 7),
+        pool_type: 0,
+      });
 
-          setTokenAmounts((prevAmounts) => {
-            const newToTokenAmount = Number(tx.result.ask_amount) / 10 ** 7;
+      if (tx.result.ask_amount && tx.result.commission_amounts) {
+        const askAmount = Number(tx.result.ask_amount);
+        const commissionAmount = Number(tx.result.commission_amounts[0][1]);
+        const netAmount = askAmount - commissionAmount;
+        const _exchangeRate = netAmount / Number(tokenAmounts[0]);
+
+        setExchangeRate(
+          `1 ${fromToken.name} = ${(_exchangeRate / 10 ** 7).toFixed(6)} ${
+            toToken.name
+          }`
+        );
+        setNetworkFee(
+          `${(commissionAmount / 10 ** 7).toFixed(6)} ${fromToken.name}`
+        );
+
+        // Only update if the amount has actually changed
+        const newToTokenAmount = askAmount / 10 ** 7;
+        setTokenAmounts((prevAmounts) => {
+          if (Math.abs(prevAmounts[1] - newToTokenAmount) > 0.000001) {
             return [prevAmounts[0], newToTokenAmount];
-          });
-        }
-      } catch (e) {
-        console.log(e);
+          }
+          return prevAmounts;
+        });
       }
+    } catch (e) {
+      console.error("Simulation error:", e);
+      setExchangeRate("");
+      setNetworkFee("");
+      setTokenAmounts((prevAmounts) => [prevAmounts[0], 0]);
+    } finally {
       setLoadingSimulate(false);
     }
-  }, [fromToken?.name, toToken, fromAmount, operations, tokenAmounts]);
+  }, [fromToken?.name, toToken?.name, operations.length, tokenAmounts[0]]);
 
   /**
    * Handles user selecting a token from the asset selector.
-   *
-   * @param {Token} token - The token selected by the user.
    */
   const handleTokenClick = useCallback(
     (token: Token): void => {
       if (isFrom) {
-        setTokens(
-          (tokens) =>
-            [
-              ...tokens.filter((el) => el.name !== token.name),
-              fromToken,
-            ].filter(Boolean) as Token[]
-        );
         setFromToken(token);
+        // If the selected token was the toToken, swap them
+        if (toToken && token.name === toToken.name) {
+          setToToken(fromToken);
+        }
+
+        // Update the tokens list, maintaining the current toToken
+        setTokens((prevTokens) => {
+          const filteredTokens = prevTokens.filter(
+            (t) =>
+              t.name !== token.name && (!toToken || t.name !== toToken.name)
+          );
+          // Add fromToken back to the list if it exists
+          return fromToken ? [...filteredTokens, fromToken] : filteredTokens;
+        });
       } else {
-        setTokens(
-          (tokens) =>
-            [...tokens.filter((el) => el.name !== token.name), toToken].filter(
-              Boolean
-            ) as Token[]
-        );
         setToToken(token);
+        // If the selected token was the fromToken, swap them
+        if (fromToken && token.name === fromToken.name) {
+          setFromToken(toToken);
+        }
+
+        // Update the tokens list, maintaining the current fromToken
+        setTokens((prevTokens) => {
+          const filteredTokens = prevTokens.filter(
+            (t) =>
+              t.name !== token.name && (!fromToken || t.name !== fromToken.name)
+          );
+          // Add toToken back to the list if it exists
+          return toToken ? [...filteredTokens, toToken] : filteredTokens;
+        });
       }
       setAssetSelectorOpen(false);
+      // Reset simulation flags when token changes
+      operationsUpdateComplete.current = false;
+      prevOperations.current = "";
+      operationsHash.current = "";
+      setOperationsStableHash("");
     },
-    [fromToken, isFrom, toToken]
+    [fromToken, toToken, isFrom]
   );
 
   /**
    * Opens the asset selector.
-   *
-   * @param {boolean} isFromToken - Whether the asset selector is for the "from" token.
    */
   const handleSelectorOpen = useCallback((isFromToken: boolean): void => {
     setAssetSelectorOpen(true);
     setIsFrom(isFromToken);
   }, []);
 
-  // Effect hook to fetch all tokens once the component mounts
+  /**
+   * Load pools data from the contract - minimizing API calls
+   */
+  const loadPoolsData = useCallback(async () => {
+    if (hasPoolsLoaded.current) return allPools;
+
+    try {
+      const factoryContract = new PhoenixFactoryContract.Client({
+        contractId: constants.FACTORY_ADDRESS,
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
+      const { result } = await factoryContract.query_all_pools_details();
+
+      const allPairs = result.map((pool: any) => ({
+        asset_a: pool.pool_response.asset_a.address,
+        asset_b: pool.pool_response.asset_b.address,
+      }));
+
+      hasPoolsLoaded.current = true;
+      setAllPools(allPairs);
+      appStore.setLoading(false);
+      return allPairs;
+    } catch (error) {
+      console.error("Failed to load pools data:", error);
+      appStore.setLoading(false);
+      return [];
+    }
+  }, [appStore]);
+
+  // Effect hook to fetch all tokens once the component mounts - with better controls
   useEffect(() => {
-    const getAllTokens = async (): Promise<void> => {
+    if (!isClient || hasTokensLoaded.current) return;
+
+    const getAllTokens = async () => {
+      // Avoid multiple loads
+      tokenLoadCount.current += 1;
+      if (tokenLoadCount.current > 1) return;
+
+      if (appStore.allTokens.length > 0) {
+        // Avoid fetching if we already have tokens
+        setIsLoading(false);
+        setTokens(appStore.allTokens.slice(2));
+        setFromToken(appStore.allTokens[0]);
+        setToToken(appStore.allTokens[1]);
+        hasTokensLoaded.current = true;
+        appStore.setLoading(false);
+
+        // Still load pools in the background
+        setTimeout(() => {
+          loadPoolsData();
+        }, 500);
+
+        return;
+      }
+
       setIsLoading(true);
       try {
+        // Load tokens first
         const allTokens = await appStore.getAllTokens();
-        setTokens(allTokens.slice(2));
-        setFromToken(allTokens[0]);
-        setToToken(allTokens[1]);
-        setIsLoading(false);
 
-        // Get all pools
-        const factoryContract = new PhoenixFactoryContract.Client({
-          contractId: constants.FACTORY_ADDRESS,
-          networkPassphrase: constants.NETWORK_PASSPHRASE,
-          rpcUrl: constants.RPC_URL,
-        });
-        const { result } = await factoryContract.query_all_pools_details();
-
-        const allPairs = result.map((pool: any) => ({
-          asset_a: pool.pool_response.asset_a.address,
-          asset_b: pool.pool_response.asset_b.address,
-        }));
-        setAllPools(allPairs);
+        if (allTokens?.length > 1) {
+          setTokens(allTokens.slice(2));
+          setFromToken(allTokens[0]);
+          setToToken(allTokens[1]);
+          hasTokensLoaded.current = true;
+        }
       } catch (e) {
-        console.error(e);
+        console.error("Failed to load tokens:", e);
       } finally {
+        setIsLoading(false);
         appStore.setLoading(false);
+
+        // Load pools separately regardless of token loading success
+        setTimeout(() => {
+          loadPoolsData();
+        }, 500);
       }
     };
+
     getAllTokens();
-  }, []);
+  }, [appStore, loadPoolsData, isClient]);
 
-  // Effect hook to simulate swaps on token change
-  useEffect(() => {
-    if (fromToken && toToken && operations.length > 0) {
-      doSimulateSwap();
+  // Update operations when tokens change with stricter control to prevent infinite loops
+  const updateSwapOperations = useCallback(() => {
+    // Only run this once per token pair change
+    if (
+      !fromToken ||
+      !toToken ||
+      !appStore.allTokens.length ||
+      !allPools.length ||
+      fromToken.name === toToken.name
+    ) {
+      return;
     }
-  }, [fromToken, toToken, fromAmount, operations.length]);
 
-  // Effect hook to update operations when tokens change
-  useEffect(() => {
-    if (fromToken && toToken) {
-      const fromTokenContractID = appStore.allTokens.find(
-        (token: Token) => token.name === fromToken.name
-      )?.contractId;
-      const toTokenContractID = appStore.allTokens.find(
-        (token: Token) => token.name === toToken.name
-      )?.contractId;
+    // Calculate current state hash to compare
+    const currentPairKey = `${fromToken.name}-${toToken.name}`;
 
-      if (!fromTokenContractID || !toTokenContractID) return;
+    // Skip if operations are already up to date for this token pair
+    if (prevOperations.current === currentPairKey) {
+      return;
+    }
 
-      const { operations: ops } = findBestPath(
-        toTokenContractID,
-        fromTokenContractID,
-        allPools
-      );
-      const _operations = ops.reverse();
-      const _swapRoute = _operations
-        .map(
-          (op) =>
-            appStore.allTokens.find(
-              (token: any) => token.contractId === op.ask_asset
-            )?.name
-        )
-        .filter(Boolean);
+    // Find token contract IDs
+    const fromTokenContractID = appStore.allTokens.find(
+      (token: Token) => token.name === fromToken.name
+    )?.contractId;
 
-      setOperations((prevOps) =>
-        prevOps !== _operations ? _operations : prevOps
-      );
+    const toTokenContractID = appStore.allTokens.find(
+      (token: Token) => token.name === toToken.name
+    )?.contractId;
+
+    if (!fromTokenContractID || !toTokenContractID) return;
+
+    // Create a new best path
+    const { operations: ops } = findBestPath(
+      toTokenContractID,
+      fromTokenContractID,
+      allPools
+    );
+
+    if (!ops?.length) return;
+
+    const _operations = ops.reverse();
+    const _swapRoute = _operations
+      .map(
+        (op) =>
+          appStore.allTokens.find(
+            (token: any) => token.contractId === op.ask_asset
+          )?.name
+      )
+      .filter(Boolean);
+
+    // Create operations hash to prevent unnecessary simulation triggers
+    const operationsString = JSON.stringify(_operations);
+    const currentOperationsHash = btoa(operationsString).slice(0, 16); // Only update if operations have actually changed
+    if (operationsHash.current !== currentOperationsHash) {
+      // Update operations and swap route
+      setOperations(_operations);
       setSwapRoute(`${fromToken.name} -> ${_swapRoute.join(" -> ")}`);
-      if (storePersist.wallet.address) {
-        handleTrustLine(toTokenContractID);
+
+      // Update hash references
+      operationsHash.current = currentOperationsHash;
+      setOperationsStableHash(currentOperationsHash);
+      prevOperations.current = currentPairKey;
+      operationsUpdateComplete.current = true;
+    }
+
+    // Check trustline if wallet is connected
+    if (storePersist.wallet.address && toTokenContractID) {
+      handleTrustLine(toTokenContractID);
+    }
+  }, [
+    allPools,
+    fromToken,
+    toToken,
+    appStore.allTokens,
+    storePersist.wallet.address,
+    handleTrustLine,
+  ]);
+
+  // Update operations when tokens or pools change - with safeguards
+  useEffect(() => {
+    if (!isClient || !fromToken || !toToken || !allPools.length) return;
+
+    // Update operations only if something meaningful has changed
+    updateSwapOperations();
+  }, [
+    isClient,
+    fromToken?.name, // Only depend on the name, not the whole object
+    toToken?.name, // Only depend on the name, not the whole object
+    allPools.length, // Only depend on the length, not the whole array
+    updateSwapOperations,
+  ]);
+
+  // Simulate swap with debounced amount changes and throttling
+  useEffect(() => {
+    if (!isClient) return;
+
+    // Skip if no operations or tokens
+    if (
+      !fromToken ||
+      !toToken ||
+      !operations.length ||
+      !operationsUpdateComplete.current
+    ) {
+      return;
+    }
+
+    // Skip if amount is zero
+    if (fromAmount <= 0) {
+      if (tokenAmounts[1] !== 0) {
+        setTokenAmounts([tokenAmounts[0], 0]);
       }
+      return;
     }
-  }, [allPools, fromToken?.name, toToken?.name, storePersist.wallet.address]);
 
-  /**
-   * Handles adding a trustline for a token.
-   *
-   * @param {string} tokenAddress - The address of the token.
-   * @async
-   */
-  const handleTrustLine = useCallback(
-    async (tokenAddress: string): Promise<void> => {
-      const trust = await checkTrustline(
-        storePersist.wallet.address!,
-        tokenAddress
-      );
-      setTrustlineButtonActive(!trust.exists);
-      setTrustlineTokenSymbol(trust.asset?.code || "");
-      const tlAsset = await appStore.fetchTokenInfo(
-        "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA"
-      );
-      setTrustlineAssetAmount(
-        Number(tlAsset?.balance) / 10 ** tlAsset?.decimals!
-      );
-      setTrustlineTokenName(trust.asset?.contract || "");
-    },
-    [storePersist.wallet.address]
+    // Use throttled simulation with a minimum interval between calls
+    if (simulationRequestRef.current) {
+      clearTimeout(simulationRequestRef.current);
+    }
+
+    simulationRequestRef.current = setTimeout(() => {
+      // Call simulation directly instead of using doSimulateSwap callback
+      if (
+        !fromToken ||
+        !toToken ||
+        !operations.length ||
+        tokenAmounts[0] === 0
+      ) {
+        setTokenAmounts((prevAmounts) => [prevAmounts[0], 0]);
+        setExchangeRate("");
+        setNetworkFee("");
+        return;
+      }
+
+      // Prevent simulation if already simulating
+      if (loadingSimulate) return;
+
+      setLoadingSimulate(true);
+
+      const runSimulation = async () => {
+        try {
+          const contract = new PhoenixMultihopContract.Client({
+            contractId: constants.MULTIHOP_ADDRESS,
+            networkPassphrase: constants.NETWORK_PASSPHRASE,
+            rpcUrl: constants.RPC_URL,
+          });
+
+          const tx = await contract.simulate_swap({
+            operations,
+            amount: BigInt(tokenAmounts[0] * 10 ** 7),
+            pool_type: 0,
+          });
+
+          if (tx.result.ask_amount && tx.result.commission_amounts) {
+            const askAmount = Number(tx.result.ask_amount);
+            const commissionAmount = Number(tx.result.commission_amounts[0][1]);
+            const netAmount = askAmount - commissionAmount;
+            const _exchangeRate = netAmount / Number(tokenAmounts[0]);
+
+            setExchangeRate(
+              `1 ${fromToken.name} = ${(_exchangeRate / 10 ** 7).toFixed(6)} ${
+                toToken.name
+              }`
+            );
+            setNetworkFee(
+              `${(commissionAmount / 10 ** 7).toFixed(6)} ${fromToken.name}`
+            );
+
+            // Only update if the amount has actually changed
+            const newToTokenAmount = askAmount / 10 ** 7;
+            setTokenAmounts((prevAmounts) => {
+              if (Math.abs(prevAmounts[1] - newToTokenAmount) > 0.000001) {
+                return [prevAmounts[0], newToTokenAmount];
+              }
+              return prevAmounts;
+            });
+          }
+        } catch (e) {
+          console.error("Simulation error:", e);
+          setExchangeRate("");
+          setNetworkFee("");
+          setTokenAmounts((prevAmounts) => [prevAmounts[0], 0]);
+        } finally {
+          setLoadingSimulate(false);
+        }
+      };
+
+      runSimulation();
+      simulationRequestRef.current = null;
+    }, 300); // Reduced timeout for better responsiveness
+
+    // Cleanup on unmount or when dependencies change
+    return () => {
+      if (simulationRequestRef.current) {
+        clearTimeout(simulationRequestRef.current);
+        simulationRequestRef.current = null;
+      }
+    };
+  }, [
+    fromAmount,
+    fromToken?.name,
+    toToken?.name,
+    operationsStableHash,
+    isClient,
+  ]);
+
+  // Memoized swap container props to prevent unnecessary re-renders
+  const swapContainerProps = useMemo(
+    () => ({
+      onOptionsClick: () => setOptionsOpen(true),
+      onSwapTokensClick: () => {
+        setTokenAmounts((prevAmounts) => [prevAmounts[1], prevAmounts[0]]);
+        setFromToken(toToken);
+        setToToken(fromToken);
+        // Reset flags when tokens are swapped
+        operationsUpdateComplete.current = false;
+        prevOperations.current = "";
+        operationsHash.current = "";
+        setOperationsStableHash("");
+      },
+      fromTokenValue: tokenAmounts[0].toString()!,
+      toTokenValue: tokenAmounts[1].toString()!,
+      fromToken: fromToken!,
+      toToken: toToken!,
+      onTokenSelectorClick: handleSelectorOpen,
+      onSwapButtonClick: doSwap,
+      onInputChange: (isFrom: boolean, value: string) => {
+        const numValue = Number(value) || 0;
+        setTokenAmounts((prevAmounts) => {
+          if (isFrom) {
+            if (prevAmounts[0] === numValue) return prevAmounts;
+            return [numValue, prevAmounts[1]];
+          } else {
+            if (prevAmounts[1] === numValue) return prevAmounts;
+            return [prevAmounts[0], numValue];
+          }
+        });
+      },
+      exchangeRate,
+      networkFee,
+      route: swapRoute,
+      loadingSimulate,
+      estSellPrice: "TODO",
+      minSellPrice: "TODO",
+      slippageTolerance: `${maxSpread}%`,
+      swapButtonDisabled:
+        tokenAmounts[0] <= 0 ||
+        !storePersist.wallet.address ||
+        !operations.length ||
+        loadingSimulate ||
+        txBroadcasting,
+      trustlineButtonActive,
+      trustlineAssetName: trustlineTokenSymbol,
+      trustlineButtonDisabled: trustlineAssetAmount < 0.5 || txBroadcasting,
+      onTrustlineButtonClick: addTrustLine,
+    }),
+    [
+      tokenAmounts,
+      fromToken,
+      toToken,
+      exchangeRate,
+      networkFee,
+      swapRoute,
+      loadingSimulate,
+      maxSpread,
+      trustlineButtonActive,
+      trustlineTokenSymbol,
+      trustlineAssetAmount,
+      storePersist.wallet.address,
+      operations.length,
+      txBroadcasting,
+      doSwap,
+      handleSelectorOpen,
+      addTrustLine,
+    ]
   );
-
-  /**
-   * Adds a trustline for the specified token.
-   *
-   * @async
-   */
-  const addTrustLine = useCallback(async (): Promise<void> => {
-    try {
-      setTxBroadcasting(true);
-      await fetchAndIssueTrustline(
-        storePersist.wallet.address!,
-        trustlineTokenName
-      );
-      setTrustlineButtonActive(false);
-    } catch (e) {
-      console.log(e);
-    }
-    setTxBroadcasting(false);
-  }, [storePersist.wallet.address, trustlineTokenName]);
 
   return (
     <>
-      {/* Hacky Title Injector - Waiting for Next Helmet for Next15 */}
-      <input type="hidden" value="Phoenix DeFi Hub - Swap your tokens" />
+      {/* Hacky Title Injector - Only on client side */}
+      {isClient && (
+        <input type="hidden" value="Phoenix DeFi Hub - Swap your tokens" />
+      )}
 
-      {isLoading ? (
-        <Box sx={{ width: "100%", maxWidth: "1440px", mt: 12 }}>
+      {isLoading || !isClient ? (
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: "1440px",
+            mt: { xs: 8, md: 12 },
+            px: { xs: 2, sm: 3, md: 4 },
+            mx: "auto",
+          }}
+        >
           <Skeleton.Swap />
         </Box>
       ) : (
-        <Box sx={{ width: "100%", maxWidth: "1440px", mt: 12 }}>
-          <Box>
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: "1440px",
+            mt: { xs: 8, md: 12 },
+            px: { xs: 2, sm: 3, md: 4 },
+            mx: "auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            minHeight: "calc(100vh - 200px)",
+          }}
+        >
+          <Box sx={{ width: "100%", maxWidth: "600px" }}>
             {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
               >
-                <SwapContainer
-                  onOptionsClick={() => setOptionsOpen(true)}
-                  onSwapTokensClick={() => {
-                    setTokenAmounts((prevAmounts) => [
-                      prevAmounts[1],
-                      prevAmounts[0],
-                    ]);
-                    setFromToken(toToken);
-                    setToToken(fromToken);
-                  }}
-                  fromTokenValue={tokenAmounts[0].toString()}
-                  toTokenValue={tokenAmounts[1].toString()}
-                  fromToken={fromToken}
-                  toToken={toToken}
-                  onTokenSelectorClick={(isFromToken: boolean) =>
-                    handleSelectorOpen(isFromToken)
-                  }
-                  onSwapButtonClick={() => doSwap()}
-                  onInputChange={(isFrom: boolean, value: string) => {
-                    setTokenAmounts((prevAmounts) =>
-                      isFrom
-                        ? [Number(value), 0]
-                        : [prevAmounts[0], Number(value)]
-                    );
-                  }}
-                  exchangeRate={exchangeRate}
-                  networkFee={networkFee}
-                  route={swapRoute}
-                  loadingSimulate={loadingSimulate}
-                  estSellPrice={"TODO"}
-                  minSellPrice={"TODO"}
-                  slippageTolerance={`${maxSpread}%`}
-                  swapButtonDisabled={
-                    tokenAmounts[0] <= 0 ||
-                    storePersist.wallet.address === undefined
-                  }
-                  trustlineButtonActive={trustlineButtonActive}
-                  trustlineAssetName={trustlineTokenSymbol}
-                  trustlineButtonDisabled={trustlineAssetAmount < 0.5}
-                  onTrustlineButtonClick={() => addTrustLine()}
-                />
+                <SwapContainer {...swapContainerProps} />
               </motion.div>
             )}
             {optionsOpen && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
               >
                 <SlippageSettings
-                  options={["1%", "3%", "5%"]}
+                  options={[1, 3, 5]}
                   selectedOption={maxSpread}
                   onClose={() => setOptionsOpen(false)}
-                  onChange={(option: string) => setMaxSpread(Number(option))}
+                  onChange={(option: number) => setMaxSpread(option)}
                 />
               </motion.div>
             )}
             {assetSelectorOpen && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
               >
                 {tokens.length > 0 ? (
                   <AssetSelector

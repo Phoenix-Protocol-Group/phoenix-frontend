@@ -11,7 +11,12 @@ import {
   SorobanTokenContract,
 } from "@phoenix-protocol/contracts";
 import { usePersistStore } from "../store";
-import { constants, fetchTokenPrices } from "@phoenix-protocol/utils";
+import {
+  constants,
+  fetchTokenPrices,
+  Signer,
+  TradeAPi,
+} from "@phoenix-protocol/utils";
 import { LiquidityPoolInfo } from "@phoenix-protocol/contracts/build/phoenix-pair";
 
 const getCategory = (name: string) => {
@@ -21,6 +26,8 @@ const getCategory = (name: string) => {
     case "eurc":
     case "veur":
     case "vchf":
+    case "eurx":
+    case "gbpx":
       return "Stable";
 
     default:
@@ -60,9 +67,15 @@ export const createWalletActions = (
           contractId: constants.FACTORY_ADDRESS,
           networkPassphrase: constants.NETWORK_PASSPHRASE,
           rpcUrl: constants.RPC_URL,
+          signTransaction: (tx: string) => new Signer().sign(tx),
         });
         // Fetch all available tokens from chain
-        const allPoolsDetails = await factoryContract.query_all_pools_details();
+        const allPoolsDetails = await factoryContract.query_all_pools_details({
+          simulate: false,
+        });
+        const _allPoolsDetails = await allPoolsDetails.simulate({
+          restore: true,
+        });
 
         // Parse results
         parsedResults = allPoolsDetails.result;
@@ -102,6 +115,8 @@ export const createWalletActions = (
 
       await Promise.all(allAssets);
 
+      const tradeAPI = new TradeAPi.API(constants.TRADING_API_URL);
+
       const _tokens = getState()
         .tokens.filter(
           (token: Token) =>
@@ -126,7 +141,7 @@ export const createWalletActions = (
             usdValue: Number(
               token?.symbol === "PHO"
                 ? await fetchPho()
-                : await fetchTokenPrices(token?.symbol)
+                : await tradeAPI.getPrice(token?.id)
             ).toFixed(2),
             contractId: token?.id,
           };

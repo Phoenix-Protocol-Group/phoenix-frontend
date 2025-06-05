@@ -35,7 +35,7 @@ const GlowingChart = ({
         variant="rectangular"
         width="100%"
         height={100}
-        sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
+        sx={{ bgcolor: "var(--neutral-700, #404040)" }}
       />
     ) : (
       <ResponsiveContainer width="100%" height={100}>
@@ -68,8 +68,8 @@ const GlowingChart = ({
           <Area
             type="monotone"
             dataKey={(entry) => entry[1]}
-            stroke="#E2491A"
-            strokeWidth={3}
+            stroke="#F97316"
+            strokeWidth={2}
             isAnimationActive={true}
             fill="none"
             filter="url(#neonGlow)"
@@ -137,16 +137,16 @@ const DashboardPriceCharts = ({
       <Box
         sx={{
           display: "flex",
-          padding: "24px",
+          padding: "16px",
           flexDirection: "row",
           alignItems: "center",
-          gap: "24px",
+          gap: "16px",
           position: "relative",
           borderRadius: "12px",
-          border: "1px solid var(--Secondary-S4, #2C2C31)",
-          background:
-            "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
-          overflow: "visible",
+          border: "1px solid var(--neutral-700, #404040)",
+          background: "var(--neutral-900, #171717)",
+          overflow: "hidden",
+          boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)",
         }}
       >
         <Box
@@ -154,23 +154,23 @@ const DashboardPriceCharts = ({
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-start",
-            paddingRight: "24px",
+            paddingRight: "16px",
           }}
         >
           {isLoading ? (
             <Skeleton
               variant="text"
-              width={80}
-              height={24}
-              sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
+              width={60}
+              height={20}
+              sx={{ bgcolor: "var(--neutral-700, #404040)" }}
             />
           ) : (
             <Typography
               sx={{
-                color: "var(--Secondary-S2-2, #BDBEBE)",
+                color: "var(--neutral-400, #A3A3A3)",
                 fontFamily: "Ubuntu",
-                fontSize: "12px",
-                fontWeight: 700,
+                fontSize: "10px",
+                fontWeight: 500,
                 lineHeight: "140%",
               }}
             >
@@ -178,21 +178,21 @@ const DashboardPriceCharts = ({
             </Typography>
           )}
           <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1, mt: "8px" }}
+            sx={{ display: "flex", alignItems: "center", gap: 1, mt: "4px" }}
           >
             {isLoading ? (
               <>
                 <Skeleton
                   variant="circular"
-                  width={32}
-                  height={32}
-                  sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
+                  width={24}
+                  height={24}
+                  sx={{ bgcolor: "var(--neutral-700, #404040)" }}
                 />
                 <Skeleton
                   variant="text"
-                  width={100}
-                  height={24}
-                  sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
+                  width={80}
+                  height={20}
+                  sx={{ bgcolor: "var(--neutral-700, #404040)" }}
                 />
               </>
             ) : (
@@ -200,20 +200,19 @@ const DashboardPriceCharts = ({
                 <Box
                   sx={{
                     display: "flex",
-                    width: "32px",
-                    height: "32px",
-                    padding: "6px",
+                    width: "24px",
+                    height: "24px",
+                    padding: "4px",
                     justifyContent: "center",
                     alignItems: "center",
-                    borderRadius: "32px",
-                    background:
-                      "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+                    borderRadius: "24px",
+                    background: "var(--neutral-700, #404040)",
                   }}
                 >
                   <Box
                     sx={{
-                      width: "20px",
-                      height: "20px",
+                      width: "16px",
+                      height: "16px",
                       flexShrink: 0,
                       borderRadius: "4px",
                       background: `url(${
@@ -224,19 +223,19 @@ const DashboardPriceCharts = ({
                 </Box>
                 <Typography
                   sx={{
-                    color: "var(--Secondary-S2, #FFF)",
+                    color: "var(--neutral-50, #FAFAFA)",
                     fontFamily: "Ubuntu",
-                    fontSize: "14px",
-                    fontWeight: 700,
+                    fontSize: "12px",
+                    fontWeight: 500,
                   }}
                 >
                   {assetName == "XLM" ? "Stellar" : "Phoenix"}
                 </Typography>
                 <Typography
                   sx={{
-                    color: "var(--Secondary-S2-2, #BDBEBE)",
+                    color: "var(--neutral-400, #A3A3A3)",
                     fontFamily: "Ubuntu",
-                    fontSize: "12px",
+                    fontSize: "10px",
                     fontWeight: 300,
                     lineHeight: "140%",
                   }}
@@ -252,23 +251,23 @@ const DashboardPriceCharts = ({
               alignItems: "center",
               justifyContent: "flex-start",
               width: "100%",
-              mt: "16px",
+              mt: "8px",
             }}
           >
             {isLoading ? (
               <Skeleton
                 variant="text"
-                width={80}
-                height={36}
-                sx={{ bgcolor: "var(--Secondary-S4, #2C2C31)" }}
+                width={60}
+                height={24}
+                sx={{ bgcolor: "var(--neutral-700, #404040)" }}
               />
             ) : (
               <>
                 <Typography
                   sx={{
-                    color: "var(--Secondary-S2, #FFF)",
+                    color: "var(--neutral-50, #FAFAFA)",
                     fontFamily: "Ubuntu",
-                    fontSize: "24px",
+                    fontSize: "18px",
                     fontWeight: 700,
                   }}
                 >
@@ -282,13 +281,13 @@ const DashboardPriceCharts = ({
                     display: "flex",
                     alignItems: "center",
                     gap: "4px",
-                    ml: "16px",
-                    color: differencePercent >= 0 ? "#5BFF22" : "#F22",
+                    ml: "8px",
+                    color: differencePercent >= 0 ? "#66BB6A" : "#E57373",
                   }}
                 >
                   <ArrowUpward
                     sx={{
-                      fontSize: "16px",
+                      fontSize: "12px",
                       transform:
                         differencePercent >= 0
                           ? "rotate(0deg)"
@@ -297,7 +296,7 @@ const DashboardPriceCharts = ({
                   />
                   <Typography
                     sx={{
-                      fontSize: "16px",
+                      fontSize: "12px",
                       fontWeight: 700,
                     }}
                   >
@@ -314,7 +313,7 @@ const DashboardPriceCharts = ({
           sx={{
             flex: 2,
             minWidth: 0,
-            overflow: "visible",
+            overflow: "hidden",
           }}
         >
           <GlowingChart data={data} loading={isLoading} />

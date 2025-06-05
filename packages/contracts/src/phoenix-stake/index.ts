@@ -1,5 +1,4 @@
 import { Buffer } from "buffer";
-import { Address } from "@stellar/stellar-sdk";
 import {
   AssembledTransaction,
   Client as ContractClient,
@@ -10,16 +9,11 @@ import {
 } from "@stellar/stellar-sdk/contract";
 import type {
   u32,
-  i32,
   u64,
   i64,
   u128,
   i128,
-  u256,
-  i256,
   Option,
-  Typepoint,
-  Duration,
 } from "@stellar/stellar-sdk/contract";
 export * from "@stellar/stellar-sdk";
 export * as contract from "@stellar/stellar-sdk/contract";
@@ -34,34 +28,26 @@ export type DistributionDataKey =
   | { tag: "RewardHistory"; values: readonly [string] }
   | { tag: "TotalStakedHistory"; values: void };
 
-export const Errors = {
-  1: { message: "AlreadyInitialized" },
-
-  2: { message: "InvalidMinBond" },
-
-  3: { message: "InvalidMinReward" },
-
-  4: { message: "InvalidBond" },
-
-  5: { message: "Unauthorized" },
-
-  6: { message: "MinRewardNotEnough" },
-
-  7: { message: "RewardsInvalid" },
-
-  8: { message: "StakeNotFound" },
-
-  9: { message: "InvalidTime" },
-
-  10: { message: "DistributionExists" },
-
-  11: { message: "InvalidRewardAmount" },
-
-  12: { message: "InvalidMaxComplexity" },
-
-  13: { message: "DistributionNotFound" },
-
-  14: { message: "AdminNotSet" },
+export const ContractError = {
+  500: { message: "AlreadyInitialized" },
+  501: { message: "InvalidMinBond" },
+  502: { message: "InvalidMinReward" },
+  503: { message: "InvalidBond" },
+  504: { message: "Unauthorized" },
+  505: { message: "MinRewardNotEnough" },
+  506: { message: "RewardsInvalid" },
+  509: { message: "StakeNotFound" },
+  510: { message: "InvalidTime" },
+  511: { message: "DistributionExists" },
+  512: { message: "InvalidRewardAmount" },
+  513: { message: "InvalidMaxComplexity" },
+  514: { message: "DistributionNotFound" },
+  515: { message: "AdminNotSet" },
+  516: { message: "ContractMathError" },
+  517: { message: "RewardCurveDoesNotExist" },
+  518: { message: "SameAdmin" },
+  519: { message: "NoAdminChangeInPlace" },
+  520: { message: "AdminChangeExpired" },
 };
 
 export interface ConfigResponse {
@@ -161,51 +147,22 @@ export interface LiquidityPoolInitInfo {
   token_init_info: TokenInitInfo;
 }
 
+export interface AdminChange {
+  new_admin: string;
+  time_limit: Option<u64>;
+}
+
+export interface AutoUnstakeInfo {
+  stake_amount: i128;
+  stake_timestamp: u64;
+}
+
 export enum PoolType {
   Xyk = 0,
   Stable = 1,
 }
 
 export interface Client {
-  /**
-   * Construct and simulate a initialize transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
-   */
-  initialize: (
-    {
-      admin,
-      lp_token,
-      min_bond,
-      min_reward,
-      manager,
-      owner,
-      max_complexity,
-    }: {
-      admin: string;
-      lp_token: string;
-      min_bond: i128;
-      min_reward: i128;
-      manager: string;
-      owner: string;
-      max_complexity: u32;
-    },
-    options?: {
-      /**
-       * The fee to pay for the transaction. Default: BASE_FEE
-       */
-      fee?: number;
-
-      /**
-       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
-       */
-      timeoutInSeconds?: number;
-
-      /**
-       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
-       */
-      simulate?: boolean;
-    }
-  ) => Promise<AssembledTransaction<null>>;
-
   /**
    * Construct and simulate a bond transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
@@ -480,7 +437,25 @@ export interface Client {
 }
 export class Client extends ContractClient {
   static async deploy<T = Client>(
-    /** Options for initalizing a Client as well as for calling a method, with extras specific to deploying. */
+    /** Constructor/Initialization Args for the contract's `__constructor` method */
+    {
+      admin,
+      lp_token,
+      min_bond,
+      min_reward,
+      manager,
+      owner,
+      max_complexity,
+    }: {
+      admin: string;
+      lp_token: string;
+      min_bond: i128;
+      min_reward: i128;
+      manager: string;
+      owner: string;
+      max_complexity: u32;
+    },
+    /** Options for initializing a Client as well as for calling a method, with extras specific to deploying. */
     options: MethodOptions &
       Omit<ContractClientOptions, "contractId"> & {
         /** The hash of the Wasm blob, which must already be installed on-chain. */
@@ -491,12 +466,15 @@ export class Client extends ContractClient {
         format?: "hex" | "base64";
       }
   ): Promise<AssembledTransaction<T>> {
-    return ContractClient.deploy(null, options);
+    return ContractClient.deploy(
+      { admin, lp_token, min_bond, min_reward, manager, owner, max_complexity },
+      options
+    );
   }
   constructor(public readonly options: ContractClientOptions) {
     super(
       new ContractSpec([
-        "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAABwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAhscF90b2tlbgAAABMAAAAAAAAACG1pbl9ib25kAAAACwAAAAAAAAAKbWluX3Jld2FyZAAAAAAACwAAAAAAAAAHbWFuYWdlcgAAAAATAAAAAAAAAAVvd25lcgAAAAAAABMAAAAAAAAADm1heF9jb21wbGV4aXR5AAAAAAAEAAAAAA==",
+        "AAAAAAAAAAAAAAANX19jb25zdHJ1Y3RvcgAAAAAAAAcAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAIbHBfdG9rZW4AAAATAAAAAAAAAAhtaW5fYm9uZAAAAAsAAAAAAAAACm1pbl9yZXdhcmQAAAAAAAsAAAAAAAAAB21hbmFnZXIAAAAAEwAAAAAAAAAFb3duZXIAAAAAAAATAAAAAAAAAA5tYXhfY29tcGxleGl0eQAAAAAABAAAAAA=",
         "AAAAAAAAAAAAAAAEYm9uZAAAAAIAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAGdG9rZW5zAAAAAAALAAAAAA==",
         "AAAAAAAAAAAAAAAGdW5ib25kAAAAAAADAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAADHN0YWtlX2Ftb3VudAAAAAsAAAAAAAAAD3N0YWtlX3RpbWVzdGFtcAAAAAAGAAAAAA==",
         "AAAAAAAAAAAAAAAYY3JlYXRlX2Rpc3RyaWJ1dGlvbl9mbG93AAAAAgAAAAAAAAAGc2VuZGVyAAAAAAATAAAAAAAAAAVhc3NldAAAAAAAABMAAAAA",
@@ -510,7 +488,7 @@ export class Client extends ContractClient {
         "AAAAAAAAAAAAAAARbWlncmF0ZV9hZG1pbl9rZXkAAAAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
         "AAAAAAAAAAAAAAAGdXBkYXRlAAAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
         "AAAAAgAAAAAAAAAAAAAAE0Rpc3RyaWJ1dGlvbkRhdGFLZXkAAAAAAgAAAAEAAAAAAAAADVJld2FyZEhpc3RvcnkAAAAAAAABAAAAEwAAAAAAAAAAAAAAElRvdGFsU3Rha2VkSGlzdG9yeQAA",
-        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAOAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAAEAAAAAAAAADkludmFsaWRNaW5Cb25kAAAAAAACAAAAAAAAABBJbnZhbGlkTWluUmV3YXJkAAAAAwAAAAAAAAALSW52YWxpZEJvbmQAAAAABAAAAAAAAAAMVW5hdXRob3JpemVkAAAABQAAAAAAAAASTWluUmV3YXJkTm90RW5vdWdoAAAAAAAGAAAAAAAAAA5SZXdhcmRzSW52YWxpZAAAAAAABwAAAAAAAAANU3Rha2VOb3RGb3VuZAAAAAAAAAgAAAAAAAAAC0ludmFsaWRUaW1lAAAAAAkAAAAAAAAAEkRpc3RyaWJ1dGlvbkV4aXN0cwAAAAAACgAAAAAAAAATSW52YWxpZFJld2FyZEFtb3VudAAAAAALAAAAAAAAABRJbnZhbGlkTWF4Q29tcGxleGl0eQAAAAwAAAAAAAAAFERpc3RyaWJ1dGlvbk5vdEZvdW5kAAAADQAAAAAAAAALQWRtaW5Ob3RTZXQAAAAADg==",
+        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAATAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAfQAAAAAAAAADkludmFsaWRNaW5Cb25kAAAAAAH1AAAAAAAAABBJbnZhbGlkTWluUmV3YXJkAAAB9gAAAAAAAAALSW52YWxpZEJvbmQAAAAB9wAAAAAAAAAMVW5hdXRob3JpemVkAAAB+AAAAAAAAAASTWluUmV3YXJkTm90RW5vdWdoAAAAAAH5AAAAAAAAAA5SZXdhcmRzSW52YWxpZAAAAAAB+gAAAAAAAAANU3Rha2VOb3RGb3VuZAAAAAAAAf0AAAAAAAAAC0ludmFsaWRUaW1lAAAAAf4AAAAAAAAAEkRpc3RyaWJ1dGlvbkV4aXN0cwAAAAAB/wAAAAAAAAATSW52YWxpZFJld2FyZEFtb3VudAAAAAIAAAAAAAAAABRJbnZhbGlkTWF4Q29tcGxleGl0eQAAAgEAAAAAAAAAFERpc3RyaWJ1dGlvbk5vdEZvdW5kAAACAgAAAAAAAAALQWRtaW5Ob3RTZXQAAAACAwAAAAAAAAARQ29udHJhY3RNYXRoRXJyb3IAAAAAAAIEAAAAAAAAABdSZXdhcmRDdXJ2ZURvZXNOb3RFeGlzdAAAAAIFAAAAAAAAAAlTYW1lQWRtaW4AAAAAAAIGAAAAAAAAABROb0FkbWluQ2hhbmdlSW5QbGFjZQAAAgcAAAAAAAAAEkFkbWluQ2hhbmdlRXhwaXJlZAAAAAACCA==",
         "AAAAAQAAAAAAAAAAAAAADkNvbmZpZ1Jlc3BvbnNlAAAAAAABAAAAAAAAAAZjb25maWcAAAAAB9AAAAAGQ29uZmlnAAA=",
         "AAAAAQAAAAAAAAAAAAAADlN0YWtlZFJlc3BvbnNlAAAAAAADAAAAAAAAABBsYXN0X3Jld2FyZF90aW1lAAAABgAAAAAAAAAGc3Rha2VzAAAAAAPqAAAH0AAAAAVTdGFrZQAAAAAAAAAAAAALdG90YWxfc3Rha2UAAAAACw==",
         "AAAAAQAAAAAAAAAAAAAAEEFubnVhbGl6ZWRSZXdhcmQAAAACAAAAAAAAAAZhbW91bnQAAAAAABAAAAAAAAAABWFzc2V0AAAAAAAAEw==",
@@ -523,13 +501,14 @@ export class Client extends ContractClient {
         "AAAAAQAAAAAAAAAAAAAADVRva2VuSW5pdEluZm8AAAAAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
         "AAAAAQAAAAAAAAAAAAAADVN0YWtlSW5pdEluZm8AAAAAAAAEAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAADm1heF9jb21wbGV4aXR5AAAAAAAEAAAAAAAAAAhtaW5fYm9uZAAAAAsAAAAAAAAACm1pbl9yZXdhcmQAAAAAAAs=",
         "AAAAAQAAAAAAAAAAAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAkAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAUZGVmYXVsdF9zbGlwcGFnZV9icHMAAAAHAAAAAAAAAA1mZWVfcmVjaXBpZW50AAAAAAAAEwAAAAAAAAAYbWF4X2FsbG93ZWRfc2xpcHBhZ2VfYnBzAAAABwAAAAAAAAAWbWF4X2FsbG93ZWRfc3ByZWFkX2JwcwAAAAAABwAAAAAAAAAQbWF4X3JlZmVycmFsX2JwcwAAAAcAAAAAAAAAD3N0YWtlX2luaXRfaW5mbwAAAAfQAAAADVN0YWtlSW5pdEluZm8AAAAAAAAAAAAADHN3YXBfZmVlX2JwcwAAAAcAAAAAAAAAD3Rva2VuX2luaXRfaW5mbwAAAAfQAAAADVRva2VuSW5pdEluZm8AAAA=",
+        "AAAAAQAAAAAAAAAAAAAAC0FkbWluQ2hhbmdlAAAAAAIAAAAAAAAACW5ld19hZG1pbgAAAAAAABMAAAAAAAAACnRpbWVfbGltaXQAAAAAA+gAAAAG",
+        "AAAAAQAAAAAAAAAAAAAAD0F1dG9VbnN0YWtlSW5mbwAAAAACAAAAAAAAAAxzdGFrZV9hbW91bnQAAAALAAAAAAAAAA9zdGFrZV90aW1lc3RhbXAAAAAABg==",
         "AAAAAwAAAAAAAAAAAAAACFBvb2xUeXBlAAAAAgAAAAAAAAADWHlrAAAAAAAAAAAAAAAABlN0YWJsZQAAAAAAAQ==",
       ]),
       options
     );
   }
   public readonly fromJSON = {
-    initialize: this.txFromJSON<null>,
     bond: this.txFromJSON<null>,
     unbond: this.txFromJSON<null>,
     create_distribution_flow: this.txFromJSON<null>,

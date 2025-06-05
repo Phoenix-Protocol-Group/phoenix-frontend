@@ -33,8 +33,6 @@ import { useMediaQuery } from "@mui/system";
 
 /**
  * Accessibility properties for tabs.
- * @param {number} index - The index of the tab.
- * @returns {object} - Accessibility properties for the tab.
  */
 function a11yProps(index: number) {
   return {
@@ -45,9 +43,6 @@ function a11yProps(index: number) {
 
 /**
  * FilterAndTabPanel
- * Handles category selection, search, and sorting for the wallet table.
- * @param {FilterAndTabPanelProps} props - Filter and tab panel props.
- * @returns {JSX.Element}
  */
 const FilterAndTabPanel = ({
   categories,
@@ -72,7 +67,7 @@ const FilterAndTabPanel = ({
         display: "flex",
         flexDirection: "column",
         marginBottom: "16px",
-        gap: isMobile ? 0 : "24px", // Added gap for larger screens
+        gap: isMobile ? 0 : "24px",
       }}
     >
       <Grid container spacing={isMobile ? 2 : 3} alignItems="center">
@@ -80,7 +75,7 @@ const FilterAndTabPanel = ({
         <Grid item xs={12} md={2}>
           <Typography
             sx={{
-              color: "var(--Secondary-S2, #FFF)",
+              color: "var(--neutral-50, #FAFAFA)",
               fontFamily: "Ubuntu",
               fontSize: "24px",
               fontStyle: "normal",
@@ -102,7 +97,7 @@ const FilterAndTabPanel = ({
             flexWrap: "nowrap",
             flexDirection: isMobile ? "column" : "row",
             overflow: "hidden",
-            gap: isMobile ? 2 : 3, // Increased gap between elements for larger screens
+            gap: isMobile ? 2 : 3,
           }}
         >
           {/* Tabs for Filtering */}
@@ -113,15 +108,16 @@ const FilterAndTabPanel = ({
                 onChange={(e) => setCategory(e.target.value)}
                 displayEmpty
                 sx={{
-                  height: "48px",
-                  borderRadius: "16px",
-                  background: "#1D1F21",
-                  border: "1px solid #2D303A",
-                  color: "#FFF",
+                  height: "40px",
+                  borderRadius: "12px",
+                  background: "var(--neutral-900, #171717)",
+                  border: "1px solid var(--neutral-700, #404040)",
+                  color: "var(--neutral-300, #D4D4D4)",
+                  fontSize: "12px",
                   "& .MuiSelect-select": {
-                    fontSize: "13px",
-                    lineHeight: "18px",
-                    padding: "8px 16px",
+                    fontSize: "12px",
+                    lineHeight: "16px",
+                    padding: "8px 12px",
                   },
                 }}
               >
@@ -143,22 +139,23 @@ const FilterAndTabPanel = ({
                 "& .MuiTab-root.Mui-selected": {
                   fontSize: "1.125rem",
                   fontWeight: 700,
-                  color: "white",
+                  color: "var(--neutral-50, #FAFAFA)",
                 },
                 "& .MuiTab-root": {
                   textTransform: "none",
-                  height: "48px",
-                  minHeight: "48px",
-                  lineHeight: "48px",
+                  height: "40px",
+                  minHeight: "40px",
+                  lineHeight: "40px",
                   alignItems: "center",
                   flexShrink: 0,
+                  color: "var(--neutral-300, #D4D4D4)",
                 },
                 maxWidth: "50%",
               }}
               TabIndicatorProps={{
                 style: {
                   background:
-                    "linear-gradient(137deg, #E2491A 0%, #E21B1B 17.08%, #E2491A 42.71%, #E2AA1B 100%)",
+                    "linear-gradient(137deg, #F97316 0%, #F97316 17.08%, #F97316 42.71%, #F97316 100%)",
                 },
               }}
             >
@@ -177,33 +174,35 @@ const FilterAndTabPanel = ({
             sx={{
               flexGrow: 1,
               minWidth: "180px",
-              height: "48px",
-              borderRadius: "16px",
-              background: "#1D1F21",
-              lineHeight: "18px",
-              fontSize: "13px",
+              height: "40px",
+              borderRadius: "12px",
+              background: "var(--neutral-900, #171717)",
+              lineHeight: "16px",
+              fontSize: "12px",
               "& .MuiOutlinedInput-root": {
-                height: "48px",
-                padding: "0 12px",
+                height: "40px",
+                padding: "0 8px",
                 "& input": {
-                  padding: "12px 0",
+                  padding: "8px 0",
+                  fontSize: "12px",
+                  color: "var(--neutral-300, #D4D4D4)",
                 },
                 "& fieldset": {
                   borderColor: "transparent",
                 },
                 "&:hover fieldset": {
-                  borderColor: "#E2621B",
+                  borderColor: "var(--primary-500, #F97316)",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#E2621B",
+                  borderColor: "var(--primary-500, #F97316)",
                 },
               },
               "& .MuiInputAdornment-root img": {
                 marginRight: "8px",
               },
               "&::placeholder": {
-                color: "#FFF",
-                opacity: 0.6,
+                color: "var(--neutral-400, #A3A3A3)",
+                opacity: 1,
               },
             }}
             InputProps={{
@@ -219,7 +218,7 @@ const FilterAndTabPanel = ({
           <FormControl
             sx={{
               minWidth: 150,
-              height: "48px",
+              height: "40px",
               flexGrow: 0,
               flexShrink: 1,
             }}
@@ -230,16 +229,17 @@ const FilterAndTabPanel = ({
               displayEmpty
               inputProps={{ "aria-label": "Without label" }}
               sx={{
-                height: "48px",
-                borderRadius: "16px",
-                background: "#1D1F21",
-                border: "1px solid #2D303A",
+                height: "40px",
+                borderRadius: "12px",
+                background: "var(--neutral-900, #171717)",
+                border: "1px solid var(--neutral-700, #404040)",
                 padding: "0 12px",
-                color: "#FFF",
+                color: "var(--neutral-300, #D4D4D4)",
+                fontSize: "12px",
                 "& .MuiSelect-select": {
-                  fontSize: "13px",
-                  lineHeight: "18px",
-                  height: "48px",
+                  fontSize: "12px",
+                  lineHeight: "16px",
+                  height: "40px",
                   display: "flex",
                   alignItems: "center",
                 },
@@ -257,10 +257,6 @@ const FilterAndTabPanel = ({
 
 /**
  * ListItem
- * Represents a single token in the wallet balance table.
- * Supports adding/removing favorites and displaying token details.
- * @param {ListItemProps} props - Props for the list item.
- * @returns {JSX.Element}
  */
 const ListItem = ({
   token: { name, icon, usdValue, amount, contractId },
@@ -269,6 +265,7 @@ const ListItem = ({
   onVestingClick,
 }: ListItemProps) => {
   const [favorites, setFavorites] = useState<string[]>([]);
+  const isXLM = name === "XLM";
 
   useEffect(() => {
     const storedFavorites = JSON.parse(
@@ -283,74 +280,41 @@ const ListItem = ({
 
   return (
     <motion.div
+      whileHover={!isXLM ? { scale: 0.98 } : {}}
+      whileTap={!isXLM ? { scale: 0.95 } : {}}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.2 }}
     >
       <Box
         sx={{
           p: 2,
           borderRadius: "8px",
-          background:
-            "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          background: "var(--neutral-900, #171717)",
+          border: "1px solid var(--neutral-700, #404040)",
           mb: 2,
+          "&:hover": {
+            cursor: isXLM ? "default" : "pointer",
+          },
         }}
+        onClick={!isXLM ? () => onTokenClick(contractId) : undefined}
       >
         <Grid container alignItems="center" spacing={1}>
           <Grid item xs={6} md={3} display="flex" alignItems="center">
             <Box
               component={"img"}
               src={icon}
-              sx={{ width: "24px", height: "24px", mr: 2 }}
+              sx={{ width: "24px", height: "24px", mr: 1 }}
             />
             <Typography
-              sx={{ color: "#FFF", fontWeight: 700, fontSize: "14px" }}
+              sx={{
+                color: "var(--neutral-50, #FAFAFA)",
+                fontWeight: 500,
+                fontSize: "14px",
+              }}
             >
               {name}
             </Typography>
-            {name !== "XLM" && (
-              <Box
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  marginLeft: "8px",
-                }}
-              >
-                <Tooltip
-                  title="More information"
-                  arrow
-                  placement="top"
-                  sx={{
-                    "& .MuiTooltip-arrow": {
-                      color: "#E2491A",
-                    },
-                    "& .MuiTooltip-tooltip": {
-                      backgroundColor: "#1D1F21",
-                      color: "#FFF",
-                      fontSize: "12px",
-                    },
-                  }}
-                >
-                  <motion.div
-                    whileHover={{
-                      scale: 1.2,
-                      rotate: 15,
-                      transition: { duration: 0.2 },
-                    }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <InfoOutlined
-                      sx={{
-                        color: "#E2621B",
-                        fontSize: "20px",
-                      }}
-                      onClick={() => onTokenClick(contractId)}
-                    />
-                  </motion.div>
-                </Tooltip>
-              </Box>
-            )}
             {/* If Name = PHO and has vesting, show a lock button */}
             {name === "PHO" && hasVesting && (
               <Box
@@ -358,7 +322,7 @@ const ListItem = ({
                   display: "inline-flex",
                   alignItems: "center",
                   cursor: "pointer",
-                  marginLeft: "8px",
+                  marginLeft: "4px",
                 }}
               >
                 <Tooltip
@@ -367,12 +331,12 @@ const ListItem = ({
                   placement="top"
                   sx={{
                     "& .MuiTooltip-arrow": {
-                      color: "#E2491A",
+                      color: "var(--primary-500, #F97316)",
                     },
                     "& .MuiTooltip-tooltip": {
-                      backgroundColor: "#1D1F21",
-                      color: "#FFF",
-                      fontSize: "12px",
+                      backgroundColor: "var(--neutral-800, #262626)",
+                      color: "var(--neutral-300, #D4D4D4)",
+                      fontSize: "10px",
                     },
                   }}
                 >
@@ -387,11 +351,16 @@ const ListItem = ({
                   >
                     <Lock
                       sx={{
-                        color: "#E2621B",
-                        fontSize: "20px",
+                        color: "var(--primary-500, #F97316)",
+                        fontSize: "16px",
                       }}
                     />
-                    <Typography sx={{ color: "#E2621B", fontSize: "12px" }}>
+                    <Typography
+                      sx={{
+                        color: "var(--primary-500, #F97316)",
+                        fontSize: "10px",
+                      }}
+                    >
                       Vesting
                     </Typography>
                   </motion.div>
@@ -400,19 +369,30 @@ const ListItem = ({
             )}
           </Grid>
           <Grid item xs={6} md={3}>
-            <Typography sx={{ color: "#FFF", fontSize: "14px" }}>
+            <Typography
+              sx={{
+                color: "var(--neutral-50, #FAFAFA)",
+                fontSize: "14px",
+              }}
+            >
               {amount}
             </Typography>
           </Grid>
           <Grid item xs={6} md={3}>
-            <Typography sx={{ color: "#FFF", fontSize: "14px", opacity: 0.6 }}>
+            <Typography
+              sx={{
+                color: "var(--neutral-300, #D4D4D4)",
+                fontSize: "14px",
+                opacity: 1,
+              }}
+            >
               ${(usdValue * amount).toFixed(2)}
             </Typography>
           </Grid>
           <Grid item xs={6} md={3} display="flex" justifyContent="flex-end">
             {!favorites.includes(name) ? (
               <IconButton onClick={() => setFavorites([...favorites, name])}>
-                <StarBorderIcon sx={{ color: "#FFF" }} />
+                <StarBorderIcon sx={{ color: "var(--neutral-300, #D4D4D4)" }} />
               </IconButton>
             ) : (
               <IconButton
@@ -420,7 +400,7 @@ const ListItem = ({
                   setFavorites(favorites.filter((f) => f !== name))
                 }
               >
-                <StarIcon sx={{ color: "#FFF" }} />
+                <StarIcon sx={{ color: "var(--primary-500, #F97316)" }} />
               </IconButton>
             )}
           </Grid>
@@ -432,10 +412,6 @@ const ListItem = ({
 
 /**
  * WalletBalanceTable
- * Displays a list of tokens with search, sorting, and filtering capabilities.
- * Includes favorite functionality and modern styling.
- * @param {WalletBalanceTableProps} props - Props for the wallet balance table.
- * @returns {JSX.Element}
  */
 const WalletBalanceTable = ({
   tokens,
@@ -473,7 +449,7 @@ const WalletBalanceTable = ({
   return (
     <Box
       sx={{
-        borderRadius: "24px",
+        borderRadius: "16px",
         height: largerThanMd ? "26rem" : "auto",
         mb: { xs: 2, md: 0 },
       }}
@@ -497,12 +473,13 @@ const WalletBalanceTable = ({
             width: "4px",
           },
           "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "#E2491A",
+            backgroundColor: "var(--primary-500, #F97316)",
             borderRadius: "8px",
           },
           // Styles for Firefox
-          scrollbarWidth: "thin", // Thin scrollbar width
-          scrollbarColor: "#E2491A #2C2C31", // Thumb color and track color
+          scrollbarWidth: "thin",
+          scrollbarColor:
+            "var(--primary-500, #F97316) var(--neutral-800, #262626)",
         }}
       >
         {filteredTokens.length ? (
@@ -518,7 +495,7 @@ const WalletBalanceTable = ({
         ) : (
           <Typography
             sx={{
-              color: "#FFF",
+              color: "var(--neutral-300, #D4D4D4)",
               fontSize: "14px",
               textAlign: "center",
               pt: 2,

@@ -10,6 +10,12 @@ import {
 import { Box, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { PriceHistoryResponse } from "@phoenix-protocol/utils";
+import {
+  colors,
+  typography,
+  spacing,
+  borderRadius,
+} from "../../Theme/styleConstants";
 
 type HistoricalPrice = {
   price: number;
@@ -31,24 +37,27 @@ const tabUnselectedStyles = {
   gap: "0.625rem",
   borderRadius: "1rem",
   cursor: "pointer",
-  background:
-    "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+  color: "var(--neutral-300, #D4D4D4)",
+  background: "var(--neutral-900, #171717)",
+  border: "1px solid var(--neutral-700, #404040)",
 };
 
 const tabSelectedStyles = {
   borderRadius: "1rem",
-  border: "1px solid #E2571C",
   background: "rgba(226, 73, 26, 0.10)",
+  color: "var(--neutral-50, #FAFAFA)",
 };
 
 // Helper function to format data
 const formatData = (data: PriceHistoryResponse): DataPoint[] => {
-  return data.map((item) => {
-    return {
-      price: item.price,
-      timeStamp: new Date(Number(item.txTime) * 1000).getTime(),
-    };
-  });
+  return data
+    .filter((item) => item.price > 0) // Filter out zero price entries
+    .map((item) => {
+      return {
+        price: item.price,
+        timeStamp: new Date(Number(item.txTime) * 1000).getTime(),
+      };
+    });
 };
 
 const GlowingChart = ({
@@ -64,14 +73,15 @@ const GlowingChart = ({
     sx={{
       display: "flex",
       width: "100%",
-      padding: "1.5rem",
+      padding: spacing.lg,
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "flex-start",
-      gap: "1.5625rem",
-      borderRadius: "1.5rem",
-      background:
-        "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%)",
+      gap: spacing.lg,
+      borderRadius: borderRadius.lg,
+      background: colors.neutral[900],
+      border: `1px solid ${colors.neutral[700]}`,
+      height: "100%",
     }}
   >
     <Box
@@ -85,10 +95,10 @@ const GlowingChart = ({
       <Box>
         <Typography
           sx={{
-            color: "white",
-            fontFamily: "Ubuntu",
-            fontSize: "0.75rem",
-            fontWeight: 400,
+            color: colors.neutral[400],
+            fontFamily: typography.fontFamily,
+            fontSize: typography.fontSize.sm,
+            fontWeight: typography.fontWeights.regular,
             opacity: 0.6,
           }}
         >
@@ -101,10 +111,10 @@ const GlowingChart = ({
         </Typography>
         <Typography
           sx={{
-            color: "white",
-            fontFamily: "Ubuntu",
-            fontSize: "1.5rem",
-            fontWeight: 700,
+            color: colors.neutral[50],
+            fontFamily: typography.fontFamily,
+            fontSize: typography.fontSize.xl,
+            fontWeight: typography.fontWeights.bold,
           }}
         >
           ${data[data.length - 1].price.toFixed(2)}
@@ -185,14 +195,44 @@ const GlowingChart = ({
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <Box p={2} border={1} borderColor="grey.300">
-        <Typography variant="body2">{`Value: ${Number(payload[0].value).toFixed(
-          2
-        )}`}</Typography>
-        <Typography variant="body2">{`Date: ${new Date(
+      <Box
+        sx={{
+          background: "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
+          border: "1px solid #292B2C",
+          borderRadius: "0.5rem",
+          padding: "10px",
+          color: "white",
+          boxShadow:
+            "-3px 3px 10px 0px rgba(25, 13, 1, 0.10),-12px 13px 18px 0px rgba(25, 13, 1, 0.09),-26px 30px 24px 0px rgba(25, 13, 1, 0.05),-46px 53px 28px 0px rgba(25, 13, 1, 0.02),-73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
+        }}
+      >
+        <Typography
+          variant="body2"
+          sx={{
+            margin: 0,
+            color: "white",
+            fontSize: "0.875rem",
+            fontWeight: 600,
+          }}
+        >{`Value: ${Number(payload[0].value).toFixed(2)}`}</Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            margin: 0,
+            color: "white",
+            fontSize: "0.875rem",
+          }}
+        >{`Date: ${new Date(
           payload[0].payload.timeStamp
         ).toLocaleDateString()}`}</Typography>
-        <Typography variant="body2">{`Time: ${new Date(
+        <Typography
+          variant="body2"
+          sx={{
+            margin: 0,
+            color: "white",
+            fontSize: "0.875rem",
+          }}
+        >{`Time: ${new Date(
           payload[0].payload.timeStamp
         ).toLocaleTimeString()}`}</Typography>
       </Box>
@@ -213,7 +253,7 @@ const FinancialChart = ({
   const formattedData = formatData(historicalPrices);
 
   return (
-    <Box>
+    <Box sx={{ width: "100%", height: "100%" }}>
       <GlowingChart
         data={formattedData}
         selected={period}

@@ -20,11 +20,10 @@ const ArticleCard = ({ article }: { article: HelpCenterArticle }) => {
     <Card
       sx={{
         borderRadius: "0.75rem",
-        border: "1px solid #525252",
-        background:
-          "var(--card-bg, linear-gradient(180deg, #292B2C 0%, #1F2123 100%))",
+        border: "1px solid var(--neutral-700, #404040)",
+        background: "var(--neutral-900, #171717)",
         "&:hover": {
-          border: "1px solid #E2571E",
+          border: "1px solid var(--primary-500, #F97316)",
         },
         cursor: "pointer",
         position: "relative",
@@ -43,8 +42,8 @@ const ArticleCard = ({ article }: { article: HelpCenterArticle }) => {
           left: "1rem",
           top: "1rem",
           borderRadius: "1rem",
-          border: "1px solid var(--Primary-P3, #E2571C)",
-          background: "#3D3D3D",
+          border: "1px solid var(--primary-500, #F97316)",
+          background: "rgba(226, 73, 26, 0.10)",
         }}
       />
       <Box
@@ -60,13 +59,13 @@ const ArticleCard = ({ article }: { article: HelpCenterArticle }) => {
           left: "1rem",
           top: "1rem",
           borderRadius: "1rem",
-          border: "1px solid var(--Primary-P3, #E2571C)",
+          border: "1px solid var(--primary-500, #F97316)",
           background: "rgba(226, 73, 26, 0.10)",
         }}
       >
         <Typography
           sx={{
-            color: "var(--Secondary-S2, #FFF)",
+            color: "var(--neutral-50, #FAFAFA)",
             fontSize: "0.6875rem",
             textTransform: "uppercase",
             fontWeight: 700,
@@ -82,14 +81,14 @@ const ArticleCard = ({ article }: { article: HelpCenterArticle }) => {
         width="440px"
         image={`https://phoenix-helpcenter.pockethost.io/api/files/${collectionId}/${id}/${thumbnail}`}
         alt="Article image"
-        sx={{ bgcolor: "#2E2E2E" }}
+        sx={{ bgcolor: "var(--neutral-800, #262626)" }}
       />
       <CardContent>
         <Typography
           gutterBottom
           component="div"
           sx={{
-            color: "#FFF",
+            color: "var(--neutral-50, #FAFAFA)",
             fontFamily: "Ubuntu",
             fontSize: "1.125rem",
             fontStyle: "normal",
@@ -103,7 +102,7 @@ const ArticleCard = ({ article }: { article: HelpCenterArticle }) => {
           variant="body2"
           sx={{
             overflow: "hidden",
-            color: "var(--Secondary-S2-2, #BDBEBE)",
+            color: "var(--neutral-300, #D4D4D4)",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
             fontFamily: "Ubuntu",

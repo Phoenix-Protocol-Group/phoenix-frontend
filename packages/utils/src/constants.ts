@@ -47,6 +47,8 @@ export const AIRDROP_POOL_ADDRESSES: string[] = [
   "CAZ6W4WHVGQBGURYTUOLCUOOHW6VQGAAPSPCD72VEDZMBBPY7H43AYEC",
 ];
 
+export const PHOENIX_BASE_FEE = "100000";
+
 /**
  * Vesting contract address
  */

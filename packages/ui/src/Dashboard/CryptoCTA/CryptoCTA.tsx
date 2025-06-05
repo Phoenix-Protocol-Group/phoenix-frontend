@@ -7,12 +7,12 @@ const CryptoCTA = ({ onClick }: CryptoCTAProps) => {
   return (
     <Box
       sx={{
-        borderRadius: "24px",
-        border: "2px solid #E2621B",
-        p: "2.5rem",
+        borderRadius: "12px",
+        border: "1px solid var(--primary-500, #F97316)",
+        p: "1.5rem",
         height: "26rem",
-        background:
-          "linear-gradient(137deg, rgba(226, 73, 26, 0.20) 0%, rgba(226, 27, 27, 0.20) 17.08%, rgba(226, 73, 26, 0.20) 42.71%, rgba(226, 170, 27, 0.20) 100%)",
+        background: "rgba(226, 73, 26, 0.10)",
+        mt: "1.5rem",
       }}
     >
       <Box
@@ -26,24 +26,33 @@ const CryptoCTA = ({ onClick }: CryptoCTAProps) => {
         <Box component="img" src="/banklocker.png" sx={{ mt: "-80px" }} />
         <Typography
           sx={{
-            fontSize: "2.5rem",
-            fontFamily: "Poppins",
-            lineHeight: "3.125rem",
+            fontSize: "2rem",
+            fontFamily: "Ubuntu",
+            lineHeight: "2.5rem",
+            color: "var(--neutral-50, #FAFAFA)",
           }}
         >
           Need More
         </Typography>
         <Typography
           sx={{
-            fontSize: "2.5rem",
-            fontWeight: 900,
-            fontFamily: "Poppins",
-            lineHeight: "3.125rem",
+            fontSize: "2rem",
+            fontWeight: 700,
+            fontFamily: "Ubuntu",
+            lineHeight: "2.5rem",
+            color: "var(--neutral-50, #FAFAFA)",
           }}
         >
           Crypto?
         </Typography>
-        <Typography sx={{ fontSize: "0.875rem", opacity: 0.4, mt: "0.5rem" }}>
+        <Typography
+          sx={{
+            fontSize: "0.875rem",
+            opacity: 0.6,
+            mt: "0.5rem",
+            color: "var(--neutral-300, #D4D4D4)",
+          }}
+        >
           You can easily deposit now!
         </Typography>
         <Button

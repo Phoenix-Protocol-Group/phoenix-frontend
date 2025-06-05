@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { MainStats } from "./MainStats";
+import React from "react";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof MainStats> = {

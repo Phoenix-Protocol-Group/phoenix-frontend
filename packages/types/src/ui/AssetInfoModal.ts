@@ -1,7 +1,38 @@
+import { Pool } from "./Pools";
+
 export interface AssetInfoModalProps {
   open: boolean;
   onClose: () => void;
   asset: AssetInfo;
+  userBalance: number;
+  loading: boolean;
+  tradingVolume7d: {
+    date?: {
+      day?: number;
+      month?: number;
+      year: number;
+    };
+    time?: {
+      hour: number;
+      date?: {
+        day: number;
+        month: number;
+        year: number;
+      };
+    };
+    week?: {
+      week: number;
+      year: number;
+    };
+    month?: {
+      month: number;
+      year: number;
+    };
+    tokenAVolume: string;
+    tokenBVolume: string;
+    usdVolume: number;
+  }[];
+  pools: Pool[];
 }
 
 export interface AssetInfo {

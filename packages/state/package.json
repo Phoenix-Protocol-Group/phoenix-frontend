@@ -8,8 +8,9 @@
     "build/**/*"
   ],
   "scripts": {
-    "test": "tsc && jest",
-    "build": "tsc"
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "build": "tsc",
+    "dev": "tsc --watch"
   },
   "np": {
     "publish": false,

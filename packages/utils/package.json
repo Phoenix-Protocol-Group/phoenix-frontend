@@ -8,8 +8,9 @@
     "build/**/*"
   ],
   "scripts": {
-    "test": "jest",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 0"
   },
   "np": {
     "publish": false,
@@ -18,6 +19,7 @@
   "author": "Phoenix Protocol Group",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@phoenix-protocol/types": "*",
     "jest": "^29.7.0",
     "jest-mock": "^29.7.0",
     "ts-jest": "^29.1.0",

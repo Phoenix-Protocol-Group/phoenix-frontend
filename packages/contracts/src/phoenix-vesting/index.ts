@@ -1,5 +1,4 @@
 import { Buffer } from "buffer";
-import { Address } from "@stellar/stellar-sdk";
 import {
   AssembledTransaction,
   Client as ContractClient,
@@ -10,16 +9,11 @@ import {
 } from "@stellar/stellar-sdk/contract";
 import type {
   u32,
-  i32,
   u64,
   i64,
   u128,
   i128,
-  u256,
-  i256,
   Option,
-  Typepoint,
-  Duration,
 } from "@stellar/stellar-sdk/contract";
 export * from "@stellar/stellar-sdk";
 export * as contract from "@stellar/stellar-sdk/contract";
@@ -31,74 +25,86 @@ if (typeof window !== "undefined") {
 }
 
 export const Errors = {
-  0: { message: "Std" },
+  700: { message: "VestingNotFoundForAddress" },
 
-  1: { message: "VestingNotFoundForAddress" },
+  701: { message: "AllowanceNotFoundForGivenPair" },
 
-  2: { message: "AllowanceNotFoundForGivenPair" },
+  702: { message: "MinterNotFound" },
 
-  3: { message: "MinterNotFound" },
+  703: { message: "NoBalanceFoundForAddress" },
 
-  4: { message: "NoBalanceFoundForAddress" },
+  704: { message: "NoConfigFound" },
 
-  5: { message: "NoConfigFound" },
+  705: { message: "NoAdminFound" },
 
-  6: { message: "NoAdminFound" },
+  706: { message: "MissingBalance" },
 
-  7: { message: "MissingBalance" },
+  707: { message: "VestingComplexityTooHigh" },
 
-  8: { message: "VestingComplexityTooHigh" },
+  708: { message: "TotalVestedOverCapacity" },
 
-  9: { message: "TotalVestedOverCapacity" },
+  709: { message: "InvalidTransferAmount" },
 
-  10: { message: "InvalidTransferAmount" },
+  710: { message: "CantMoveVestingTokens" },
 
-  11: { message: "CantMoveVestingTokens" },
+  711: { message: "NotEnoughCapacity" },
 
-  12: { message: "NotEnoughCapacity" },
+  712: { message: "NotAuthorized" },
 
-  13: { message: "NotAuthorized" },
+  713: { message: "NeverFullyVested" },
 
-  14: { message: "NeverFullyVested" },
+  714: { message: "VestsMoreThanSent" },
 
-  15: { message: "VestsMoreThanSent" },
+  715: { message: "InvalidBurnAmount" },
 
-  16: { message: "InvalidBurnAmount" },
+  716: { message: "InvalidMintAmount" },
 
-  17: { message: "InvalidMintAmount" },
+  717: { message: "InvalidAllowanceAmount" },
 
-  18: { message: "InvalidAllowanceAmount" },
+  718: { message: "DuplicateInitialBalanceAddresses" },
 
-  19: { message: "DuplicateInitialBalanceAddresses" },
+  719: { message: "CurveError" },
 
-  20: { message: "CurveError" },
+  720: { message: "NoWhitelistFound" },
 
-  21: { message: "NoWhitelistFound" },
+  721: { message: "NoTokenInfoFound" },
 
-  22: { message: "NoTokenInfoFound" },
+  722: { message: "NoVestingComplexityValueFound" },
 
-  23: { message: "NoVestingComplexityValueFound" },
+  723: { message: "NoAddressesToAdd" },
 
-  24: { message: "NoAddressesToAdd" },
+  724: { message: "NoEnoughtTokensToStart" },
 
-  25: { message: "NoEnoughtTokensToStart" },
+  725: { message: "NotEnoughBalance" },
 
-  26: { message: "NotEnoughBalance" },
+  726: { message: "VestingBothPresent" },
 
-  27: { message: "VestingBothPresent" },
+  727: { message: "VestingNonePresent" },
 
-  28: { message: "VestingNonePresent" },
+  728: { message: "CurveConstant" },
 
-  29: { message: "CurveConstant" },
+  729: { message: "CurveSLNotDecreasing" },
 
-  30: { message: "CurveSLNotDecreasing" },
+  730: { message: "AlreadyInitialized" },
 
-  31: { message: "AlreadyInitialized" },
+  731: { message: "AdminNotFound" },
 
-  32: { message: "AdminNotFound" },
+  732: { message: "ContractMathError" },
 
-  33: { message: "ContractMathError" },
+  733: { message: "SameAdmin" },
+
+  734: { message: "NoAdminChangeInPlace" },
+
+  735: { message: "AdminChangeExpired" },
+
+  745: { message: "SameTokenAddress" },
+
+  746: { message: "InvalidMaxComplexity" },
 };
+
+export interface Config {
+  is_with_minter: boolean;
+}
 
 export interface VestingTokenInfo {
   address: string;
@@ -219,76 +225,22 @@ export interface LiquidityPoolInitInfo {
   token_init_info: TokenInitInfo;
 }
 
+export interface AdminChange {
+  new_admin: string;
+  time_limit: Option<u64>;
+}
+
+export interface AutoUnstakeInfo {
+  stake_amount: i128;
+  stake_timestamp: u64;
+}
+
 export enum PoolType {
   Xyk = 0,
   Stable = 1,
 }
 
 export interface Client {
-  /**
-   * Construct and simulate a initialize transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
-   */
-  initialize: (
-    {
-      admin,
-      vesting_token,
-      max_vesting_complexity,
-    }: {
-      admin: string;
-      vesting_token: VestingTokenInfo;
-      max_vesting_complexity: u32;
-    },
-    options?: {
-      /**
-       * The fee to pay for the transaction. Default: BASE_FEE
-       */
-      fee?: number;
-
-      /**
-       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
-       */
-      timeoutInSeconds?: number;
-
-      /**
-       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
-       */
-      simulate?: boolean;
-    }
-  ) => Promise<AssembledTransaction<null>>;
-
-  /**
-   * Construct and simulate a initialize_with_minter transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
-   */
-  initialize_with_minter: (
-    {
-      admin,
-      vesting_token,
-      max_vesting_complexity,
-      minter_info,
-    }: {
-      admin: string;
-      vesting_token: VestingTokenInfo;
-      max_vesting_complexity: u32;
-      minter_info: MinterInfo;
-    },
-    options?: {
-      /**
-       * The fee to pay for the transaction. Default: BASE_FEE
-       */
-      fee?: number;
-
-      /**
-       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
-       */
-      timeoutInSeconds?: number;
-
-      /**
-       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
-       */
-      simulate?: boolean;
-    }
-  ) => Promise<AssembledTransaction<null>>;
-
   /**
    * Construct and simulate a create_vesting_schedules transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
@@ -537,6 +489,26 @@ export interface Client {
   }) => Promise<AssembledTransaction<MinterInfo>>;
 
   /**
+   * Construct and simulate a query_config transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  query_config: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Config>>;
+
+  /**
    * Construct and simulate a query_vesting_contract_balance transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
   query_vesting_contract_balance: (options?: {
@@ -578,6 +550,52 @@ export interface Client {
       simulate?: boolean;
     }
   ) => Promise<AssembledTransaction<i128>>;
+
+  /**
+   * Construct and simulate a update_vesting_token transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  update_vesting_token: (
+    { new_token_address }: { new_token_address: string },
+    options?: {
+      /**
+       * The fee to pay for the transaction. Default: BASE_FEE
+       */
+      fee?: number;
+
+      /**
+       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+       */
+      timeoutInSeconds?: number;
+
+      /**
+       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+       */
+      simulate?: boolean;
+    }
+  ) => Promise<AssembledTransaction<Result<void>>>;
+
+  /**
+   * Construct and simulate a update_max_complexity transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  update_max_complexity: (
+    { new_max_complexity }: { new_max_complexity: u32 },
+    options?: {
+      /**
+       * The fee to pay for the transaction. Default: BASE_FEE
+       */
+      fee?: number;
+
+      /**
+       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+       */
+      timeoutInSeconds?: number;
+
+      /**
+       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+       */
+      simulate?: boolean;
+    }
+  ) => Promise<AssembledTransaction<Result<void>>>;
 
   /**
    * Construct and simulate a update transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
@@ -623,6 +641,69 @@ export interface Client {
   }) => Promise<AssembledTransaction<Result<void>>>;
 
   /**
+   * Construct and simulate a propose_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  propose_admin: (
+    { new_admin, time_limit }: { new_admin: string; time_limit: Option<u64> },
+    options?: {
+      /**
+       * The fee to pay for the transaction. Default: BASE_FEE
+       */
+      fee?: number;
+
+      /**
+       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+       */
+      timeoutInSeconds?: number;
+
+      /**
+       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+       */
+      simulate?: boolean;
+    }
+  ) => Promise<AssembledTransaction<Result<string>>>;
+
+  /**
+   * Construct and simulate a revoke_admin_change transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  revoke_admin_change: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<void>>>;
+
+  /**
+   * Construct and simulate a accept_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  accept_admin: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<Result<string>>>;
+
+  /**
    * Construct and simulate a add_new_key_to_storage transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
   add_new_key_to_storage: (options?: {
@@ -641,9 +722,41 @@ export interface Client {
      */
     simulate?: boolean;
   }) => Promise<AssembledTransaction<Result<void>>>;
+
+  /**
+   * Construct and simulate a query_version transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
+   */
+  query_version: (options?: {
+    /**
+     * The fee to pay for the transaction. Default: BASE_FEE
+     */
+    fee?: number;
+
+    /**
+     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+     */
+    timeoutInSeconds?: number;
+
+    /**
+     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+     */
+    simulate?: boolean;
+  }) => Promise<AssembledTransaction<string>>;
 }
 export class Client extends ContractClient {
   static async deploy<T = Client>(
+    /** Constructor/Initialization Args for the contract's `__constructor` method */
+    {
+      admin,
+      vesting_token,
+      max_vesting_complexity,
+      minter_info,
+    }: {
+      admin: string;
+      vesting_token: VestingTokenInfo;
+      max_vesting_complexity: u32;
+      minter_info: Option<MinterInfo>;
+    },
     /** Options for initalizing a Client as well as for calling a method, with extras specific to deploying. */
     options: MethodOptions &
       Omit<ContractClientOptions, "contractId"> & {
@@ -655,13 +768,14 @@ export class Client extends ContractClient {
         format?: "hex" | "base64";
       }
   ): Promise<AssembledTransaction<T>> {
-    return ContractClient.deploy(null, options);
+    return ContractClient.deploy(
+      { admin, vesting_token, max_vesting_complexity, minter_info },
+      options
+    );
   }
   constructor(public readonly options: ContractClientOptions) {
     super(
       new ContractSpec([
-        "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAA12ZXN0aW5nX3Rva2VuAAAAAAAH0AAAABBWZXN0aW5nVG9rZW5JbmZvAAAAAAAAABZtYXhfdmVzdGluZ19jb21wbGV4aXR5AAAAAAAEAAAAAA==",
-        "AAAAAAAAAAAAAAAWaW5pdGlhbGl6ZV93aXRoX21pbnRlcgAAAAAABAAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAA12ZXN0aW5nX3Rva2VuAAAAAAAH0AAAABBWZXN0aW5nVG9rZW5JbmZvAAAAAAAAABZtYXhfdmVzdGluZ19jb21wbGV4aXR5AAAAAAAEAAAAAAAAAAttaW50ZXJfaW5mbwAAAAfQAAAACk1pbnRlckluZm8AAAAAAAA=",
         "AAAAAAAAAAAAAAAYY3JlYXRlX3Zlc3Rpbmdfc2NoZWR1bGVzAAAAAQAAAAAAAAARdmVzdGluZ19zY2hlZHVsZXMAAAAAAAPqAAAH0AAAAA9WZXN0aW5nU2NoZWR1bGUAAAAAAA==",
         "AAAAAAAAAAAAAAAFY2xhaW0AAAAAAAACAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAABWluZGV4AAAAAAAABgAAAAA=",
         "AAAAAAAAAAAAAAAEYnVybgAAAAIAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAGYW1vdW50AAAAAAAKAAAAAA==",
@@ -673,12 +787,21 @@ export class Client extends ContractClient {
         "AAAAAAAAAAAAAAAWcXVlcnlfYWxsX3Zlc3RpbmdfaW5mbwAAAAAAAQAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAQAAA+oAAAfQAAAAE1Zlc3RpbmdJbmZvUmVzcG9uc2UA",
         "AAAAAAAAAAAAAAAQcXVlcnlfdG9rZW5faW5mbwAAAAAAAAABAAAH0AAAABBWZXN0aW5nVG9rZW5JbmZv",
         "AAAAAAAAAAAAAAAMcXVlcnlfbWludGVyAAAAAAAAAAEAAAfQAAAACk1pbnRlckluZm8AAA==",
+        "AAAAAAAAAAAAAAAMcXVlcnlfY29uZmlnAAAAAAAAAAEAAAfQAAAABkNvbmZpZwAA",
         "AAAAAAAAAAAAAAAecXVlcnlfdmVzdGluZ19jb250cmFjdF9iYWxhbmNlAAAAAAAAAAAAAQAAAAs=",
         "AAAAAAAAAAAAAAAYcXVlcnlfYXZhaWxhYmxlX3RvX2NsYWltAAAAAgAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAAAAAAVpbmRleAAAAAAAAAYAAAABAAAACw==",
+        "AAAAAAAAAAAAAAAUdXBkYXRlX3Zlc3RpbmdfdG9rZW4AAAABAAAAAAAAABFuZXdfdG9rZW5fYWRkcmVzcwAAAAAAABMAAAABAAAD6QAAA+0AAAAAAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+        "AAAAAAAAAAAAAAAVdXBkYXRlX21heF9jb21wbGV4aXR5AAAAAAAAAQAAAAAAAAASbmV3X21heF9jb21wbGV4aXR5AAAAAAAEAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
         "AAAAAAAAAAAAAAAGdXBkYXRlAAAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
         "AAAAAAAAAAAAAAARbWlncmF0ZV9hZG1pbl9rZXkAAAAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+        "AAAAAAAAAAAAAAANcHJvcG9zZV9hZG1pbgAAAAAAAAIAAAAAAAAACW5ld19hZG1pbgAAAAAAABMAAAAAAAAACnRpbWVfbGltaXQAAAAAA+gAAAAGAAAAAQAAA+kAAAATAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+        "AAAAAAAAAAAAAAATcmV2b2tlX2FkbWluX2NoYW5nZQAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+        "AAAAAAAAAAAAAAAMYWNjZXB0X2FkbWluAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+        "AAAAAAAAAAAAAAANX19jb25zdHJ1Y3RvcgAAAAAAAAQAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAANdmVzdGluZ190b2tlbgAAAAAAB9AAAAAQVmVzdGluZ1Rva2VuSW5mbwAAAAAAAAAWbWF4X3Zlc3RpbmdfY29tcGxleGl0eQAAAAAABAAAAAAAAAALbWludGVyX2luZm8AAAAD6AAAB9AAAAAKTWludGVySW5mbwAAAAAAAA==",
         "AAAAAAAAAAAAAAAWYWRkX25ld19rZXlfdG9fc3RvcmFnZQAAAAAAAAAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
-        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAiAAAAAAAAAANTdGQAAAAAAAAAAAAAAAAZVmVzdGluZ05vdEZvdW5kRm9yQWRkcmVzcwAAAAAAAAEAAAAAAAAAHUFsbG93YW5jZU5vdEZvdW5kRm9yR2l2ZW5QYWlyAAAAAAAAAgAAAAAAAAAOTWludGVyTm90Rm91bmQAAAAAAAMAAAAAAAAAGE5vQmFsYW5jZUZvdW5kRm9yQWRkcmVzcwAAAAQAAAAAAAAADU5vQ29uZmlnRm91bmQAAAAAAAAFAAAAAAAAAAxOb0FkbWluRm91bmQAAAAGAAAAAAAAAA5NaXNzaW5nQmFsYW5jZQAAAAAABwAAAAAAAAAYVmVzdGluZ0NvbXBsZXhpdHlUb29IaWdoAAAACAAAAAAAAAAXVG90YWxWZXN0ZWRPdmVyQ2FwYWNpdHkAAAAACQAAAAAAAAAVSW52YWxpZFRyYW5zZmVyQW1vdW50AAAAAAAACgAAAAAAAAAVQ2FudE1vdmVWZXN0aW5nVG9rZW5zAAAAAAAACwAAAAAAAAARTm90RW5vdWdoQ2FwYWNpdHkAAAAAAAAMAAAAAAAAAA1Ob3RBdXRob3JpemVkAAAAAAAADQAAAAAAAAAQTmV2ZXJGdWxseVZlc3RlZAAAAA4AAAAAAAAAEVZlc3RzTW9yZVRoYW5TZW50AAAAAAAADwAAAAAAAAARSW52YWxpZEJ1cm5BbW91bnQAAAAAAAAQAAAAAAAAABFJbnZhbGlkTWludEFtb3VudAAAAAAAABEAAAAAAAAAFkludmFsaWRBbGxvd2FuY2VBbW91bnQAAAAAABIAAAAAAAAAIER1cGxpY2F0ZUluaXRpYWxCYWxhbmNlQWRkcmVzc2VzAAAAEwAAAAAAAAAKQ3VydmVFcnJvcgAAAAAAFAAAAAAAAAAQTm9XaGl0ZWxpc3RGb3VuZAAAABUAAAAAAAAAEE5vVG9rZW5JbmZvRm91bmQAAAAWAAAAAAAAAB1Ob1Zlc3RpbmdDb21wbGV4aXR5VmFsdWVGb3VuZAAAAAAAABcAAAAAAAAAEE5vQWRkcmVzc2VzVG9BZGQAAAAYAAAAAAAAABZOb0Vub3VnaHRUb2tlbnNUb1N0YXJ0AAAAAAAZAAAAAAAAABBOb3RFbm91Z2hCYWxhbmNlAAAAGgAAAAAAAAASVmVzdGluZ0JvdGhQcmVzZW50AAAAAAAbAAAAAAAAABJWZXN0aW5nTm9uZVByZXNlbnQAAAAAABwAAAAAAAAADUN1cnZlQ29uc3RhbnQAAAAAAAAdAAAAAAAAABRDdXJ2ZVNMTm90RGVjcmVhc2luZwAAAB4AAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAAAHwAAAAAAAAANQWRtaW5Ob3RGb3VuZAAAAAAAACAAAAAAAAAAEUNvbnRyYWN0TWF0aEVycm9yAAAAAAAAIQ==",
+        "AAAAAAAAAAAAAAANcXVlcnlfdmVyc2lvbgAAAAAAAAAAAAABAAAAEA==",
+        "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAmAAAAAAAAABlWZXN0aW5nTm90Rm91bmRGb3JBZGRyZXNzAAAAAAACvAAAAAAAAAAdQWxsb3dhbmNlTm90Rm91bmRGb3JHaXZlblBhaXIAAAAAAAK9AAAAAAAAAA5NaW50ZXJOb3RGb3VuZAAAAAACvgAAAAAAAAAYTm9CYWxhbmNlRm91bmRGb3JBZGRyZXNzAAACvwAAAAAAAAANTm9Db25maWdGb3VuZAAAAAAAAsAAAAAAAAAADE5vQWRtaW5Gb3VuZAAAAsEAAAAAAAAADk1pc3NpbmdCYWxhbmNlAAAAAALCAAAAAAAAABhWZXN0aW5nQ29tcGxleGl0eVRvb0hpZ2gAAALDAAAAAAAAABdUb3RhbFZlc3RlZE92ZXJDYXBhY2l0eQAAAALEAAAAAAAAABVJbnZhbGlkVHJhbnNmZXJBbW91bnQAAAAAAALFAAAAAAAAABVDYW50TW92ZVZlc3RpbmdUb2tlbnMAAAAAAALGAAAAAAAAABFOb3RFbm91Z2hDYXBhY2l0eQAAAAAAAscAAAAAAAAADU5vdEF1dGhvcml6ZWQAAAAAAALIAAAAAAAAABBOZXZlckZ1bGx5VmVzdGVkAAACyQAAAAAAAAARVmVzdHNNb3JlVGhhblNlbnQAAAAAAALKAAAAAAAAABFJbnZhbGlkQnVybkFtb3VudAAAAAAAAssAAAAAAAAAEUludmFsaWRNaW50QW1vdW50AAAAAAACzAAAAAAAAAAWSW52YWxpZEFsbG93YW5jZUFtb3VudAAAAAACzQAAAAAAAAAgRHVwbGljYXRlSW5pdGlhbEJhbGFuY2VBZGRyZXNzZXMAAALOAAAAAAAAAApDdXJ2ZUVycm9yAAAAAALPAAAAAAAAABBOb1doaXRlbGlzdEZvdW5kAAAC0AAAAAAAAAAQTm9Ub2tlbkluZm9Gb3VuZAAAAtEAAAAAAAAAHU5vVmVzdGluZ0NvbXBsZXhpdHlWYWx1ZUZvdW5kAAAAAAAC0gAAAAAAAAAQTm9BZGRyZXNzZXNUb0FkZAAAAtMAAAAAAAAAFk5vRW5vdWdodFRva2Vuc1RvU3RhcnQAAAAAAtQAAAAAAAAAEE5vdEVub3VnaEJhbGFuY2UAAALVAAAAAAAAABJWZXN0aW5nQm90aFByZXNlbnQAAAAAAtYAAAAAAAAAElZlc3RpbmdOb25lUHJlc2VudAAAAAAC1wAAAAAAAAANQ3VydmVDb25zdGFudAAAAAAAAtgAAAAAAAAAFEN1cnZlU0xOb3REZWNyZWFzaW5nAAAC2QAAAAAAAAASQWxyZWFkeUluaXRpYWxpemVkAAAAAALaAAAAAAAAAA1BZG1pbk5vdEZvdW5kAAAAAAAC2wAAAAAAAAARQ29udHJhY3RNYXRoRXJyb3IAAAAAAALcAAAAAAAAAAlTYW1lQWRtaW4AAAAAAALdAAAAAAAAABROb0FkbWluQ2hhbmdlSW5QbGFjZQAAAt4AAAAAAAAAEkFkbWluQ2hhbmdlRXhwaXJlZAAAAAAC3wAAAAAAAAAQU2FtZVRva2VuQWRkcmVzcwAAAukAAAAAAAAAFEludmFsaWRNYXhDb21wbGV4aXR5AAAC6g==",
+        "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAAAQAAAAAAAAAOaXNfd2l0aF9taW50ZXIAAAAAAAE=",
         "AAAAAQAAAAAAAAAAAAAAEFZlc3RpbmdUb2tlbkluZm8AAAAEAAAAAAAAAAdhZGRyZXNzAAAAABMAAAAAAAAACGRlY2ltYWxzAAAABAAAAAAAAAAEbmFtZQAAABAAAAAAAAAABnN5bWJvbAAAAAAAEA==",
         "AAAAAQAAAAAAAAAAAAAAD1Zlc3RpbmdTY2hlZHVsZQAAAAACAAAAAAAAAAVjdXJ2ZQAAAAAAB9AAAAAFQ3VydmUAAAAAAAAAAAAACXJlY2lwaWVudAAAAAAAABM=",
         "AAAAAQAAAAAAAAAAAAAAC1Zlc3RpbmdJbmZvAAAAAAMAAAAAAAAAB2JhbGFuY2UAAAAACgAAAAAAAAAJcmVjaXBpZW50AAAAAAAAEwAAAAAAAAAIc2NoZWR1bGUAAAfQAAAABUN1cnZlAAAA",
@@ -693,14 +816,14 @@ export class Client extends ContractClient {
         "AAAAAQAAAAAAAAAAAAAADVRva2VuSW5pdEluZm8AAAAAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
         "AAAAAQAAAAAAAAAAAAAADVN0YWtlSW5pdEluZm8AAAAAAAAEAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAADm1heF9jb21wbGV4aXR5AAAAAAAEAAAAAAAAAAhtaW5fYm9uZAAAAAsAAAAAAAAACm1pbl9yZXdhcmQAAAAAAAs=",
         "AAAAAQAAAAAAAAAAAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAkAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAUZGVmYXVsdF9zbGlwcGFnZV9icHMAAAAHAAAAAAAAAA1mZWVfcmVjaXBpZW50AAAAAAAAEwAAAAAAAAAYbWF4X2FsbG93ZWRfc2xpcHBhZ2VfYnBzAAAABwAAAAAAAAAWbWF4X2FsbG93ZWRfc3ByZWFkX2JwcwAAAAAABwAAAAAAAAAQbWF4X3JlZmVycmFsX2JwcwAAAAcAAAAAAAAAD3N0YWtlX2luaXRfaW5mbwAAAAfQAAAADVN0YWtlSW5pdEluZm8AAAAAAAAAAAAADHN3YXBfZmVlX2JwcwAAAAcAAAAAAAAAD3Rva2VuX2luaXRfaW5mbwAAAAfQAAAADVRva2VuSW5pdEluZm8AAAA=",
+        "AAAAAQAAAAAAAAAAAAAAC0FkbWluQ2hhbmdlAAAAAAIAAAAAAAAACW5ld19hZG1pbgAAAAAAABMAAAAAAAAACnRpbWVfbGltaXQAAAAAA+gAAAAG",
+        "AAAAAQAAAAAAAAAAAAAAD0F1dG9VbnN0YWtlSW5mbwAAAAACAAAAAAAAAAxzdGFrZV9hbW91bnQAAAALAAAAAAAAAA9zdGFrZV90aW1lc3RhbXAAAAAABg==",
         "AAAAAwAAAAAAAAAAAAAACFBvb2xUeXBlAAAAAgAAAAAAAAADWHlrAAAAAAAAAAAAAAAABlN0YWJsZQAAAAAAAQ==",
       ]),
       options
     );
   }
   public readonly fromJSON = {
-    initialize: this.txFromJSON<null>,
-    initialize_with_minter: this.txFromJSON<null>,
     create_vesting_schedules: this.txFromJSON<null>,
     claim: this.txFromJSON<null>,
     burn: this.txFromJSON<null>,
@@ -712,10 +835,17 @@ export class Client extends ContractClient {
     query_all_vesting_info: this.txFromJSON<Array<VestingInfoResponse>>,
     query_token_info: this.txFromJSON<VestingTokenInfo>,
     query_minter: this.txFromJSON<MinterInfo>,
+    query_config: this.txFromJSON<Config>,
     query_vesting_contract_balance: this.txFromJSON<i128>,
     query_available_to_claim: this.txFromJSON<i128>,
+    update_vesting_token: this.txFromJSON<Result<void>>,
+    update_max_complexity: this.txFromJSON<Result<void>>,
     update: this.txFromJSON<null>,
     migrate_admin_key: this.txFromJSON<Result<void>>,
+    propose_admin: this.txFromJSON<Result<string>>,
+    revoke_admin_change: this.txFromJSON<Result<void>>,
+    accept_admin: this.txFromJSON<Result<string>>,
     add_new_key_to_storage: this.txFromJSON<Result<void>>,
+    query_version: this.txFromJSON<string>,
   };
 }

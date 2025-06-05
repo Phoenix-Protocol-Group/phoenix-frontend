@@ -1,9 +1,9 @@
 import type { Preview } from "@storybook/react";
-import { withThemeFromJSXProvider } from "@storybook/addon-styling";
-import { CssBaseline } from "@mui/material";
-import { ThemeProvider } from "../src";
+// Import theme directly without MUI components to avoid emotion issues at this level
 import theme from "../src/Theme";
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
+import React from "react";
+import { withMuiTheme } from "./withMuiTheme.decorator";
 
 const customViewports = {
   iPhone12: {
@@ -72,18 +72,13 @@ const preview: Preview = {
         date: /Date$/,
       },
     },
-  },
-};
-
-export const decorators = [
-  withThemeFromJSXProvider({
-    themes: {
-      dark: theme,
+    backgrounds: {
+      default: "dark",
     },
-    defaultTheme: "dark",
-    Provider: ThemeProvider,
-    GlobalStyles: CssBaseline,
-  }),
-];
+  },
+  tags: ["autodocs"],
+  // Just use the decorator we created separately
+  decorators: [withMuiTheme],
+};
 
 export default preview;

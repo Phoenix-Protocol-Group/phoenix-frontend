@@ -1,23 +1,26 @@
 import { Box, Skeleton, Typography, List, ListItem } from "@mui/material";
 import React from "react";
+import { colors, typography, spacing, borderRadius } from "../../Theme/styleConstants";
 
 const listItemContainer = {
   display: "flex",
   justifyContent: "space-between",
-  padding: "8px 0",
+  padding: `${spacing.xs} 0`,
 };
 
 const listItemNameStyle = {
-  color: "var(--content-medium-emphasis, rgba(255, 255, 255, 0.70))",
-  fontSize: "14px",
+  color: "rgba(255, 255, 255, 0.70)",
+  fontSize: typography.fontSize.sm,
+  fontFamily: typography.fontFamily,
   lineHeight: "140%",
   marginBottom: 0,
 };
 
 const listItemContentStyle = {
-  color: "#FFF",
-  fontSize: "14px",
-  fontWeight: "700",
+  color: colors.neutral[50],
+  fontSize: typography.fontSize.sm,
+  fontFamily: typography.fontFamily,
+  fontWeight: typography.fontWeights.bold,
   lineHeight: "140%",
 };
 
@@ -28,7 +31,7 @@ export const Swap = () => {
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        gap: "16px",
+        gap: spacing.md,
       }}
     >
       {/* Header Section */}
@@ -37,34 +40,76 @@ export const Swap = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          background: colors.neutral[900],
+          borderRadius: borderRadius.lg,
+          border: `1px solid ${colors.neutral[700]}`,
+          padding: spacing.md,
         }}
       >
         <Typography
           sx={{
-            fontSize: "32px",
-            fontWeight: "700",
+            fontSize: typography.fontSize.xxl,
+            fontWeight: typography.fontWeights.bold,
+            fontFamily: typography.fontFamily,
+            color: colors.neutral[50],
           }}
         >
           Swap tokens instantly
         </Typography>
-        <Skeleton variant="circular" width={40} height={40} />
+        <Skeleton 
+          variant="circular" 
+          width={40} 
+          height={40} 
+          sx={{ bgcolor: colors.neutral[700] }} 
+        />
       </Box>
 
       {/* Main Content Section */}
       <Box
         sx={{
           display: "flex",
-          gap: "24px",
+          gap: spacing.xl,
           flexDirection: { xs: "column", lg: "row" },
           alignItems: "stretch",
         }}
       >
         {/* Swap Form Section */}
         <Box sx={{ flex: 1, position: "relative", width: "100%" }}>
-          <Skeleton variant="rounded" height={86} />
-          <Skeleton variant="rounded" height={36} sx={{ mt: 2 }} />
-          <Skeleton variant="rounded" height={86} sx={{ mt: 2 }} />
-          <Skeleton variant="rounded" height={56} sx={{ mt: 2 }} />
+          <Skeleton 
+            variant="rounded" 
+            height={86} 
+            sx={{ 
+              bgcolor: colors.neutral[800],
+              borderRadius: borderRadius.lg 
+            }} 
+          />
+          <Skeleton 
+            variant="rounded" 
+            height={36} 
+            sx={{ 
+              mt: spacing.sm, 
+              bgcolor: colors.neutral[800],
+              borderRadius: borderRadius.md 
+            }} 
+          />
+          <Skeleton 
+            variant="rounded" 
+            height={86} 
+            sx={{ 
+              mt: spacing.sm, 
+              bgcolor: colors.neutral[800],
+              borderRadius: borderRadius.lg 
+            }} 
+          />
+          <Skeleton 
+            variant="rounded" 
+            height={56} 
+            sx={{ 
+              mt: spacing.sm, 
+              bgcolor: colors.neutral[800],
+              borderRadius: borderRadius.lg 
+            }} 
+          />
         </Box>
 
         {/* Swap Details Section */}
@@ -72,18 +117,19 @@ export const Swap = () => {
           sx={{
             flex: 1,
             width: "100%",
-            padding: "24px",
-            borderRadius: "12px",
-            border: "1px solid var(--Secondary-S4, #2C2C31)",
-            background:
-              "var(--Secondary-S3, linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%))",
+            padding: spacing.lg,
+            borderRadius: borderRadius.lg,
+            border: `1px solid ${colors.neutral[700]}`,
+            background: colors.neutral[900],
           }}
         >
           <Typography
             sx={{
-              fontWeight: "700",
-              fontSize: "20px",
-              marginBottom: "16px",
+              fontWeight: typography.fontWeights.bold,
+              fontSize: typography.fontSize.xl,
+              fontFamily: typography.fontFamily,
+              marginBottom: spacing.md,
+              color: colors.neutral[50],
             }}
           >
             Swap Details
@@ -97,25 +143,41 @@ export const Swap = () => {
             <ListItem sx={listItemContainer}>
               <Typography sx={listItemNameStyle}>Exchange rate</Typography>
               <Typography sx={listItemContentStyle}>
-                <Skeleton variant="text" width={100} />
+                <Skeleton 
+                  variant="text" 
+                  width={100} 
+                  sx={{ bgcolor: colors.neutral[700] }} 
+                />
               </Typography>
             </ListItem>
             <ListItem sx={listItemContainer}>
               <Typography sx={listItemNameStyle}>Protocol fee</Typography>
               <Typography sx={listItemContentStyle}>
-                <Skeleton variant="text" width={100} />
+                <Skeleton 
+                  variant="text" 
+                  width={80} 
+                  sx={{ bgcolor: colors.neutral[700] }} 
+                />
               </Typography>
             </ListItem>
             <ListItem sx={listItemContainer}>
               <Typography sx={listItemNameStyle}>Route</Typography>
               <Typography sx={listItemContentStyle}>
-                <Skeleton variant="text" width={100} />
+                <Skeleton 
+                  variant="text" 
+                  width={120} 
+                  sx={{ bgcolor: colors.neutral[700] }} 
+                />
               </Typography>
             </ListItem>
             <ListItem sx={listItemContainer}>
               <Typography sx={listItemNameStyle}>Slippage tolerance</Typography>
               <Typography sx={listItemContentStyle}>
-                <Skeleton variant="text" width={100} />
+                <Skeleton 
+                  variant="text" 
+                  width={60} 
+                  sx={{ bgcolor: colors.neutral[700] }} 
+                />
               </Typography>
             </ListItem>
           </List>

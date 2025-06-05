@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import DashboardStats from "./DashboardStats";
 import { Grid } from "@mui/material";
+import React from "react";
 
 const stellarGainerAsset = {
   name: "Stellar",
