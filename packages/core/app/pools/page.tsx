@@ -91,11 +91,19 @@ export default function Page() {
             rpcUrl: constants.RPC_URL,
           });
 
+          // Check if wallet is connected before fetching user stake
+          const isWalletConnected = storePersist.wallet.address !== undefined;
+
+          const stakingInfoPromise = StakeContract.query_total_staked();
+          const userStakePromise = isWalletConnected
+            ? StakeContract.query_staked({
+                address: storePersist.wallet.address!,
+              })
+            : Promise.resolve({ total_stake: 0 }); // Default value when no wallet
+
           const [stakingInfo, userStake] = await Promise.all([
-            StakeContract.query_total_staked(),
-            StakeContract.query_staked({
-              address: storePersist.wallet.address!,
-            }),
+            stakingInfoPromise,
+            userStakePromise,
           ]);
 
           const totalStaked = Number(stakingInfo.result);
@@ -155,10 +163,11 @@ export default function Page() {
             ],
             tvl: formatCurrency("USD", tvl.toString(), navigator.language),
             maxApr: `${(apr / 2).toFixed(2)}%`,
-            userLiquidity:
-              (lpToken && lpToken.balance > 0) || userStake.total_stake > 0
+            userLiquidity: isWalletConnected
+              ? (lpToken && lpToken.balance > 0) || userStake.total_stake > 0
                 ? 1
-                : 0,
+                : 0
+              : 0, // Always 0 when no wallet is connected
             poolAddress: poolAddress,
           };
         }
@@ -167,7 +176,7 @@ export default function Page() {
       }
       return;
     },
-    [store]
+    [store, storePersist.wallet.address]
   );
 
   const getTVL = async () => {
