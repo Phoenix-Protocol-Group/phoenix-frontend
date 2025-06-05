@@ -69,7 +69,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const [version, setVersion] = useState(0);
 
   // Show maintenance screen for V2 upgrade
-  const [isMaintenanceMode] = useState<boolean>(false);
+  const [isMaintenanceMode] = useState<boolean>(true);
 
   // useEffect to set navigation state based on screen size without animation on initial load
   useEffect(() => {
