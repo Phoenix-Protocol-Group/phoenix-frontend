@@ -13,6 +13,7 @@ import {
 } from "@phoenix-protocol/ui";
 import { API, constants, TradeAPi } from "@phoenix-protocol/utils";
 import { fetchAllTrades, scaToToken } from "@phoenix-protocol/utils";
+import { motion } from "framer-motion";
 
 import {
   PriceHistoryResponse,
@@ -378,92 +379,286 @@ export default function Page() {
   return (
     <Box
       sx={{
-        maxWidth: "1440px",
+        minHeight: "100vh",
         width: "100%",
-        padding: { xs: 0, md: "2.5rem" },
-        mt: { xs: "4.5rem", md: 0 },
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <input type="hidden" value="Phoenix DeFi Hub - Transaction History" />
-      <Typography
+      <Box
         sx={{
-          color: "#FFF",
-          fontFamily: "Ubuntu",
-          fontSize: "2rem",
-          fontStyle: "normal",
-          fontWeight: 700,
-          lineHeight: "normal",
-          mb: "1.5rem",
+          maxWidth: "1440px",
+          width: "100%",
+          margin: "0 auto",
+          padding: { xs: "1rem", md: "2.5rem" },
+          mt: { xs: "4.5rem", md: 0 },
+          position: "relative",
+          zIndex: 1,
         }}
       >
-        Transaction History
-      </Typography>
-      <Grid container spacing={2} sx={{ display: "flex" }}>
-        <Grid item xs={12} md={6}>
-          <VolumeChart
-            pools={pools}
-            selectedPoolForVolume={selectedPoolForVolume}
-            setSelectedPoolForVolume={setSelectedPoolForVolume}
-            data={data}
-            setSelectedTab={(e) => setSelectedTimeEpoch(e)}
-            selectedTab={selectedTimeEpoch}
-            totalVolume={totalVolume}
-          />
-        </Grid>
-        <Grid item xs={12} md={6} sx={{ height: "auto" }}>
-          {historicalPrices.length > 0 && (
-            <Box
-              sx={{
-                height: "100%",
-                display: "flex",
-                width: "100%",
-              }}
-            >
-              <FinancialChart
-                setPeriod={setPeriod}
-                period={period}
-                historicalPrices={historicalPrices}
-              />
-            </Box>
-          )}
-        </Grid>
-      </Grid>
-      <TransactionsCards
-        activeTraders={meta.users24h}
-        totalTraders={meta.totalUsers}
-        totalTrades={meta.totalTrades}
-        mostTradedAsset={meta.mostTradedAsset}
-      />
-      <Box sx={{ flexGrow: 1 }}>
-        {!historyLoading ? (
-          <TransactionsTable
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            entries={history}
-            activeSort={{ column: sortBy, direction: sortOrder }}
-            activeView={activeView}
-            setActiveView={(view) => {
-              setHistory([]);
-              setActiveView(view);
+        <input type="hidden" value="Phoenix DeFi Hub - Transaction History" />
+
+        {/* Hero Section */}
+        <Box
+          sx={{
+            mb: "3rem",
+            textAlign: "center",
+            pt: { xs: "2rem", md: "3rem" },
+            pb: "2rem",
+          }}
+        >
+          <Typography
+            sx={{
+              background:
+                "linear-gradient(135deg, #ffffff 0%, #e4e4e7 50%, #a1a1aa 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              fontFamily: "Ubuntu",
+              fontSize: { xs: "2.5rem", md: "3.5rem" },
+              fontWeight: 700,
+              lineHeight: 1.2,
+              mb: "1rem",
+              animation: "glow 3s ease-in-out infinite alternate",
+              "@keyframes glow": {
+                "0%": {
+                  filter: "drop-shadow(0 0 20px rgba(249, 115, 22, 0.3))",
+                },
+                "100%": {
+                  filter: "drop-shadow(0 0 30px rgba(234, 88, 12, 0.4))",
+                },
+              },
             }}
-            loggedIn={!!appStorePersist.wallet.address}
-            activeFilters={activeFilters}
-            applyFilters={(newFilters: ActiveFilters) =>
-              applyFilters(newFilters)
-            }
-            handleSort={(column) =>
-              handleSortChange(
-                column as any,
-                sortOrder === "asc" ? "desc" : "asc"
-              )
-            }
-          />
-        ) : (
-          <Skeleton.TransactionsTable />
-        )}
-      </Box>
-      <Box sx={{ display: "flex", justifyContent: "end", mt: 3 }}>
-        <Button type="secondary" label="Load more" onClick={loadMore} />
+          >
+            Transaction History
+          </Typography>
+
+          <Typography
+            sx={{
+              color: "rgba(255, 255, 255, 0.7)",
+              fontSize: { xs: "1rem", md: "1.125rem" },
+              fontWeight: 400,
+              maxWidth: "600px",
+              margin: "0 auto",
+              mb: "2rem",
+            }}
+          >
+            Track all trading activity and market statistics across the Phoenix
+            DeFi ecosystem
+          </Typography>
+
+          {/* Stats Section */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: { xs: "1.5rem", md: "3rem" },
+              flexWrap: "wrap",
+              mb: "1rem",
+            }}
+          >
+            <Box sx={{ textAlign: "center" }}>
+              <Typography
+                sx={{
+                  fontSize: { xs: "1.5rem", md: "2rem" },
+                  fontWeight: 700,
+                  background: "linear-gradient(135deg, #F97316, #FB923C)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                {meta.totalTrades}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "rgba(255, 255, 255, 0.6)",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                }}
+              >
+                Total Trades
+              </Typography>
+            </Box>
+
+            <Box sx={{ textAlign: "center" }}>
+              <Typography
+                sx={{
+                  fontSize: { xs: "1.5rem", md: "2rem" },
+                  fontWeight: 700,
+                  background: "linear-gradient(135deg, #EA580C, #F97316)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                {meta.totalUsers}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "rgba(255, 255, 255, 0.6)",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                }}
+              >
+                Total Users
+              </Typography>
+            </Box>
+
+            <Box sx={{ textAlign: "center" }}>
+              <Typography
+                sx={{
+                  fontSize: { xs: "1.5rem", md: "2rem" },
+                  fontWeight: 700,
+                  background: "linear-gradient(135deg, #FB923C, #FDBA74)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                $
+                {totalVolume.toLocaleString(undefined, {
+                  maximumFractionDigits: 0,
+                })}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "rgba(255, 255, 255, 0.6)",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                }}
+              >
+                Volume (
+                {selectedTimeEpoch === "D"
+                  ? "24h"
+                  : selectedTimeEpoch === "M"
+                  ? "30d"
+                  : "1y"}
+                )
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Charts Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <Grid container spacing={2} sx={{ display: "flex" }}>
+            <Grid item xs={12} md={6}>
+              <VolumeChart
+                pools={pools}
+                selectedPoolForVolume={selectedPoolForVolume}
+                setSelectedPoolForVolume={setSelectedPoolForVolume}
+                data={data}
+                setSelectedTab={(e) => setSelectedTimeEpoch(e)}
+                selectedTab={selectedTimeEpoch}
+                totalVolume={totalVolume}
+              />
+            </Grid>
+            <Grid item xs={12} md={6} sx={{ height: "auto" }}>
+              {historicalPrices.length > 0 && (
+                <Box
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    width: "100%",
+                  }}
+                >
+                  <FinancialChart
+                    setPeriod={setPeriod}
+                    period={period}
+                    historicalPrices={historicalPrices}
+                  />
+                </Box>
+              )}
+            </Grid>
+          </Grid>
+        </motion.div>
+        <Box sx={{ flexGrow: 1 }}>
+          {!historyLoading ? (
+            <TransactionsTable
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              entries={history}
+              activeSort={{ column: sortBy, direction: sortOrder }}
+              activeView={activeView}
+              setActiveView={(view) => {
+                setHistory([]);
+                setActiveView(view);
+              }}
+              loggedIn={!!appStorePersist.wallet.address}
+              activeFilters={activeFilters}
+              applyFilters={(newFilters: ActiveFilters) =>
+                applyFilters(newFilters)
+              }
+              handleSort={(column) =>
+                handleSortChange(
+                  column as any,
+                  sortOrder === "asc" ? "desc" : "asc"
+                )
+              }
+            />
+          ) : (
+            <Skeleton.TransactionsTable />
+          )}
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            mt: 4,
+            mb: 2,
+          }}
+        >
+          <Box
+            component="button"
+            onClick={loadMore}
+            sx={{
+              background:
+                "linear-gradient(135deg, rgba(249, 115, 22, 0.8) 0%, rgba(234, 88, 12, 0.6) 100%)",
+              border: "1px solid rgba(249, 115, 22, 0.4)",
+              borderRadius: "12px",
+              padding: "12px 32px",
+              color: "#ffffff",
+              fontSize: "14px",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 8px 32px rgba(249, 115, 22, 0.3)",
+              position: "relative",
+              overflow: "hidden",
+              "&:hover": {
+                transform: "translateY(-2px)",
+                boxShadow: "0 12px 40px rgba(249, 115, 22, 0.4)",
+                background:
+                  "linear-gradient(135deg, rgba(249, 115, 22, 0.9) 0%, rgba(234, 88, 12, 0.7) 100%)",
+              },
+              "&:active": {
+                transform: "translateY(0)",
+              },
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: "-100%",
+                width: "100%",
+                height: "100%",
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)",
+                transition: "left 0.5s",
+              },
+              "&:hover::before": {
+                left: "100%",
+              },
+            }}
+          >
+            Load More Transactions
+          </Box>
+        </Box>
       </Box>
     </Box>
   );

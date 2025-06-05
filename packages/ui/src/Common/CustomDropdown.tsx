@@ -114,6 +114,7 @@ const CustomDropdown = ({
           open={open}
           anchorEl={anchorRef.current}
           placement="bottom-start"
+          sx={{ zIndex: 1000 }}
         >
           <Paper
             sx={{
@@ -123,7 +124,7 @@ const CustomDropdown = ({
               boxShadow:
                 "-3px 3px 10px 0px rgba(25, 13, 1, 0.10),-12px 13px 18px 0px rgba(25, 13, 1, 0.09),-26px 30px 24px 0px rgba(25, 13, 1, 0.05),-46px 53px 28px 0px rgba(25, 13, 1, 0.02),-73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
               marginTop: "0.5rem",
-              zIndex: 1,
+              zIndex: 100,
             }}
           >
             <MenuList

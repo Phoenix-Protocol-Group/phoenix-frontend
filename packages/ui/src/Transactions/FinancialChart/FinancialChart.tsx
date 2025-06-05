@@ -50,12 +50,14 @@ const tabSelectedStyles = {
 
 // Helper function to format data
 const formatData = (data: PriceHistoryResponse): DataPoint[] => {
-  return data.map((item) => {
-    return {
-      price: item.price,
-      timeStamp: new Date(Number(item.txTime) * 1000).getTime(),
-    };
-  });
+  return data
+    .filter((item) => item.price > 0) // Filter out zero price entries
+    .map((item) => {
+      return {
+        price: item.price,
+        timeStamp: new Date(Number(item.txTime) * 1000).getTime(),
+      };
+    });
 };
 
 const GlowingChart = ({
