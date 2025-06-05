@@ -98,7 +98,7 @@ export const ClaimAllModal = ({
       // setItems([]); // Optionally clear items, or let the open condition repopulate.
       // itemsRef.current = [];
     }
-  }, [open, claimableStrategies, isClaiming, isComplete]); // Added isComplete to the dependency array
+  }, [open, claimableStrategies]); // Removed isClaiming and isComplete from dependencies
 
   const handleCloseModal = () => {
     setIsClaiming(false); // Stop any ongoing claiming process
@@ -172,9 +172,9 @@ export const ClaimAllModal = ({
             itemsRef.current[indexBeingProcessed].error = finalError;
           }
 
-          if (isClaiming) {
-            setCurrentIndex((prev) => prev + 1);
-          }
+          // Always move to next item after processing current one
+          // The useEffect dependency on isClaiming will handle stopping if needed
+          setCurrentIndex((prev) => prev + 1);
         }
       };
       doClaim(currentIndex);
@@ -185,9 +185,7 @@ export const ClaimAllModal = ({
     ) {
       // If item is not 'pending' (e.g. already success/error from a previous attempt in this cycle, or bad state)
       // and not currently 'claiming', skip to next.
-      if (mounted) {
-        setCurrentIndex((prev) => prev + 1);
-      }
+      setCurrentIndex((prev) => prev + 1);
     }
 
     return () => {

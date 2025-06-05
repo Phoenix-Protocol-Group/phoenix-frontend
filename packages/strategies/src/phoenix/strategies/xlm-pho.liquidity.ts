@@ -66,6 +66,8 @@ class PhoenixXlmPhoStrategy implements Strategy {
         contractId: contractAddress,
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
+        publicKey: usePersistStore.getState().wallet.address,
+        signTransaction: (tx: string) => new Signer().sign(tx),
       });
 
       // Fetch real-time data for the strategy
@@ -337,58 +339,19 @@ class PhoenixXlmPhoStrategy implements Strategy {
 
   async unbond(
     walletAddress: string,
-    params: number | { lpAmount: bigint; timestamp: bigint }
+    params: { lpAmount: bigint; timestamp: bigint }
   ): Promise<AssembledTransaction<any>> {
     if (!this.stakeContract) {
       throw new Error("Stake contract not initialized");
     }
 
-    let stakeAmountToUnbond: bigint;
-    let stakeTimestampToUnbond: bigint;
-
-    if (typeof params === "number") {
-      if (this.userIndividualStakesDetailed.length === 0) {
-        throw new Error("No stakes available to unbond based on USD amount.");
-      }
-      if (this.lpTokenPrice <= 0) {
-        throw new Error(
-          "LP token price is not available to calculate unbond amount from USD."
-        );
-      }
-      const lpAmountToUnbondNumber = params / this.lpTokenPrice;
-      stakeAmountToUnbond = BigInt(
-        (lpAmountToUnbondNumber * 10 ** (this.lpToken?.decimals || 7)).toFixed(
-          0
-        )
-      );
-
-      // This logic for 'number' param might need to be more robust,
-      // e.g. selecting which stake to unbond from or ensuring sufficient balance.
-      // For now, using the first stake's timestamp if a general amount is given.
-      // The primary UI flow should use the object { lpAmount, timestamp }.
-      const firstStake = this.userIndividualStakesDetailed[0];
-      if (!firstStake || BigInt(firstStake.stake) < stakeAmountToUnbond) {
-        throw new Error(
-          "Not enough in the first stake or no stake available for general amount unbonding."
-        );
-      }
-      stakeTimestampToUnbond = BigInt(firstStake.stake_timestamp);
-    } else {
-      stakeAmountToUnbond = params.lpAmount;
-      stakeTimestampToUnbond = params.timestamp;
-    }
-
-    if (stakeAmountToUnbond <= BigInt(0)) {
-      throw new Error("Unbond amount must be positive.");
-    }
-
-    const assembledTx = await this.stakeContract.unbond(
+    const assembledTx = this.removeLiquidity(
+      walletAddress,
+      Number(params.lpAmount),
       {
-        sender: walletAddress,
-        stake_amount: stakeAmountToUnbond,
-        stake_timestamp: stakeTimestampToUnbond,
-      },
-      { simulate: true }
+        lpAmount: params.lpAmount,
+        timestamp: params.timestamp,
+      }
     );
 
     return assembledTx;
@@ -416,7 +379,6 @@ class PhoenixXlmPhoStrategy implements Strategy {
     if (!this.pairContract) {
       throw new Error("Pair contract not initialized");
     }
-
     const assembledTx = await this.pairContract.provide_liquidity(
       {
         sender: walletAddress,
@@ -441,26 +403,28 @@ class PhoenixXlmPhoStrategy implements Strategy {
   // Helper method to remove liquidity
   async removeLiquidity(
     walletAddress: string,
-    lpAmount: number
+    lpAmount: number,
+    stakeBucket: { lpAmount: bigint; timestamp: bigint }
   ): Promise<AssembledTransaction<any>> {
     if (!this.pairContract) {
       throw new Error("Pair contract not initialized");
     }
-
     const assembledTx = await this.pairContract.withdraw_liquidity(
       {
         sender: walletAddress,
         share_amount: BigInt(
           (lpAmount * 10 ** (this.lpToken?.decimals || 7)).toFixed(0)
         ),
-        min_a: BigInt(1), // Consider making these configurable or based on slippage
-        min_b: BigInt(1), // Consider making these configurable or based on slippage
+        min_a: BigInt(1),
+        min_b: BigInt(1),
         deadline: undefined,
-        auto_unstake: true, // TODO: In our strategy UI, we need to show different stake buckets and let the user choose which stake to unbond from.
+        auto_unstake: {
+          stake_amount: stakeBucket.lpAmount,
+          stake_timestamp: stakeBucket.timestamp,
+        },
       },
       { simulate: true }
     );
-
     return assembledTx;
   }
 }

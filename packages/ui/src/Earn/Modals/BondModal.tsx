@@ -36,7 +36,7 @@ export const BondModal = ({
   const [error, setError] = useState<string>("");
   // Track user token balances with actual wallet amounts
   const [userTokenBalances, setUserTokenBalances] = useState<{
-    [key: string]: StateToken;
+    [key: string]: Token;
   }>({});
 
   const isPairStrategy =
@@ -58,36 +58,27 @@ export const BondModal = ({
   useEffect(() => {
     const fetchUserBalances = async () => {
       if (open && strategy?.assets) {
-        const balances: { [key: string]: StateToken } = {};
+        const balances: { [key: string]: Token } = {};
 
+        const allAssets = await appStore.getAllTokens();
         // For each asset in the strategy, fetch the user's actual token balance
-        await Promise.all(
-          strategy.assets.map(async (asset) => {
-            // Use the asset name/symbol to identify the token
-            const tokenIdentifier = asset.name;
 
-            try {
-              // Fetch the user's actual token balance from their wallet
-              const userToken = await appStore.fetchTokenInfo(tokenIdentifier);
-              if (userToken) {
-                balances[tokenIdentifier] = userToken;
-              }
-            } catch (error) {
-              console.log(asset);
-              console.error(
-                `Error fetching user balance for ${asset.name}:`,
-                error
-              );
-            }
-          })
-        );
+        strategy.assets.forEach((asset) => {
+          const userToken = allAssets.find(
+            (token) => token.name === asset.name
+          );
+          if (userToken) {
+            balances[asset.name] = userToken;
+          }
+        });
 
         setUserTokenBalances(balances);
+        console.log(balances);
       }
     };
 
     fetchUserBalances();
-  }, [open, strategy, appStore]);
+  }, [open, strategy]);
 
   // Create tokens with user balances for display
   const tokensWithUserBalances = useMemo(() => {
@@ -98,8 +89,7 @@ export const BondModal = ({
 
       if (userToken) {
         // Convert StateToken balance to displayable amount
-        const userBalance =
-          Number(userToken.balance) / 10 ** userToken.decimals;
+        const userBalance = Number(userToken.amount);
 
         // Create a Token object with user's actual balance
         const tokenWithUserBalance: Token = {
@@ -133,7 +123,7 @@ export const BondModal = ({
         ratios[index] = 1; // Base asset has ratio 1
       } else {
         // Calculate how many of this token equals 1 of the base token
-        ratios[index] = baseValue / (asset.usdValue || 1);
+        ratios[index] = strategy.assets[1].amount / strategy.assets[0].amount;
       }
     });
 
@@ -236,7 +226,8 @@ export const BondModal = ({
     });
     setAmounts(resetAmounts);
     setError("");
-
+    // Reload the page
+    window.location.reload();
     onClose();
   };
 
@@ -291,8 +282,6 @@ export const BondModal = ({
           maxHeight: "90vh",
           overflow: "auto",
           borderRadius: "20px",
-          background:
-            "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)",
           border: "1px solid rgba(71, 85, 105, 0.3)",
           padding: { xs: spacing.lg, md: "2rem" },
           backdropFilter: "blur(20px)",

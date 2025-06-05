@@ -90,6 +90,9 @@ export const UnbondModal = ({
 
   const handleConfirmSpecificStake = (stake: IndividualStake) => {
     onConfirm({ lpAmount: stake.lpAmount, timestamp: stake.timestamp });
+
+    // Reload page
+    window.location.reload();
     // Optionally close modal immediately or wait for parent component to do so after transaction
     // onClose();
   };
