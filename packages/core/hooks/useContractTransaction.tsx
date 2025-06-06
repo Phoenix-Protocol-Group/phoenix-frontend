@@ -115,7 +115,6 @@ const getSigner = async () => {
 };
 
 const getSignerFunction = (signer: any, storePersist: any) => {
-  console.log(signer);
   return (tx: string) => signer.sign(tx);
 };
 
