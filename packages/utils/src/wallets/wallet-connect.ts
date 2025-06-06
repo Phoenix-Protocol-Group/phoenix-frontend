@@ -100,12 +100,14 @@ export class WalletConnect implements Wallet {
       });
 
       // Set up session event listeners
-      this.client.on("session_delete", (event) => {
-        console.log("Session deleted:", event.topic);
-        if (this.activeSession === event.topic) {
-          this.activeSession = undefined;
-        }
-      });
+      if (this.client) {
+        this.client.on("session_delete", (event) => {
+          console.log("Session deleted:", event.topic);
+          if (this.activeSession === event.topic) {
+            this.activeSession = undefined;
+          }
+        });
+      }
 
       // Clean up expired sessions on initialization
       await this.cleanupExpiredSessions();
