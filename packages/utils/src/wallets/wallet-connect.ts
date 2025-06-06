@@ -25,7 +25,6 @@ const parseWalletConnectSession = (
 };
 
 export interface IParsedWalletConnectSession {
-  // "id" is the topic, we call it "id" to make it easier for those not familiarized with WalletConnect
   id: string;
   name: string;
   description: string;
@@ -45,29 +44,40 @@ export class WalletConnect implements Wallet {
   };
   private activeSession?: string;
   private qrModal!: WalletConnectModal;
+  private initializingClient?: Promise<void>;
 
   constructor(public wcParams: IWalletConnectConstructorParams) {
     if (wcParams.sessionId) {
       this.setSession(wcParams.sessionId);
     }
 
-    SignClient.init({
-      projectId: wcParams.projectId,
+    this.initializingClient = this.initializeClient();
+  }
+
+  private async initializeClient() {
+    if (this.client) return;
+
+    this.client = (await SignClient.init({
+      projectId: this.wcParams.projectId,
       metadata: {
-        name: wcParams.name,
-        url: wcParams.url,
-        description: wcParams.description,
-        icons: wcParams.icons,
+        name: this.wcParams.name,
+        url: this.wcParams.url,
+        description: this.wcParams.description,
+        icons: this.wcParams.icons,
       },
-    })
-      .then((client) => {
-        console.log("WalletConnect is ready.");
-        this.client = client as never;
-        this.qrModal = new WalletConnectModal({
-          projectId: wcParams.projectId,
-        });
-      })
-      .catch(console.log);
+    })) as any;
+
+    this.qrModal = new WalletConnectModal({
+      projectId: this.wcParams.projectId,
+    });
+
+    console.log("WalletConnect client and modal initialized.");
+  }
+
+  private async ensureClientReady() {
+    if (!this.client) {
+      await this.initializingClient;
+    }
   }
 
   async isAllowed(): Promise<boolean> {
@@ -75,10 +85,12 @@ export class WalletConnect implements Wallet {
   }
 
   async isConnected(): Promise<boolean> {
+    await this.ensureClientReady();
     return !!this.client;
   }
 
-  public isReady(): boolean {
+  public async isReady(): Promise<boolean> {
+    await this.ensureClientReady();
     return !!this.client;
   }
 
@@ -87,12 +99,9 @@ export class WalletConnect implements Wallet {
   }
 
   async getPublicKey(): Promise<string> {
-    if (!this.client) {
-      throw new Error("WalletConnect is not running yet");
-    }
+    await this.ensureClientReady();
 
-    const targetSession: IParsedWalletConnectSession =
-      await this.getTargetSession();
+    const targetSession = await this.getTargetSession();
     return targetSession.accounts[0].publicKey;
   }
 
@@ -107,15 +116,13 @@ export class WalletConnect implements Wallet {
     signedTxXdr: string;
     signerAddress: string;
   }> {
-    if (!this.client) {
-      throw new Error("WalletConnect is not running yet");
-    }
+    await this.ensureClientReady();
 
-    let updatedXdr: string = tx;
+    const targetSession = await this.getTargetSession({
+      publicKey: await this.getPublicKey(),
+    });
 
-    const targetSession: IParsedWalletConnectSession =
-      await this.getTargetSession({ publicKey: await this.getPublicKey() });
-    updatedXdr = await this.client.request({
+    const updatedXdr = await this.client!.request({
       topic: targetSession.id,
       chainId: "stellar:pubnet",
       request: {
@@ -130,7 +137,6 @@ export class WalletConnect implements Wallet {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async signBlob(params: {
     blob: string;
     publicKey?: string;
@@ -138,74 +144,55 @@ export class WalletConnect implements Wallet {
     throw new Error("xBull does not support signing random blobs");
   }
 
-  /**
-   * Allows manually setting the current active session to be used in the kit when doing WalletConnect requests
-   *
-   * @param sessionId The session ID is a placeholder for the session "topic", term used in WalletConnect
-   * */
   public setSession(sessionId: string) {
     this.activeSession = sessionId;
   }
 
-  public onSessionDeleted(cb: (sessionId: string) => void) {
-    if (!this.client) {
-      throw new Error("WalletConnect is not running yet");
-    }
-
-    this.client.on("session_delete", (data) => {
+  public async onSessionDeleted(cb: (sessionId: string) => void) {
+    await this.ensureClientReady();
+    this.client!.on("session_delete", (data) => {
       cb(data.topic);
     });
   }
 
   public async connectWalletConnect(): Promise<IParsedWalletConnectSession> {
-    if (!this.client) {
-      throw new Error("WalletConnect is not running yet");
-    }
+    await this.ensureClientReady();
 
-    try {
-      const { uri, approval } = await this.client.connect({
-        requiredNamespaces: {
-          stellar: {
-            methods: [this.wcParams.method],
-            chains: ["stellar:pubnet"],
-            events: [],
-          },
+    const { uri, approval } = await this.client!.connect({
+      requiredNamespaces: {
+        stellar: {
+          methods: [this.wcParams.method],
+          chains: ["stellar:pubnet"],
+          events: [],
         },
-      });
-      const session: IParsedWalletConnectSession =
-        await new Promise<SessionTypes.Struct>((resolve, reject) => {
-          // Open QRCode modal if a URI was returned (i.e. we're not connecting an existing pairing).
-          if (uri) {
-            this.qrModal.openModal({ uri, theme: { zIndex: 99999 } });
-          }
+      },
+    });
 
-          // Await session approval from the wallet.
-          approval()
-            .then((session) => {
-              this.qrModal.closeModal();
-              resolve(session);
-            })
-            .catch((error) => {
-              this.qrModal.closeModal();
-              reject(error);
-            });
-        }).then(parseWalletConnectSession);
+    const session: IParsedWalletConnectSession =
+      await new Promise<SessionTypes.Struct>((resolve, reject) => {
+        if (uri) {
+          this.qrModal.openModal({ uri, theme: { zIndex: 99999 } });
+        }
 
-      this.setSession(session.id);
-      return session;
-    } catch (e: unknown) {
-      this.qrModal.closeModal();
-      console.log(e);
-      throw new Error("There was an error when trying to connect");
-    }
+        approval()
+          .then((session) => {
+            this.qrModal.closeModal();
+            resolve(session);
+          })
+          .catch((error) => {
+            this.qrModal.closeModal();
+            reject(error);
+          });
+      }).then(parseWalletConnectSession);
+
+    this.setSession(session.id);
+    return session;
   }
 
   public async closeSession(sessionId: string, reason?: string): Promise<void> {
-    if (!this.client) {
-      throw new Error("WalletConnect is not running yet");
-    }
+    await this.ensureClientReady();
 
-    await this.client.disconnect({
+    await this.client!.disconnect({
       topic: sessionId,
       reason: {
         message: reason || "Session closed",
@@ -215,21 +202,16 @@ export class WalletConnect implements Wallet {
   }
 
   public async getSessions(): Promise<IParsedWalletConnectSession[]> {
-    if (!this.client) {
-      throw new Error("WalletConnect is not running yet");
-    }
-
-    return this.client.session.values.map(parseWalletConnectSession);
+    await this.ensureClientReady();
+    return this.client!.session.values.map(parseWalletConnectSession);
   }
 
   async signAuthEntry(
     entryXdr: string,
-    opts?:
-      | {
-          networkPassphrase?: string | undefined;
-          address?: string | undefined;
-        }
-      | undefined
+    opts?: {
+      networkPassphrase?: string;
+      address?: string;
+    }
   ): Promise<{
     signedAuthEntry: Buffer | null;
     signerAddress: string;
@@ -240,15 +222,15 @@ export class WalletConnect implements Wallet {
   }
 
   private async getTargetSession(params?: { publicKey?: string }) {
+    await this.ensureClientReady();
     const activeSessions = await this.getSessions();
 
-    // 🔧 SAFEGUARD: fall back to first session if nothing else matches
-    let targetSession =
+    const targetSession =
       activeSessions.find(
         (s) =>
           s.id === this.activeSession ||
           s.accounts.some((a) => a.publicKey === params?.publicKey)
-      ) || activeSessions[0]; // fallback
+      ) || activeSessions[0];
 
     if (!targetSession) {
       throw new Error("No valid WalletConnect session available");
