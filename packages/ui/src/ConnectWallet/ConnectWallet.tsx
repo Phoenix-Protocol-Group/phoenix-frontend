@@ -342,7 +342,6 @@ const ConnectWallet = ({
         // Close the modal after successful connection for other wallets
         setOpen(false);
       } catch (error) {
-        us;
         console.error("Wallet connection failed:", error);
         setLoading(false);
       }
