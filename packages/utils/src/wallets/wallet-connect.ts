@@ -44,7 +44,8 @@ export class WalletConnect implements Wallet {
   };
   private activeSession?: string;
   private qrModal!: WalletConnectModal;
-  private initializingClient?: Promise<void>;
+  public initializingClient?: Promise<void>;
+  private connectionPromise?: Promise<IParsedWalletConnectSession>;
 
   constructor(public wcParams: IWalletConnectConstructorParams) {
     if (wcParams.sessionId) {
@@ -57,26 +58,108 @@ export class WalletConnect implements Wallet {
   private async initializeClient() {
     if (this.client) return;
 
-    this.client = (await SignClient.init({
-      projectId: this.wcParams.projectId,
-      metadata: {
-        name: this.wcParams.name,
-        url: this.wcParams.url,
-        description: this.wcParams.description,
-        icons: this.wcParams.icons,
-      },
-    })) as any;
+    // Prevent multiple initializations
+    try {
+      this.client = (await SignClient.init({
+        projectId: this.wcParams.projectId,
+        metadata: {
+          name: this.wcParams.name,
+          url: this.wcParams.url,
+          description: this.wcParams.description,
+          icons: this.wcParams.icons,
+        },
+        // Add storage options to prevent init warnings
+        logger: "error", // Reduce log noise
+      })) as any;
 
-    this.qrModal = new WalletConnectModal({
-      projectId: this.wcParams.projectId,
-    });
+      this.qrModal = new WalletConnectModal({
+        projectId: this.wcParams.projectId,
+        themeMode: "dark",
+        themeVariables: {
+          "--wcm-z-index": "99999",
+        },
+        // Configure mobile wallet support
+        mobileWallets: [
+          {
+            id: "lobstr",
+            name: "Lobstr",
+            links: {
+              native: "lobstr://",
+              universal: "https://lobstr.co",
+            },
+          },
+          {
+            id: "freighter",
+            name: "Freighter",
+            links: {
+              native: "freighter://",
+              universal: "https://freighter.app",
+            },
+          },
+        ],
+      });
 
-    console.log("WalletConnect client and modal initialized.");
+      // Set up session event listeners
+      this.client.on("session_delete", (event) => {
+        console.log("Session deleted:", event.topic);
+        if (this.activeSession === event.topic) {
+          this.activeSession = undefined;
+        }
+      });
+
+      // Clean up expired sessions on initialization
+      await this.cleanupExpiredSessions();
+
+      console.log("WalletConnect client and modal initialized.");
+    } catch (error) {
+      console.error("Failed to initialize WalletConnect client:", error);
+      throw error;
+    }
+  }
+
+  private async cleanupExpiredSessions() {
+    try {
+      if (!this.client) return;
+
+      const sessions = await this.getSessions();
+      const now = Date.now();
+
+      for (const session of sessions) {
+        try {
+          // Check if session exists in client
+          const clientSession = this.client.session.get(session.id);
+          if (!clientSession) {
+            console.log(
+              `Session ${session.id} not found in client, skipping cleanup`
+            );
+            continue;
+          }
+
+          // Sessions typically expire after 7 days, but we'll check if they're still valid
+          // by attempting to get the session from the client
+        } catch (sessionError) {
+          console.log(`Cleaning up invalid session: ${session.id}`);
+          try {
+            await this.closeSession(session.id, "Invalid session");
+          } catch (closeError) {
+            console.log(
+              `Failed to close invalid session ${session.id}:`,
+              closeError
+            );
+          }
+        }
+      }
+    } catch (error) {
+      console.log("Error cleaning up expired sessions:", error);
+    }
   }
 
   private async ensureClientReady() {
     if (!this.client) {
       await this.initializingClient;
+    }
+    if (!this.client) {
+      throw new Error("Failed to initialize WalletConnect client");
     }
   }
 
@@ -101,8 +184,28 @@ export class WalletConnect implements Wallet {
   async getPublicKey(): Promise<string> {
     await this.ensureClientReady();
 
-    const targetSession = await this.getTargetSession();
-    return targetSession.accounts[0].publicKey;
+    try {
+      const targetSession = await this.getTargetSession();
+      return targetSession.accounts[0].publicKey;
+    } catch (error) {
+      // No valid session found, need to connect
+      throw new Error(
+        "No active WalletConnect session. Call connectWalletConnect() first."
+      );
+    }
+  }
+
+  async ensureConnection(): Promise<IParsedWalletConnectSession> {
+    await this.ensureClientReady();
+
+    // Check if we have a valid existing session
+    try {
+      const targetSession = await this.getTargetSession();
+      return targetSession;
+    } catch (error) {
+      // No valid session, create a new one
+      return await this.connectWalletConnect();
+    }
   }
 
   async signTransaction(
@@ -158,6 +261,22 @@ export class WalletConnect implements Wallet {
   public async connectWalletConnect(): Promise<IParsedWalletConnectSession> {
     await this.ensureClientReady();
 
+    // Prevent multiple simultaneous connection attempts
+    if (this.connectionPromise) {
+      return this.connectionPromise;
+    }
+
+    this.connectionPromise = this.performConnection();
+
+    try {
+      const session = await this.connectionPromise;
+      return session;
+    } finally {
+      this.connectionPromise = undefined;
+    }
+  }
+
+  private async performConnection(): Promise<IParsedWalletConnectSession> {
     const { uri, approval } = await this.client!.connect({
       requiredNamespaces: {
         stellar: {
@@ -170,17 +289,71 @@ export class WalletConnect implements Wallet {
 
     const session: IParsedWalletConnectSession =
       await new Promise<SessionTypes.Struct>((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          this.qrModal.closeModal();
+          reject(
+            new Error(
+              "Connection timeout - wallet did not respond within 5 minutes"
+            )
+          );
+        }, 300000); // 5 minute timeout
+
         if (uri) {
-          this.qrModal.openModal({ uri, theme: { zIndex: 99999 } });
+          // Check if we're on mobile
+          const isMobile =
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+              navigator.userAgent
+            );
+
+          this.qrModal.openModal({
+            uri,
+            theme: { zIndex: 99999 },
+            // Enable mobile linking
+            mobileLinks: [
+              "lobstr",
+              "freighter",
+              "rainbow",
+              "metamask",
+              "trust",
+              "argentx",
+              "zerion",
+              "phantom",
+            ],
+            desktopLinks: ["ledger", "walletconnect"],
+          });
+
+          // For mobile, try to open the deep link directly after a short delay
+          if (isMobile) {
+            setTimeout(() => {
+              // Try to trigger deep link for common Stellar wallets
+              const deepLinks = [
+                `lobstr://wc?uri=${encodeURIComponent(uri)}`,
+                `freighter://wc?uri=${encodeURIComponent(uri)}`,
+              ];
+
+              // Try each deep link (browser will only open the one that's installed)
+              deepLinks.forEach((link) => {
+                try {
+                  window.location.href = link;
+                } catch (e) {
+                  console.log("Deep link failed:", link);
+                }
+              });
+            }, 1000);
+          }
         }
 
         approval()
           .then((session) => {
+            clearTimeout(timeoutId);
             this.qrModal.closeModal();
+            console.log("WalletConnect session established:", session.topic);
             resolve(session);
           })
           .catch((error) => {
+            clearTimeout(timeoutId);
             this.qrModal.closeModal();
+            console.error("WalletConnect connection failed:", error);
             reject(error);
           });
       }).then(parseWalletConnectSession);
@@ -225,18 +398,93 @@ export class WalletConnect implements Wallet {
     await this.ensureClientReady();
     const activeSessions = await this.getSessions();
 
+    // Filter out expired or invalid sessions
+    const validSessions = activeSessions.filter((session) => {
+      try {
+        return this.client?.session.get(session.id) !== undefined;
+      } catch {
+        return false;
+      }
+    });
+
     const targetSession =
-      activeSessions.find(
+      validSessions.find(
         (s) =>
           s.id === this.activeSession ||
           s.accounts.some((a) => a.publicKey === params?.publicKey)
-      ) || activeSessions[0];
+      ) || validSessions[0];
 
     if (!targetSession) {
       throw new Error("No valid WalletConnect session available");
     }
 
     return targetSession;
+  }
+
+  // Method to check for existing sessions without triggering connection
+  async hasValidSession(): Promise<boolean> {
+    await this.ensureClientReady();
+
+    try {
+      const sessions = await this.getSessions();
+      return (
+        sessions.length > 0 &&
+        sessions.some((session) => {
+          try {
+            return this.client?.session.get(session.id) !== undefined;
+          } catch {
+            return false;
+          }
+        })
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  // Method to restore a session by ID
+  async restoreSession(sessionId: string): Promise<boolean> {
+    await this.ensureClientReady();
+
+    try {
+      const session = this.client?.session.get(sessionId);
+      if (session) {
+        this.setSession(sessionId);
+        return true;
+      }
+    } catch (error) {
+      console.log("Failed to restore session:", sessionId, error);
+    }
+
+    return false;
+  }
+
+  // Method to disconnect all sessions and reset state
+  async disconnect(): Promise<void> {
+    await this.ensureClientReady();
+
+    try {
+      const sessions = await this.getSessions();
+
+      // Close all active sessions
+      for (const session of sessions) {
+        try {
+          await this.closeSession(session.id, "User disconnected");
+        } catch (error) {
+          console.log("Failed to close session:", session.id, error);
+        }
+      }
+
+      // Reset active session
+      this.activeSession = undefined;
+
+      // Close modal if open
+      this.qrModal.closeModal();
+
+      console.log("WalletConnect disconnected successfully");
+    } catch (error) {
+      console.error("Error during WalletConnect disconnect:", error);
+    }
   }
 }
 

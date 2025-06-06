@@ -52,18 +52,39 @@ export class WalletConnect implements Connector {
     };
   }
 
-  getPublicKey(): Promise<string> {
-    return this.client?.getPublicKey()!;
+  async getPublicKey(): Promise<string> {
+    if (!this.client) throw new Error("Wallet client is not initialized");
+    await this.client.initializingClient;
+
+    try {
+      // First, check if we have a valid existing session
+      const hasValidSession = await this.client.hasValidSession();
+      if (hasValidSession) {
+        return await this.client.getPublicKey();
+      }
+    } catch (error) {
+      console.log("No existing session found:", error);
+    }
+
+    // No valid session exists, establish a new connection
+    try {
+      const session = await this.client.ensureConnection();
+      return session.accounts[0].publicKey;
+    } catch (error) {
+      console.error("Failed to establish WalletConnect session:", error);
+      throw new Error("Failed to connect wallet. Please try again.");
+    }
   }
 
-  signTransaction(
-    xdr: string,
-    opts?: {
-      network?: string;
-      networkPassphrase?: string;
-      accountToSign?: string;
-    }
-  ): Promise<any> {
-    return this.client!.signTransaction(xdr, opts);
+  async signTransaction(xdr: string, opts?: any): Promise<any> {
+    if (!this.client) throw new Error("Wallet client is not initialized");
+    await this.client.initializingClient;
+    return this.client.signTransaction(xdr, opts);
+  }
+
+  async disconnect(): Promise<void> {
+    if (!this.client) return;
+    await this.client.initializingClient;
+    return this.client.disconnect();
   }
 }

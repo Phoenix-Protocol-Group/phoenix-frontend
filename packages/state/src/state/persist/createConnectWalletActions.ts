@@ -17,26 +17,22 @@ export const initializeWalletConnect = async () => {
     console.log("Initialized Wallet Connect");
   }
 
-  let publicKey: string | null = null;
+  try {
+    // This will trigger connection if no session exists
+    const publicKey = await walletConnectInstance.getPublicKey();
+    console.log("Wallet connected with public key:", publicKey);
 
-  while (!publicKey) {
-    try {
-      publicKey = await walletConnectInstance.getPublicKey();
-    } catch (error) {
-      console.log("Waiting for wallet to connect...");
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
+    // Save the walletConnectInstance in the regular app state
+    useAppStore.setState((state: AppStore) => ({
+      ...state,
+      walletConnectInstance,
+    }));
+
+    return walletConnectInstance;
+  } catch (error) {
+    console.error("Failed to connect wallet:", error);
+    throw error;
   }
-
-  console.log("Wallet connected", walletConnectInstance);
-
-  // Save the walletConnectInstance in the regular app state
-  useAppStore.setState((state: AppStore) => ({
-    ...state,
-    walletConnectInstance,
-  }));
-
-  return walletConnectInstance;
 };
 
 export const createConnectWalletActions = () => {
@@ -120,7 +116,19 @@ export const createConnectWalletActions = () => {
     },
 
     // Disconnect the wallet
-    disconnectWallet: () => {
+    disconnectWallet: async () => {
+      const currentWalletType = usePersistStore.getState().wallet.walletType;
+
+      // If it's a WalletConnect session, properly disconnect
+      if (currentWalletType === "wallet-connect" && walletConnectInstance) {
+        try {
+          await walletConnectInstance.disconnect();
+          walletConnectInstance = null;
+        } catch (error) {
+          console.error("Error disconnecting WalletConnect:", error);
+        }
+      }
+
       // Update the state
       usePersistStore.setState((state: AppStorePersist) => ({
         ...state,
@@ -130,6 +138,12 @@ export const createConnectWalletActions = () => {
           server: undefined,
           walletType: undefined,
         },
+      }));
+
+      // Clear the app state WalletConnect instance
+      useAppStore.setState((state: AppStore) => ({
+        ...state,
+        walletConnectInstance: null,
       }));
     },
   };
