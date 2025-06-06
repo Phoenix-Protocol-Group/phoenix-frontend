@@ -239,20 +239,19 @@ export class WalletConnect implements Wallet {
     );
   }
 
-  private async getTargetSession(params?: {
-    publicKey?: string;
-  }): Promise<IParsedWalletConnectSession> {
-    const activeSessions: IParsedWalletConnectSession[] =
-      await this.getSessions();
-    let targetSession: IParsedWalletConnectSession | undefined =
+  private async getTargetSession(params?: { publicKey?: string }) {
+    const activeSessions = await this.getSessions();
+
+    // 🔧 SAFEGUARD: fall back to first session if nothing else matches
+    let targetSession =
       activeSessions.find(
-        (session: IParsedWalletConnectSession): boolean =>
-          session.id === this.activeSession ||
-          !!session.accounts.find((a) => a.publicKey === params?.publicKey)
-      );
+        (s) =>
+          s.id === this.activeSession ||
+          s.accounts.some((a) => a.publicKey === params?.publicKey)
+      ) || activeSessions[0]; // fallback
 
     if (!targetSession) {
-      targetSession = await this.connectWalletConnect();
+      throw new Error("No valid WalletConnect session available");
     }
 
     return targetSession;

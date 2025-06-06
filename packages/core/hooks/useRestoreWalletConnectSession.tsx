@@ -1,56 +1,44 @@
 import { useEffect } from "react";
-import { SignClient } from "@walletconnect/sign-client";
-import { usePersistStore } from "@phoenix-protocol/state";
+import { usePersistStore, useAppStore } from "@phoenix-protocol/state";
+import { WalletConnect } from "@phoenix-protocol/utils";
+import { WalletConnectAllowedMethods } from "@phoenix-protocol/utils/build/wallets/wallet-connect";
 
 export const useRestoreWalletConnectSession = () => {
   const persistStore = usePersistStore();
+  const appStore = useAppStore();
 
   useEffect(() => {
-    const checkSession = async () => {
+    const restoreSession = async () => {
       if (persistStore.wallet.walletType !== "wallet-connect") return;
 
-      const client = await SignClient.init({
-        projectId: "YOUR_PROJECT_ID", // same one used in your modal
-        relayUrl: "wss://relay.walletconnect.com",
-        metadata: {
-          name: "Phoenix",
-          description: "Phoenix DeFi Hub",
-          url: "https://app.phoenix-hub.io",
-          icons: ["https://app.phoenix-hub.io/icon.png"],
-        },
+      const wc = await new WalletConnect({
+        projectId: "1cca500fbafdda38a70f8bf3bcb91b15",
+        name: "Phoenix DeFi Hub",
+        description: "Serving only the tastiest DeFi",
+        url: "https://app.phoenix-hub.io",
+        icons: ["https://app.phoenix-hub.io/logoIcon.png"],
+        method: WalletConnectAllowedMethods.SIGN_AND_SUBMIT, // Use the correct WalletConnectAllowedMethods value
+        network: "pubnet",
       });
 
-      const sessions = client.session.getAll();
+      const sessions = await wc.getSessions();
 
-      if (sessions.length === 0) {
-        // No active session: clean up
+      if (!sessions.length) {
         persistStore.disconnectWallet();
-        console.log("No active WalletConnect session found.");
         return;
       }
 
-      const session = sessions[0]; // You might support multiple sessions later
-
+      const session = sessions[0];
       const now = Math.floor(Date.now() / 1000);
-      if (session.expiry <= now) {
-        // Session expired: disconnect and clear
-        await client.disconnect({
-          topic: session.topic,
-          reason: {
-            code: 6000,
-            message: "Session expired",
-          },
-        });
 
-        persistStore.disconnectWallet();
-        console.log("WalletConnect session has expired. Disconnected.");
-        return;
-      }
-
-      // Session is still valid
-      console.log("WalletConnect session is still active:", session);
+      useAppStore.setState((state) => ({
+        ...state,
+        walletConnectInstance: wc,
+      }));
+      wc.setSession(session.id);
+      console.log("WalletConnect session restored:", session);
     };
 
-    checkSession();
+    restoreSession();
   }, [persistStore.wallet.walletType]);
 };
