@@ -7,9 +7,11 @@ import {
   WalletConnectAllowedMethods,
 } from "./wallet-connect";
 import { NETWORK_PASSPHRASE } from "../constants";
-
+let walletConnectInstance: WalletClient | undefined;
 const initializeWalletConnect = async () => {
-  const walletConnectInstance = new WalletClient({
+  if (walletConnectInstance) return walletConnectInstance;
+
+  walletConnectInstance = new WalletClient({
     projectId: "1cca500fbafdda38a70f8bf3bcb91b15",
     name: "Phoenix DeFi Hub",
     description: "Serving only the tastiest DeFi",
@@ -18,16 +20,23 @@ const initializeWalletConnect = async () => {
     method: WalletConnectAllowedMethods.SIGN_AND_SUBMIT,
     network: NETWORK_PASSPHRASE,
   });
+
   console.log("Initialized Wallet Connect");
 
+  // If already connected (restored session), skip waiting
+  if (await walletConnectInstance.isConnected()) {
+    console.log("Restored WalletConnect session");
+    return walletConnectInstance;
+  }
+
+  // Otherwise, wait for connection
   while (!(await walletConnectInstance.isConnected())) {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  console.log("Wallet connected", walletConnectInstance);
 
+  console.log("New WalletConnect session established");
   return walletConnectInstance;
 };
-
 /**
  * Signer class
  * @class Signer
@@ -84,7 +93,25 @@ export default class Signer {
     } else if (this.walletType === "hana") {
       this.wallet = new hana();
     } else if (this.walletType === "wallet-connect") {
-      this.wallet = await initializeWalletConnect();
+      const wc = await initializeWalletConnect();
+
+      this.wallet = {
+        signTransaction: async (tx: string) => {
+          return wc.signTransaction(tx); // or wc.signAndSubmit(tx), depending on the WalletConnectAllowedMethods
+        },
+        getAddress: async () => {
+          if (typeof wc.getAddress === "function") {
+            return wc.getAddress();
+          }
+          throw new Error("getAddress not implemented for WalletConnect");
+        },
+        signAuthEntry: async (entry: string) => {
+          if (typeof wc.signAuthEntry === "function") {
+            return wc.signAuthEntry(entry);
+          }
+          throw new Error("signAuthEntry not implemented for WalletConnect");
+        },
+      };
     } else {
       console.log("Wallet type not supported.");
     }

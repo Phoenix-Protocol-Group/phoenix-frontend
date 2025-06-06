@@ -29,6 +29,7 @@ import { motion } from "framer-motion";
 import { ToastProvider } from "@/providers/ToastProvider";
 import { RestoreModalProvider } from "@/providers/RestoreModalProvider";
 import Loader from "@/components/Loader/Loader";
+import { useRestoreWalletConnectSession } from "@/hooks/useRestoreWalletConnectSession";
 
 // Client-side only component for title updates
 const HiddenInputChecker = () => {
@@ -102,7 +103,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     setIsClient(true);
     setNavOpen(largerThanMd);
   }, [largerThanMd]);
-
+  useRestoreWalletConnectSession();
   // Update version when wallet address changes - client-side only
   useEffect(() => {
     if (isClient) {
@@ -136,24 +137,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
-
-  // Clean up wallet-connect sessions on page load - client-side only
-  useEffect(() => {
-    if (isClient) {
-      try {
-        const appStorageValue = localStorage?.getItem("app-storage");
-        if (appStorageValue !== null) {
-          const parsedValue = JSON.parse(appStorageValue);
-          const walletType = parsedValue?.state?.wallet?.walletType;
-          if (walletType === "wallet-connect") {
-            persistStore.disconnectWallet();
-          }
-        }
-      } catch (error) {
-        console.error("Error checking wallet connection:", error);
-      }
-    }
-  }, [persistStore, isClient]); // Add isClient dependency
 
   // Update disclaimer modal state - client-side only
   useEffect(() => {

@@ -31,17 +31,22 @@ const OptionComponent = ({
   onClick,
   selected,
   allowed,
-}: OptionComponentProps & { allowed: boolean }) => {
+  isMobile,
+}: OptionComponentProps & { allowed: boolean; isMobile: boolean }) => {
+  // On mobile, only wallet connect is available
+  const isMobileUnavailable = isMobile && connector.id !== "wallet-connect";
+  const isClickable = allowed && !isMobileUnavailable;
+
   return (
     <motion.div
-      whileHover={allowed ? { scale: 1.02 } : {}}
-      whileTap={allowed ? { scale: 0.98 } : {}}
+      whileHover={isClickable ? { scale: 1.02 } : {}}
+      whileTap={isClickable ? { scale: 0.98 } : {}}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
     >
       <Box
-        onClick={allowed ? onClick : undefined}
+        onClick={isClickable ? onClick : undefined}
         sx={{
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
@@ -56,8 +61,8 @@ const OptionComponent = ({
           marginTop: spacing.sm,
           borderRadius: borderRadius.md,
           transition: "all 0.3s ease",
-          opacity: allowed ? 1 : 0.6,
-          cursor: allowed ? "pointer" : "default",
+          opacity: isClickable ? 1 : 0.6,
+          cursor: isClickable ? "pointer" : "default",
           boxShadow: selected
             ? `0 0 16px rgba(${colors.primary.gradient}, 0.15)`
             : "none",
@@ -94,16 +99,21 @@ const OptionComponent = ({
           >
             {connector.name}
           </Typography>
-          {!allowed && (
+          {(!allowed || isMobileUnavailable) && (
             <Typography
               sx={{
                 fontSize: typography.fontSize.xs,
                 fontWeight: typography.fontWeights.regular,
                 color: colors.neutral[400],
-                display: { xs: "none", md: "block" },
+                display: {
+                  xs: isMobileUnavailable ? "block" : "none",
+                  md: "block",
+                },
               }}
             >
-              Not installed
+              {isMobileUnavailable
+                ? "Not available on mobile"
+                : "Not installed"}
             </Typography>
           )}
         </Box>
@@ -246,11 +256,16 @@ const ConnectWallet = ({
         if (!isMounted) break;
 
         try {
-          const isAllowed = await connector.isConnected();
-          if (isAllowed) {
-            allowed.push(connector);
-          } else {
+          // On mobile, only show wallet connect as available
+          if (isMobile && connector.id !== "wallet-connect") {
             disallowed.push(connector);
+          } else {
+            const isAllowed = await connector.isConnected();
+            if (isAllowed) {
+              allowed.push(connector);
+            } else {
+              disallowed.push(connector);
+            }
           }
         } catch (error) {
           disallowed.push(connector);
@@ -273,7 +288,7 @@ const ConnectWallet = ({
     return () => {
       isMounted = false;
     };
-  }, [open]); // Remove connectors from dependency array to prevent re-renders
+  }, [open, isMobile]); // Add isMobile to dependency array
 
   // Handle connecting to a wallet
   const handleConnect = useCallback(
@@ -281,9 +296,29 @@ const ConnectWallet = ({
       setLoading(true);
       setSelected(connector);
 
+      // If it's WalletConnect, close the modal immediately as the WalletConnect modal will open
+      if (connector.id === "wallet-connect") {
+        setOpen(false);
+        // Reset state immediately for WalletConnect
+        setTimeout(() => {
+          setLoading(false);
+          setSelected(undefined);
+        }, 100);
+
+        try {
+          await connect(connector);
+        } catch (error) {
+          console.error("Wallet connection failed:", error);
+          // Reopen the modal if WalletConnect fails
+          setOpen(true);
+          setLoading(false);
+        }
+        return;
+      }
+
       try {
         await connect(connector);
-        // Close the modal after successful connection
+        // Close the modal after successful connection for other wallets
         setOpen(false);
       } catch (error) {
         console.error("Wallet connection failed:", error);
@@ -416,7 +451,9 @@ const ConnectWallet = ({
                     mb: spacing.md,
                   }}
                 >
-                  Start by connecting with one of the wallets below.
+                  {isMobile
+                    ? "On mobile, we recommend using WalletConnect for the best experience."
+                    : "Start by connecting with one of the wallets below."}
                 </Typography>
 
                 {loadingConnectors ? (
@@ -448,6 +485,7 @@ const ConnectWallet = ({
                         selected={selected === connector}
                         onClick={() => handleConnect(connector)}
                         allowed={true}
+                        isMobile={isMobile}
                       />
                     ))}
                     {disallowedConnectors.map((connector) => (
@@ -457,6 +495,7 @@ const ConnectWallet = ({
                         selected={selected === connector}
                         onClick={() => {}}
                         allowed={false}
+                        isMobile={isMobile}
                       />
                     ))}
                   </Box>

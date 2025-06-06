@@ -108,17 +108,15 @@ interface ExecuteContractTransactionParams<T extends ContractType>
   contractType: T;
 }
 
-const getSigner = (storePersist: AppStorePersist, appStore: AppStore) => {
-  return storePersist.wallet.walletType === "wallet-connect"
-    ? appStore.walletConnectInstance
-    : new Signer();
+const getSigner = async () => {
+  const signer = new Signer();
+  await signer.getWallet();
+  return signer;
 };
 
 const getSignerFunction = (signer: any, storePersist: any) => {
-  return (tx: string) =>
-    storePersist.wallet.walletType === "wallet-connect"
-      ? signer.signTransaction(tx)
-      : signer.sign(tx);
+  console.log(signer);
+  return (tx: string) => signer.sign(tx);
 };
 
 const getContractClient = <T extends ContractType>(
@@ -158,7 +156,7 @@ export const useContractTransaction = () => {
       transactionFunction,
       options = {},
     }: ExecuteContractTransactionParams<T>) => {
-      const signer = getSigner(storePersist, appStore);
+      const signer = await getSigner();
       const networkPassphrase = constants.NETWORK_PASSPHRASE;
       const rpcUrl = constants.RPC_URL;
       const loadingMessage = "Transaction in progress...";
