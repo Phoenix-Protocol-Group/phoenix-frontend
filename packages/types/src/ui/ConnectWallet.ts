@@ -4,6 +4,7 @@ export interface OptionComponentProps {
   connector: Connector;
   onClick: () => void;
   selected: boolean;
+  isMobile?: boolean;
 }
 
 export interface ConnectWalletProps {

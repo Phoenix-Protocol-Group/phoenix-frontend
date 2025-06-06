@@ -11,7 +11,7 @@ import { hana } from "../wallet/hana";
 // Maintain a single WalletConnect instance
 let walletConnectInstance: WalletConnect | null = null;
 
-const initializeWalletConnect = async () => {
+export const initializeWalletConnect = async () => {
   if (!walletConnectInstance) {
     walletConnectInstance = new WalletConnect();
     console.log("Initialized Wallet Connect");
