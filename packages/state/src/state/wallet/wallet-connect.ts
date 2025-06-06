@@ -87,4 +87,16 @@ export class WalletConnect implements Connector {
     await this.client.initializingClient;
     return this.client.disconnect();
   }
+
+  async verifyAllSessionsClosed(): Promise<boolean> {
+    if (!this.client) return true;
+    await this.client.initializingClient;
+    return this.client.verifyAllSessionsClosed();
+  }
+
+  async forceNewConnection(): Promise<any> {
+    if (!this.client) throw new Error("Wallet client is not initialized");
+    await this.client.initializingClient;
+    return this.client.forceNewConnection();
+  }
 }

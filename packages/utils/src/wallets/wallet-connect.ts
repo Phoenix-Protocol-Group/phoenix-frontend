@@ -467,26 +467,80 @@ export class WalletConnect implements Wallet {
 
     try {
       const sessions = await this.getSessions();
+      console.log(`Disconnecting ${sessions.length} WalletConnect sessions...`);
 
       // Close all active sessions
-      for (const session of sessions) {
+      const disconnectPromises = sessions.map(async (session) => {
         try {
+          console.log(`Closing session: ${session.id} (${session.name})`);
           await this.closeSession(session.id, "User disconnected");
+          console.log(`Successfully closed session: ${session.id}`);
         } catch (error) {
           console.log("Failed to close session:", session.id, error);
         }
-      }
+      });
+
+      // Wait for all sessions to be closed
+      await Promise.allSettled(disconnectPromises);
 
       // Reset active session
       this.activeSession = undefined;
 
       // Close modal if open
-      this.qrModal.closeModal();
+      try {
+        this.qrModal.closeModal();
+      } catch (error) {
+        // Modal might not be open, ignore error
+        console.log("Modal close error (expected if not open):", error);
+      }
 
-      console.log("WalletConnect disconnected successfully");
+      console.log(
+        "WalletConnect disconnected successfully - all sessions closed"
+      );
     } catch (error) {
       console.error("Error during WalletConnect disconnect:", error);
+      throw error;
     }
+  }
+
+  // Method to verify all sessions are closed (useful for debugging)
+  async verifyAllSessionsClosed(): Promise<boolean> {
+    try {
+      await this.ensureClientReady();
+      const sessions = await this.getSessions();
+      const isAllClosed = sessions.length === 0;
+      console.log(
+        `Session verification: ${sessions.length} sessions remaining. All closed: ${isAllClosed}`
+      );
+      return isAllClosed;
+    } catch (error) {
+      console.error("Error verifying sessions:", error);
+      return false;
+    }
+  }
+
+  // Method to force a new connection (always shows modal, even if sessions exist)
+  async forceNewConnection(): Promise<IParsedWalletConnectSession> {
+    await this.ensureClientReady();
+
+    // Disconnect any existing sessions first
+    try {
+      const existingSessions = await this.getSessions();
+      if (existingSessions.length > 0) {
+        console.log(
+          `Disconnecting ${existingSessions.length} existing sessions to force new connection...`
+        );
+        await this.disconnect();
+
+        // Wait a moment for sessions to be fully cleared
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    } catch (error) {
+      console.log("Error clearing existing sessions:", error);
+    }
+
+    // Now establish a fresh connection (this will always show the modal)
+    return await this.connectWalletConnect();
   }
 }
 

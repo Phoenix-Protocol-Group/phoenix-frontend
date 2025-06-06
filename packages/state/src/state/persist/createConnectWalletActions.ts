@@ -11,15 +11,25 @@ import { hana } from "../wallet/hana";
 // Maintain a single WalletConnect instance
 let walletConnectInstance: WalletConnect | null = null;
 
-export const initializeWalletConnect = async () => {
+export const initializeWalletConnect = async (forceNew = false) => {
   if (!walletConnectInstance) {
     walletConnectInstance = new WalletConnect();
     console.log("Initialized Wallet Connect");
   }
 
   try {
-    // This will trigger connection if no session exists
-    const publicKey = await walletConnectInstance.getPublicKey();
+    let publicKey;
+
+    if (forceNew) {
+      // Force a new connection (will always show modal)
+      console.log("Forcing new WalletConnect connection...");
+      const session = await walletConnectInstance.forceNewConnection();
+      publicKey = session.accounts[0].publicKey;
+    } else {
+      // This will trigger connection if no session exists
+      publicKey = await walletConnectInstance.getPublicKey();
+    }
+
     console.log("Wallet connected with public key:", publicKey);
 
     // Save the walletConnectInstance in the regular app state
@@ -47,7 +57,7 @@ export const createConnectWalletActions = () => {
     // This function is called when the user clicks the "Connect" button
     // in the wallet modal. It uses the Freighters SDK to get the user's
     // address and network details, and then stores them in the app state.
-    connectWallet: async (wallet: string) => {
+    connectWallet: async (wallet: string, forceNew = false) => {
       // Get the network details from the user's wallet.
       // TODO: Make this dynamic
       const networkDetails = {
@@ -91,7 +101,7 @@ export const createConnectWalletActions = () => {
           address = await hana().getPublicKey();
           break;
         case "wallet-connect":
-          const Client = await initializeWalletConnect();
+          const Client = await initializeWalletConnect(forceNew);
           address = await Client.getPublicKey();
           break;
         default:
@@ -113,23 +123,60 @@ export const createConnectWalletActions = () => {
       }));
 
       return;
-    },
-
-    // Disconnect the wallet
+    }, // Disconnect the wallet
     disconnectWallet: async () => {
       const currentWalletType = usePersistStore.getState().wallet.walletType;
 
+      console.log(`Disconnecting wallet type: ${currentWalletType}`);
+
       // If it's a WalletConnect session, properly disconnect
-      if (currentWalletType === "wallet-connect" && walletConnectInstance) {
-        try {
-          await walletConnectInstance.disconnect();
-          walletConnectInstance = null;
-        } catch (error) {
-          console.error("Error disconnecting WalletConnect:", error);
+      if (currentWalletType === "wallet-connect") {
+        if (walletConnectInstance) {
+          try {
+            console.log("Disconnecting WalletConnect instance...");
+            await walletConnectInstance.disconnect();
+
+            // Verify all sessions are closed
+            const allClosed =
+              await walletConnectInstance.verifyAllSessionsClosed();
+            console.log(
+              `WalletConnect sessions cleanup verified: ${
+                allClosed ? "SUCCESS" : "PARTIAL"
+              }`
+            );
+          } catch (error) {
+            console.error("Error disconnecting WalletConnect:", error);
+          }
         }
+
+        // Also check app state for WalletConnect instance
+        const appState = useAppStore.getState();
+        if (appState.walletConnectInstance) {
+          try {
+            console.log("Disconnecting WalletConnect from app state...");
+            await appState.walletConnectInstance.disconnect();
+
+            // Verify app state sessions are closed
+            const allClosed =
+              await appState.walletConnectInstance.verifyAllSessionsClosed();
+            console.log(
+              `App state WalletConnect cleanup verified: ${
+                allClosed ? "SUCCESS" : "PARTIAL"
+              }`
+            );
+          } catch (error) {
+            console.error(
+              "Error disconnecting app state WalletConnect:",
+              error
+            );
+          }
+        }
+
+        // Clear the global instance
+        walletConnectInstance = null;
       }
 
-      // Update the state
+      // Update the persist state
       usePersistStore.setState((state: AppStorePersist) => ({
         ...state,
         wallet: {
@@ -145,6 +192,29 @@ export const createConnectWalletActions = () => {
         ...state,
         walletConnectInstance: null,
       }));
+
+      console.log("Wallet disconnected and state cleared");
+    },
+
+    // Force reconnect wallet (always shows modal for WalletConnect)
+    reconnectWallet: async (wallet: string) => {
+      console.log(`Force reconnecting wallet: ${wallet}`);
+
+      // First disconnect if already connected
+      const currentWalletType = usePersistStore.getState().wallet.walletType;
+      if (currentWalletType === wallet) {
+        await createConnectWalletActions().disconnectWallet();
+        // Wait a moment for disconnect to complete
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+
+      // Now connect with force flag
+      return await createConnectWalletActions().connectWallet(wallet, true);
     },
   };
+};
+
+export const forceWalletConnectReconnection = async () => {
+  console.log("Forcing WalletConnect reconnection...");
+  return await initializeWalletConnect(true);
 };

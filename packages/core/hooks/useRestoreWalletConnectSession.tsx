@@ -62,5 +62,5 @@ export const useRestoreWalletConnectSession = () => {
     };
 
     restoreSession();
-  }, [persistStore.wallet.walletType]);
+  }, [persistStore, persistStore.wallet.walletType]);
 };
