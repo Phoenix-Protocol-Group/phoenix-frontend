@@ -132,7 +132,7 @@ export class WalletConnect implements Wallet {
     });
 
     return {
-      signedTxXdr: updatedXdr,
+      signedTxXdr: updatedXdr as string,
       signerAddress: (await this.getAddress()).address!,
     };
   }
