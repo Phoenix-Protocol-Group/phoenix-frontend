@@ -49,16 +49,15 @@ const OptionComponent = ({
         onClick={isClickable ? onClick : undefined}
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          padding: { md: spacing.md, xs: spacing.sm },
+          flexDirection: "row", // Always use row layout for cleaner mobile display
+          padding: { xs: spacing.sm, md: spacing.md },
           alignItems: "center",
-          gap: spacing.xs,
+          gap: { xs: spacing.sm, md: spacing.xs },
           background: colors.neutral[900],
           border: selected
             ? `1px solid ${colors.primary.main}`
             : `1px solid ${colors.neutral[700]}`,
           width: "100%",
-          marginTop: spacing.sm,
           borderRadius: borderRadius.md,
           transition: "all 0.3s ease",
           opacity: isClickable ? 1 : 0.6,
@@ -66,6 +65,14 @@ const OptionComponent = ({
           boxShadow: selected
             ? `0 0 16px rgba(${colors.primary.gradient}, 0.15)`
             : "none",
+          minHeight: { xs: "48px", md: "60px" },
+          "&:hover": isClickable
+            ? {
+                background: colors.neutral[850],
+                borderColor: colors.primary.main,
+                transform: "translateY(-1px)",
+              }
+            : {},
         }}
       >
         <Box
@@ -73,28 +80,35 @@ const OptionComponent = ({
           src={connector.iconUrl}
           alt={connector.name}
           sx={{
-            width: "37px",
-            height: "37px",
+            width: { xs: "32px", md: "37px" },
+            height: { xs: "32px", md: "37px" },
             borderRadius: "50%",
             objectFit: "contain",
             background: colors.neutral[800],
             padding: spacing.xs,
             boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+            flexShrink: 0,
           }}
         />
         <Box
           sx={{
             flex: 1,
-            textAlign: { xs: "center", md: "left" },
-            mt: { xs: 1, md: 0 },
+            textAlign: "left",
+            minWidth: 0, // Allows text to truncate properly
           }}
         >
           <Typography
             sx={{
-              fontSize: typography.fontSize.md,
+              fontSize: {
+                xs: typography.fontSize.sm,
+                md: typography.fontSize.md,
+              },
               fontWeight: typography.fontWeights.medium,
               color: colors.neutral[50],
               mb: 0.5,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
             }}
           >
             {connector.name}
@@ -102,13 +116,15 @@ const OptionComponent = ({
           {(!allowed || isMobileUnavailable) && (
             <Typography
               sx={{
-                fontSize: typography.fontSize.xs,
+                fontSize: {
+                  xs: typography.fontSize.xxs,
+                  md: typography.fontSize.xs,
+                },
                 fontWeight: typography.fontWeights.regular,
                 color: colors.neutral[400],
-                display: {
-                  xs: isMobileUnavailable ? "block" : "none",
-                  md: "block",
-                },
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
               }}
             >
               {isMobileUnavailable
@@ -125,7 +141,7 @@ const OptionComponent = ({
 /**
  * Loading screen when connecting to a wallet
  */
-const WalletConnectingScreen = ({ connector, onBack }) => (
+const WalletConnectingScreen = ({ connector, onBack, isMobile }) => (
   <motion.div
     initial={{ scale: 0.95, opacity: 0 }}
     animate={{ scale: 1, opacity: 1 }}
@@ -135,20 +151,21 @@ const WalletConnectingScreen = ({ connector, onBack }) => (
     <Box
       sx={{
         display: "flex",
-        padding: spacing.lg,
+        padding: { xs: spacing.md, md: spacing.lg },
         flexDirection: "column",
         alignItems: "center",
-        borderRadius: borderRadius.lg,
+        borderRadius: { xs: borderRadius.md, md: borderRadius.lg },
         background: colors.neutral[800],
         border: `1px solid ${colors.neutral[700]}`,
+        textAlign: "center",
       }}
     >
       <motion.img
         src={connector?.iconUrl || "/cryptoIcons/pho.svg"}
         alt="Loading Wallet"
         style={{
-          width: "120px",
-          height: "120px",
+          width: isMobile ? "80px" : "120px",
+          height: isMobile ? "80px" : "120px",
           borderRadius: "50%",
           marginBottom: spacing.md,
         }}
@@ -164,25 +181,29 @@ const WalletConnectingScreen = ({ connector, onBack }) => (
       />
       <Typography
         sx={{
-          fontSize: typography.fontSize.lg,
+          fontSize: { xs: typography.fontSize.md, md: typography.fontSize.lg },
           fontWeight: typography.fontWeights.bold,
           color: colors.neutral[50],
-          mt: spacing.md,
+          mb: spacing.sm,
         }}
       >
         Opening {connector?.name}
       </Typography>
       <Typography
         sx={{
-          fontSize: typography.fontSize.sm,
+          fontSize: { xs: typography.fontSize.xs, md: typography.fontSize.sm },
           color: colors.neutral[400],
           mb: spacing.lg,
-          textAlign: "center",
+          lineHeight: 1.4,
         }}
       >
         Please confirm the connection request in the {connector?.name} app
       </Typography>
-      <Button sx={{ width: "100%" }} onClick={onBack} type="secondary">
+      <Button
+        sx={{ width: "100%", minHeight: "44px" }}
+        onClick={onBack}
+        type="secondary"
+      >
         Back
       </Button>
     </Box>
@@ -321,6 +342,7 @@ const ConnectWallet = ({
         // Close the modal after successful connection for other wallets
         setOpen(false);
       } catch (error) {
+        us;
         console.error("Wallet connection failed:", error);
         setLoading(false);
       }
@@ -359,23 +381,36 @@ const ConnectWallet = ({
       <Box
         sx={{
           position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: { xs: "95%", md: "800px" },
-          maxHeight: { xs: "90vh", md: "80vh" },
+          top: { xs: 0, md: "50%" },
+          left: { xs: 0, md: "50%" },
+          transform: { xs: "none", md: "translate(-50%, -50%)" },
+          width: { xs: "100vw", md: "800px" },
+          height: { xs: "100vh", md: "auto" },
+          maxHeight: { xs: "none", md: "80vh" },
           outline: "none",
         }}
       >
         <AnimatePresence mode="wait">
           <motion.div
             key="modal"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+            initial={{
+              opacity: 0,
+              scale: isMobile ? 1 : 0.95,
+              y: isMobile ? "100%" : 0,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              y: 0,
+            }}
+            exit={{
+              opacity: 0,
+              scale: isMobile ? 1 : 0.95,
+              y: isMobile ? "100%" : 0,
+            }}
             transition={{ duration: 0.3 }}
             style={{
-              borderRadius: borderRadius.lg,
+              borderRadius: isMobile ? 0 : borderRadius.lg,
               backgroundColor: colors.neutral[900],
               border: `1px solid ${colors.neutral[700]}`,
               boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
@@ -386,18 +421,22 @@ const ConnectWallet = ({
             }}
           >
             <Grid container sx={{ height: "100%" }}>
-              {/* Left Side - Wallet Selection */}
+              {/* Mobile-first layout - single column on mobile, split on desktop */}
               <Grid
                 item
                 xs={12}
                 md={6}
                 sx={{
-                  padding: spacing.lg,
-                  height: "100%",
+                  padding: { xs: spacing.md, md: spacing.lg },
+                  height: { xs: "auto", md: "100%" },
                   overflow: "auto",
                   borderRight: {
                     md: `1px solid ${colors.neutral[800]}`,
                     xs: "none",
+                  },
+                  borderBottom: {
+                    xs: `1px solid ${colors.neutral[800]}`,
+                    md: "none",
                   },
                   "&::-webkit-scrollbar": {
                     width: "4px",
@@ -413,13 +452,16 @@ const ConnectWallet = ({
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    mb: spacing.md,
+                    mb: { xs: spacing.sm, md: spacing.md },
                   }}
                 >
                   <Typography
                     variant="h2"
                     sx={{
-                      fontSize: typography.fontSize.xl,
+                      fontSize: {
+                        xs: typography.fontSize.lg,
+                        md: typography.fontSize.xl,
+                      },
                       fontWeight: typography.fontWeights.bold,
                       color: colors.neutral[50],
                     }}
@@ -436,6 +478,7 @@ const ConnectWallet = ({
                         opacity: 0.7,
                         color: colors.neutral[300],
                         "&:hover": { opacity: 1 },
+                        padding: spacing.xs,
                       }}
                       onClick={handleClose}
                     >
@@ -446,26 +489,30 @@ const ConnectWallet = ({
 
                 <Typography
                   sx={{
-                    fontSize: typography.fontSize.sm,
+                    fontSize: {
+                      xs: typography.fontSize.xs,
+                      md: typography.fontSize.sm,
+                    },
                     color: colors.neutral[400],
-                    mb: spacing.md,
+                    mb: { xs: spacing.sm, md: spacing.md },
+                    lineHeight: 1.4,
                   }}
                 >
                   {isMobile
-                    ? "On mobile, we recommend using WalletConnect for the best experience."
+                    ? "Choose your preferred wallet to connect and start using Phoenix Protocol."
                     : "Start by connecting with one of the wallets below."}
                 </Typography>
 
                 {loadingConnectors ? (
-                  // Loading skeleton
+                  // Loading skeleton with better mobile spacing
                   [...Array(4)].map((_, index) => (
                     <Box
                       key={index}
                       sx={{
-                        height: "60px",
+                        height: { xs: "48px", md: "60px" },
                         borderRadius: borderRadius.md,
                         background: colors.neutral[800],
-                        mb: spacing.sm,
+                        mb: { xs: spacing.xs, md: spacing.sm },
                         animation: "pulse 1.5s infinite ease-in-out",
                         "@keyframes pulse": {
                           "0%": { opacity: 0.5 },
@@ -476,8 +523,14 @@ const ConnectWallet = ({
                     />
                   ))
                 ) : (
-                  // Wallet options
-                  <Box>
+                  // Wallet options with improved mobile layout
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: { xs: spacing.xs, md: spacing.sm },
+                    }}
+                  >
                     {allowedConnectors.map((connector) => (
                       <OptionComponent
                         key={connector.id}
@@ -502,18 +555,19 @@ const ConnectWallet = ({
                 )}
               </Grid>
 
-              {/* Right Side - Loading or Info */}
+              {/* Info section - hidden on mobile when loading */}
               <Grid
                 item
                 xs={12}
                 md={6}
                 sx={{
-                  padding: spacing.lg,
-                  display: "flex",
+                  padding: { xs: spacing.md, md: spacing.lg },
+                  display: { xs: loading ? "none" : "flex", md: "flex" },
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
                   position: "relative",
+                  minHeight: { xs: "300px", md: "auto" },
                 }}
               >
                 <AnimatePresence mode="wait">
@@ -522,6 +576,7 @@ const ConnectWallet = ({
                       key="loading"
                       connector={selected}
                       onBack={handleBack}
+                      isMobile={isMobile}
                     />
                   ) : (
                     <motion.div

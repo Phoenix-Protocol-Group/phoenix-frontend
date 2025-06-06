@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography, IconButton } from "@mui/material";
+import { Box, Typography, IconButton, useMediaQuery, useTheme } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { colors, typography, spacing, borderRadius } from "../Theme/styleConstants";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
@@ -17,6 +17,8 @@ interface CarouselProps {
 const CarouselComponent = ({ items }: CarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const handleNext = () => {
     setDirection(1);
@@ -66,13 +68,13 @@ const CarouselComponent = ({ items }: CarouselProps) => {
                 borderRadius: borderRadius.lg,
                 background: colors.neutral[800],
                 border: `1px solid ${colors.neutral[700]}`,
-                padding: spacing.lg,
+                padding: { xs: spacing.md, md: spacing.lg },
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
                 textAlign: "center",
-                minHeight: "300px",
+                minHeight: { xs: "250px", md: "300px" },
               }}
             >
               {/* If the image source exists, use it, otherwise display a placeholder */}
@@ -82,9 +84,9 @@ const CarouselComponent = ({ items }: CarouselProps) => {
                   src={items[currentIndex].image || "/placeholder-wallet.svg"}
                   alt={items[currentIndex].title}
                   sx={{
-                    width: "120px",
-                    height: "120px",
-                    marginBottom: spacing.md,
+                    width: { xs: "80px", md: "120px" },
+                    height: { xs: "80px", md: "120px" },
+                    marginBottom: { xs: spacing.sm, md: spacing.md },
                     filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))",
                   }}
                   onError={(e) => {
@@ -95,9 +97,9 @@ const CarouselComponent = ({ items }: CarouselProps) => {
               ) : (
                 <Box
                   sx={{
-                    width: "120px",
-                    height: "120px",
-                    marginBottom: spacing.md,
+                    width: { xs: "80px", md: "120px" },
+                    height: { xs: "80px", md: "120px" },
+                    marginBottom: { xs: spacing.sm, md: spacing.md },
                     background: colors.neutral[700],
                     borderRadius: "50%",
                     display: "flex",
@@ -105,26 +107,27 @@ const CarouselComponent = ({ items }: CarouselProps) => {
                     justifyContent: "center",
                   }}
                 >
-                  <Typography sx={{ color: colors.neutral[300], fontSize: 40 }}>
+                  <Typography sx={{ color: colors.neutral[300], fontSize: { xs: 30, md: 40 } }}>
                     ?
                   </Typography>
                 </Box>
               )}
               <Typography
                 sx={{
-                  fontSize: typography.fontSize.lg,
+                  fontSize: { xs: typography.fontSize.md, md: typography.fontSize.lg },
                   fontWeight: typography.fontWeights.bold,
                   color: colors.neutral[50],
-                  mb: spacing.sm,
+                  mb: { xs: spacing.xs, md: spacing.sm },
                 }}
               >
                 {items[currentIndex].title}
               </Typography>
               <Typography
                 sx={{
-                  fontSize: typography.fontSize.md,
+                  fontSize: { xs: typography.fontSize.sm, md: typography.fontSize.md },
                   color: colors.neutral[300],
                   maxWidth: "90%",
+                  lineHeight: 1.4,
                 }}
               >
                 {items[currentIndex].content}
@@ -139,8 +142,8 @@ const CarouselComponent = ({ items }: CarouselProps) => {
         sx={{
           display: "flex",
           justifyContent: "center",
-          mt: spacing.md,
-          gap: spacing.xs,
+          mt: { xs: spacing.sm, md: spacing.md },
+          gap: { xs: spacing.xs, md: spacing.xs },
         }}
       >
         {items.map((_, index) => (
@@ -148,8 +151,8 @@ const CarouselComponent = ({ items }: CarouselProps) => {
             key={index}
             onClick={() => handleDotClick(index)}
             sx={{
-              width: 10,
-              height: 10,
+              width: { xs: 8, md: 10 },
+              height: { xs: 8, md: 10 },
               borderRadius: "50%",
               backgroundColor: index === currentIndex ? colors.primary.main : colors.neutral[700],
               cursor: "pointer",
@@ -162,49 +165,53 @@ const CarouselComponent = ({ items }: CarouselProps) => {
         ))}
       </Box>
 
-      {/* Navigation arrows */}
-      <IconButton
-        onClick={handlePrev}
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "-20px",
-          transform: "translateY(-50%)",
-          width: 40,
-          height: 40,
-          backgroundColor: colors.neutral[800],
-          border: `1px solid ${colors.neutral[700]}`,
-          color: colors.neutral[300],
-          opacity: 0.7,
-          '&:hover': {
-            opacity: 1,
-            backgroundColor: colors.neutral[700],
-          }
-        }}
-      >
-        <ArrowBackIos fontSize="small" />
-      </IconButton>
-      <IconButton
-        onClick={handleNext}
-        sx={{
-          position: "absolute",
-          top: "50%",
-          right: "-20px",
-          transform: "translateY(-50%)",
-          width: 40,
-          height: 40,
-          backgroundColor: colors.neutral[800],
-          border: `1px solid ${colors.neutral[700]}`,
-          color: colors.neutral[300],
-          opacity: 0.7,
-          '&:hover': {
-            opacity: 1,
-            backgroundColor: colors.neutral[700],
-          }
-        }}
-      >
-        <ArrowForwardIos fontSize="small" />
-      </IconButton>
+      {/* Navigation arrows - hide on mobile for cleaner look */}
+      {!isMobile && (
+        <>
+          <IconButton
+            onClick={handlePrev}
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "-20px",
+              transform: "translateY(-50%)",
+              width: 40,
+              height: 40,
+              backgroundColor: colors.neutral[800],
+              border: `1px solid ${colors.neutral[700]}`,
+              color: colors.neutral[300],
+              opacity: 0.7,
+              '&:hover': {
+                opacity: 1,
+                backgroundColor: colors.neutral[700],
+              }
+            }}
+          >
+            <ArrowBackIos fontSize="small" />
+          </IconButton>
+          <IconButton
+            onClick={handleNext}
+            sx={{
+              position: "absolute",
+              top: "50%",
+              right: "-20px",
+              transform: "translateY(-50%)",
+              width: 40,
+              height: 40,
+              backgroundColor: colors.neutral[800],
+              border: `1px solid ${colors.neutral[700]}`,
+              color: colors.neutral[300],
+              opacity: 0.7,
+              '&:hover': {
+                opacity: 1,
+                backgroundColor: colors.neutral[700],
+              }
+            }}
+          >
+            <ArrowForwardIos fontSize="small" />
+          </IconButton>
+        </>
+      )}
     </Box>
   );
 };
