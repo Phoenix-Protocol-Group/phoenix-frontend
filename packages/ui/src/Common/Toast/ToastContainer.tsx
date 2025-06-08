@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { Box } from "@mui/material";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Toast, ToastProps } from "./Toast";
-import { spacing } from "../../Theme/styleConstants";
+import { spacing, colors, borderRadius } from "../../Theme/styleConstants";
 import { useToast } from "./useToast";
 
 interface ToastContainerProps {
@@ -51,35 +51,76 @@ export const ToastContainer = ({
   };
 
   return (
-    <Box
-      sx={{
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      style={{
         position: "fixed",
         zIndex: 2000,
-        display: "flex",
-        flexDirection: "column",
-        gap: spacing.sm,
-        width: {
-          xs: "calc(100% - 32px)", // On small screens, use most of the width
-          sm: "400px", // On larger screens, fixed width
-        },
-        maxWidth: "400px", // Maximum width
-        maxHeight: "100vh",
-        overflowY: "auto",
-        "&::-webkit-scrollbar": {
-          width: "4px",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          backgroundColor: "rgba(255, 255, 255, 0.2)",
-          borderRadius: "4px",
-        },
         ...getPositionStyle(),
       }}
     >
-      <AnimatePresence mode="sync">
-        {toasts.map((toast) => (
-          <Toast key={toast.id} {...toast} onClose={onClose} />
-        ))}
-      </AnimatePresence>
-    </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: spacing.sm,
+          width: {
+            xs: "calc(100vw - 32px)", // On small screens, use most of the width
+            sm: "400px", // On larger screens, fixed width
+          },
+          maxWidth: "400px", // Maximum width
+          maxHeight: "100vh",
+          overflowY: "auto",
+          padding: spacing.xs,
+          "&::-webkit-scrollbar": {
+            width: "6px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: `linear-gradient(135deg, ${colors.primary.main} 0%, ${colors.primary.dark} 100%)`,
+            borderRadius: borderRadius.sm,
+            "&:hover": {
+              background: colors.primary.light,
+            },
+          },
+          // Enhanced scrollbar for Firefox
+          scrollbarWidth: "thin",
+          scrollbarColor: `${colors.primary.main} transparent`,
+        }}
+      >
+        <AnimatePresence mode="popLayout">
+          {toasts.map((toast, index) => (
+            <motion.div
+              key={toast.id}
+              layout
+              initial={{ opacity: 0, x: 300, scale: 0.8 }}
+              animate={{
+                opacity: 1,
+                x: 0,
+                scale: 1,
+                transition: {
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 30,
+                  delay: index * 0.1,
+                },
+              }}
+              exit={{
+                opacity: 0,
+                x: 300,
+                scale: 0.8,
+                transition: { duration: 0.3, ease: "easeInOut" },
+              }}
+            >
+              <Toast {...toast} onClose={onClose} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </Box>
+    </motion.div>
   );
 };

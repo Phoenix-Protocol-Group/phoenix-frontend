@@ -2,6 +2,9 @@ import React, { useState, useCallback, useContext, createContext } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ToastProps, ToastType } from "./Toast";
 
+// Import enhanced error resolver
+import { resolveContractErrorEnhanced } from "@phoenix-protocol/utils/src/enhancedErrorResolver";
+
 interface ToastContextType {
   toasts: ToastProps[];
   addToast: (options: Omit<ToastProps, "id" | "onClose">) => string;
@@ -112,38 +115,61 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
             : "Operation completed successfully!",
           transactionId,
         });
-        return result;
-      } catch (error) {
-        // Create a serializable error object
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : typeof error === "object" && error !== null && "message" in error
-            ? error.message
-            : "Operation failed";
 
-        const errorObj =
-          error instanceof Error
-            ? { message: error.message, stack: error.stack }
-            : typeof error === "object" && error !== null
-            ? error
-            : { message: String(error) };
-
-        updateToast(toastId, {
-          type: "error",
-          message: errorMessage as string,
-          error: errorObj as
-            | string
-            | Error
-            | { message: string; stack?: string | undefined }
-            | undefined, // Store a serializable error object
-        });
-        throw error;
-      } finally {
-        // Auto remove the toast after 5 seconds
+        // Auto remove success toasts after 5 seconds
         setTimeout(() => {
           removeToast(toastId);
         }, 5000);
+
+        return result;
+      } catch (error) {
+        // Enhanced error processing using the new error resolver
+        const errorString =
+          error instanceof Error
+            ? error.message
+            : typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : String(error);
+
+        // Use enhanced error resolver to get user-friendly message
+        const errorResult = resolveContractErrorEnhanced(errorString);
+
+        // Create a serializable error object with enhanced details
+        const errorObj =
+          error instanceof Error
+            ? {
+                message: error.message,
+                stack: error.stack,
+                userFriendlyMessage: errorResult.userFriendlyMessage,
+                errorCode: errorResult.errorCode,
+                contractType: errorResult.contractType,
+              }
+            : typeof error === "object" && error !== null
+            ? {
+                ...error,
+                userFriendlyMessage: errorResult.userFriendlyMessage,
+                errorCode: errorResult.errorCode,
+                contractType: errorResult.contractType,
+              }
+            : {
+                message: String(error),
+                userFriendlyMessage: errorResult.userFriendlyMessage,
+                errorCode: errorResult.errorCode,
+                contractType: errorResult.contractType,
+              };
+
+        updateToast(toastId, {
+          type: "error",
+          message: errorResult.userFriendlyMessage, // Use user-friendly message as primary
+          error: errorObj, // Store enhanced error details for "Show Details" functionality
+        });
+
+        // Auto remove error toasts after 10 seconds
+        setTimeout(() => {
+          removeToast(toastId);
+        }, 10000);
+
+        throw error;
       }
     },
     [addToast, updateToast, removeToast]

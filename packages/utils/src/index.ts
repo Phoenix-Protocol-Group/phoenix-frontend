@@ -9,6 +9,7 @@ export * from "./sep10";
 export * from "./graphql";
 export * from "./prices";
 export * from "./errorResolver";
+export * from "./enhancedErrorResolver";
 export * from "./trustlines";
 export * from "./api";
 export * as TradeAPi from "./trade_api";
