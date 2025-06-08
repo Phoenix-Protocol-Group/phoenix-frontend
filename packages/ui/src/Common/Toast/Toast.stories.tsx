@@ -53,6 +53,58 @@ Warning.args = {
   onClose: () => console.log("Toast closed"),
 };
 
+export const ErrorWithEnhancedDetails = SingleToastTemplate.bind({});
+ErrorWithEnhancedDetails.args = {
+  id: "enhanced-error",
+  type: "error",
+  title: "Contract Error",
+  message:
+    "The slippage exceeds the allowable limit. In Phase 1 of the launch, it's capped at 1%. Please try to swap a lower amount of tokens.",
+  onClose: () => console.log("Toast closed"),
+  // Simulate enhanced error object from the new error resolver
+  error: {
+    message: "Transaction simulation failed: HostError: Error(Contract, #300)",
+    userFriendlyMessage:
+      "The slippage exceeds the allowable limit. In Phase 1 of the launch, it's capped at 1%. Please try to swap a lower amount of tokens.",
+    errorCode: 300,
+    contractType: "pair",
+    stack:
+      "Error: Transaction simulation failed: HostError: Error(Contract, #300)\n    at PhoenixPairContract.swap (contract.js:123:15)\n    at executeContractTransaction (useContractTransaction.tsx:45:20)",
+  },
+};
+
+export const ErrorWithStakeContract = SingleToastTemplate.bind({});
+ErrorWithStakeContract.args = {
+  id: "stake-error",
+  type: "error",
+  title: "Staking Error",
+  message: "Insufficient staking balance",
+  onClose: () => console.log("Toast closed"),
+  error: {
+    message: "Error(Contract, #503)",
+    userFriendlyMessage: "Insufficient staking balance",
+    errorCode: 503,
+    contractType: "stake",
+  },
+};
+
+export const ErrorWithUnknownCode = SingleToastTemplate.bind({});
+ErrorWithUnknownCode.args = {
+  id: "unknown-error",
+  type: "error",
+  title: "Unknown Contract Error",
+  message:
+    "Contract error occurred (code: 999). Please try again or contact support.",
+  onClose: () => console.log("Toast closed"),
+  error: {
+    message: "Error(Contract, #999)",
+    userFriendlyMessage:
+      "Contract error occurred (code: 999). Please try again or contact support.",
+    errorCode: 999,
+    contractType: null,
+  },
+};
+
 export const Info = SingleToastTemplate.bind({});
 Info.args = {
   id: "4",

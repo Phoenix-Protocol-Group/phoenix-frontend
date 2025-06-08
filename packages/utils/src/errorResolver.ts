@@ -1,13 +1,11 @@
+// Legacy error definitions for backward compatibility
 enum ContractError {
   SpreadExceedsLimit = 1,
-
   ProvideLiquiditySlippageToleranceTooHigh = 2,
   ProvideLiquidityAtLeastOneTokenMustBeBiggerThenZero = 3,
-
   WithdrawLiquidityMinimumAmountOfAOrBIsNotSatisfied = 4,
   SplitDepositBothPoolsAndDepositMustBePositive = 5,
   ValidateFeeBpsTotalFeesCantBeGreaterThen100 = 6,
-
   GetDepositAmountsMinABiggerThenDesiredA = 7,
   GetDepositAmountsMinBBiggerThenDesiredB = 8,
   GetDepositAmountsAmountABiggerThenDesiredA = 9,
@@ -19,23 +17,39 @@ enum ContractError {
   MinAmountsBelowZero = 15,
 }
 
+// Import enhanced error resolver
+import {
+  resolveContractErrorEnhanced as resolveContractErrorEnhanced,
+  extractErrorCodeFromMessage,
+} from "./enhancedErrorResolver";
+
 /**
- * Extracts the error code from a diagnostic event string.
- * @param {string} eventString
- * @returns {number | null} The error code or null if not found
- * @example
- * extractErrorCodeFromDiagnosticEvent("Error(Contract, #1)") // 1
- * extractErrorCodeFromDiagnosticEvent("Error(Contract, #2)") // 2
+ * Legacy function - extracts the error code from a diagnostic event string.
+ * @deprecated Use extractErrorCodeFromMessage from enhancedErrorResolver instead
  */
 function extractErrorCodeFromDiagnosticEvent(
   eventString: string
 ): number | null {
-  const errorRegex = /Error\(Contract, #(\d+)\)/;
-  const match = eventString.match(errorRegex);
-  return match ? parseInt(match[1], 10) : null;
+  return extractErrorCodeFromMessage(eventString)?.code || null;
 }
 
+/**
+ * Enhanced contract error resolver that provides user-friendly error messages
+ * with fallback to legacy error handling for backward compatibility
+ */
 export function resolveContractError(eventString: string): string {
+  // Try enhanced resolver first
+  const enhancedResult = resolveContractErrorEnhanced(eventString);
+
+  // If enhanced resolver found a meaningful message, use it
+  if (
+    enhancedResult.errorCode !== null &&
+    enhancedResult.userFriendlyMessage !== "Unknown error occurred."
+  ) {
+    return enhancedResult.userFriendlyMessage;
+  }
+
+  // Fallback to legacy resolver for backward compatibility
   const errorCode = extractErrorCodeFromDiagnosticEvent(eventString);
 
   switch (errorCode) {
@@ -70,6 +84,9 @@ export function resolveContractError(eventString: string): string {
     case ContractError.MinAmountsBelowZero:
       return "The minimum amounts cannot be below zero.";
     default:
-      return "Unknown error.";
+      return enhancedResult.userFriendlyMessage || "Unknown error.";
   }
 }
+
+// Re-export for convenience (but use the enhanced resolver internally)
+export { extractErrorCodeFromMessage };

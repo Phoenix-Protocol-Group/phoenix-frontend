@@ -6,6 +6,7 @@ import {
   CircularProgress,
   Link,
   Collapse,
+  Button,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import CloseIcon from "@mui/icons-material/Close";
@@ -16,6 +17,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import LaunchIcon from "@mui/icons-material/Launch";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import {
   colors,
   typography,
@@ -81,7 +83,7 @@ export const Toast = ({
   title,
   message,
   onClose,
-  autoHideDuration = 5000,
+  autoHideDuration = type === "error" ? 10000 : 5000, // Error toasts stay 10 seconds, others 5 seconds
   transactionId,
   error,
 }: ToastProps) => {
@@ -101,16 +103,65 @@ export const Toast = ({
   }, [id, onClose, autoHideDuration, type]);
 
   // Format error details for display
-  const errorMessage = React.useMemo(() => {
-    if (!error) return "";
-    if (typeof error === "string") return error;
+  const errorDetails = React.useMemo(() => {
+    if (!error) return { display: "", technical: "", hasTechnical: false };
 
-    // Handle Error objects and plain objects with message/stack properties
+    if (typeof error === "string") {
+      return { display: error, technical: error, hasTechnical: false };
+    }
+
+    // Handle enhanced error objects with user-friendly messages
     const errorObj = error as any;
-    return errorObj.stack || errorObj.message || String(error);
+
+    // If we have enhanced error details, format them nicely
+    if (errorObj.userFriendlyMessage && errorObj.errorCode !== undefined) {
+      const technicalInfo = [
+        `Error Code: ${errorObj.errorCode}`,
+        errorObj.contractType
+          ? `Contract Type: ${errorObj.contractType}`
+          : null,
+        `Technical Details: ${
+          errorObj.message || errorObj.stack || "Unknown error"
+        }`,
+        errorObj.stack ? `Stack Trace:\n${errorObj.stack}` : null,
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      return {
+        display: errorObj.stack || errorObj.message || String(error),
+        technical: technicalInfo,
+        hasTechnical: true,
+      };
+    }
+
+    // Fallback to original behavior
+    return {
+      display: errorObj.stack || errorObj.message || String(error),
+      technical: errorObj.stack || errorObj.message || String(error),
+      hasTechnical: Boolean(errorObj.stack),
+    };
   }, [error]);
 
-  const hasErrorDetails = type === "error" && errorMessage;
+  const hasErrorDetails = type === "error" && errorDetails.display;
+
+  // Copy technical details to clipboard
+  const copyErrorDetails = React.useCallback(async () => {
+    if (errorDetails.technical) {
+      try {
+        await navigator.clipboard.writeText(errorDetails.technical);
+      } catch (err) {
+        console.error("Failed to copy error details:", err);
+        // Fallback for older browsers
+        const textArea = document.createElement("textarea");
+        textArea.value = errorDetails.technical;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+    }
+  }, [errorDetails.technical]);
 
   return (
     <motion.div
@@ -210,26 +261,59 @@ export const Toast = ({
               </Link>
             )}
 
-            {/* Error expand/collapse button */}
+            {/* Error expand/collapse and copy buttons */}
             {hasErrorDetails && (
               <Box
-                onClick={() => setExpanded(!expanded)}
                 sx={{
                   display: "flex",
                   alignItems: "center",
+                  gap: spacing.sm,
                   mt: 1,
-                  cursor: "pointer",
-                  fontSize: typography.fontSize.xs,
-                  color: colors.primary.main,
+                  flexWrap: "wrap",
                 }}
               >
-                <Typography sx={{ fontSize: "inherit", color: "inherit" }}>
-                  {expanded ? "Hide Details" : "Show Details"}
-                </Typography>
-                {expanded ? (
-                  <ExpandLessIcon sx={{ fontSize: 16, ml: 0.5 }} />
-                ) : (
-                  <ExpandMoreIcon sx={{ fontSize: 16, ml: 0.5 }} />
+                <Box
+                  onClick={() => setExpanded(!expanded)}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    fontSize: typography.fontSize.xs,
+                    color: colors.primary.main,
+                    "&:hover": {
+                      color: colors.primary.light,
+                    },
+                  }}
+                >
+                  <Typography sx={{ fontSize: "inherit", color: "inherit" }}>
+                    {expanded ? "Hide Details" : "Show Details"}
+                  </Typography>
+                  {expanded ? (
+                    <ExpandLessIcon sx={{ fontSize: 16, ml: 0.5 }} />
+                  ) : (
+                    <ExpandMoreIcon sx={{ fontSize: 16, ml: 0.5 }} />
+                  )}
+                </Box>
+
+                {errorDetails.hasTechnical && (
+                  <Button
+                    size="small"
+                    startIcon={<ContentCopyIcon sx={{ fontSize: 14 }} />}
+                    onClick={copyErrorDetails}
+                    sx={{
+                      fontSize: typography.fontSize.xs,
+                      color: colors.neutral[400],
+                      textTransform: "none",
+                      minWidth: "auto",
+                      p: 0.5,
+                      "&:hover": {
+                        color: colors.neutral[200],
+                        backgroundColor: "transparent",
+                      },
+                    }}
+                  >
+                    Copy Details
+                  </Button>
                 )}
               </Box>
             )}
@@ -273,7 +357,7 @@ export const Toast = ({
                 wordBreak: "break-word",
               }}
             >
-              {errorMessage}
+              {errorDetails.display}
             </Box>
           </Collapse>
         )}
