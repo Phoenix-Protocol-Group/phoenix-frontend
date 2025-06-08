@@ -7,6 +7,13 @@ import {
   DashboardData as Data,
 } from "@phoenix-protocol/types";
 import { ArrowUpward } from "@mui/icons-material";
+import {
+  borderRadius,
+  colors,
+  spacing,
+  typography,
+  cardStyles,
+} from "../../Theme/styleConstants";
 
 /**
  * GlowingChart
@@ -25,8 +32,13 @@ const GlowingChart = ({
 }) => (
   <Box
     sx={{
+      position: "relative",
+      width: "100%",
+      height: "100%",
+      minHeight: { xs: "80px", sm: "90px", md: "100px" }, // Reduced minimum heights for compact display
+      overflow: "hidden", // Prevent chart overflow on mobile
       ".recharts-surface, .recharts-wrapper": {
-        overflow: "visible !important",
+        overflow: "hidden !important", // Ensure charts don't overflow on mobile
       },
     }}
   >
@@ -34,45 +46,60 @@ const GlowingChart = ({
       <Skeleton
         variant="rectangular"
         width="100%"
-        height={100}
-        sx={{ bgcolor: "var(--neutral-700, #404040)" }}
+        height="100%"
+        sx={{
+          bgcolor: colors.neutral[700],
+          borderRadius: borderRadius.md,
+          minHeight: { xs: "80px", sm: "90px", md: "100px" }, // Match reduced chart heights
+        }}
       />
     ) : (
-      <ResponsiveContainer width="100%" height={100}>
+      <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={data}
-          margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+          margin={{ top: 5, right: 5, left: 5, bottom: 5 }} // Reduced margins for more chart space
         >
           <defs>
-            {/* Filter for strong neon glowing effect */}
-            <filter
-              id="neonGlow"
-              x="-100%"
-              y="-100%"
-              width="200%"
-              height="300%"
-            >
-              <feGaussianBlur stdDeviation="2" result="blur1" opacity={0} />
-              <feGaussianBlur stdDeviation="4" result="blur2" />
-              <feMerge>
-                <feMergeNode in="blur1" />
-                <feMergeNode in="blur2" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
+            {/* Enhanced gradient with better visibility */}
+            <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop
+                offset="0%"
+                stopColor={colors.primary.main}
+                stopOpacity={0.4}
+              />
+              <stop
+                offset="50%"
+                stopColor={colors.primary.main}
+                stopOpacity={0.2}
+              />
+              <stop
+                offset="100%"
+                stopColor={colors.primary.main}
+                stopOpacity={0.05}
+              />
+            </linearGradient>
           </defs>
           <YAxis
             hide={true}
-            domain={[(dataMin: number) => dataMin * 0.9, "dataMax"]}
+            domain={[
+              (dataMin: number) => dataMin * 0.9,
+              (dataMax: number) => dataMax * 1.1,
+            ]}
           />
           <Area
             type="monotone"
             dataKey={(entry) => entry[1]}
-            stroke="#F97316"
-            strokeWidth={2}
+            stroke={colors.primary.main}
+            strokeWidth={2} // Slightly thinner line for compact display
+            fill="url(#chartGradient)"
             isAnimationActive={true}
-            fill="none"
-            filter="url(#neonGlow)"
+            dot={false}
+            activeDot={{
+              r: 4, // Smaller active dot
+              stroke: colors.primary.main,
+              strokeWidth: 2,
+              fill: colors.primary.main,
+            }}
           />
         </AreaChart>
       </ResponsiveContainer>
@@ -108,167 +135,175 @@ const DashboardPriceCharts = ({
     return 0;
   }, [data]);
 
-  // Force a reflow after animation to fix overflow issue
+  // Initialize animation and ensure proper chart rendering
   useEffect(() => {
+    const startAnimation = async () => {
+      await controls.start({ opacity: 1, y: 0 });
+
+      // Force chart visibility after animation
+      setTimeout(() => {
+        if (chartRef.current) {
+          const elements = chartRef.current.querySelectorAll(
+            ".recharts-wrapper, .recharts-surface"
+          );
+          elements.forEach((element: any) => {
+            if (element?.style) {
+              element.style.overflow = "hidden"; // Prevent overflow on mobile
+            }
+          });
+
+          // Trigger a resize to ensure chart renders properly
+          window.dispatchEvent(new Event("resize"));
+        }
+      }, 150);
+    };
+
     if (!isLoading) {
-      controls.start({ opacity: 1, y: 0 }).then(() => {
-        setTimeout(() => {
-          if (chartRef.current) {
-            const elements = chartRef.current.querySelectorAll(
-              ".recharts-wrapper, .recharts-surface"
-            );
-            elements.forEach((element) => {
-              element.style.overflow = "visible";
-            });
-            window.dispatchEvent(new Event("resize"));
-          }
-        }, 100);
-      });
+      startAnimation();
     }
   }, [isLoading, controls]);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={controls}
       transition={{ duration: 0.6, ease: "easeOut" }}
       ref={chartRef}
     >
+      {" "}
       <Box
         sx={{
+          ...cardStyles.base,
+          height: { xs: "180px", sm: "200px", md: "220px" }, // Reduced height for more compact chart display
           display: "flex",
-          padding: "16px",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: "16px",
+          flexDirection: "column",
           position: "relative",
-          borderRadius: "12px",
-          border: "1px solid var(--neutral-700, #404040)",
-          background: "var(--neutral-900, #171717)",
-          overflow: "hidden",
-          boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)",
+          overflow: "hidden", // Prevent chart overflow on mobile
+          "&:hover": {
+            transform: "translateY(-2px)",
+            boxShadow: `0 8px 25px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.1)`,
+            border: `1px solid ${colors.neutral[600]}`,
+            transition: "all 0.2s ease-in-out",
+          },
+          transition: "all 0.2s ease-in-out",
         }}
       >
+        {/* Header Section - Compact */}
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            paddingRight: "16px",
+            padding: { xs: spacing.sm, sm: spacing.md },
+            paddingBottom: { xs: spacing.xs, sm: spacing.sm }, // Reduced bottom padding
+            position: "relative",
+            zIndex: 2,
           }}
         >
           {isLoading ? (
-            <Skeleton
-              variant="text"
-              width={60}
-              height={20}
-              sx={{ bgcolor: "var(--neutral-700, #404040)" }}
-            />
-          ) : (
-            <Typography
-              sx={{
-                color: "var(--neutral-400, #A3A3A3)",
-                fontFamily: "Ubuntu",
-                fontSize: "10px",
-                fontWeight: 500,
-                lineHeight: "140%",
-              }}
-            >
-              {""}
-            </Typography>
-          )}
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1, mt: "4px" }}
-          >
-            {isLoading ? (
-              <>
-                <Skeleton
-                  variant="circular"
-                  width={24}
-                  height={24}
-                  sx={{ bgcolor: "var(--neutral-700, #404040)" }}
-                />
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+              <Skeleton
+                variant="circular"
+                width={28}
+                height={28}
+                sx={{ bgcolor: colors.neutral[700] }}
+              />
+              <Box>
                 <Skeleton
                   variant="text"
                   width={80}
-                  height={20}
-                  sx={{ bgcolor: "var(--neutral-700, #404040)" }}
+                  height={16}
+                  sx={{ bgcolor: colors.neutral[700], mb: 0.5 }}
                 />
-              </>
-            ) : (
-              <>
+                <Skeleton
+                  variant="text"
+                  width={60}
+                  height={12}
+                  sx={{ bgcolor: colors.neutral[700] }}
+                />
+              </Box>
+            </Box>
+          ) : (
+            <Box
+              sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ duration: 0.2 }}
+              >
                 <Box
                   sx={{
                     display: "flex",
-                    width: "24px",
-                    height: "24px",
-                    padding: "4px",
+                    width: "32px",
+                    height: "32px",
+                    padding: "2px",
                     justifyContent: "center",
                     alignItems: "center",
-                    borderRadius: "24px",
-                    background: "var(--neutral-700, #404040)",
+                    borderRadius: "50%",
+                    background: `linear-gradient(145deg, ${colors.neutral[800]} 0%, ${colors.neutral[700]} 100%)`,
+                    border: `2px solid ${colors.neutral[600]}`,
+                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
                   }}
                 >
                   <Box
                     sx={{
-                      width: "16px",
-                      height: "16px",
-                      flexShrink: 0,
-                      borderRadius: "4px",
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
                       background: `url(${
                         icon?.small || ""
                       }) transparent 50% / cover no-repeat`,
                     }}
                   />
                 </Box>
+              </motion.div>
+              <Box>
                 <Typography
                   sx={{
-                    color: "var(--neutral-50, #FAFAFA)",
-                    fontFamily: "Ubuntu",
-                    fontSize: "12px",
-                    fontWeight: 500,
+                    color: colors.neutral[50],
+                    fontFamily: typography.fontFamily,
+                    fontSize: typography.fontSize.md,
+                    fontWeight: typography.fontWeights.semiBold,
+                    lineHeight: 1.2,
                   }}
                 >
-                  {assetName == "XLM" ? "Stellar" : "Phoenix"}
+                  {assetName === "XLM" ? "Stellar" : "Phoenix"}
                 </Typography>
                 <Typography
                   sx={{
-                    color: "var(--neutral-400, #A3A3A3)",
-                    fontFamily: "Ubuntu",
-                    fontSize: "10px",
-                    fontWeight: 300,
-                    lineHeight: "140%",
+                    color: colors.neutral[400],
+                    fontFamily: typography.fontFamily,
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeights.regular,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    opacity: 0.8,
                   }}
                 >
                   {assetName}
                 </Typography>
-              </>
-            )}
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-start",
-              width: "100%",
-              mt: "8px",
-            }}
-          >
+              </Box>
+            </Box>
+          )}
+
+          {/* Price and Change */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {isLoading ? (
               <Skeleton
                 variant="text"
-                width={60}
-                height={24}
-                sx={{ bgcolor: "var(--neutral-700, #404040)" }}
+                width={120}
+                height={32}
+                sx={{ bgcolor: colors.neutral[700] }}
               />
             ) : (
               <>
                 <Typography
                   sx={{
-                    color: "var(--neutral-50, #FAFAFA)",
-                    fontFamily: "Ubuntu",
-                    fontSize: "18px",
-                    fontWeight: 700,
+                    color: colors.neutral[50],
+                    fontFamily: typography.fontFamily,
+                    fontSize: {
+                      xs: typography.fontSize.lg,
+                      sm: typography.fontSize.xl,
+                    },
+                    fontWeight: typography.fontWeights.bold,
+                    lineHeight: 1,
                   }}
                 >
                   ${" "}
@@ -281,13 +316,26 @@ const DashboardPriceCharts = ({
                     display: "flex",
                     alignItems: "center",
                     gap: "4px",
-                    ml: "8px",
-                    color: differencePercent >= 0 ? "#66BB6A" : "#E57373",
+                    padding: "4px 8px",
+                    borderRadius: borderRadius.sm,
+                    background:
+                      differencePercent >= 0
+                        ? `linear-gradient(135deg, rgba(102, 187, 106, 0.15) 0%, rgba(102, 187, 106, 0.08) 100%)`
+                        : `linear-gradient(135deg, rgba(229, 115, 115, 0.15) 0%, rgba(229, 115, 115, 0.08) 100%)`,
+                    border: `1px solid ${
+                      differencePercent >= 0
+                        ? "rgba(102, 187, 106, 0.3)"
+                        : "rgba(229, 115, 115, 0.3)"
+                    }`,
+                    color:
+                      differencePercent >= 0
+                        ? colors.success.main
+                        : colors.error.main,
                   }}
                 >
                   <ArrowUpward
                     sx={{
-                      fontSize: "12px",
+                      fontSize: "14px",
                       transform:
                         differencePercent >= 0
                           ? "rotate(0deg)"
@@ -296,8 +344,8 @@ const DashboardPriceCharts = ({
                   />
                   <Typography
                     sx={{
-                      fontSize: "12px",
-                      fontWeight: 700,
+                      fontSize: typography.fontSize.xs,
+                      fontWeight: typography.fontWeights.semiBold,
                     }}
                   >
                     {differencePercent.toFixed(2)}%
@@ -308,12 +356,15 @@ const DashboardPriceCharts = ({
           </Box>
         </Box>
 
-        {/* Chart Section on the Right */}
+        {/* Chart Section - Compact */}
         <Box
           sx={{
-            flex: 2,
-            minWidth: 0,
-            overflow: "hidden",
+            flex: 1,
+            position: "relative",
+            height: { xs: "100px", sm: "110px", md: "120px" }, // Fixed height instead of flex
+            padding: { xs: spacing.xs, sm: spacing.sm },
+            paddingTop: 0, // Remove top padding to reduce gap
+            overflow: "hidden", // Prevent chart overflow on mobile
           }}
         >
           <GlowingChart data={data} loading={isLoading} />

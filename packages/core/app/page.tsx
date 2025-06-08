@@ -575,170 +575,171 @@ export default function Page() {
           mt: { xs: 2, md: 4 },
         }}
       >
-        {/* Phoenix-styled Welcome Banner with modern design */}
+        {/* Modern Welcome Hero Section - Matching Earn/Pools Design */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.6 }}
         >
           <Box
             sx={{
-              background:
-                "linear-gradient(135deg, #292B2C 0%, #1F2123 50%, #1A1C1D 100%)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              borderRadius: { xs: "12px", sm: "16px", md: "20px" },
-              boxShadow: "0px 8px 32px rgba(0, 0, 0, 0.4)",
-              overflow: "hidden",
+              textAlign: "center",
+              mb: 6,
               position: "relative",
-              mb: { xs: 3, md: 4 },
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "1px",
-                background:
-                  "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)",
-              },
+              pt: { xs: 2, md: 3 },
+              pb: { xs: 3, md: 4 },
             }}
           >
-            {/* Enhanced background decoration */}
-            <Box
-              sx={{
-                position: "absolute",
-                top: { xs: -50, md: -30 },
-                right: { xs: -50, md: -30 },
-                width: { xs: 150, sm: 200, md: 250 },
-                height: { xs: 150, sm: 200, md: 250 },
-                opacity: { xs: 0.6, md: 0.8 },
-                backgroundImage: "url('/3d.png')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                filter: "blur(1px)",
-                zIndex: 0,
-              }}
-            />
-
-            {/* Gradient overlay for better text readability */}
-            <Box
-              sx={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "linear-gradient(135deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%)",
-                zIndex: 1,
-              }}
-            />
-
-            <Box
-              sx={{
-                padding: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
-                position: "relative",
-                zIndex: 2,
-              }}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <Grid container alignItems="center" spacing={{ xs: 2, md: 3 }}>
-                <Grid item xs={12} md={7}>
-                  <Typography
-                    sx={{
-                      color: "#FFFFFF",
-                      fontSize: { xs: "1.75rem", sm: "2rem", md: "2.25rem" },
-                      fontWeight: 800,
-                      mb: { xs: 1, md: 1.5 },
+              <Typography
+                variant="h1"
+                sx={{
+                  fontSize: { xs: "2.5rem", md: "3.5rem" },
+                  fontWeight: 800,
+                  background:
+                    "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  mb: 2,
+                  fontFamily: "Ubuntu",
+                  lineHeight: 1.2,
+                }}
+              >
+                Welcome to Phoenix
+              </Typography>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "1.125rem", md: "1.25rem" },
+                  color: "#A3A3A3",
+                  fontFamily: "Ubuntu",
+                  maxWidth: "700px",
+                  mx: "auto",
+                  mb: 4,
+                  lineHeight: 1.6,
+                }}
+              >
+                Your comprehensive DeFi hub on Stellar. Trade, earn, and explore
+                the future of decentralized finance with cutting-edge protocols.
+              </Typography>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: { xs: 2, sm: 3 },
+                  justifyContent: "center",
+                  alignItems: "center",
+                  maxWidth: "400px",
+                  mx: "auto",
+                }}
+              >
+                <Button
+                  type="primary"
+                  onClick={() => router.push("/swap")}
+                  sx={{
+                    minWidth: { xs: "200px", sm: "160px" },
+                    height: { xs: "48px", sm: "52px" },
+                    fontSize: { xs: "1rem", md: "1.125rem" },
+                    fontWeight: 600,
+                    fontFamily: "Ubuntu",
+                    textTransform: "none",
+                    borderRadius: "12px",
+                    background:
+                      "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
+                    border: "1px solid rgba(249, 115, 22, 0.3)",
+                    boxShadow:
+                      "0 4px 20px rgba(249, 115, 22, 0.3), 0 2px 10px rgba(0, 0, 0, 0.1)",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
                       background:
-                        "linear-gradient(135deg, #FFFFFF 0%, #E2491A 100%)",
-                      backgroundClip: "text",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      letterSpacing: "-0.02em",
-                    }}
-                  >
-                    Welcome to Phoenix!
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: { xs: "1rem", md: "1.125rem" },
-                      color: "rgba(255, 255, 255, 0.8)",
-                      maxWidth: { xs: "100%", md: "85%" },
-                      lineHeight: 1.6,
-                      mb: { xs: 2, md: 0 },
-                    }}
-                  >
-                    Your comprehensive DeFi hub on Stellar. Trade, earn, and
-                    explore the future of decentralized finance.
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={5}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: { xs: "column", sm: "row" },
-                      gap: { xs: 1.5, sm: 2 },
-                      justifyContent: { xs: "stretch", md: "flex-end" },
-                    }}
-                  >
-                    <Button
-                      type="primary"
-                      onClick={() => router.push("/swap")}
-                      sx={{
-                        minWidth: { xs: "100%", sm: "140px" },
-                        py: 1.5,
-                        fontSize: "1rem",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Start Trading
-                    </Button>
-                    <Button
-                      type="secondary"
-                      onClick={() => router.push("/pools")}
-                      sx={{
-                        minWidth: { xs: "100%", sm: "140px" },
-                        py: 1.5,
-                        fontSize: "1rem",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Explore Pools
-                    </Button>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
+                        "linear-gradient(135deg, #FB923C 0%, #F97316 100%)",
+                      transform: "translateY(-3px)",
+                      boxShadow:
+                        "0 8px 30px rgba(249, 115, 22, 0.4), 0 4px 15px rgba(249, 115, 22, 0.2)",
+                      border: "1px solid rgba(249, 115, 22, 0.5)",
+                    },
+                    "&:active": {
+                      transform: "translateY(-1px)",
+                      boxShadow:
+                        "0 4px 20px rgba(249, 115, 22, 0.3), 0 2px 10px rgba(0, 0, 0, 0.1)",
+                    },
+                    "@media (max-width: 768px)": {
+                      "&:active": {
+                        transform: "scale(0.98)",
+                        transition: "all 0.1s ease",
+                      },
+                    },
+                  }}
+                >
+                  Start Trading
+                </Button>
+                <Button
+                  type="secondary"
+                  onClick={() => router.push("/pools")}
+                  sx={{
+                    minWidth: { xs: "200px", sm: "160px" },
+                    height: { xs: "48px", sm: "52px" },
+                    fontSize: { xs: "1rem", md: "1.125rem" },
+                    fontWeight: 600,
+                    fontFamily: "Ubuntu",
+                    textTransform: "none",
+                    borderRadius: "12px",
+                    background:
+                      "linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%)",
+                    border: "1px solid rgba(255, 255, 255, 0.15)",
+                    color: "#FAFAFA",
+                    backdropFilter: "blur(10px)",
+                    boxShadow:
+                      "0 4px 15px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1)",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
+                      background:
+                        "linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%)",
+                      transform: "translateY(-3px)",
+                      border: "1px solid rgba(249, 115, 22, 0.3)",
+                      boxShadow:
+                        "0 8px 25px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(249, 115, 22, 0.1)",
+                    },
+                    "&:active": {
+                      transform: "translateY(-1px)",
+                      boxShadow:
+                        "0 4px 15px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1)",
+                    },
+                    "@media (max-width: 768px)": {
+                      "&:active": {
+                        transform: "scale(0.98)",
+                        transition: "all 0.1s ease",
+                      },
+                    },
+                  }}
+                >
+                  Explore Pools
+                </Button>
+              </Box>
+            </motion.div>
           </Box>
         </motion.div>
 
         {/* Main content grid with improved responsive design */}
         <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
-          {/* Dashboard Stats - Full width */}
-          <Grid item xs={12}>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              {loadingDashboard ? (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: { xs: "20px", md: "24px" },
-                    backgroundColor: "var(--neutral-900, #171717)",
-                    borderRadius: { xs: "12px", md: "16px" },
-                    border: "1px solid var(--neutral-700, #404040)",
-                    minHeight: { xs: "120px", md: "140px" },
-                  }}
-                >
-                  <CircularProgress sx={{ color: "#E2491A" }} />
-                </Box>
-              ) : (
-                <DashboardStats {...args.dashboardStatsArgs} />
-              )}
-            </motion.div>
-          </Grid>
-
           {/* Main Content Area */}
           <Grid item xs={12} lg={9}>
             <Grid container spacing={{ xs: 2, sm: 3, md: 3 }}>
