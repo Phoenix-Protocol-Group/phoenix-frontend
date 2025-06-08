@@ -3647,7 +3647,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@phoenix-protocol/contracts@*, @phoenix-protocol/contracts@workspace:*, @phoenix-protocol/contracts@workspace:^, @phoenix-protocol/contracts@workspace:packages/contracts":
+"@phoenix-protocol/contracts@*, @phoenix-protocol/contracts@workspace:^, @phoenix-protocol/contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/contracts@workspace:packages/contracts"
   dependencies:
@@ -3841,7 +3841,6 @@ __metadata:
   dependencies:
     "@apollo/client": ^3.9.0
     "@creit.tech/xbull-wallet-connect": 0.3.0
-    "@phoenix-protocol/contracts": "workspace:*"
     "@phoenix-protocol/types": "*"
     "@stellar/stellar-sdk": ^13.1.0
     big.js: ^6.2.1

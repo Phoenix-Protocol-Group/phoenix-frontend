@@ -1,12 +1,3 @@
-import {
-  PhoenixFactoryContract,
-  PhoenixPairContract,
-  PhoenixStakeContract,
-  PhoenixMultihopContract,
-  PhoenixVestingContract,
-  SorobanTokenContract,
-} from "@phoenix-protocol/contracts";
-
 // Enhanced error code extraction that supports multiple error formats
 export function extractErrorCodeFromMessage(
   message: string
