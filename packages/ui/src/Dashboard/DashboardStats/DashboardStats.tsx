@@ -13,6 +13,13 @@ import {
   GainerOrLooserAsset,
 } from "@phoenix-protocol/types";
 import { ArrowUpward } from "@mui/icons-material";
+import {
+  borderRadius,
+  colors,
+  spacing,
+  typography,
+  cardStyles,
+} from "../../Theme/styleConstants";
 
 /**
  * GainerAndLooser
@@ -38,37 +45,52 @@ const GainerAndLooser = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, ease: "easeInOut" }}
-      whileHover={{ scale: 1.02, y: -2 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      whileHover={{
+        scale: 1.02,
+        y: -4,
+        transition: { duration: 0.2, ease: "easeInOut" },
+      }}
       whileTap={{ scale: 0.98 }}
     >
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          gap: { xs: "8px", sm: "12px" },
-          padding: { xs: "16px", sm: "20px" },
-          borderRadius: { xs: "12px", sm: "16px" },
-          border: "1px solid var(--neutral-700, #404040)",
-          background: "var(--neutral-900, #171717)",
-          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)",
-          overflow: "hidden",
+          ...cardStyles.base,
+          height: { xs: "140px", sm: "160px" },
+          padding: { xs: spacing.md, sm: spacing.lg },
           position: "relative",
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          overflow: "hidden",
           cursor: "pointer",
           "&:hover": {
-            boxShadow: "0px 12px 32px rgba(0, 0, 0, 0.4)",
-            borderColor: "var(--neutral-600, #525252)",
+            ...cardStyles.hover,
             "& .background-icon": {
-              opacity: 0.12,
+              opacity: 0.15,
               transform: "scale(1.1) rotate(5deg)",
             },
+            "& .glow-effect": {
+              opacity: 1,
+            },
           },
-          "&:active": {
-            transform: "translateY(1px)",
+          "&:before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: `linear-gradient(45deg, transparent 30%, rgba(249, 115, 22, 0.05) 50%, transparent 70%)`,
+            opacity: 0,
+            transition: "opacity 0.4s ease-in-out",
+          },
+          "&:hover:before": {
+            opacity: 1,
+            animation: "shimmer 2s infinite",
+            "@keyframes shimmer": {
+              "0%": { transform: "translateX(-100%)" },
+              "100%": { transform: "translateX(100%)" },
+            },
           },
         }}
       >
@@ -79,16 +101,16 @@ const GainerAndLooser = ({
               width={isMobile ? 80 : 100}
               height={isMobile ? 20 : 24}
               sx={{
-                bgcolor: "var(--neutral-700, #404040)",
-                borderRadius: "8px",
+                bgcolor: colors.neutral[700],
+                borderRadius: borderRadius.sm,
               }}
             />
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 2 }}>
               <Skeleton
                 variant="circular"
                 width={isMobile ? 28 : 32}
                 height={isMobile ? 28 : 32}
-                sx={{ bgcolor: "var(--neutral-700, #404040)" }}
+                sx={{ bgcolor: colors.neutral[700] }}
               />
               <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
                 <Skeleton
@@ -96,8 +118,8 @@ const GainerAndLooser = ({
                   width={isMobile ? 60 : 80}
                   height={16}
                   sx={{
-                    bgcolor: "var(--neutral-700, #404040)",
-                    borderRadius: "4px",
+                    bgcolor: colors.neutral[700],
+                    borderRadius: borderRadius.xs,
                   }}
                 />
                 <Skeleton
@@ -105,8 +127,8 @@ const GainerAndLooser = ({
                   width={isMobile ? 40 : 50}
                   height={12}
                   sx={{
-                    bgcolor: "var(--neutral-700, #404040)",
-                    borderRadius: "4px",
+                    bgcolor: colors.neutral[700],
+                    borderRadius: borderRadius.xs,
                   }}
                 />
               </Box>
@@ -118,6 +140,7 @@ const GainerAndLooser = ({
                 justifyContent: "space-between",
                 width: "100%",
                 gap: 2,
+                mt: 2,
               }}
             >
               <Skeleton
@@ -125,8 +148,8 @@ const GainerAndLooser = ({
                 width={isMobile ? 50 : 60}
                 height={isMobile ? 28 : 32}
                 sx={{
-                  bgcolor: "var(--neutral-700, #404040)",
-                  borderRadius: "8px",
+                  bgcolor: colors.neutral[700],
+                  borderRadius: borderRadius.md,
                 }}
               />
               <Skeleton
@@ -134,23 +157,23 @@ const GainerAndLooser = ({
                 width={isMobile ? 50 : 60}
                 height={isMobile ? 20 : 24}
                 sx={{
-                  bgcolor: "var(--neutral-700, #404040)",
-                  borderRadius: "6px",
+                  bgcolor: colors.neutral[700],
+                  borderRadius: borderRadius.sm,
                 }}
               />
             </Box>
           </>
         ) : (
           <>
-            {/* Background Asset Icon */}
+            {/* Background Asset Icon with Glassmorphism Effect */}
             <Box
               className="background-icon"
               sx={{
                 position: "absolute",
-                top: "-10%",
-                right: "-10%",
-                width: isMobile ? "80px" : "120px",
-                height: isMobile ? "80px" : "120px",
+                top: "-20%",
+                right: "-15%",
+                width: isMobile ? "100px" : "140px",
+                height: isMobile ? "100px" : "140px",
                 opacity: 0.08,
                 background: `url(${asset?.icon}) center / contain no-repeat`,
                 filter: "grayscale(100%)",
@@ -159,15 +182,39 @@ const GainerAndLooser = ({
               }}
             />
 
+            {/* Glow Effect */}
+            <Box
+              className="glow-effect"
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: "60%",
+                height: "60%",
+                transform: "translate(-50%, -50%)",
+                background: `radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 70%)`,
+                opacity: 0,
+                transition: "opacity 0.3s ease-in-out",
+                borderRadius: "50%",
+                filter: "blur(20px)",
+              }}
+            />
+
             {/* Title */}
             <Typography
               sx={{
-                color: "var(--neutral-300, #D4D4D4)",
-                fontFamily: "Ubuntu",
-                fontSize: { xs: "11px", sm: "12px" },
-                fontWeight: 500,
+                color: colors.neutral[300],
+                fontFamily: typography.fontFamily,
+                fontSize: {
+                  xs: typography.fontSize.xs,
+                  sm: typography.fontSize.sm,
+                },
+                fontWeight: typography.fontWeights.medium,
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
+                mb: 1,
+                position: "relative",
+                zIndex: 2,
               }}
             >
               {title}
@@ -180,36 +227,49 @@ const GainerAndLooser = ({
                 alignItems: "center",
                 gap: { xs: 1.5, sm: 2 },
                 width: "100%",
+                mb: 2,
+                position: "relative",
+                zIndex: 2,
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  width: { xs: "28px", sm: "32px" },
-                  height: { xs: "28px", sm: "32px" },
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: "50%",
-                  background: "var(--neutral-700, #404040)",
-                  flexShrink: 0,
-                }}
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ duration: 0.2 }}
               >
                 <Box
                   sx={{
-                    width: { xs: "16px", sm: "20px" },
-                    height: { xs: "16px", sm: "20px" },
-                    borderRadius: "4px",
-                    background: `url(${asset?.icon}) transparent 50% / cover no-repeat`,
+                    display: "flex",
+                    width: { xs: "32px", sm: "36px" },
+                    height: { xs: "32px", sm: "36px" },
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderRadius: "50%",
+                    background: `linear-gradient(145deg, ${colors.neutral[800]} 0%, ${colors.neutral[700]} 100%)`,
+                    border: `2px solid ${colors.neutral[600]}`,
+                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+                    flexShrink: 0,
                   }}
-                />
-              </Box>
+                >
+                  <Box
+                    sx={{
+                      width: { xs: "18px", sm: "22px" },
+                      height: { xs: "18px", sm: "22px" },
+                      borderRadius: "50%",
+                      background: `url(${asset?.icon}) transparent 50% / cover no-repeat`,
+                    }}
+                  />
+                </Box>
+              </motion.div>
               <Box sx={{ minWidth: 0, flex: 1 }}>
                 <Typography
                   sx={{
-                    color: "var(--neutral-50, #FAFAFA)",
-                    fontFamily: "Ubuntu",
-                    fontSize: { xs: "13px", sm: "14px" },
-                    fontWeight: 500,
+                    color: colors.neutral[50],
+                    fontFamily: typography.fontFamily,
+                    fontSize: {
+                      xs: typography.fontSize.sm,
+                      sm: typography.fontSize.md,
+                    },
+                    fontWeight: typography.fontWeights.semiBold,
                     lineHeight: 1.2,
                   }}
                 >
@@ -217,11 +277,15 @@ const GainerAndLooser = ({
                 </Typography>
                 <Typography
                   sx={{
-                    color: "var(--neutral-400, #A3A3A3)",
-                    fontFamily: "Ubuntu",
-                    fontSize: { xs: "11px", sm: "12px" },
-                    fontWeight: 400,
+                    color: colors.neutral[400],
+                    fontFamily: typography.fontFamily,
+                    fontSize: {
+                      xs: typography.fontSize.xs,
+                      sm: typography.fontSize.sm,
+                    },
+                    fontWeight: typography.fontWeights.regular,
                     lineHeight: 1,
+                    opacity: 0.8,
                   }}
                 >
                   {asset?.symbol}
@@ -237,14 +301,19 @@ const GainerAndLooser = ({
                 justifyContent: "space-between",
                 width: "100%",
                 gap: 2,
+                position: "relative",
+                zIndex: 2,
               }}
             >
               <Typography
                 sx={{
-                  color: "var(--neutral-50, #FAFAFA)",
-                  fontFamily: "Ubuntu",
-                  fontSize: { xs: "20px", sm: "24px" },
-                  fontWeight: 700,
+                  color: colors.neutral[50],
+                  fontFamily: typography.fontFamily,
+                  fontSize: {
+                    xs: typography.fontSize.lg,
+                    sm: typography.fontSize.xl,
+                  },
+                  fontWeight: typography.fontWeights.bold,
                   lineHeight: 1,
                 }}
               >
@@ -255,14 +324,22 @@ const GainerAndLooser = ({
                   display: "flex",
                   alignItems: "center",
                   gap: { xs: "4px", sm: "6px" },
-                  padding: { xs: "4px 6px", sm: "6px 8px" },
-                  borderRadius: "8px",
-                  backgroundColor:
+                  padding: { xs: "6px 8px", sm: "8px 12px" },
+                  borderRadius: borderRadius.md,
+                  background:
                     asset?.change && asset?.change > 0
-                      ? "rgba(102, 187, 106, 0.1)"
-                      : "rgba(229, 115, 115, 0.1)",
+                      ? `linear-gradient(135deg, rgba(102, 187, 106, 0.15) 0%, rgba(102, 187, 106, 0.08) 100%)`
+                      : `linear-gradient(135deg, rgba(229, 115, 115, 0.15) 0%, rgba(229, 115, 115, 0.08) 100%)`,
+                  border: `1px solid ${
+                    asset?.change && asset?.change > 0
+                      ? "rgba(102, 187, 106, 0.3)"
+                      : "rgba(229, 115, 115, 0.3)"
+                  }`,
                   color:
-                    asset?.change && asset?.change > 0 ? "#66BB6A" : "#E57373",
+                    asset?.change && asset?.change > 0
+                      ? colors.success.main
+                      : colors.error.main,
+                  backdropFilter: "blur(10px)",
                 }}
               >
                 <Box
@@ -283,9 +360,12 @@ const GainerAndLooser = ({
                 </Box>
                 <Typography
                   sx={{
-                    fontFamily: "Ubuntu",
-                    fontSize: { xs: "14px", sm: "16px" },
-                    fontWeight: 500,
+                    fontFamily: typography.fontFamily,
+                    fontSize: {
+                      xs: typography.fontSize.sm,
+                      sm: typography.fontSize.md,
+                    },
+                    fontWeight: typography.fontWeights.semiBold,
                     lineHeight: 1,
                   }}
                 >

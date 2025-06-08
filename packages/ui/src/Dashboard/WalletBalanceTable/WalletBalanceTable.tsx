@@ -30,6 +30,13 @@ import {
   Lock,
 } from "@mui/icons-material";
 import { useMediaQuery } from "@mui/system";
+import {
+  borderRadius,
+  colors,
+  spacing,
+  typography,
+  cardStyles,
+} from "../../Theme/styleConstants";
 
 /**
  * Accessibility properties for tabs.
@@ -66,8 +73,8 @@ const FilterAndTabPanel = ({
       sx={{
         display: "flex",
         flexDirection: "column",
-        marginBottom: "16px",
-        gap: isMobile ? 0 : "24px",
+        marginBottom: spacing.lg,
+        gap: isMobile ? spacing.sm : spacing.lg,
       }}
     >
       <Grid container spacing={isMobile ? 2 : 3} alignItems="center">
@@ -75,12 +82,15 @@ const FilterAndTabPanel = ({
         <Grid item xs={12} md={2}>
           <Typography
             sx={{
-              color: "var(--neutral-50, #FAFAFA)",
-              fontFamily: "Ubuntu",
-              fontSize: "24px",
-              fontStyle: "normal",
-              fontWeight: 700,
-              lineHeight: "normal",
+              color: colors.neutral[50],
+              fontFamily: typography.fontFamily,
+              fontSize: typography.fontSize.xl,
+              fontWeight: typography.fontWeights.bold,
+              lineHeight: 1.2,
+              background: `linear-gradient(135deg, ${colors.neutral[50]} 0%, ${colors.neutral[300]} 100%)`,
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
             }}
           >
             Assets
@@ -168,41 +178,47 @@ const FilterAndTabPanel = ({
 
           {/* Search Bar */}
           <TextField
-            placeholder="Search"
+            placeholder="Search assets..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             sx={{
               flexGrow: 1,
               minWidth: "180px",
               height: "40px",
-              borderRadius: "12px",
-              background: "var(--neutral-900, #171717)",
-              lineHeight: "16px",
-              fontSize: "12px",
+              borderRadius: borderRadius.md,
+              background: `linear-gradient(135deg, ${colors.neutral[800]}60 0%, ${colors.neutral[900]}80 100%)`,
+              backdropFilter: "blur(10px)",
+              border: `1px solid ${colors.neutral[600]}`,
               "& .MuiOutlinedInput-root": {
                 height: "40px",
-                padding: "0 8px",
+                padding: "0 12px",
+                borderRadius: borderRadius.md,
                 "& input": {
                   padding: "8px 0",
-                  fontSize: "12px",
-                  color: "var(--neutral-300, #D4D4D4)",
+                  fontSize: typography.fontSize.sm,
+                  color: colors.neutral[50],
+                  fontFamily: typography.fontFamily,
+                  "&::placeholder": {
+                    color: colors.neutral[400],
+                    opacity: 0.8,
+                  },
                 },
                 "& fieldset": {
                   borderColor: "transparent",
                 },
                 "&:hover fieldset": {
-                  borderColor: "var(--primary-500, #F97316)",
+                  borderColor: colors.primary.main,
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "var(--primary-500, #F97316)",
+                  borderColor: colors.primary.main,
+                  boxShadow: `0 0 0 2px ${colors.primary.main}20`,
                 },
               },
-              "& .MuiInputAdornment-root img": {
-                marginRight: "8px",
-              },
-              "&::placeholder": {
-                color: "var(--neutral-400, #A3A3A3)",
-                opacity: 1,
+              "& .MuiInputAdornment-root": {
+                "& img": {
+                  marginRight: spacing.xs,
+                  filter: "opacity(0.7)",
+                },
               },
             }}
             InputProps={{
@@ -227,21 +243,37 @@ const FilterAndTabPanel = ({
               value={sort}
               onChange={(e) => setSort(e.target.value as "highest" | "lowest")}
               displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
+              inputProps={{ "aria-label": "Sort options" }}
               sx={{
                 height: "40px",
-                borderRadius: "12px",
-                background: "var(--neutral-900, #171717)",
-                border: "1px solid var(--neutral-700, #404040)",
+                borderRadius: borderRadius.md,
+                background: `linear-gradient(135deg, ${colors.neutral[800]}60 0%, ${colors.neutral[900]}80 100%)`,
+                backdropFilter: "blur(10px)",
+                border: `1px solid ${colors.neutral[600]}`,
                 padding: "0 12px",
-                color: "var(--neutral-300, #D4D4D4)",
-                fontSize: "12px",
+                color: colors.neutral[50],
+                fontFamily: typography.fontFamily,
+                fontSize: typography.fontSize.sm,
                 "& .MuiSelect-select": {
-                  fontSize: "12px",
+                  fontSize: typography.fontSize.sm,
                   lineHeight: "16px",
                   height: "40px",
                   display: "flex",
                   alignItems: "center",
+                  color: colors.neutral[50],
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "transparent",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: colors.primary.main,
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: colors.primary.main,
+                  boxShadow: `0 0 0 2px ${colors.primary.main}20`,
+                },
+                "& .MuiSelect-icon": {
+                  color: colors.neutral[400],
                 },
               }}
             >
@@ -280,41 +312,89 @@ const ListItem = ({
 
   return (
     <motion.div
-      whileHover={!isXLM ? { scale: 0.98 } : {}}
-      whileTap={!isXLM ? { scale: 0.95 } : {}}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
     >
       <Box
         sx={{
-          p: 2,
-          borderRadius: "8px",
-          background: "var(--neutral-900, #171717)",
-          border: "1px solid var(--neutral-700, #404040)",
-          mb: 2,
+          ...cardStyles.base,
+          p: { xs: spacing.sm, sm: spacing.md },
+          py: spacing.sm,
+          borderRadius: borderRadius.lg,
+          mb: spacing.sm,
+          position: "relative",
+          overflow: "hidden",
+          background: `linear-gradient(135deg, ${colors.neutral[800]}40 0%, ${colors.neutral[900]}60 100%)`,
+          border: `1px solid ${colors.neutral[700]}`,
+          backdropFilter: "blur(20px)",
+          boxShadow: `0 4px 16px rgba(0, 0, 0, 0.15)`,
+          minHeight: "auto",
           "&:hover": {
             cursor: isXLM ? "default" : "pointer",
+            background: !isXLM
+              ? `linear-gradient(135deg, ${colors.neutral[700]}50 0%, ${colors.neutral[800]}70 100%)`
+              : `linear-gradient(135deg, ${colors.neutral[800]}40 0%, ${colors.neutral[900]}60 100%)`,
+            border: !isXLM
+              ? `1px solid ${colors.primary.main}40`
+              : `1px solid ${colors.neutral[700]}`,
+            transform: !isXLM ? "translateY(-1px)" : "none",
+            boxShadow: !isXLM
+              ? `0 6px 24px rgba(0, 0, 0, 0.2)`
+              : `0 4px 16px rgba(0, 0, 0, 0.15)`,
           },
+          transition: "all 0.2s ease",
         }}
         onClick={!isXLM ? () => onTokenClick(contractId) : undefined}
       >
-        <Grid container alignItems="center" spacing={1}>
+        <Grid
+          container
+          alignItems="center"
+          spacing={2}
+          sx={{ position: "relative", zIndex: 2 }}
+        >
           <Grid item xs={6} md={3} display="flex" alignItems="center">
             <Box
-              component={"img"}
-              src={icon}
-              sx={{ width: "24px", height: "24px", mr: 1 }}
-            />
-            <Typography
+              className="token-icon"
               sx={{
-                color: "var(--neutral-50, #FAFAFA)",
-                fontWeight: 500,
-                fontSize: "14px",
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                background: `linear-gradient(135deg, ${colors.primary.main}20 0%, ${colors.primary.main}10 100%)`,
+                border: `1px solid ${colors.primary.main}30`,
+                mr: spacing.md,
+                backdropFilter: "blur(10px)",
+                boxShadow: `0 4px 16px ${colors.primary.main}20`,
               }}
             >
-              {name}
-            </Typography>
+              <Box
+                component={"img"}
+                src={icon}
+                sx={{
+                  width: "24px",
+                  height: "24px",
+                  filter: "drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))",
+                }}
+              />
+            </Box>
+            <Box>
+              <Typography
+                sx={{
+                  color: colors.neutral[50],
+                  fontWeight: typography.fontWeights.semiBold,
+                  fontSize: typography.fontSize.md,
+                  fontFamily: typography.fontFamily,
+                  lineHeight: 1.2,
+                }}
+              >
+                {name}
+              </Typography>
+              {/* Additional token info can go here */}
+            </Box>
             {/* If Name = PHO and has vesting, show a lock button */}
             {name === "PHO" && hasVesting && (
               <Box
@@ -340,14 +420,17 @@ const ListItem = ({
                     },
                   }}
                 >
-                  <motion.div
-                    whileHover={{
-                      scale: 1.2,
-                      rotate: 15,
-                      transition: { duration: 0.2 },
-                    }}
-                    whileTap={{ scale: 0.9 }}
+                  <Box
                     onClick={onVestingClick}
+                    sx={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "4px",
+                      cursor: "pointer",
+                      "&:hover": {
+                        opacity: 0.8,
+                      },
+                    }}
                   >
                     <Lock
                       sx={{
@@ -363,7 +446,7 @@ const ListItem = ({
                     >
                       Vesting
                     </Typography>
-                  </motion.div>
+                  </Box>
                 </Tooltip>
               </Box>
             )}
@@ -371,38 +454,92 @@ const ListItem = ({
           <Grid item xs={6} md={3}>
             <Typography
               sx={{
-                color: "var(--neutral-50, #FAFAFA)",
-                fontSize: "14px",
+                color: colors.neutral[50],
+                fontSize: typography.fontSize.md,
+                fontWeight: typography.fontWeights.medium,
+                fontFamily: typography.fontFamily,
               }}
             >
               {amount}
             </Typography>
           </Grid>
           <Grid item xs={6} md={3}>
-            <Typography
+            <Box
               sx={{
-                color: "var(--neutral-300, #D4D4D4)",
-                fontSize: "14px",
-                opacity: 1,
+                display: "inline-flex",
+                alignItems: "center",
+                px: spacing.sm,
+                py: spacing.xs,
+                borderRadius: borderRadius.sm,
+                background: `linear-gradient(135deg, ${colors.success.main}15 0%, ${colors.success.main}08 100%)`,
+                border: `1px solid ${colors.success.main}30`,
               }}
             >
-              ${(usdValue * amount).toFixed(2)}
-            </Typography>
+              <Typography
+                sx={{
+                  color: colors.success.main,
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.semiBold,
+                  fontFamily: typography.fontFamily,
+                }}
+              >
+                ${(usdValue * amount).toFixed(2)}
+              </Typography>
+            </Box>
           </Grid>
           <Grid item xs={6} md={3} display="flex" justifyContent="flex-end">
-            {!favorites.includes(name) ? (
-              <IconButton onClick={() => setFavorites([...favorites, name])}>
-                <StarBorderIcon sx={{ color: "var(--neutral-300, #D4D4D4)" }} />
-              </IconButton>
-            ) : (
-              <IconButton
-                onClick={() =>
-                  setFavorites(favorites.filter((f) => f !== name))
-                }
-              >
-                <StarIcon sx={{ color: "var(--primary-500, #F97316)" }} />
-              </IconButton>
-            )}
+            <Box>
+              {!favorites.includes(name) ? (
+                <IconButton
+                  onClick={() => setFavorites([...favorites, name])}
+                  sx={{
+                    background: `linear-gradient(135deg, ${colors.neutral[700]}40 0%, ${colors.neutral[800]}60 100%)`,
+                    border: `1px solid ${colors.neutral[600]}`,
+                    borderRadius: borderRadius.md,
+                    width: 36,
+                    height: 36,
+                    "&:hover": {
+                      background: `linear-gradient(135deg, ${colors.primary.main}20 0%, ${colors.primary.main}10 100%)`,
+                      border: `1px solid ${colors.primary.main}40`,
+                      transform: "translateY(-1px)",
+                    },
+                  }}
+                >
+                  <StarBorderIcon
+                    sx={{
+                      color: colors.neutral[300],
+                      fontSize: "18px",
+                      transition: "all 0.2s ease",
+                    }}
+                  />
+                </IconButton>
+              ) : (
+                <IconButton
+                  onClick={() =>
+                    setFavorites(favorites.filter((f) => f !== name))
+                  }
+                  sx={{
+                    background: `linear-gradient(135deg, ${colors.primary.main}30 0%, ${colors.primary.main}20 100%)`,
+                    border: `1px solid ${colors.primary.main}50`,
+                    borderRadius: borderRadius.md,
+                    width: 36,
+                    height: 36,
+                    "&:hover": {
+                      background: `linear-gradient(135deg, ${colors.primary.main}40 0%, ${colors.primary.main}30 100%)`,
+                      transform: "translateY(-1px)",
+                    },
+                  }}
+                >
+                  <StarIcon
+                    sx={{
+                      color: colors.primary.main,
+                      fontSize: "18px",
+                      filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))",
+                    }}
+                  />
+                </IconButton>
+              )}
+            </Box>
           </Grid>
         </Grid>
       </Box>
@@ -447,65 +584,103 @@ const WalletBalanceTable = ({
   }, [tokens, category, searchTerm, sort]);
 
   return (
-    <Box
-      sx={{
-        borderRadius: "16px",
-        height: largerThanMd ? "26rem" : "auto",
-        mb: { xs: 2, md: 0 },
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <FilterAndTabPanel
-        searchTerm={searchTerm}
-        category={category}
-        categories={categories}
-        setCategory={setCategory}
-        setSearchTerm={setSearchTerm}
-        setSort={setSort}
-        sort={sort}
-        isMobile={!largerThanMd}
-      />
       <Box
         sx={{
-          overflow: "auto",
-          maxHeight: largerThanMd ? "19rem" : "auto",
-          mt: { xs: 2, md: 0 },
-          "&::-webkit-scrollbar": {
-            width: "4px",
+          ...cardStyles.base,
+          borderRadius: borderRadius.xl,
+          height: largerThanMd ? "24rem" : "auto",
+          mb: { xs: spacing.md, md: 0 },
+          background: `linear-gradient(135deg, ${colors.neutral[800]}40 0%, ${colors.neutral[900]}60 100%)`,
+          border: `1px solid ${colors.neutral[700]}`,
+          backdropFilter: "blur(20px)",
+          boxShadow: `0 4px 16px rgba(0, 0, 0, 0.2)`,
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "1px",
+            background: `linear-gradient(90deg, transparent, ${colors.primary.main}60, transparent)`,
+            zIndex: 1,
           },
-          "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "var(--primary-500, #F97316)",
-            borderRadius: "8px",
+          "&:hover": {
+            border: `1px solid ${colors.primary.main}40`,
+            boxShadow: `0 6px 24px rgba(0, 0, 0, 0.25)`,
           },
-          // Styles for Firefox
-          scrollbarWidth: "thin",
-          scrollbarColor:
-            "var(--primary-500, #F97316) var(--neutral-800, #262626)",
+          transition: "all 0.2s ease",
         }}
       >
-        {filteredTokens.length ? (
-          filteredTokens.map((token, index) => (
-            <ListItem
-              token={token}
-              onTokenClick={onTokenClick}
-              key={index}
-              hasVesting={hasVesting}
-              onVestingClick={onVestingClick}
-            />
-          ))
-        ) : (
-          <Typography
-            sx={{
-              color: "var(--neutral-300, #D4D4D4)",
-              fontSize: "14px",
-              textAlign: "center",
-              pt: 2,
-            }}
-          >
-            Looks like you haven't acquired any tokens.
-          </Typography>
-        )}
+        <FilterAndTabPanel
+          searchTerm={searchTerm}
+          category={category}
+          categories={categories}
+          setCategory={setCategory}
+          setSearchTerm={setSearchTerm}
+          setSort={setSort}
+          sort={sort}
+          isMobile={!largerThanMd}
+        />
+        <Box
+          sx={{
+            overflow: "auto",
+            maxHeight: largerThanMd ? "17rem" : "auto",
+            mt: { xs: spacing.md, md: 0 },
+            position: "relative",
+            zIndex: 2,
+            "&::-webkit-scrollbar": {
+              width: "6px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: colors.neutral[800],
+              borderRadius: borderRadius.md,
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: colors.primary.main,
+              borderRadius: borderRadius.md,
+              "&:hover": {
+                backgroundColor: colors.primary.light,
+              },
+            },
+            // Styles for Firefox
+            scrollbarWidth: "thin",
+            scrollbarColor: `${colors.primary.main} ${colors.neutral[800]}`,
+          }}
+        >
+          {filteredTokens.length ? (
+            filteredTokens.map((token, index) => (
+              <ListItem
+                token={token}
+                onTokenClick={onTokenClick}
+                key={index}
+                hasVesting={hasVesting}
+                onVestingClick={onVestingClick}
+              />
+            ))
+          ) : (
+            <Typography
+              sx={{
+                color: colors.neutral[300],
+                fontSize: typography.fontSize.md,
+                fontFamily: typography.fontFamily,
+                textAlign: "center",
+                pt: spacing.xl,
+                opacity: 0.8,
+              }}
+            >
+              Looks like you haven't acquired any tokens.
+            </Typography>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </motion.div>
   );
 };
 
