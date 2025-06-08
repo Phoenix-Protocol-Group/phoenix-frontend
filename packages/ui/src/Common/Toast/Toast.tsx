@@ -35,7 +35,16 @@ export interface ToastProps {
   onClose: (id: string) => void;
   autoHideDuration?: number;
   transactionId?: string;
-  error?: Error | string | { message: string; stack?: string }; // For collapsible error details
+  error?:
+    | Error
+    | string
+    | {
+        message?: string;
+        stack?: string;
+        userFriendlyMessage?: string;
+        errorCode?: number | null;
+        contractType?: string | null;
+      }; // For collapsible error details with enhanced error resolver support
 }
 
 const getToastIcon = (type: ToastType) => {
