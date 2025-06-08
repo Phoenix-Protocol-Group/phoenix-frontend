@@ -259,7 +259,7 @@ export const useContractTransaction = () => {
       // Start transaction execution
       return executeTransaction();
     },
-    [addAsyncToast, storePersist, appStore, openRestoreModal, closeRestoreModal]
+    [addAsyncToast, storePersist, openRestoreModal, closeRestoreModal]
   );
 
   return {

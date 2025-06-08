@@ -146,7 +146,6 @@ export const YieldSummary = ({
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  {/* Replace with your PHO icon, example below uses a placeholder SVG */}
                   <Box
                     component="span"
                     sx={{
@@ -157,7 +156,6 @@ export const YieldSummary = ({
                       mr: 0.5,
                     }}
                   >
-                    {/* Example PHO icon SVG */}
                     <Box
                       component="img"
                       src="/cryptoIcons/pho.svg"
@@ -170,7 +168,7 @@ export const YieldSummary = ({
                     />
                   </Box>
                   <span>
-                    {claimableRewards / 10 ** 7}
+                    {claimableRewards}
                     <span
                       style={{
                         marginLeft: 6,

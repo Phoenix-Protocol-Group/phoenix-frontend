@@ -275,18 +275,17 @@ export default function EarnPage(): JSX.Element {
   );
 
   const handleClaimStrategy = useCallback(
-    (strategy: Strategy, metadata: StrategyMetadata): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        if (!walletAddress) {
-          console.warn(
-            "Claim attempt with no wallet address for strategy:",
-            metadata.id
-          );
-          reject(new Error("Wallet not connected. Cannot claim."));
-          return;
-        }
+    async (strategy: Strategy, metadata: StrategyMetadata): Promise<void> => {
+      if (!walletAddress) {
+        console.warn(
+          "Claim attempt with no wallet address for strategy:",
+          metadata.id
+        );
+        throw new Error("Wallet not connected. Cannot claim.");
+      }
 
-        executeContractTransaction({
+      try {
+        await executeContractTransaction({
           contractType: metadata.contractType,
           contractAddress: metadata.contractAddress,
           transactionFunction: (_client, _restore) => {
@@ -300,17 +299,14 @@ export default function EarnPage(): JSX.Element {
                 `Claim successful for ${metadata.name}. Refreshing strategies.`
               );
               loadStrategies(); // Refresh data on success
-              resolve(); // Resolve the promise that ClaimAllModal is awaiting
             },
-            // Errors from executeContractTransaction (e.g. user rejection, network issues)
-            // will be caught by the .catch() below.
           },
-        }).catch((error) => {
-          // This catches rejections from the promise returned by executeContractTransaction.
-          console.error(`Claim failed for ${metadata.name}:`, error);
-          reject(error); // Reject the promise that ClaimAllModal is awaiting
         });
-      });
+        console.log(`Claim completed for ${metadata.name}`);
+      } catch (error) {
+        console.error(`Claim failed for ${metadata.name}:`, error);
+        throw error; // Re-throw the error for ClaimAllModal to handle
+      }
     },
     [walletAddress, executeContractTransaction, loadStrategies]
   );

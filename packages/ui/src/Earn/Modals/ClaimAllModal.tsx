@@ -375,7 +375,7 @@ export const ClaimAllModal = ({
                   ml: 1,
                 }}
               >
-                {formatCurrencyStatic.format(totalRewards)}
+                {totalRewards} PHO
               </Typography>
             </Typography>
             {(isClaiming || isComplete) && (
@@ -485,7 +485,7 @@ export const ClaimAllModal = ({
                             fontSize: "0.85rem",
                           }}
                         >
-                          Rewards: {formatCurrencyStatic.format(item.rewards)}
+                          Rewards: {item.rewards} PHO{" "}
                           {item.status === "error" &&
                             item.error &&
                             ` - Error: ${item.error}`}
