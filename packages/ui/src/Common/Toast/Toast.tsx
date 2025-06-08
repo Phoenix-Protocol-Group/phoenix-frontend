@@ -8,7 +8,6 @@ import {
   Collapse,
   Button,
 } from "@mui/material";
-import { motion } from "framer-motion";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
@@ -50,7 +49,20 @@ const getToastIcon = (type: ToastType) => {
     case "info":
       return <InfoIcon sx={{ color: colors.primary.main }} />;
     case "loading":
-      return <CircularProgress size={20} sx={{ color: colors.info.main }} />;
+      return (
+        <CircularProgress
+          size={20}
+          thickness={3}
+          sx={{
+            color: colors.info.main,
+            animationDuration: "0.8s",
+            filter: `drop-shadow(0 0 8px ${colors.info.main}40)`,
+            "& .MuiCircularProgress-circle": {
+              strokeLinecap: "round",
+            },
+          }}
+        />
+      );
     default:
       return <InfoIcon sx={{ color: colors.primary.main }} />;
   }
@@ -70,6 +82,22 @@ const getToastColor = (type: ToastType) => {
     default:
       return colors.primary.main;
   }
+};
+
+// Helper function to convert hex color to rgb values for gradient usage
+const hexToRgb = (hex: string) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(
+        result[3],
+        16
+      )}`
+    : "249, 115, 22"; // Fallback to primary color RGB
+};
+
+// Helper function to get RGB from toast color
+const getToastColorRgb = (type: ToastType) => {
+  return hexToRgb(getToastColor(type));
 };
 
 // Helper function to get Explorer URL for transaction
@@ -164,80 +192,156 @@ export const Toast = ({
   }, [errorDetails.technical]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50, scale: 0.3 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-      layout
-      style={{ width: "100%" }} // Ensure consistent width
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        minWidth: "320px",
+        maxWidth: "400px",
+        background: `linear-gradient(145deg, ${colors.neutral[800]} 0%, ${colors.neutral[850]} 100%)`,
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderRadius: borderRadius.lg,
+        border: `1px solid ${getToastColor(type)}60`,
+        borderLeft: `3px solid ${getToastColor(type)}`,
+        boxShadow: `
+          0 12px 40px rgba(0, 0, 0, 0.4), 
+          0 6px 20px rgba(0, 0, 0, 0.2),
+          0 0 0 1px ${getToastColor(type)}40,
+          inset 0 1px 0 rgba(255, 255, 255, 0.08)
+        `,
+        overflow: "hidden",
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `linear-gradient(135deg, rgba(${getToastColorRgb(
+            type
+          )}, 0.08) 0%, transparent 50%, rgba(${getToastColorRgb(
+            type
+          )}, 0.08) 100%)`,
+          pointerEvents: "none",
+          zIndex: 0,
+        },
+        "&::after": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "1px",
+          background: `linear-gradient(90deg, transparent 0%, ${getToastColor(
+            type
+          )}60 50%, transparent 100%)`,
+          pointerEvents: "none",
+          zIndex: 1,
+        },
+      }}
     >
       <Box
         sx={{
           display: "flex",
-          flexDirection: "column",
-          width: "100%", // Fix width to be consistent
-          minWidth: "320px", // Set minimum width
-          maxWidth: "400px",
-          backgroundColor: colors.neutral[800],
-          borderRadius: borderRadius.md,
-          borderLeft: `4px solid ${getToastColor(type)}`,
-          boxShadow: shadows.card,
-          overflow: "hidden",
+          alignItems: "flex-start",
+          padding: spacing.md,
+          width: "100%",
           position: "relative",
+          zIndex: 2,
         }}
       >
         <Box
           sx={{
+            mr: spacing.sm,
+            mt: "2px",
+            position: "relative",
             display: "flex",
-            alignItems: "flex-start",
-            padding: spacing.md,
-            width: "100%", // Ensure full width
+            alignItems: "center",
+            justifyContent: "center",
+            width: "28px",
+            height: "28px",
+            borderRadius: "50%",
+            background:
+              type === "loading"
+                ? `radial-gradient(circle, rgba(${hexToRgb(
+                    colors.info.main
+                  )}, 0.15) 0%, transparent 70%)`
+                : `radial-gradient(circle, rgba(${getToastColorRgb(
+                    type
+                  )}, 0.15) 0%, transparent 70%)`,
+            "&::before":
+              type !== "loading"
+                ? {
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    borderRadius: "50%",
+                    background: `linear-gradient(135deg, rgba(${getToastColorRgb(
+                      type
+                    )}, 0.1) 0%, transparent 50%)`,
+                    animation: "pulse 2s infinite",
+                    "@keyframes pulse": {
+                      "0%, 100%": { opacity: 0.3, transform: "scale(1)" },
+                      "50%": { opacity: 0.6, transform: "scale(1.1)" },
+                    },
+                  }
+                : {},
           }}
         >
-          <Box sx={{ mr: spacing.sm, mt: "2px" }}>
-            {type === "loading" ? (
-              <CircularProgress
-                size={22}
-                thickness={4}
-                sx={{
-                  color: colors.info.main,
-                  animationDuration: "0.8s", // Speed up the animation slightly
-                }}
-              />
-            ) : (
-              getToastIcon(type)
-            )}
-          </Box>
+          {type === "loading" ? (
+            <CircularProgress
+              size={20}
+              thickness={3}
+              sx={{
+                color: colors.info.main,
+                animationDuration: "0.8s",
+                filter: `drop-shadow(0 0 8px ${colors.info.main}40)`,
+                "& .MuiCircularProgress-circle": {
+                  strokeLinecap: "round",
+                },
+              }}
+            />
+          ) : (
+            getToastIcon(type)
+          )}
+        </Box>
 
-          <Box sx={{ flex: 1 }}>
-            {title && (
-              <Typography
-                sx={{
-                  fontFamily: typography.fontFamily,
-                  fontSize: typography.fontSize.sm,
-                  fontWeight: typography.fontWeights.bold,
-                  color: colors.neutral[50],
-                  mb: "2px",
-                }}
-              >
-                {title}
-              </Typography>
-            )}
-
+        <Box sx={{ flex: 1 }}>
+          {title && (
             <Typography
               sx={{
                 fontFamily: typography.fontFamily,
                 fontSize: typography.fontSize.sm,
-                fontWeight: typography.fontWeights.regular,
-                color: colors.neutral[300],
-                wordBreak: "break-word",
+                fontWeight: typography.fontWeights.bold,
+                color: colors.neutral[50],
+                mb: "2px",
               }}
             >
-              {message}
+              {title}
             </Typography>
+          )}
 
-            {/* Transaction Link */}
-            {transactionId && (
+          <Typography
+            sx={{
+              fontFamily: typography.fontFamily,
+              fontSize: typography.fontSize.sm,
+              fontWeight: typography.fontWeights.regular,
+              color: colors.neutral[300],
+              wordBreak: "break-word",
+            }}
+          >
+            {message}
+          </Typography>
+
+          {/* Transaction Link */}
+          {transactionId && (
+            <Box sx={{ mt: spacing.xs }}>
               <Link
                 href={getExplorerUrl(transactionId)}
                 target="_blank"
@@ -248,27 +352,36 @@ export const Toast = ({
                   fontFamily: typography.fontFamily,
                   fontSize: typography.fontSize.xs,
                   color: colors.primary.main,
-                  mt: spacing.xs,
                   cursor: "pointer",
                   textDecoration: "none",
+                  padding: "4px 8px",
+                  borderRadius: borderRadius.sm,
+                  background: `linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(249, 115, 22, 0.05) 100%)`,
+                  border: `1px solid rgba(249, 115, 22, 0.2)`,
+                  transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                   "&:hover": {
-                    textDecoration: "underline",
+                    textDecoration: "none",
+                    background: `linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.1) 100%)`,
+                    border: `1px solid rgba(249, 115, 22, 0.4)`,
+                    transform: "translateY(-1px)",
+                    boxShadow: `0 4px 12px rgba(249, 115, 22, 0.2)`,
                   },
                 }}
               >
                 View Transaction
                 <LaunchIcon sx={{ fontSize: 12, ml: 0.5 }} />
               </Link>
-            )}
+            </Box>
+          )}
 
-            {/* Error expand/collapse and copy buttons */}
-            {hasErrorDetails && (
+          {/* Error expand/collapse and copy buttons */}
+          {hasErrorDetails && (
+            <Box sx={{ mt: 1 }}>
               <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
                   gap: spacing.sm,
-                  mt: 1,
                   flexWrap: "wrap",
                 }}
               >
@@ -280,8 +393,16 @@ export const Toast = ({
                     cursor: "pointer",
                     fontSize: typography.fontSize.xs,
                     color: colors.primary.main,
+                    padding: "4px 8px",
+                    borderRadius: borderRadius.sm,
+                    background: `linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(249, 115, 22, 0.05) 100%)`,
+                    border: `1px solid rgba(249, 115, 22, 0.2)`,
+                    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                     "&:hover": {
-                      color: colors.primary.light,
+                      background: `linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.1) 100%)`,
+                      border: `1px solid rgba(249, 115, 22, 0.4)`,
+                      transform: "translateY(-1px)",
+                      boxShadow: `0 4px 12px rgba(249, 115, 22, 0.2)`,
                     },
                   }}
                 >
@@ -305,10 +426,17 @@ export const Toast = ({
                       color: colors.neutral[400],
                       textTransform: "none",
                       minWidth: "auto",
-                      p: 0.5,
+                      padding: "4px 8px",
+                      borderRadius: borderRadius.sm,
+                      background: `linear-gradient(135deg, rgba(115, 115, 115, 0.1) 0%, rgba(115, 115, 115, 0.05) 100%)`,
+                      border: `1px solid rgba(115, 115, 115, 0.2)`,
+                      transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                       "&:hover": {
                         color: colors.neutral[200],
-                        backgroundColor: "transparent",
+                        background: `linear-gradient(135deg, rgba(115, 115, 115, 0.2) 0%, rgba(115, 115, 115, 0.1) 100%)`,
+                        border: `1px solid rgba(115, 115, 115, 0.4)`,
+                        transform: "translateY(-1px)",
+                        boxShadow: `0 4px 12px rgba(115, 115, 115, 0.2)`,
                       },
                     }}
                   >
@@ -316,52 +444,86 @@ export const Toast = ({
                   </Button>
                 )}
               </Box>
-            )}
-          </Box>
-
-          {/* Only show close button for non-loading toasts */}
-          {type !== "loading" && (
-            <IconButton
-              size="small"
-              onClick={() => onClose(id)}
-              sx={{
-                padding: "4px",
-                color: colors.neutral[400],
-                "&:hover": {
-                  color: colors.neutral[200],
-                  backgroundColor: "transparent",
-                },
-              }}
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton>
+            </Box>
           )}
         </Box>
 
-        {/* Collapsible Error Details */}
-        {hasErrorDetails && (
-          <Collapse in={expanded}>
-            <Box
-              sx={{
-                backgroundColor: colors.neutral[900],
-                padding: spacing.md,
-                mx: spacing.md,
-                mb: spacing.md,
-                borderRadius: borderRadius.sm,
-                maxHeight: "200px",
-                overflow: "auto",
-                fontSize: typography.fontSize.xs,
-                fontFamily: "monospace",
-                whiteSpace: "pre-wrap",
-                color: colors.error.light,
-                wordBreak: "break-word",
-              }}
-            >
-              {errorDetails.display}
-            </Box>
-          </Collapse>
+        {/* Only show close button for non-loading toasts */}
+        {type !== "loading" && (
+          <IconButton
+            size="small"
+            onClick={() => onClose(id)}
+            sx={{
+              padding: "6px",
+              color: colors.neutral[400],
+              borderRadius: "50%",
+              background: `linear-gradient(135deg, rgba(115, 115, 115, 0.1) 0%, rgba(115, 115, 115, 0.05) 100%)`,
+              border: `1px solid rgba(115, 115, 115, 0.2)`,
+              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+              "&:hover": {
+                color: colors.neutral[200],
+                background: `linear-gradient(135deg, rgba(115, 115, 115, 0.2) 0%, rgba(115, 115, 115, 0.1) 100%)`,
+                border: `1px solid rgba(115, 115, 115, 0.4)`,
+                boxShadow: `0 4px 12px rgba(115, 115, 115, 0.2)`,
+              },
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
         )}
       </Box>
-    </motion.div>
+
+      {/* Collapsible Error Details */}
+      {hasErrorDetails && (
+        <Collapse in={expanded}>
+          <Box
+            sx={{
+              background: `linear-gradient(145deg, ${colors.neutral[900]} 0%, ${colors.neutral[850]} 100%)`,
+              backdropFilter: "blur(10px)",
+              padding: spacing.md,
+              mx: spacing.md,
+              mb: spacing.md,
+              borderRadius: borderRadius.md,
+              border: `1px solid ${colors.neutral[700]}`,
+              maxHeight: "200px",
+              overflow: "auto",
+              fontSize: typography.fontSize.xs,
+              fontFamily: "monospace",
+              whiteSpace: "pre-wrap",
+              color: colors.error.light,
+              wordBreak: "break-word",
+              position: "relative",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: `linear-gradient(135deg, rgba(229, 115, 115, 0.03) 0%, transparent 50%, rgba(229, 115, 115, 0.03) 100%)`,
+                pointerEvents: "none",
+                borderRadius: borderRadius.md,
+              },
+              "&::-webkit-scrollbar": {
+                width: "6px",
+              },
+              "&::-webkit-scrollbar-track": {
+                background: colors.neutral[800],
+                borderRadius: borderRadius.sm,
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: `linear-gradient(135deg, ${colors.error.main} 0%, ${colors.error.dark} 100%)`,
+                borderRadius: borderRadius.sm,
+                "&:hover": {
+                  background: colors.error.light,
+                },
+              },
+            }}
+          >
+            {errorDetails.display}
+          </Box>
+        </Collapse>
+      )}
+    </Box>
   );
 };
