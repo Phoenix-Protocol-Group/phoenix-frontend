@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { Box, Modal, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Modal,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { motion } from "framer-motion";
 import { Button } from "../../Button/Button";
 import { TokenBox } from "../../Swap"; // Import TokenBox from Swap components
@@ -283,7 +290,6 @@ export const BondModal = ({
           overflow: "auto",
           borderRadius: "20px",
           border: "1px solid rgba(71, 85, 105, 0.3)",
-          padding: { xs: spacing.lg, md: "2rem" },
           backdropFilter: "blur(20px)",
           boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
           outline: "none",
@@ -304,61 +310,121 @@ export const BondModal = ({
           }}
         />
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
-          style={{ position: "relative", zIndex: 1 }}
+        {/* Enhanced Header with premium styling */}
+        <Box
+          sx={{
+            background:
+              "linear-gradient(135deg, rgba(115, 115, 115, 0.08) 0%, rgba(148, 163, 184, 0.04) 50%, rgba(249, 115, 22, 0.02) 100%)",
+            borderBottom: `1px solid ${colors.neutral[700]}`,
+            borderRadius: "20px 20px 0 0",
+            p: spacing.lg,
+            mx: 0,
+            mt: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            position: "relative",
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 1,
+              background:
+                "linear-gradient(90deg, transparent 0%, rgba(249, 115, 22, 0.3) 50%, transparent 100%)",
+            },
+          }}
         >
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
               alignItems: "center",
-              mb: spacing.lg,
+              gap: spacing.md,
             }}
           >
-            <Typography
-              id="bond-modal-title"
-              variant="h6"
-              component="h2"
+            <Box
+              component="img"
+              src={strategy.assets[0]?.icon || "/cryptoIcons/default.svg"}
+              alt={`${strategy.name || "Strategy"} icon`}
               sx={{
-                color: colors.neutral[50],
-                fontWeight: typography.fontWeights.bold,
-                fontSize: { xs: "1.25rem", md: "1.5rem" },
-                background: "linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
+                width: isMobile ? 40 : 48,
+                height: isMobile ? 40 : 48,
+                borderRadius: "50%",
+                border: `2px solid ${colors.neutral[600]}`,
               }}
-            >
-              {isPairStrategy ? "Provide Liquidity" : "Bond to"} {strategy.name}
-            </Typography>
-            <motion.div
-              whileHover={{ rotate: 90, scale: 1.1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Box
+            />
+            <Box>
+              <Typography
+                id="bond-modal-title"
                 sx={{
-                  cursor: "pointer",
-                  opacity: 0.7,
-                  color: colors.neutral[300],
-                  p: 1,
-                  borderRadius: "8px",
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    opacity: 1,
-                    backgroundColor: "rgba(71, 85, 105, 0.2)",
-                    color: colors.neutral[100],
-                  },
+                  color: colors.neutral[50],
+                  fontSize: typography.fontSize.xl,
+                  fontWeight: typography.fontWeights.bold,
+                  fontFamily: typography.fontFamily,
                 }}
-                onClick={handleClose}
               >
-                <CloseIcon />
-              </Box>
-            </motion.div>
+                {strategy.name || "Strategy"}
+              </Typography>
+              <Typography
+                sx={{
+                  color: colors.neutral[400],
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.medium,
+                }}
+              >
+                {isPairStrategy ? "Provide Liquidity" : "Bond Strategy"} •{" "}
+                {strategy.category || "Yield Farming"}
+              </Typography>
+            </Box>
           </Box>
 
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{
+              type: "spring",
+              stiffness: 400,
+              damping: 15,
+            }}
+          >
+            <IconButton
+              onClick={handleClose}
+              aria-label="Close bond modal"
+              sx={{
+                background: "rgba(239, 68, 68, 0.1)",
+                color: colors.neutral[300],
+                width: 40,
+                height: 40,
+                border: `1px solid rgba(239, 68, 68, 0.2)`,
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&:hover": {
+                  background: "rgba(239, 68, 68, 0.2)",
+                  color: colors.error.main,
+                  borderColor: "rgba(239, 68, 68, 0.4)",
+                  boxShadow: "0 4px 12px rgba(239, 68, 68, 0.15)",
+                },
+                "&:focus": {
+                  outline: `2px solid ${colors.primary.main}`,
+                  outlineOffset: 2,
+                },
+              }}
+            >
+              <CloseIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </motion.div>
+        </Box>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            position: "relative",
+            zIndex: 1,
+            padding: isMobile ? spacing.lg : "2rem",
+          }}
+        >
           <Typography
             id="bond-modal-description"
             sx={{

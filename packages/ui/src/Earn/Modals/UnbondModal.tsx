@@ -116,93 +116,154 @@ export const UnbondModal = ({
       onClose={handleClose}
       aria-labelledby="unbond-modal-title"
       aria-describedby="unbond-modal-description"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1300,
+      }}
     >
       <Box
         sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
+          position: "relative",
           width: { xs: "90%", sm: "450px" },
-          background:
-            "linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(251, 146, 60, 0.15) 50%, rgba(254, 215, 170, 0.15) 100%)",
+          maxHeight: "90vh",
+          overflow: "auto",
+          borderRadius: "20px",
+          border: "1px solid rgba(71, 85, 105, 0.3)",
           backdropFilter: "blur(20px)",
-          border: "1px solid rgba(249, 115, 22, 0.3)",
-          borderRadius: borderRadius.lg,
-          boxShadow:
-            "0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(249, 115, 22, 0.1)",
-          p: spacing.lg,
+          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
           outline: "none",
-          "&::before": {
-            content: '""',
+        }}
+      >
+        {/* Subtle gradient overlay */}
+        <Box
+          sx={{
             position: "absolute",
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
             background:
-              "linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(251, 146, 60, 0.1) 100%)",
-            borderRadius: borderRadius.lg,
-            zIndex: -1,
-          },
-        }}
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
+              "linear-gradient(135deg, rgba(71, 85, 105, 0.02) 0%, rgba(148, 163, 184, 0.01) 50%, rgba(71, 85, 105, 0.02) 100%)",
+            borderRadius: "20px",
+            zIndex: 0,
+          }}
+        />
+
+        {/* Enhanced Header with premium styling */}
+        <Box
+          sx={{
+            background:
+              "linear-gradient(135deg, rgba(115, 115, 115, 0.08) 0%, rgba(148, 163, 184, 0.04) 50%, rgba(249, 115, 22, 0.02) 100%)",
+            borderBottom: `1px solid ${colors.neutral[700]}`,
+            borderRadius: "20px 20px 0 0",
+            p: spacing.lg,
+            mx: 0,
+            mt: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            position: "relative",
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 1,
+              background:
+                "linear-gradient(90deg, transparent 0%, rgba(249, 115, 22, 0.3) 50%, transparent 100%)",
+            },
+          }}
         >
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
               alignItems: "center",
-              mb: spacing.md,
+              gap: spacing.md,
             }}
           >
-            <Typography
-              id="unbond-modal-title"
-              variant="h6"
-              component="h2"
+            <Box
+              component="img"
+              src={strategy?.assets[0]?.icon || "/cryptoIcons/default.svg"}
+              alt={`${strategy?.name || "Strategy"} icon`}
               sx={{
-                background: "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                fontWeight: typography.fontWeights.bold,
-                fontSize: "1.25rem",
+                width: isMobile ? 40 : 48,
+                height: isMobile ? 40 : 48,
+                borderRadius: "50%",
+                border: `2px solid ${colors.neutral[600]}`,
               }}
-            >
-              Unbond from {strategy.name}
-            </Typography>
-            <motion.div
-              whileHover={{
-                rotate: 90,
-                scale: 1.1,
-              }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Box
+            />
+            <Box>
+              <Typography
+                id="unbond-modal-title"
                 sx={{
-                  cursor: "pointer",
-                  padding: "8px",
-                  borderRadius: "50%",
-                  background: "rgba(249, 115, 22, 0.1)",
-                  color: colors.neutral[300],
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    background: "rgba(249, 115, 22, 0.2)",
-                    color: "#F97316",
-                  },
+                  color: colors.neutral[50],
+                  fontSize: typography.fontSize.xl,
+                  fontWeight: typography.fontWeights.bold,
+                  fontFamily: typography.fontFamily,
                 }}
-                onClick={handleClose}
               >
-                <CloseIcon />
-              </Box>
-            </motion.div>
+                {strategy?.name || "Strategy"}
+              </Typography>
+              <Typography
+                sx={{
+                  color: colors.neutral[400],
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.medium,
+                }}
+              >
+                Withdraw Stake • {strategy?.category || "Yield Farming"}
+              </Typography>
+            </Box>
           </Box>
 
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{
+              type: "spring",
+              stiffness: 400,
+              damping: 15,
+            }}
+          >
+            <IconButton
+              onClick={handleClose}
+              aria-label="Close unbond modal"
+              sx={{
+                background: "rgba(239, 68, 68, 0.1)",
+                color: colors.neutral[300],
+                width: 40,
+                height: 40,
+                border: `1px solid rgba(239, 68, 68, 0.2)`,
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&:hover": {
+                  background: "rgba(239, 68, 68, 0.2)",
+                  color: colors.error.main,
+                  borderColor: "rgba(239, 68, 68, 0.4)",
+                  boxShadow: "0 4px 12px rgba(239, 68, 68, 0.15)",
+                },
+                "&:focus": {
+                  outline: `2px solid ${colors.primary.main}`,
+                  outlineOffset: 2,
+                },
+              }}
+            >
+              <CloseIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </motion.div>
+        </Box>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            position: "relative",
+            zIndex: 1,
+            padding: isMobile ? spacing.lg : "2rem",
+          }}
+        >
           {showIndividualStakes ? (
             <>
               <Typography
