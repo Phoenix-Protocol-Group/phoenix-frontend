@@ -70,7 +70,7 @@ const SideNav = ({
       href: "/pools",
     },
     {
-      label: "Statistics",
+      label: "History",
       icon: (
         <Image
           alt="Statistics Icon"
