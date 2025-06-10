@@ -660,6 +660,7 @@ export default function Page(props: PoolPageProps) {
         border: { xs: "none", md: "1px solid rgba(249, 115, 22, 0.1)" },
         backdropFilter: "blur(20px)",
         p: { xs: 1, sm: 2, md: 4 },
+        mx: "auto",
         pb: { xs: 2, sm: 3, md: 4 },
         position: "relative",
         overflow: "hidden",
