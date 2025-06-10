@@ -7,6 +7,7 @@ import {
   WalletConnectAllowedMethods,
 } from "./wallet-connect";
 import { NETWORK_PASSPHRASE } from "../constants";
+import { Albedo } from "./albedo";
 let walletConnectInstance: WalletClient | undefined;
 const initializeWalletConnect = async () => {
   if (walletConnectInstance) return walletConnectInstance;
@@ -92,6 +93,8 @@ export default class Signer {
       this.wallet = new lobstr();
     } else if (this.walletType === "hana") {
       this.wallet = new hana();
+    } else if (this.walletType === "albedo") {
+      this.wallet = new Albedo();
     } else if (this.walletType === "wallet-connect") {
       const wc = await initializeWalletConnect();
 

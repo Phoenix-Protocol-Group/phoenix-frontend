@@ -8,6 +8,7 @@ import {
   WalletConnect,
   xbull,
   hana,
+  albedo,
 } from "@phoenix-protocol/state";
 import { AppBar, ConnectWallet } from "@phoenix-protocol/ui";
 import React, { useEffect } from "react";
@@ -76,6 +77,7 @@ const TopBar = ({
           xbull(),
           lobstr(),
           hana(),
+          albedo(),
           new WalletConnect(true),
         ]}
         setOpen={() => store.setWalletModalOpen(!store.walletModalOpen)}

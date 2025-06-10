@@ -7,6 +7,7 @@ import { xbull } from "../wallet/xbull";
 import { lobstr } from "../wallet/lobstr";
 import { WalletConnect } from "../wallet/wallet-connect";
 import { hana } from "../wallet/hana";
+import { albedo } from "../wallet/albedo";
 
 // Maintain a single WalletConnect instance
 let walletConnectInstance: WalletConnect | null = null;
@@ -99,6 +100,9 @@ export const createConnectWalletActions = () => {
           break;
         case "hana":
           address = await hana().getPublicKey();
+          break;
+        case "albedo":
+          address = await albedo().getPublicKey();
           break;
         case "wallet-connect":
           const Client = await initializeWalletConnect(forceNew);

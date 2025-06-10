@@ -12,6 +12,7 @@ import { xBull } from "./wallets/xbull";
 import { lobstr } from "./wallets/lobstr";
 import { hana } from "./wallets/hana";
 import { Wallet } from "./wallets/types";
+import { Albedo } from "./wallets/albedo";
 
 const horizonUrl = "https://horizon.stellar.org";
 const server = new Horizon.Server(horizonUrl);
@@ -171,6 +172,10 @@ export async function fetchAndIssueTrustline(
       case "hana":
         wallet = new hana();
         break;
+      case "albedo":
+        wallet = new Albedo();
+        break;
+      case "wallet-connect": // TODO
       default:
         wallet = (await import("@stellar/freighter-api")).default;
     }
