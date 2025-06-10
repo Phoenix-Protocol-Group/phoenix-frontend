@@ -176,6 +176,18 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
           }}
         >
           <Box flex={1}>
+            <Typography
+              sx={{
+                color: colors.neutral[400],
+                fontFamily: typography.fontFamily,
+                fontSize: typography.fontSize.xs,
+                fontWeight: typography.fontWeights.regular,
+                lineHeight: "140%",
+                opacity: 0.6,
+              }}
+            >
+              From
+            </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer
                 components={["DatePicker"]}
