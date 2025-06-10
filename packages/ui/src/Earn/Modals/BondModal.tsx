@@ -67,7 +67,8 @@ export const BondModal = ({
       if (open && strategy?.assets) {
         const balances: { [key: string]: Token } = {};
 
-        const allAssets = await appStore.getAllTokens();
+        // Use unified token storage from appStore.tokens
+        const allAssets = appStore.tokens;
         // For each asset in the strategy, fetch the user's actual token balance
 
         strategy.assets.forEach((asset) => {
@@ -85,7 +86,7 @@ export const BondModal = ({
     };
 
     fetchUserBalances();
-  }, [open, strategy]);
+  }, [open, strategy, appStore.tokens]);
 
   // Create tokens with user balances for display
   const tokensWithUserBalances = useMemo(() => {

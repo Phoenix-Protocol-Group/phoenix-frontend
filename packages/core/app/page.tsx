@@ -68,7 +68,6 @@ export default function Page() {
   const [loserAsset, setLoserAsset] = useState<GainerOrLooserAsset>(
     {} as GainerOrLooserAsset
   );
-  const [allTokens, setAllTokens] = useState<Token[]>([]);
   const [xlmPriceChart, setXlmPriceChart] = useState<any[]>([]);
   const [phoPriceChart, setPhoPriceChart] = useState<any[]>([]);
   const [loadingBalances, setLoadingBalances] = useState(true);
@@ -221,7 +220,7 @@ export default function Page() {
 
         // Fetch gainer and loser
         const { winner, loser } = await fetchBiggestWinnerAndLoser();
-        const allTokens = await appStore.getAllTokens();
+        const allTokens = appStore.tokens;
         const gainer = allTokens.find((token) => token.name === winner.symbol);
         const loserAsset = allTokens.find(
           (token) => token.name === loser.symbol
@@ -264,8 +263,8 @@ export default function Page() {
         setXlmPriceChart(xlmPrices);
         setPhoPriceChart(phoPrices);
 
-        // Load all token balances
-        setAllTokens(allTokens);
+        // Token balances are now managed centrally by appStore.getAllTokens()
+        // No need to set local state
       } catch (error) {
         console.log("Failed to initialize data:", error);
       } finally {
@@ -408,7 +407,9 @@ export default function Page() {
                 tokens: [
                   {
                     name: tokenA?.symbol || "",
-                    icon: `/cryptoIcons/${(tokenA?.symbol || 'unknown').toLowerCase()}.svg`,
+                    icon: `/cryptoIcons/${(
+                      tokenA?.symbol || "unknown"
+                    ).toLowerCase()}.svg`,
                     amount:
                       Number(pairInfo.result.asset_a.amount) /
                       10 ** Number(tokenA?.decimals),
@@ -418,7 +419,9 @@ export default function Page() {
                   },
                   {
                     name: tokenB?.symbol || "",
-                    icon: `/cryptoIcons/${(tokenB?.symbol || 'unknown').toLowerCase()}.svg`,
+                    icon: `/cryptoIcons/${(
+                      tokenB?.symbol || "unknown"
+                    ).toLowerCase()}.svg`,
                     amount:
                       Number(pairInfo.result.asset_b.amount) /
                       10 ** Number(tokenB?.decimals),
@@ -515,7 +518,7 @@ export default function Page() {
         lockedAssets: "$100,000",
       },
       walletBalanceArgs: {
-        tokens: allTokens,
+        tokens: appStore.tokens,
         onTokenClick: (token: string) => {
           fetchTokenInfo(token);
         },
@@ -542,7 +545,7 @@ export default function Page() {
     [
       gainerAsset,
       loserAsset,
-      allTokens,
+      appStore.tokens,
       xlmPriceChart,
       phoPriceChart,
       vestingInfo,
@@ -819,7 +822,7 @@ export default function Page() {
                       >
                         <CircularProgress sx={{ color: "#E2491A" }} />
                       </Box>
-                    ) : allTokens.length ? (
+                    ) : appStore.tokens.length ? (
                       <WalletBalanceTable {...args.walletBalanceArgs} />
                     ) : (
                       <Box

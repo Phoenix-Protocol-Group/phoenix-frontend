@@ -114,15 +114,16 @@ export const createWalletActions = (
 
       const allTokensResults = await Promise.all(allTokensPromises);
       // Filter out any undefined results and process the valid tokens
-      const validTokens = allTokensResults.filter((token): token is Token => 
-        token !== undefined &&
-        token.symbol !== "POOL" &&
-        token.symbol !== "PUST" &&
-        token.symbol !== "EXUT" &&
-        token.symbol !== "XEXT" &&
-        token.symbol !== "XGXT" &&
-        token.symbol !== "GXUT" &&
-        !token.isStakingToken
+      const validTokens = allTokensResults.filter(
+        (token): token is Token =>
+          token !== undefined &&
+          token.symbol !== "POOL" &&
+          token.symbol !== "PUST" &&
+          token.symbol !== "EXUT" &&
+          token.symbol !== "XEXT" &&
+          token.symbol !== "XGXT" &&
+          token.symbol !== "GXUT" &&
+          !token.isStakingToken
       );
 
       setState((state: AppStore) => {
@@ -141,8 +142,9 @@ export const createWalletActions = (
       }
 
       // Check if token already exists and return/update it
-      const existingToken = getState().tokens.find((token: Token) => 
-        token.contractId === tokenAddress || token.id === tokenAddress
+      const existingToken = getState().tokens.find(
+        (token: Token) =>
+          token.contractId === tokenAddress || token.id === tokenAddress
       );
 
       // Token contract
@@ -181,7 +183,9 @@ export const createWalletActions = (
         return;
       }
 
-      const decimals = existingToken?.decimals || Number((await TokenContract.decimals()).result);
+      const decimals =
+        existingToken?.decimals ||
+        Number((await TokenContract.decimals()).result);
 
       // Get price data
       const tradeAPI = new TradeAPi.API(constants.TRADING_API_URL);
@@ -201,7 +205,7 @@ export const createWalletActions = (
         name: symbol,
         symbol: symbol,
         icon: `/cryptoIcons/${symbol.toLowerCase()}.svg`,
-        amount: Number(balance) / (10 ** decimals),
+        amount: Number(balance) / 10 ** decimals,
         category: getCategory(symbol),
         usdValue: usdValue,
         contractId: tokenAddress,
@@ -218,14 +222,17 @@ export const createWalletActions = (
             ? { ...token, ...tokenData }
             : token
         );
-        
+
         // If token couldn't be found, add it
-        if (!updatedTokens.find((token: Token) => 
-          token.contractId === tokenAddress || token.id === tokenAddress
-        )) {
+        if (
+          !updatedTokens.find(
+            (token: Token) =>
+              token.contractId === tokenAddress || token.id === tokenAddress
+          )
+        ) {
           updatedTokens.push(tokenData);
         }
-        
+
         return { tokens: updatedTokens };
       });
 
