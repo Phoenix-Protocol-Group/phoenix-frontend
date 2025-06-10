@@ -1,120 +1,22 @@
 import React from "react";
-import { Box, Grid, Tooltip, Typography, useMediaQuery } from "@mui/material"; // Import useMediaQuery
-import { motion } from "framer-motion"; // Import Framer Motion
+import { Box, Grid, Tooltip, Typography, useMediaQuery } from "@mui/material";
+import { motion } from "framer-motion";
 import FilterMenu from "./FilterMenu";
 import { TransactionsTableProps } from "@phoenix-protocol/types";
 import TransactionEntry from "./TransactionEntry";
 import TransactionHeader from "./TransactionsHeader";
-import { maxWidth } from "@mui/system";
 import {
   colors,
   typography,
   spacing,
   borderRadius,
+  cardStyles,
 } from "../../Theme/styleConstants";
 
 const customSpacing = {
   xs: spacing.xs,
   sm: spacing.sm,
   md: spacing.md,
-};
-
-const classes = {
-  root: {
-    marginTop: customSpacing.md,
-    padding: `${customSpacing.md} ${customSpacing.md}`,
-    borderRadius: "20px",
-    background: `
-      linear-gradient(135deg, rgba(23, 23, 23, 0.95) 0%, rgba(38, 38, 38, 0.85) 100%)
-    `,
-    backdropFilter: "blur(20px)",
-    border: "1px solid rgba(249, 115, 22, 0.2)",
-    overflowX: "auto",
-    boxShadow:
-      "0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(249, 115, 22, 0.1)",
-    position: "relative",
-    "&::before": {
-      content: '""',
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background:
-        "linear-gradient(135deg, rgba(249, 115, 22, 0.03) 0%, rgba(234, 88, 12, 0.02) 100%)",
-      borderRadius: "20px",
-      pointerEvents: "none",
-    },
-  },
-  tabUnselected: {
-    display: "flex",
-    width: "auto",
-    minWidth: "80px",
-    height: "40px",
-    padding: `12px 20px`,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: "0.625rem",
-    borderRadius: "12px",
-    cursor: "pointer",
-    color: "rgba(255, 255, 255, 0.7)",
-    background: "rgba(23, 23, 23, 0.8)",
-    backdropFilter: "blur(10px)",
-    opacity: 0.9,
-    textAlign: "center",
-    fontFeatureSettings: "'clig' off, 'liga' off",
-    fontFamily: typography.fontFamily,
-    fontSize: "14px",
-    fontStyle: "normal",
-    fontWeight: typography.fontWeights.medium,
-    lineHeight: "1.25rem",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    transition: "all 0.3s ease",
-    "&:hover": {
-      background: "rgba(249, 115, 22, 0.15)",
-      border: "1px solid rgba(249, 115, 22, 0.3)",
-      color: "rgba(255, 255, 255, 0.9)",
-      transform: "translateY(-1px)",
-      boxShadow: "0 4px 12px rgba(249, 115, 22, 0.2)",
-    },
-  },
-  tabSelected: {
-    display: "flex",
-    minWidth: "80px",
-    height: "40px",
-    padding: `12px 20px`,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: "0.625rem",
-    flex: "1 0 0",
-    borderRadius: "12px",
-    border: "1px solid rgba(249, 115, 22, 0.8)",
-    background: `
-      linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(234, 88, 12, 0.15) 100%)
-    `,
-    backdropFilter: "blur(10px)",
-    color: "#FAFAFA",
-    textAlign: "center",
-    fontFeatureSettings: "'clig' off, 'liga' off",
-    fontFamily: typography.fontFamily,
-    fontSize: "14px",
-    fontStyle: "normal",
-    fontWeight: typography.fontWeights.bold,
-    lineHeight: "1.25rem",
-    boxShadow:
-      "0 0 20px rgba(249, 115, 22, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-    animation: "glow 2s ease-in-out infinite alternate",
-    "@keyframes glow": {
-      "0%": {
-        boxShadow:
-          "0 0 20px rgba(249, 115, 22, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-      },
-      "100%": {
-        boxShadow:
-          "0 0 30px rgba(249, 115, 22, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
-      },
-    },
-  },
 };
 
 const TransactionsTable = ({
@@ -128,7 +30,7 @@ const TransactionsTable = ({
   entries,
 }: TransactionsTableProps) => {
   const [renderedEntries, setRenderedEntries] = React.useState<number>(0);
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md")); // Check if the device is mobile
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"));
 
   // Render entries one by one with a delay
   React.useEffect(() => {
@@ -137,7 +39,7 @@ const TransactionsTable = ({
         setRenderedEntries((prevCount) =>
           prevCount < entries.length ? prevCount + 1 : prevCount
         );
-      }, 200); // Adjust the delay between each entry here (in milliseconds)
+      }, 200);
 
       return () => clearInterval(interval);
     }
@@ -145,77 +47,160 @@ const TransactionsTable = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -10 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      {/* @ts-ignore */}
-      <Box sx={classes.root}>
+      <Box
+        sx={{
+          ...cardStyles.base,
+          p: { xs: spacing.md, md: spacing.lg },
+          background: `linear-gradient(145deg, ${colors.neutral[800]}80 0%, ${colors.neutral[850]}60 100%)`,
+          border: `1px solid ${colors.neutral[700]}`,
+          backdropFilter: "blur(20px)",
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: `linear-gradient(135deg, ${colors.primary.main}03 0%, ${colors.primary.dark}02 100%)`,
+            borderRadius: borderRadius.lg,
+            pointerEvents: "none",
+          },
+        }}
+      >
+        {/* Header with Tabs and Filter */}
         <Box
           sx={{
             display: "flex",
-            marginBottom: customSpacing.md,
-            minWidth: { md: "700px", xs: "100%" },
             justifyContent: "space-between",
+            alignItems: { xs: "flex-start", md: "center" },
+            flexDirection: { xs: "column", md: "row" },
+            gap: spacing.md,
+            mb: spacing.lg,
+            position: "relative",
+            zIndex: 1,
           }}
         >
           <Box
-            style={{
+            sx={{
               display: "flex",
-              gap: customSpacing.sm,
-              justifyContent: "space-between",
+              gap: spacing.sm,
+              flexWrap: "wrap",
             }}
           >
-            <motion.div
-              // @ts-ignore
-              style={{
-                ...classes.tabUnselected,
-                ...(activeView === "all" ? classes.tabSelected : ""),
-              }}
-              onClick={() => setActiveView("all")}
-              whileHover={{ scale: 1.05 }}
-            >
-              All
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  minWidth: "80px",
+                  height: "40px",
+                  padding: `${spacing.sm} ${spacing.md}`,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: borderRadius.md,
+                  cursor: "pointer",
+                  fontFamily: typography.fontFamily,
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.medium,
+                  transition: "all 0.3s ease",
+                  ...(activeView === "all"
+                    ? {
+                        background: `linear-gradient(135deg, ${colors.primary.main}25 0%, ${colors.primary.dark}15 100%)`,
+                        border: `1px solid ${colors.primary.main}80`,
+                        color: colors.neutral[50],
+                        boxShadow: `0 0 20px ${colors.primary.main}40`,
+                      }
+                    : {
+                        background: `linear-gradient(145deg, ${colors.neutral[800]} 0%, ${colors.neutral[850]} 100%)`,
+                        border: `1px solid ${colors.neutral[700]}`,
+                        color: colors.neutral[300],
+                        "&:hover": {
+                          background: `linear-gradient(135deg, ${colors.primary.main}15 0%, ${colors.primary.dark}08 100%)`,
+                          border: `1px solid ${colors.primary.main}30`,
+                          color: colors.neutral[100],
+                        },
+                      }),
+                }}
+                onClick={() => setActiveView("all")}
+              >
+                All
+              </Box>
             </motion.div>
+
             <Tooltip
               title={
                 loggedIn
                   ? undefined
                   : "Connect wallet to see personal transactions"
               }
+              arrow
             >
               <motion.div
-                // @ts-ignore
-                style={{
-                  ...classes.tabUnselected,
-                  ...(activeView === "personal" ? classes.tabSelected : ""),
-                }}
-                onClick={() => (loggedIn ? setActiveView("personal") : null)}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: loggedIn ? 1.02 : 1 }}
+                whileTap={{ scale: loggedIn ? 0.98 : 1 }}
               >
-                Personal
+                <Box
+                  sx={{
+                    display: "flex",
+                    minWidth: "80px",
+                    height: "40px",
+                    padding: `${spacing.sm} ${spacing.md}`,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderRadius: borderRadius.md,
+                    cursor: loggedIn ? "pointer" : "not-allowed",
+                    fontFamily: typography.fontFamily,
+                    fontSize: typography.fontSize.sm,
+                    fontWeight: typography.fontWeights.medium,
+                    transition: "all 0.3s ease",
+                    opacity: loggedIn ? 1 : 0.6,
+                    ...(activeView === "personal"
+                      ? {
+                          background: `linear-gradient(135deg, ${colors.primary.main}25 0%, ${colors.primary.dark}15 100%)`,
+                          border: `1px solid ${colors.primary.main}80`,
+                          color: colors.neutral[50],
+                          boxShadow: `0 0 20px ${colors.primary.main}40`,
+                        }
+                      : {
+                          background: `linear-gradient(145deg, ${colors.neutral[800]} 0%, ${colors.neutral[850]} 100%)`,
+                          border: `1px solid ${colors.neutral[700]}`,
+                          color: colors.neutral[300],
+                          ...(loggedIn && {
+                            "&:hover": {
+                              background: `linear-gradient(135deg, ${colors.primary.main}15 0%, ${colors.primary.dark}08 100%)`,
+                              border: `1px solid ${colors.primary.main}30`,
+                              color: colors.neutral[100],
+                            },
+                          }),
+                        }),
+                  }}
+                  onClick={() => (loggedIn ? setActiveView("personal") : null)}
+                >
+                  Personal
+                </Box>
               </motion.div>
             </Tooltip>
           </Box>
+
           <FilterMenu
             activeFilters={activeFilters}
             applyFilters={applyFilters}
           />
         </Box>
-        {!isMobile && ( // Hide header on mobile
+        {/* Desktop Header */}
+        {!isMobile && (
           <Box
             sx={{
-              padding: `${customSpacing.md} ${customSpacing.md}`,
-              borderRadius: "16px",
-              background: `
-                linear-gradient(135deg, rgba(23, 23, 23, 0.9) 0%, rgba(38, 38, 38, 0.7) 100%),
-                radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.08) 0%, transparent 70%)
-              `,
-              backdropFilter: "blur(10px)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              boxShadow:
-                "0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)",
+              p: spacing.md,
+              borderRadius: borderRadius.md,
+              background: `linear-gradient(145deg, ${colors.neutral[850]} 0%, ${colors.neutral[800]} 100%)`,
+              border: `1px solid ${colors.neutral[700]}`,
+              mb: spacing.md,
               position: "relative",
               overflow: "hidden",
               "&::before": {
@@ -225,8 +210,7 @@ const TransactionsTable = ({
                 left: 0,
                 right: 0,
                 height: "1px",
-                background:
-                  "linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.5), transparent)",
+                background: `linear-gradient(90deg, transparent, ${colors.primary.main}50, transparent)`,
               },
             }}
           >
@@ -234,11 +218,9 @@ const TransactionsTable = ({
               <Grid item xs={2}>
                 <TransactionHeader
                   handleSort={handleSort}
-                  label="Date"
+                  label="Date & Time"
                   active={
-                    activeSort.column === "tradeType"
-                      ? activeSort.direction
-                      : false
+                    activeSort.column === "date" ? activeSort.direction : false
                   }
                 />
               </Grid>
@@ -267,25 +249,30 @@ const TransactionsTable = ({
                   handleSort={handleSort}
                   label="Transaction ID"
                   active={
-                    activeSort.column === "date" ? activeSort.direction : false
+                    activeSort.column === "actions"
+                      ? activeSort.direction
+                      : false
                   }
                 />
               </Grid>
             </Grid>
           </Box>
         )}
-        <Box sx={{ minWidth: { md: "700px", xs: "100%" } }}>
+
+        {/* Transactions List */}
+        <Box sx={{ position: "relative", zIndex: 1 }}>
           {entries.map((entry, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }} // Delay each entry animation
+              transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               <TransactionEntry {...entry} isMobile={isMobile} />
             </motion.div>
           ))}
+
+          {/* Empty State */}
           {entries.length === 0 && (
             <Box
               sx={{
@@ -293,42 +280,39 @@ const TransactionsTable = ({
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                py: 6,
-                px: 4,
+                py: spacing.xxl,
+                px: spacing.lg,
                 textAlign: "center",
               }}
             >
-              <Box
-                sx={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: "50%",
-                  background:
-                    "linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(234, 88, 12, 0.1))",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  mb: 3,
-                  animation: "pulse 2s ease-in-out infinite",
-                  "@keyframes pulse": {
-                    "0%, 100%": { transform: "scale(1)", opacity: 0.8 },
-                    "50%": { transform: "scale(1.05)", opacity: 1 },
-                  },
-                }}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.4 }}
               >
-                <Typography
-                  sx={{ fontSize: "24px", color: "rgba(249, 115, 22, 0.8)" }}
+                <Box
+                  sx={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: "50%",
+                    background: `linear-gradient(135deg, ${colors.primary.main}20, ${colors.primary.dark}10)`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mb: spacing.md,
+                    border: `2px solid ${colors.primary.main}30`,
+                  }}
                 >
-                  📊
-                </Typography>
-              </Box>
+                  <Typography sx={{ fontSize: "24px" }}>📊</Typography>
+                </Box>
+              </motion.div>
 
               <Typography
                 sx={{
-                  color: "rgba(255, 255, 255, 0.9)",
-                  fontSize: "18px",
-                  fontWeight: 600,
-                  mb: 1,
+                  color: colors.neutral[50],
+                  fontSize: typography.fontSize.lg,
+                  fontWeight: typography.fontWeights.semiBold,
+                  mb: spacing.xs,
                 }}
               >
                 {activeView === "personal"
@@ -338,8 +322,8 @@ const TransactionsTable = ({
 
               <Typography
                 sx={{
-                  color: "rgba(255, 255, 255, 0.5)",
-                  fontSize: "14px",
+                  color: colors.neutral[400],
+                  fontSize: typography.fontSize.sm,
                   maxWidth: "400px",
                   lineHeight: 1.5,
                 }}

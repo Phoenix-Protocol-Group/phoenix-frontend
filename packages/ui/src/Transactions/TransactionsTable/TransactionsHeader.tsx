@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { ArrowDownward, SwapVert } from "@mui/icons-material";
-import { colors, typography } from "../../Theme/styleConstants";
+import { colors, typography, spacing } from "../../Theme/styleConstants";
 
 function convertToCamelCase(input: string): string {
   return input
@@ -23,6 +23,21 @@ const TransactionHeader = ({
       display: "flex",
       alignItems: "center",
       cursor: label !== "Actions" ? "pointer" : "default",
+      p: spacing.xs,
+      borderRadius: "6px",
+      transition: "all 0.2s ease",
+      "&:hover":
+        label !== "Actions"
+          ? {
+              background: `linear-gradient(135deg, ${colors.primary.main}10 0%, ${colors.primary.dark}05 100%)`,
+              "& .header-text": {
+                color: colors.neutral[100],
+              },
+              "& .header-icon": {
+                color: colors.primary.main,
+              },
+            }
+          : {},
     }}
     onClick={() => {
       if (label !== "Actions") {
@@ -31,14 +46,16 @@ const TransactionHeader = ({
     }}
   >
     <Typography
+      className="header-text"
       sx={{
         fontSize: typography.fontSize.xs,
-        lineHeight: "200%",
+        lineHeight: 1.4,
         fontWeight: typography.fontWeights.bold,
         textTransform: "uppercase",
-        color: colors.neutral[300],
-        opacity: active && label !== "Actions" ? "1" : "0.6",
-        mr: 0.5,
+        color: active ? colors.neutral[200] : colors.neutral[400],
+        letterSpacing: "0.5px",
+        mr: spacing.xs,
+        transition: "color 0.2s ease",
       }}
     >
       {label}
@@ -46,18 +63,22 @@ const TransactionHeader = ({
     {label !== "Actions" &&
       (active ? (
         <ArrowDownward
+          className="header-icon"
           sx={{
             fontSize: "14px",
             transform: active === "desc" ? "rotate(180deg)" : "none",
-            color: colors.neutral[300],
+            transition: "all 0.2s ease",
+            color: colors.primary.main,
           }}
         />
       ) : (
         <SwapVert
+          className="header-icon"
           sx={{
             fontSize: "14px",
-            opacity: "0.6",
-            color: colors.neutral[300],
+            color: colors.neutral[500],
+            opacity: 0.6,
+            transition: "all 0.2s ease",
           }}
         />
       ))}

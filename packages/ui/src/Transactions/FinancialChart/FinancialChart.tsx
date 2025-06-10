@@ -8,6 +8,7 @@ import {
   YAxis,
 } from "recharts";
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { PriceHistoryResponse } from "@phoenix-protocol/utils";
 import {
@@ -29,23 +30,33 @@ type DataPoint = {
 
 const tabUnselectedStyles = {
   display: "flex",
-  width: "2.75rem",
-  height: "2.3125rem",
-  padding: "1.125rem 1.5rem",
+  minWidth: "44px",
+  height: "40px",
+  padding: `${spacing.sm} ${spacing.md}`,
   justifyContent: "center",
   alignItems: "center",
-  gap: "0.625rem",
-  borderRadius: "1rem",
+  borderRadius: borderRadius.md,
   cursor: "pointer",
-  color: "var(--neutral-300, #D4D4D4)",
-  background: "var(--neutral-900, #171717)",
-  border: "1px solid var(--neutral-700, #404040)",
+  fontFamily: typography.fontFamily,
+  fontSize: typography.fontSize.sm,
+  fontWeight: typography.fontWeights.medium,
+  transition: "all 0.3s ease",
+  color: colors.neutral[300],
+  background: `linear-gradient(145deg, ${colors.neutral[850]} 0%, ${colors.neutral[800]} 100%)`,
+  border: `1px solid ${colors.neutral[700]}`,
+  "&:hover": {
+    background: `linear-gradient(135deg, ${colors.primary.main}15 0%, ${colors.primary.dark}08 100%)`,
+    border: `1px solid ${colors.primary.main}30`,
+    color: colors.neutral[100],
+    transform: "translateY(-1px)",
+  },
 };
 
 const tabSelectedStyles = {
-  borderRadius: "1rem",
-  background: "rgba(226, 73, 26, 0.10)",
-  color: "var(--neutral-50, #FAFAFA)",
+  background: `linear-gradient(135deg, ${colors.primary.main}25 0%, ${colors.primary.dark}15 100%)`,
+  border: `1px solid ${colors.primary.main}80`,
+  color: colors.neutral[50],
+  boxShadow: `0 0 20px ${colors.primary.main}40`,
 };
 
 // Helper function to format data
@@ -84,9 +95,22 @@ const GlowingChart = ({
         alignItems: "flex-start",
         gap: spacing.lg,
         borderRadius: borderRadius.lg,
-        background: colors.neutral[900],
+        background: `linear-gradient(145deg, ${colors.neutral[850]} 0%, ${colors.neutral[800]} 100%)`,
         border: `1px solid ${colors.neutral[700]}`,
         height: "100%",
+        position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `linear-gradient(135deg, ${colors.primary.main}03 0%, ${colors.primary.dark}02 100%)`,
+          borderRadius: borderRadius.lg,
+          pointerEvents: "none",
+        },
       }}
     >
       <Box
@@ -96,7 +120,9 @@ const GlowingChart = ({
           justifyContent: "space-between",
           alignItems: { xs: "flex-start", sm: "center" },
           width: "100%",
-          gap: { xs: 2, sm: 1, md: 0 },
+          gap: { xs: spacing.md, sm: spacing.sm, md: 0 },
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <Box sx={{ flex: 1, width: { xs: "100%", sm: "auto" } }}>
@@ -152,90 +178,98 @@ const GlowingChart = ({
         <Box
           sx={{
             display: "flex",
-            gap: 1,
+            gap: spacing.sm,
             alignItems: "center",
             flexWrap: "wrap",
             justifyContent: { xs: "flex-start", sm: "flex-end" },
             width: { xs: "100%", sm: "auto" },
-            mt: { xs: 1, sm: 0 },
+            mt: { xs: spacing.sm, sm: 0 },
           }}
         >
-          <Box
-            sx={
-              selected === "W"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-                : tabUnselectedStyles
-            }
-            onClick={() => setSelected("W")}
-          >
-            W
-          </Box>
-          <Box
-            sx={
-              selected === "M"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-                : tabUnselectedStyles
-            }
-            onClick={() => setSelected("M")}
-          >
-            M
-          </Box>
-          <Box
-            sx={
-              selected === "Y"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-                : tabUnselectedStyles
-            }
-            onClick={() => setSelected("Y")}
-          >
-            A
-          </Box>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Box
+              sx={
+                selected === "W"
+                  ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                  : tabUnselectedStyles
+              }
+              onClick={() => setSelected("W")}
+            >
+              W
+            </Box>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Box
+              sx={
+                selected === "M"
+                  ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                  : tabUnselectedStyles
+              }
+              onClick={() => setSelected("M")}
+            >
+              M
+            </Box>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Box
+              sx={
+                selected === "Y"
+                  ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                  : tabUnselectedStyles
+              }
+              onClick={() => setSelected("Y")}
+            >
+              A
+            </Box>
+          </motion.div>
         </Box>
       </Box>
-      <ResponsiveContainer width="100%" height={isMobile ? 150 : 200}>
-        <AreaChart
-          data={data}
-          margin={
-            isMobile
-              ? { top: 0, right: -5, left: -5, bottom: 0 }
-              : { top: 0, right: -10, left: -10, bottom: 0 }
-          }
-        >
-          <defs>
-            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#E2491A" stopOpacity={0.2} />
-              <stop offset="95%" stopColor="#E2491A" stopOpacity={0.02} />
-            </linearGradient>
-          </defs>
-          <YAxis
-            hide={false}
-            dataKey="price"
-            domain={[0, "dataMax + 0.1"]}
-            tickFormatter={(tick) => tick.toFixed(2)}
-            tick={{ fontSize: isMobile ? 10 : 12 }}
-            width={isMobile ? 35 : 45}
-          />
-          <XAxis
-            hide={false}
-            dataKey="timeStamp"
-            interval={Math.ceil(data.length / (isMobile ? 3 : 5))}
-            domain={["dataMin", "dataMax"]}
-            tickFormatter={(tick) => format(new Date(tick), "MM/dd/yy")}
-            tick={{ fontSize: isMobile ? 10 : 12 }}
-            tickMargin={isMobile ? 5 : 10}
-          />
-          <Area
-            type="monotone"
-            dataKey="price"
-            stroke="#E2491A"
-            strokeWidth={2}
-            isAnimationActive={true}
-            fillOpacity={1}
-            fill="url(#colorUv)"
-          />
-          <Tooltip content={<CustomTooltip />} />
-        </AreaChart>
-      </ResponsiveContainer>
+      <Box sx={{ position: "relative", zIndex: 1, width: "100%" }}>
+        <ResponsiveContainer width="100%" height={isMobile ? 180 : 220}>
+          <AreaChart
+            data={data}
+            margin={
+              isMobile
+                ? { top: 0, right: -5, left: -5, bottom: 0 }
+                : { top: 0, right: -10, left: -10, bottom: 0 }
+            }
+          >
+            <defs>
+              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#E2491A" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#E2491A" stopOpacity={0.02} />
+              </linearGradient>
+            </defs>
+            <YAxis
+              hide={false}
+              dataKey="price"
+              domain={[0, "dataMax + 0.1"]}
+              tickFormatter={(tick) => tick.toFixed(2)}
+              tick={{ fontSize: isMobile ? 10 : 12 }}
+              width={isMobile ? 35 : 45}
+            />
+            <XAxis
+              hide={false}
+              dataKey="timeStamp"
+              interval={Math.ceil(data.length / (isMobile ? 3 : 5))}
+              domain={["dataMin", "dataMax"]}
+              tickFormatter={(tick) => format(new Date(tick), "MM/dd/yy")}
+              tick={{ fontSize: isMobile ? 10 : 12 }}
+              tickMargin={isMobile ? 5 : 10}
+            />
+            <Area
+              type="monotone"
+              dataKey="price"
+              stroke="#E2491A"
+              strokeWidth={2}
+              isAnimationActive={true}
+              fillOpacity={1}
+              fill="url(#colorUv)"
+            />
+            <Tooltip content={<CustomTooltip />} />
+          </AreaChart>
+        </ResponsiveContainer>
+      </Box>
     </Box>
   );
 };

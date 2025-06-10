@@ -14,6 +14,13 @@ import {
 import { API, constants, TradeAPi } from "@phoenix-protocol/utils";
 import { fetchAllTrades, scaToToken } from "@phoenix-protocol/utils";
 import { motion } from "framer-motion";
+import {
+  cardStyles,
+  colors,
+  spacing,
+  borderRadius,
+  typography,
+} from "@phoenix-protocol/ui/src/Theme/styleConstants";
 
 import {
   PriceHistoryResponse,
@@ -36,6 +43,7 @@ export default function Page() {
   const [data, setData] = useState<{ timestamp: string; volume: number }[]>([]);
   const [totalVolume, setTotalVolume] = useState(0);
   const [period, setPeriod] = useState<"W" | "M" | "Y">("W");
+  const [volumeTimeframe, setVolumeTimeframe] = useState<"D" | "M" | "A">("D"); // Independent state for volume chart
   const [history, setHistory] = useState<any>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [historicalPrices, setHistoricalPrices] =
@@ -52,9 +60,6 @@ export default function Page() {
     | undefined
   >("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [selectedTimeEpoch, setSelectedTimeEpoch] = useState<"D" | "M" | "A">(
-    "D"
-  );
   const [activeView, setActiveView] = useState<"personal" | "all">("all");
   const [pools, setPools] = useState<any[]>([]);
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>({
@@ -364,8 +369,8 @@ export default function Page() {
   }, [pageSize, activeView]);
 
   useEffect(() => {
-    loadVolumeData(selectedTimeEpoch);
-  }, [selectedTimeEpoch, selectedPoolForVolume]);
+    loadVolumeData(volumeTimeframe); // Use independent volume timeframe
+  }, [volumeTimeframe, selectedPoolForVolume]);
 
   useEffect(() => {
     loadPriceData(period);
@@ -379,10 +384,10 @@ export default function Page() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        width: "100%",
-        position: "relative",
-        overflow: "hidden",
+        maxWidth: 1440,
+        mx: "auto",
+        px: { xs: 2, sm: 3, md: 4 },
+        mt: { xs: 2, md: 4 },
       }}
     >
       <Box
@@ -529,9 +534,9 @@ export default function Page() {
                 }}
               >
                 Volume (
-                {selectedTimeEpoch === "D"
+                {volumeTimeframe === "D"
                   ? "24h"
-                  : selectedTimeEpoch === "M"
+                  : volumeTimeframe === "M"
                   ? "30d"
                   : "1y"}
                 )
@@ -539,45 +544,50 @@ export default function Page() {
             </Box>
           </Box>
         </Box>
-
-        {/* Charts Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-        >
-          <Grid container spacing={2} sx={{ display: "flex" }}>
+      </Box>
+      {/* Charts Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <Box sx={{ mb: spacing.xxl }}>
+          <Grid container spacing={4}>
+            {" "}
+            {/* Increased spacing between charts */}
             <Grid item xs={12} md={6}>
-              <VolumeChart
-                pools={pools}
-                selectedPoolForVolume={selectedPoolForVolume}
-                setSelectedPoolForVolume={setSelectedPoolForVolume}
-                data={data}
-                setSelectedTab={(e) => setSelectedTimeEpoch(e)}
-                selectedTab={selectedTimeEpoch}
-                totalVolume={totalVolume}
-              />
+              {data.length > 0 && (
+                <VolumeChart
+                  selectedTab={volumeTimeframe}
+                  data={data}
+                  totalVolume={totalVolume}
+                  setSelectedTab={setVolumeTimeframe}
+                  pools={pools}
+                  selectedPoolForVolume={selectedPoolForVolume}
+                  setSelectedPoolForVolume={setSelectedPoolForVolume}
+                />
+              )}
             </Grid>
-            <Grid item xs={12} md={6} sx={{ height: "auto" }}>
+            <Grid item xs={12} md={6}>
               {historicalPrices.length > 0 && (
-                <Box
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    width: "100%",
-                  }}
-                >
-                  <FinancialChart
-                    setPeriod={setPeriod}
-                    period={period}
-                    historicalPrices={historicalPrices}
-                  />
-                </Box>
+                <FinancialChart
+                  setPeriod={setPeriod}
+                  period={period}
+                  historicalPrices={historicalPrices}
+                />
               )}
             </Grid>
           </Grid>
-        </motion.div>
-        <Box sx={{ flexGrow: 1 }}>
+        </Box>
+      </motion.div>
+
+      {/* Transactions Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <Box sx={{ mb: spacing.xl }}>
           {!historyLoading ? (
             <TransactionsTable
               searchTerm={searchTerm}
@@ -605,61 +615,59 @@ export default function Page() {
             <Skeleton.TransactionsTable />
           )}
         </Box>
+
+        {/* Load More Button */}
         <Box
           sx={{
             display: "flex",
             justifyContent: "center",
-            mt: 4,
-            mb: 2,
+            mt: spacing.xl,
           }}
         >
-          <Box
-            component="button"
-            onClick={loadMore}
-            sx={{
-              background:
-                "linear-gradient(135deg, rgba(249, 115, 22, 0.8) 0%, rgba(234, 88, 12, 0.6) 100%)",
-              border: "1px solid rgba(249, 115, 22, 0.4)",
-              borderRadius: "12px",
-              padding: "12px 32px",
-              color: "#ffffff",
-              fontSize: "14px",
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              backdropFilter: "blur(10px)",
-              boxShadow: "0 8px 32px rgba(249, 115, 22, 0.3)",
-              position: "relative",
-              overflow: "hidden",
-              "&:hover": {
-                transform: "translateY(-2px)",
-                boxShadow: "0 12px 40px rgba(249, 115, 22, 0.4)",
-                background:
-                  "linear-gradient(135deg, rgba(249, 115, 22, 0.9) 0%, rgba(234, 88, 12, 0.7) 100%)",
-              },
-              "&:active": {
-                transform: "translateY(0)",
-              },
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: "-100%",
-                width: "100%",
-                height: "100%",
-                background:
-                  "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)",
-                transition: "left 0.5s",
-              },
-              "&:hover::before": {
-                left: "100%",
-              },
-            }}
-          >
-            Load More Transactions
-          </Box>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Box
+              component="button"
+              onClick={loadMore}
+              sx={{
+                ...cardStyles.base,
+                p: `${spacing.md} ${spacing.xl}`,
+                background: `linear-gradient(135deg, ${colors.primary.main}80 0%, ${colors.primary.dark}60 100%)`,
+                border: `1px solid ${colors.primary.main}40`,
+                color: colors.neutral[50],
+                fontSize: typography.fontSize.sm,
+                fontWeight: typography.fontWeights.semiBold,
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                position: "relative",
+                overflow: "hidden",
+                "&:hover": {
+                  transform: "translateY(-2px)",
+                  boxShadow: `0 12px 40px ${colors.primary.main}40`,
+                  background: `linear-gradient(135deg, ${colors.primary.main}90 0%, ${colors.primary.dark}70 100%)`,
+                },
+                "&:active": {
+                  transform: "translateY(0)",
+                },
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: "-100%",
+                  width: "100%",
+                  height: "100%",
+                  background: `linear-gradient(90deg, transparent, ${colors.neutral[50]}20, transparent)`,
+                  transition: "left 0.5s",
+                },
+                "&:hover::before": {
+                  left: "100%",
+                },
+              }}
+            >
+              Load More Transactions
+            </Box>
+          </motion.div>
         </Box>
-      </Box>
+      </motion.div>
     </Box>
   );
 }

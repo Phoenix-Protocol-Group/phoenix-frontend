@@ -17,6 +17,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { motion } from "framer-motion";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils";
 import { CustomDropdown } from "../../Common/CustomDropdown";
 import {
@@ -86,23 +87,33 @@ const resolveSelectedVolume = (selectedTab: string) => {
 
 const tabUnselectedStyles = {
   display: "flex",
-  width: "2.75rem",
-  height: "2.3125rem",
-  padding: "1.125rem 1.5rem",
+  minWidth: "44px",
+  height: "40px",
+  padding: `${spacing.sm} ${spacing.md}`,
   justifyContent: "center",
   alignItems: "center",
-  gap: "0.625rem",
   borderRadius: borderRadius.md,
   cursor: "pointer",
+  fontFamily: typography.fontFamily,
+  fontSize: typography.fontSize.sm,
+  fontWeight: typography.fontWeights.medium,
+  transition: "all 0.3s ease",
   color: colors.neutral[300],
-  background: colors.neutral[900],
+  background: `linear-gradient(145deg, ${colors.neutral[850]} 0%, ${colors.neutral[800]} 100%)`,
   border: `1px solid ${colors.neutral[700]}`,
+  "&:hover": {
+    background: `linear-gradient(135deg, ${colors.primary.main}15 0%, ${colors.primary.dark}08 100%)`,
+    border: `1px solid ${colors.primary.main}30`,
+    color: colors.neutral[100],
+    transform: "translateY(-1px)",
+  },
 };
 
 const tabSelectedStyles = {
-  borderRadius: borderRadius.md,
-  background: "rgba(226, 73, 26, 0.10)",
+  background: `linear-gradient(135deg, ${colors.primary.main}25 0%, ${colors.primary.dark}15 100%)`,
+  border: `1px solid ${colors.primary.main}80`,
   color: colors.neutral[50],
+  boxShadow: `0 0 20px ${colors.primary.main}40`,
 };
 
 const VolumeChart = ({
@@ -143,24 +154,39 @@ const VolumeChart = ({
       sx={{
         display: "flex",
         width: "100%",
-        padding: "1.5rem",
+        padding: spacing.lg,
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "flex-start",
-        gap: "1.5625rem",
-        borderRadius: "1.5rem",
-        background: colors.neutral[900], // Adjusted background
-        border: `1px solid ${colors.neutral[700]}`, // Adjusted border
+        gap: spacing.lg,
+        borderRadius: borderRadius.lg,
+        background: `linear-gradient(145deg, ${colors.neutral[850]} 0%, ${colors.neutral[800]} 100%)`,
+        border: `1px solid ${colors.neutral[700]}`,
+        position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `linear-gradient(135deg, ${colors.primary.main}03 0%, ${colors.primary.dark}02 100%)`,
+          borderRadius: borderRadius.lg,
+          pointerEvents: "none",
+        },
       }}
     >
       <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", sm: "row" }, // Stack on small screens
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
           alignItems: { xs: "flex-start", sm: "center" },
           width: "100%",
-          gap: { xs: 2, sm: 1, md: 0 },
+          gap: { xs: spacing.md, sm: spacing.sm, md: 0 },
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <Box sx={{ flex: 1, width: { xs: "100%", sm: "auto" } }}>
@@ -216,139 +242,153 @@ const VolumeChart = ({
         <Box
           sx={{
             display: "flex",
-            gap: 1,
+            gap: spacing.sm,
             alignItems: "center",
             flexWrap: "wrap",
             justifyContent: { xs: "flex-start", sm: "flex-end" },
             width: { xs: "100%", sm: "auto" },
-            mt: { xs: 1, sm: 0 },
+            mt: { xs: spacing.sm, sm: 0 },
           }}
         >
-          <Box
-            sx={
-              selectedTab === "D"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-                : tabUnselectedStyles
-            }
-            onClick={() => setSelectedTab("D")}
-          >
-            D
-          </Box>
-          <Box
-            sx={
-              selectedTab === "M"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-                : tabUnselectedStyles
-            }
-            onClick={() => setSelectedTab("M")}
-          >
-            M
-          </Box>
-          <Box
-            sx={
-              selectedTab === "A"
-                ? { ...tabUnselectedStyles, ...tabSelectedStyles }
-                : tabUnselectedStyles
-            }
-            onClick={() => setSelectedTab("A")}
-          >
-            A
-          </Box>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Box
+              sx={
+                selectedTab === "D"
+                  ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                  : tabUnselectedStyles
+              }
+              onClick={() => setSelectedTab("D")}
+            >
+              D
+            </Box>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Box
+              sx={
+                selectedTab === "M"
+                  ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                  : tabUnselectedStyles
+              }
+              onClick={() => setSelectedTab("M")}
+            >
+              M
+            </Box>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Box
+              sx={
+                selectedTab === "A"
+                  ? { ...tabUnselectedStyles, ...tabSelectedStyles }
+                  : tabUnselectedStyles
+              }
+              onClick={() => setSelectedTab("A")}
+            >
+              A
+            </Box>
+          </motion.div>
         </Box>
       </Box>
-      <ResponsiveContainer width="100%" height={isMobile ? 150 : 200}>
-        <BarChart
-          data={data}
-          barCategoryGap={isMobile ? 1 : 2}
-          margin={
-            isMobile
-              ? { top: 5, right: 10, bottom: 5, left: 0 }
-              : { top: 5, right: 30, bottom: 5, left: 0 }
-          }
-        >
-          <defs>
-            <linearGradient id="highGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#E23F1C" />
-              <stop offset="100%" stopColor="#E3721E" />
-            </linearGradient>
-            <linearGradient id="mediumGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#E3871C" />
-              <stop offset="100%" stopColor="#E4A220" />
-            </linearGradient>
-            <linearGradient id="lowMediumGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#E2A01C" />
-              <stop offset="100%" stopColor="#FFD787" />
-            </linearGradient>
-            <linearGradient id="lowGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#FFD581" />
-              <stop offset="100%" stopColor="#FFEDC9" />
-            </linearGradient>
-          </defs>
-          <CartesianGrid
-            horizontal
-            stroke="#FFF"
-            strokeOpacity={0}
-            strokeWidth={3}
-            vertical={false}
-          />
-          <XAxis
-            dataKey="timestamp"
-            tick={{ fontSize: isMobile ? 10 : 12 }}
-            tickMargin={isMobile ? 5 : 10}
-          />
-          <Tooltip
-            content={({ active, payload, label }) => {
-              if (active && payload && payload.length) {
-                return (
-                  <div
-                    style={{
-                      background:
-                        "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
-                      border: "1px solid #292B2C",
-                      borderRadius: "0.5rem",
-                      padding: "10px",
-                      color: "white",
-                      boxShadow:
-                        "-3px 3px 10px 0px rgba(25, 13, 1, 0.10),-12px 13px 18px 0px rgba(25, 13, 1, 0.09),-26px 30px 24px 0px rgba(25, 13, 1, 0.05),-46px 53px 28px 0px rgba(25, 13, 1, 0.02),-73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
-                    }}
-                  >
-                    <p
+      <Box sx={{ position: "relative", zIndex: 1, width: "100%" }}>
+        <ResponsiveContainer width="100%" height={isMobile ? 180 : 220}>
+          <BarChart
+            data={data}
+            barCategoryGap={isMobile ? 1 : 2}
+            margin={
+              isMobile
+                ? { top: 10, right: 10, bottom: 10, left: 0 }
+                : { top: 10, right: 30, bottom: 10, left: 0 }
+            }
+          >
+            <defs>
+              <linearGradient id="highGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#E23F1C" />
+                <stop offset="100%" stopColor="#E3721E" />
+              </linearGradient>
+              <linearGradient id="mediumGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#E3871C" />
+                <stop offset="100%" stopColor="#E4A220" />
+              </linearGradient>
+              <linearGradient
+                id="lowMediumGradient"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="0%" stopColor="#E2A01C" />
+                <stop offset="100%" stopColor="#FFD787" />
+              </linearGradient>
+              <linearGradient id="lowGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#FFD581" />
+                <stop offset="100%" stopColor="#FFEDC9" />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              horizontal
+              stroke="#FFF"
+              strokeOpacity={0}
+              strokeWidth={3}
+              vertical={false}
+            />
+            <XAxis
+              dataKey="timestamp"
+              tick={{ fontSize: isMobile ? 10 : 12 }}
+              tickMargin={isMobile ? 5 : 10}
+            />
+            <Tooltip
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <div
                       style={{
-                        margin: 0,
+                        background:
+                          "linear-gradient(180deg, #292B2C 0%, #1F2123 100%)",
+                        border: "1px solid #292B2C",
+                        borderRadius: "0.5rem",
+                        padding: "10px",
                         color: "white",
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
+                        boxShadow:
+                          "-3px 3px 10px 0px rgba(25, 13, 1, 0.10),-12px 13px 18px 0px rgba(25, 13, 1, 0.09),-26px 30px 24px 0px rgba(25, 13, 1, 0.05),-46px 53px 28px 0px rgba(25, 13, 1, 0.02),-73px 83px 31px 0px rgba(25, 13, 1, 0.00)",
                       }}
                     >
-                      {label}
-                    </p>
-                    <p
-                      style={{
-                        margin: 0,
-                        color: "white",
-                        fontSize: "0.875rem",
-                      }}
-                    >
-                      Volume:
-                      {formatCurrencyStatic.format(Number(payload[0].value))}
-                    </p>
-                  </div>
-                );
-              }
-              return null;
-            }}
-          />
+                      <p
+                        style={{
+                          margin: 0,
+                          color: "white",
+                          fontSize: "0.875rem",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {label}
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          color: "white",
+                          fontSize: "0.875rem",
+                        }}
+                      >
+                        Volume:
+                        {formatCurrencyStatic.format(Number(payload[0].value))}
+                      </p>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
 
-          <Bar dataKey="volume" barSize={12} radius={[2, 2, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={getBarBackground(entry.volume, maxValue)}
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+            <Bar dataKey="volume" barSize={12} radius={[2, 2, 0, 0]}>
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={getBarBackground(entry.volume, maxValue)}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </Box>
     </Box>
   );
 };
