@@ -16,6 +16,7 @@ import { useState } from "react";
 import MailIcon from "@mui/icons-material/Mail";
 import { AppBar } from "../../AppBar/AppBar";
 import { testTokens } from "../../Dashboard/WalletBalanceTable/WalletBalanceTable.stories";
+import { contract } from "@stellar/stellar-sdk";
 
 const args = {
   poolStatArgs: {
@@ -46,6 +47,7 @@ const args = {
         amount: 25,
         category: "Stable",
         usdValue: 1 * 25,
+        contractId: "dai-token",
       },
       {
         name: "XLM",
@@ -53,6 +55,7 @@ const args = {
         amount: 200,
         category: "Non-Stable",
         usdValue: 0.85 * 200,
+        contractId: "xlm-token",
       },
     ],
     balance: 800,

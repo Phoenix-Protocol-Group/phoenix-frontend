@@ -2,8 +2,9 @@ import {
   AppStore,
   GetStateType,
   SetStateType,
-  StateToken as Token,
+  StateToken,
   WalletActions,
+  Token,
 } from "@phoenix-protocol/types";
 import {
   fetchPho,
@@ -41,7 +42,6 @@ export const createWalletActions = (
 ): WalletActions => {
   return {
     tokens: [],
-    allTokens: [],
 
     getAllTokens: async () => {
       // If wallet is connected, use it, otherwise some demo account
@@ -107,68 +107,51 @@ export const createWalletActions = (
         // Remove duplicates
         .filter((address, index, self) => self.indexOf(address) === index);
 
-      const allAssets = _allAssets
-        ? _allAssets.map(async (asset) => {
-            await getState().fetchTokenInfo(asset);
-          })
-        : [];
-
-      await Promise.all(allAssets);
-
-      const tradeAPI = new TradeAPi.API(constants.TRADING_API_URL);
-
-      const _tokens = getState()
-        .tokens.filter(
-          (token: Token) =>
-            token?.symbol !== "POOL" &&
-            token?.symbol !== "PUST" &&
-            token?.symbol !== "EXUT" &&
-            token?.symbol !== "XEXT" &&
-            token?.symbol !== "XGXT" &&
-            token?.symbol !== "GXUT" &&
-            token.isStakingToken !== true
-        )
-        .map(async (token: Token) => {
-          return {
-            name: token?.symbol === "native" ? "XLM" : token?.symbol,
-            icon: `/cryptoIcons/${
-              token?.symbol === "native" ? "XLM" : token?.symbol.toLowerCase()
-            }.svg`,
-            amount: Number(token?.balance) / 10 ** token?.decimals,
-            category: getCategory(
-              token?.symbol === "native" ? "XLM" : token?.symbol
-            ),
-            usdValue: Number(
-              token?.symbol === "PHO"
-                ? await fetchPho()
-                : await tradeAPI.getPrice(token?.id)
-            ).toFixed(2),
-            contractId: token?.id,
-          };
-        });
-      // Wait promise
-      const _allTokens = await Promise.all(_tokens);
-      setState((state: AppStore) => {
-        return { allTokens: _allTokens };
+      // Fetch all tokens with enriched data
+      const allTokensPromises = _allAssets.map(async (asset) => {
+        return await getState().fetchTokenInfo(asset);
       });
-      return _allTokens;
+
+      const allTokensResults = await Promise.all(allTokensPromises);
+      // Filter out any undefined results and process the valid tokens
+      const validTokens = allTokensResults.filter((token): token is Token => 
+        token !== undefined &&
+        token.symbol !== "POOL" &&
+        token.symbol !== "PUST" &&
+        token.symbol !== "EXUT" &&
+        token.symbol !== "XEXT" &&
+        token.symbol !== "XGXT" &&
+        token.symbol !== "GXUT" &&
+        !token.isStakingToken
+      );
+
+      setState((state: AppStore) => {
+        return { tokens: validTokens };
+      });
+      return validTokens;
     },
 
     fetchTokenInfo: async (
       tokenAddress: string,
       isStakingToken: boolean = false
     ) => {
-      let updatedTokenInfo: Token | undefined;
       // Check if account, server, and network passphrase are set
       if (!getState().server || !getState().networkPassphrase) {
         throw new Error("Missing account, server, or network passphrase");
       }
+
+      // Check if token already exists and return/update it
+      const existingToken = getState().tokens.find((token: Token) => 
+        token.contractId === tokenAddress || token.id === tokenAddress
+      );
+
       // Token contract
       const TokenContract = new SorobanTokenContract.Client({
         contractId: tokenAddress.toString(),
         networkPassphrase: constants.NETWORK_PASSPHRASE,
         rpcUrl: constants.RPC_URL,
       });
+
       let balance: bigint;
       try {
         balance = (
@@ -181,58 +164,72 @@ export const createWalletActions = (
           tokenAddress ==
           "CABCLZXGTOIZ75FFKDGVANUT665LO34DZM5LHHDNVEHDFTC5CY4UTIWQ"
         ) {
-          balance +=
-            (
-              await getState().fetchTokenInfo(
-                "CBSM6C6OZJN2CS27RFTTYZJNAGRZ4MFHWVSV6GKLMCOYTQXD6K7UEA2A"
-              )
-            )?.balance || BigInt(0);
+          const additionalToken = await getState().fetchTokenInfo(
+            "CBSM6C6OZJN2CS27RFTTYZJNAGRZ4MFHWVSV6GKLMCOYTQXD6K7UEA2A"
+          );
+          balance += additionalToken?.balance || BigInt(0);
         }
       } catch (e) {
         balance = BigInt(0);
       }
+
       let symbol: string;
       try {
-        const _symbol: string =
-          getState().tokens.find((token: Token) => token.id === tokenAddress)
-            ?.symbol || (await TokenContract.symbol()).result;
-        symbol = _symbol === "native" ? "XLM" : _symbol;
+        symbol = existingToken?.symbol || (await TokenContract.symbol()).result;
+        symbol = symbol === "native" ? "XLM" : symbol;
       } catch (e) {
         return;
       }
-      const decimals =
-        getState().tokens.find((token: Token) => token.id === tokenAddress)
-          ?.decimals || Number((await TokenContract.decimals()).result);
 
-      // Update token balance
+      const decimals = existingToken?.decimals || Number((await TokenContract.decimals()).result);
+
+      // Get price data
+      const tradeAPI = new TradeAPi.API(constants.TRADING_API_URL);
+      let usdValue: number;
+      try {
+        usdValue = Number(
+          symbol === "PHO"
+            ? await fetchPho()
+            : await tradeAPI.getPrice(tokenAddress)
+        );
+      } catch (e) {
+        usdValue = 0;
+      }
+
+      // Create the normalized token object
+      const tokenData: Token = {
+        name: symbol,
+        symbol: symbol,
+        icon: `/cryptoIcons/${symbol.toLowerCase()}.svg`,
+        amount: Number(balance) / (10 ** decimals),
+        category: getCategory(symbol),
+        usdValue: usdValue,
+        contractId: tokenAddress,
+        id: tokenAddress, // For backward compatibility
+        decimals: decimals,
+        balance: balance,
+        isStakingToken: isStakingToken,
+      };
+
+      // Update token in the array
       setState((state: AppStore) => {
         const updatedTokens = state.tokens.map((token: Token) =>
-          token.id === tokenAddress
-            ? {
-                ...token,
-                balance,
-                decimals,
-                symbol,
-                isStakingToken,
-              }
+          token.contractId === tokenAddress || token.id === tokenAddress
+            ? { ...token, ...tokenData }
             : token
         );
-        // If token couldnt be found, add it
-        if (!updatedTokens.find((token: Token) => token.id === tokenAddress)) {
-          updatedTokens.push({
-            id: tokenAddress,
-            balance,
-            decimals: decimals,
-            symbol: symbol === "native" ? "XLM" : symbol,
-            isStakingToken,
-          });
+        
+        // If token couldn't be found, add it
+        if (!updatedTokens.find((token: Token) => 
+          token.contractId === tokenAddress || token.id === tokenAddress
+        )) {
+          updatedTokens.push(tokenData);
         }
-        updatedTokenInfo = updatedTokens.find(
-          (token: Token) => token.id === tokenAddress
-        );
+        
         return { tokens: updatedTokens };
       });
-      return updatedTokenInfo;
+
+      return tokenData;
     },
   };
 };

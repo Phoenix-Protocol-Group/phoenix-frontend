@@ -34,6 +34,12 @@ const mockToken = (name: string, symbol: string): Token => ({
   usdValue: Math.random() * 100,
   category: "mock",
   address: `C${"X".repeat(55)}`,
+  id: `mock-token-${symbol.toLowerCase()}`,
+  symbol,
+  decimals: 18,
+  balance: BigInt(0),
+  isStakingToken: false,
+  contractId: `mock-contract-${symbol.toLowerCase()}`,
 });
 
 const mockStrategyMetadata = (

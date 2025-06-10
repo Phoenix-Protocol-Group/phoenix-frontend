@@ -10,6 +10,7 @@ const testTokens: Token[] = [
     amount: 100,
     category: "Stable",
     usdValue: 1 * 100,
+    contractId: "",
   },
   {
     name: "USDC",
@@ -17,6 +18,7 @@ const testTokens: Token[] = [
     amount: 50,
     category: "Stable",
     usdValue: 1 * 50,
+    contractId: "",
   },
 ];
 

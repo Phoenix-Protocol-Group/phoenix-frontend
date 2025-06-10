@@ -4,7 +4,7 @@ import { TransactionsCards } from "./TransactionsCards";
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof TransactionsCards> = {
   title: "Transactions/TransactionsCards",
-  component: TransactionsCards
+  component: TransactionsCards,
 };
 
 export default meta;
@@ -22,6 +22,7 @@ export const Primary: Story = {
       amount: 100,
       category: "Stable",
       usdValue: 1 * 100,
-    }
+      contractId: "",
+    },
   },
 };

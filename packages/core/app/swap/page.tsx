@@ -381,12 +381,12 @@ export default function SwapPage(): JSX.Element {
       tokenLoadCount.current += 1;
       if (tokenLoadCount.current > 1) return;
 
-      if (appStore.allTokens.length > 0) {
+      if (appStore.tokens.length > 0) {
         // Avoid fetching if we already have tokens
         setIsLoading(false);
-        setTokens(appStore.allTokens.slice(2));
-        setFromToken(appStore.allTokens[0]);
-        setToToken(appStore.allTokens[1]);
+        setTokens(appStore.tokens.slice(2));
+        setFromToken(appStore.tokens[0]);
+        setToToken(appStore.tokens[1]);
         hasTokensLoaded.current = true;
         appStore.setLoading(false);
 
@@ -431,7 +431,7 @@ export default function SwapPage(): JSX.Element {
     if (
       !fromToken ||
       !toToken ||
-      !appStore.allTokens.length ||
+      !appStore.tokens.length ||
       !allPools.length ||
       fromToken.name === toToken.name
     ) {
@@ -447,11 +447,11 @@ export default function SwapPage(): JSX.Element {
     }
 
     // Find token contract IDs
-    const fromTokenContractID = appStore.allTokens.find(
+    const fromTokenContractID = appStore.tokens.find(
       (token: Token) => token.name === fromToken.name
     )?.contractId;
 
-    const toTokenContractID = appStore.allTokens.find(
+    const toTokenContractID = appStore.tokens.find(
       (token: Token) => token.name === toToken.name
     )?.contractId;
 
@@ -470,7 +470,7 @@ export default function SwapPage(): JSX.Element {
     const _swapRoute = _operations
       .map(
         (op) =>
-          appStore.allTokens.find(
+          appStore.tokens.find(
             (token: any) => token.contractId === op.ask_asset
           )?.name
       )
@@ -499,7 +499,7 @@ export default function SwapPage(): JSX.Element {
     allPools,
     fromToken,
     toToken,
-    appStore.allTokens,
+    appStore.tokens,
     storePersist.wallet.address,
     handleTrustLine,
   ]);

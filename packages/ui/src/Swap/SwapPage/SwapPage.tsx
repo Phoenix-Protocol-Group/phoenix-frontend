@@ -48,6 +48,7 @@ const args = {
       amount: 100,
       category: "Stable",
       usdValue: 1 * 100,
+      contractId: "usdt-token",
     },
     toToken: {
       name: "USDT",
@@ -55,6 +56,7 @@ const args = {
       amount: 100,
       category: "Stable",
       usdValue: 1 * 100,
+      contractId: "usdt-token",
     },
     exchangeRate: "1 BTC = 26,567 USDT ($26,564)",
     networkFee: "0.0562 USDT (~$0.0562)",
@@ -71,6 +73,7 @@ const args = {
         amount: 100,
         category: "Stable",
         usdValue: 1 * 100,
+        contractId: "usdt-token",
       },
       {
         name: "USDC",
@@ -78,6 +81,7 @@ const args = {
         amount: 50,
         category: "Stable",
         usdValue: 1 * 50,
+        contractId: "usdc-token",
       },
       {
         name: "DAI",
@@ -85,6 +89,7 @@ const args = {
         amount: 25,
         category: "Stable",
         usdValue: 1 * 25,
+        contractId: "dai-token",
       },
       {
         name: "XLM",
@@ -92,6 +97,7 @@ const args = {
         amount: 200,
         category: "Non-Stable",
         usdValue: 0.85 * 200,
+        contractId: "xlm-token",
       },
       {
         name: "BTC",
@@ -99,6 +105,7 @@ const args = {
         amount: 0.5,
         category: "Non-Stable",
         usdValue: 30000 * 0.5,
+        contractId: "btc-token",
       },
     ],
   },

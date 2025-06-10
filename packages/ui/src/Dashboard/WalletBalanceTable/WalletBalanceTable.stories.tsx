@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import WalletBalanceTable from "./WalletBalanceTable";
 import { Grid } from "@mui/material";
 import React from "react";
+import { contract } from "@stellar/stellar-sdk";
 
 export const testTokens = [
   {
@@ -10,6 +11,7 @@ export const testTokens = [
     amount: 100,
     category: "Stable",
     usdValue: 1 * 100,
+    contractId: "usdt-token",
   },
   {
     name: "USDC",
@@ -17,6 +19,7 @@ export const testTokens = [
     amount: 50,
     category: "Stable",
     usdValue: 1 * 50,
+    contractId: "usdt-token",
   },
   {
     name: "DAI",
@@ -24,6 +27,7 @@ export const testTokens = [
     amount: 25,
     category: "Stable",
     usdValue: 1 * 25,
+    contractId: "usdt-token",
   },
   {
     name: "XLM",
@@ -31,6 +35,7 @@ export const testTokens = [
     amount: 200,
     category: "Non-Stable",
     usdValue: 0.85 * 200,
+    contractId: "usdt-token",
   },
   {
     name: "BTC",
@@ -38,6 +43,7 @@ export const testTokens = [
     amount: 0.5,
     category: "Non-Stable",
     usdValue: 30000 * 0.5,
+    contractId: "usdt-token",
   },
 ];
 

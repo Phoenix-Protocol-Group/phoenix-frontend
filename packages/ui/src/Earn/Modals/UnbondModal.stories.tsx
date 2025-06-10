@@ -34,6 +34,7 @@ const mockStrategyAssets = [
     amount: 0,
     category: "native",
     usdValue: 0.11,
+    contractId: "xlm-native",
   },
 ];
 
@@ -44,6 +45,7 @@ const mockLPAssets = [
     amount: 0,
     category: "native",
     usdValue: 0.11,
+    contractId: "xlm-native",
   },
   {
     name: "USDC",
@@ -51,6 +53,7 @@ const mockLPAssets = [
     amount: 0,
     category: "token",
     usdValue: 1.0,
+    contractId: "usdc-token",
   },
 ];
 
@@ -68,6 +71,7 @@ const mockStrategy: StrategyMetadata = {
     amount: 0,
     category: "phoenix",
     usdValue: 0.02,
+    contractId: "pho-token",
   },
   unbondTime: 0, // Instant
   category: "yield",
@@ -101,6 +105,7 @@ const mockLPStrategyWithIndividualStakes: StrategyMetadata = {
     amount: 0,
     category: "phoenix",
     usdValue: 0.02,
+    contractId: "pho-token",
   },
   unbondTime: 0, // Instant for LP example
   category: "liquidity",

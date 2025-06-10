@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import LiquidityMining from "./LiquidityMining";
 import { Grid } from "@mui/material";
 import React from "react";
+import { contract } from "@stellar/stellar-sdk";
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export
 const meta: Meta<typeof LiquidityMining> = {
@@ -29,6 +30,7 @@ const testTokens = [
     amount: 25,
     category: "Stable",
     usdValue: 1 * 25,
+    contractId: "dai-token",
   },
   {
     name: "XLM",
@@ -36,6 +38,7 @@ const testTokens = [
     amount: 200,
     category: "Non-Stable",
     usdValue: 0.85 * 200,
+    contractId: "xlm-token",
   },
 ];
 

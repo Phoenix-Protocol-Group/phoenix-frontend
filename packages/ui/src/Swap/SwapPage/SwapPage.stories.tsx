@@ -8,6 +8,7 @@ const token = {
   amount: 100,
   category: "Stable",
   usdValue: 1 * 100,
+  contractId: "",
 };
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export

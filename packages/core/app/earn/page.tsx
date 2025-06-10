@@ -19,15 +19,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useContractTransaction } from "../../hooks/useContractTransaction";
-
-// Define the Token type
-interface Token {
-  name: string;
-  icon: string;
-  usdValue: number;
-  amount: number;
-  category: string;
-}
+import { Token } from "@phoenix-protocol/types";
 
 export default function EarnPage(): JSX.Element {
   const router = useRouter();

@@ -1,4 +1,5 @@
 import { Horizon } from "@stellar/stellar-sdk";
+import { Token } from "../general/token";
 
 export type StateToken = {
   id: string;
@@ -22,13 +23,12 @@ export type Wallet = {
 };
 
 export interface WalletActions {
-  tokens: StateToken[];
-  allTokens: any;
+  tokens: Token[];
   fetchTokenInfo: (
     tokenAddress: string,
     isStakingToken?: boolean
-  ) => Promise<StateToken | undefined>;
-  getAllTokens: () => Promise<any[]>;
+  ) => Promise<Token | undefined>;
+  getAllTokens: () => Promise<Token[]>;
   walletConnectInstance?: any;
 }
 
