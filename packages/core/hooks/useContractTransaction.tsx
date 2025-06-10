@@ -207,7 +207,11 @@ export const useContractTransaction = () => {
                   await transaction.simulate({ restore: true });
                   options.onSuccess?.(); // Call onSuccess callback after successful restore
                   resolve({});
-                  appStore.getAllTokens();
+                  try {
+                    await appStore.getAllTokens();
+                  } catch (error) {
+                    console.error("Error fetching all tokens:", error);
+                  }
                 } else {
                   const sentTransaction = await transaction.signAndSend();
                   console.log(
