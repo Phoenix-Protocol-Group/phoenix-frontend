@@ -390,7 +390,7 @@ export default function SwapPage(): JSX.Element {
     };
 
     getAllTokens();
-  }, [appStore, loadPoolsData, isClient, fromToken, toToken]);
+  }, [appStore, loadPoolsData, isClient]);
 
   // Separate effect to set tokens if they're already available in the store
   useEffect(() => {
@@ -400,7 +400,31 @@ export default function SwapPage(): JSX.Element {
       setFromToken(appStore.tokens[0]);
       setToToken(appStore.tokens[1]);
     }
-  }, [isClient, appStore.tokens.length, fromToken, toToken]);
+  }, [isClient, appStore.tokens.length]);
+
+  // Get fresh token data from store whenever tokens change
+  const currentFromToken = useMemo(() => {
+    if (!fromToken || !appStore.tokens.length) return fromToken;
+
+    const updatedToken = appStore.tokens.find(
+      (token: Token) =>
+        token.contractId === fromToken.contractId ||
+        token.name === fromToken.name
+    );
+
+    return updatedToken || fromToken;
+  }, [fromToken, appStore.tokens]);
+
+  const currentToToken = useMemo(() => {
+    if (!toToken || !appStore.tokens.length) return toToken;
+
+    const updatedToken = appStore.tokens.find(
+      (token: Token) =>
+        token.contractId === toToken.contractId || token.name === toToken.name
+    );
+
+    return updatedToken || toToken;
+  }, [toToken, appStore.tokens]);
 
   // Update operations when tokens change with stricter control to prevent infinite loops
   const updateSwapOperations = useCallback(() => {
@@ -624,8 +648,8 @@ export default function SwapPage(): JSX.Element {
       },
       fromTokenValue: tokenAmounts[0].toString()!,
       toTokenValue: tokenAmounts[1].toString()!,
-      fromToken: fromToken!,
-      toToken: toToken!,
+      fromToken: currentFromToken!,
+      toToken: currentToToken!,
       onTokenSelectorClick: handleSelectorOpen,
       onSwapButtonClick: doSwap,
       onInputChange: (isFrom: boolean, value: string) => {
@@ -660,8 +684,8 @@ export default function SwapPage(): JSX.Element {
     }),
     [
       tokenAmounts,
-      fromToken,
-      toToken,
+      currentFromToken,
+      currentToToken,
       exchangeRate,
       networkFee,
       swapRoute,
@@ -676,6 +700,8 @@ export default function SwapPage(): JSX.Element {
       doSwap,
       handleSelectorOpen,
       addTrustLine,
+      fromToken,
+      toToken,
     ]
   );
 
@@ -712,21 +738,24 @@ export default function SwapPage(): JSX.Element {
           }}
         >
           <Box sx={{ width: "100%", maxWidth: "600px" }}>
-            {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-              >
-                <SwapContainer {...swapContainerProps} />
-              </motion.div>
-            )}
+            {!optionsOpen &&
+              !assetSelectorOpen &&
+              currentFromToken &&
+              currentToToken && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                >
+                  <SwapContainer {...swapContainerProps} />
+                </motion.div>
+              )}
 
             {/* Show message when tokens aren't loaded */}
             {!optionsOpen &&
               !assetSelectorOpen &&
-              (!fromToken || !toToken) &&
+              (!currentFromToken || !currentToToken) &&
               !isLoading && (
                 <Box
                   sx={{
@@ -742,9 +771,9 @@ export default function SwapPage(): JSX.Element {
                     Loading tokens...
                   </Typography>
                   <Typography variant="body2" sx={{ color: "#A3A3A3" }}>
-                    {!fromToken && "From token not loaded"}
-                    {!fromToken && !toToken && " | "}
-                    {!toToken && "To token not loaded"}
+                    {!currentFromToken && "From token not loaded"}
+                    {!currentFromToken && !currentToToken && " | "}
+                    {!currentToToken && "To token not loaded"}
                   </Typography>
                   <Typography variant="body2" sx={{ color: "#A3A3A3", mt: 1 }}>
                     Available tokens: {appStore.tokens.length}
@@ -777,8 +806,8 @@ export default function SwapPage(): JSX.Element {
                   <AssetSelector
                     tokens={appStore.tokens.filter(
                       (token) =>
-                        token.name !== fromToken?.name &&
-                        token.name !== toToken?.name
+                        token.name !== currentFromToken?.name &&
+                        token.name !== currentToToken?.name
                     )}
                     tokensAll={appStore.tokens}
                     onClose={() => setAssetSelectorOpen(false)}

@@ -33,7 +33,6 @@ import Head from "next/head";
  * @component
  */
 export default function Page() {
-  const store = useAppStore(); // Global state management
   const router = useRouter(); // Next.js router
   const [allPools, setAllPools] = useState<Pool[]>([]); // State to hold pool data
   const storePersist = usePersistStore(); // Persisted state
@@ -41,17 +40,24 @@ export default function Page() {
   const [sortBy, setSortBy] = useState<string>("HighAPR");
   const appStore = useAppStore();
   const [tvl, setTvl] = useState<number>(0);
+  const hasInitialized = useRef(false);
 
-  /**
-   * Fetch pool information by its address.
-   *
-   * @async
-   * @function fetchPool
-   * @param {string} poolAddress - The address of the pool contract.
-   * @returns {Promise<Pool | undefined>} A promise that resolves to the pool information or undefined in case of failure.
-   */
-  const fetchPool = useCallback(
-    async (poolAddress: string) => {
+  const getTVL = async () => {
+    const allTickers = await API.getTickers();
+    const _tvl = allTickers.reduce((total, ticker) => {
+      return total + ticker.liquidity_in_usd;
+    }, 0);
+    setTvl(_tvl);
+  };
+
+  // On component mount, fetch pools
+  useEffect(() => {
+    // Prevent multiple initializations
+    if (hasInitialized.current) return;
+
+    let isMounted = true;
+
+    const fetchPool = async (poolAddress: string) => {
       try {
         const PairContract = new PhoenixPairContract.Client({
           contractId: poolAddress,
@@ -66,9 +72,9 @@ export default function Page() {
 
         if (pairConfig?.result && pairInfo?.result) {
           const [tokenA, tokenB, lpToken] = await Promise.all([
-            store.fetchTokenInfo(pairConfig.result.token_a),
-            store.fetchTokenInfo(pairConfig.result.token_b),
-            store.fetchTokenInfo(pairConfig.result.share_token, true),
+            appStore.fetchTokenInfo(pairConfig.result.token_a),
+            appStore.fetchTokenInfo(pairConfig.result.token_b),
+            appStore.fetchTokenInfo(pairConfig.result.share_token, true),
           ]);
 
           // Fetch prices and calculate TVL
@@ -144,7 +150,9 @@ export default function Page() {
             tokens: [
               {
                 name: tokenA?.symbol || "",
-                icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
+                icon: `/cryptoIcons/${(
+                  tokenA?.symbol || ""
+                ).toLowerCase()}.svg`,
                 amount:
                   Number(pairInfo.result.asset_a.amount) /
                   10 ** Number(tokenA?.decimals),
@@ -153,7 +161,9 @@ export default function Page() {
               },
               {
                 name: tokenB?.symbol || "",
-                icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
+                icon: `/cryptoIcons/${(
+                  tokenB?.symbol || ""
+                ).toLowerCase()}.svg`,
                 amount:
                   Number(pairInfo.result.asset_b.amount) /
                   10 ** Number(tokenB?.decimals),
@@ -164,7 +174,8 @@ export default function Page() {
             tvl: formatCurrency("USD", tvl.toString(), navigator.language),
             maxApr: `${(apr / 2).toFixed(2)}%`,
             userLiquidity: isWalletConnected
-              ? (lpToken && lpToken.balance > 0) || userStake.total_stake > 0
+              ? (lpToken && (lpToken.balance || 0) > 0) ||
+                userStake.total_stake > 0
                 ? 1
                 : 0
               : 0, // Always 0 when no wallet is connected
@@ -175,21 +186,7 @@ export default function Page() {
         console.log(e);
       }
       return;
-    },
-    [store, storePersist.wallet.address]
-  );
-
-  const getTVL = async () => {
-    const allTickers = await API.getTickers();
-    const _tvl = allTickers.reduce((total, ticker) => {
-      return total + ticker.liquidity_in_usd;
-    }, 0);
-    setTvl(_tvl);
-  };
-
-  // On component mount, fetch pools
-  useEffect(() => {
-    let isMounted = true;
+    };
 
     const loadPools = async () => {
       if (!isMounted) return;
@@ -228,6 +225,7 @@ export default function Page() {
           setAllPools(poolsFiltered);
           appStore.setLoading(false);
           console.log("Pools loaded successfully:", poolsFiltered.length);
+          hasInitialized.current = true; // Mark as initialized
         }
       } catch (e) {
         console.error("Error loading pools:", e);
@@ -244,7 +242,8 @@ export default function Page() {
       isMounted = false;
       clearTimeout(timeoutId);
     };
-  }, []); // Include fetchPool and appStore in dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array since we only want this to run once
 
   // Render: conditionally display skeleton loader or pool data
   return (

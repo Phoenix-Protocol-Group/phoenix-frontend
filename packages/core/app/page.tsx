@@ -518,7 +518,9 @@ export default function Page() {
         lockedAssets: "$100,000",
       },
       walletBalanceArgs: {
-        tokens: appStore.tokens,
+        tokens: appStore.tokens.filter(
+          (token) => token.isStakingToken === false && token.name !== "PUST"
+        ),
         onTokenClick: (token: string) => {
           fetchTokenInfo(token);
         },
