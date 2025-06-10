@@ -233,8 +233,6 @@ export const BondModal = ({
     });
     setAmounts(resetAmounts);
     setError("");
-    // Reload the page
-    window.location.reload();
     onClose();
   };
 
