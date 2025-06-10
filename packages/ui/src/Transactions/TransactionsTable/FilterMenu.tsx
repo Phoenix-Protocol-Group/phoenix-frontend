@@ -107,15 +107,39 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
 
   return (
     <div>
-      <Button
+      <Box
+        component="button"
         onClick={handleClick}
-        type="secondary"
-        label="Filter"
         sx={{
-          padding: `${spacing.xs} ${spacing.sm}`,
+          display: "flex",
+          alignItems: "center",
+          gap: spacing.xs,
+          padding: `${spacing.sm} ${spacing.md}`,
+          borderRadius: borderRadius.md,
+          border: `1px solid ${colors.neutral[700]}`,
+          background: `linear-gradient(145deg, ${colors.neutral[850]} 0%, ${colors.neutral[800]} 100%)`,
+          color: colors.neutral[300],
           fontSize: typography.fontSize.sm,
+          fontWeight: typography.fontWeights.medium,
+          fontFamily: typography.fontFamily,
+          cursor: "pointer",
+          transition: "all 0.3s ease",
+          minWidth: "80px",
+          justifyContent: "center",
+          "&:hover": {
+            background: `linear-gradient(135deg, ${colors.primary.main}15 0%, ${colors.primary.dark}08 100%)`,
+            border: `1px solid ${colors.primary.main}30`,
+            color: colors.neutral[100],
+            transform: "translateY(-1px)",
+            boxShadow: `0 4px 12px ${colors.primary.main}20`,
+          },
+          "&:active": {
+            transform: "translateY(0)",
+          },
         }}
-      />
+      >
+        🔍 Filter
+      </Box>
 
       <Menu
         id="basic-menu"
@@ -128,14 +152,17 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
         sx={{
           "& .MuiMenu-paper": {
             display: "flex",
-            padding: `${spacing.sm} ${spacing.lg}`,
+            padding: spacing.lg,
             flexDirection: "column",
             gap: spacing.lg,
-            borderRadius: borderRadius.md,
+            borderRadius: borderRadius.lg,
             border: `1px solid ${colors.neutral[700]}`,
-            background: colors.neutral[800],
+            background: `linear-gradient(145deg, ${colors.neutral[850]} 0%, ${colors.neutral[800]} 100%)`,
             color: colors.neutral[300],
-            boxShadow: shadows.tooltip,
+            boxShadow: `0 20px 40px ${colors.neutral[900]}60, 0 0 0 1px ${colors.primary.main}20`,
+            backdropFilter: "blur(20px)",
+            minWidth: "320px",
+            mt: spacing.sm,
           },
         }}
       >
@@ -149,6 +176,18 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
           }}
         >
           <Box flex={1}>
+            <Typography
+              sx={{
+                color: colors.neutral[400],
+                fontFamily: typography.fontFamily,
+                fontSize: typography.fontSize.xs,
+                fontWeight: typography.fontWeights.regular,
+                lineHeight: "140%",
+                opacity: 0.6,
+              }}
+            >
+              From
+            </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer
                 components={["DatePicker"]}
@@ -305,14 +344,23 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                 placeholder="Min"
                 style={{
                   width: "100%",
-                  background: colors.neutral[900],
+                  background: `linear-gradient(145deg, ${colors.neutral[900]} 0%, ${colors.neutral[850]} 100%)`,
                   border: `1px solid ${colors.neutral[700]}`,
-                  color: colors.neutral[300],
-                  padding: "8px 12px",
-                  borderRadius: borderRadius.lg,
+                  color: colors.neutral[200],
+                  padding: `${spacing.sm} ${spacing.md}`,
+                  borderRadius: borderRadius.md,
                   fontFamily: typography.fontFamily,
                   fontSize: typography.fontSize.sm,
                   outline: "none",
+                  transition: "all 0.3s ease",
+                }}
+                onFocus={(e) => {
+                  e.target.style.border = `1px solid ${colors.primary.main}50`;
+                  e.target.style.boxShadow = `0 0 0 2px ${colors.primary.main}20`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.border = `1px solid ${colors.neutral[700]}`;
+                  e.target.style.boxShadow = "none";
                 }}
               />
             </Box>
@@ -344,14 +392,23 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                 placeholder="Max"
                 style={{
                   width: "100%",
-                  background: colors.neutral[900],
+                  background: `linear-gradient(145deg, ${colors.neutral[900]} 0%, ${colors.neutral[850]} 100%)`,
                   border: `1px solid ${colors.neutral[700]}`,
-                  color: colors.neutral[300],
-                  padding: "8px 12px",
-                  borderRadius: borderRadius.lg,
+                  color: colors.neutral[200],
+                  padding: `${spacing.sm} ${spacing.md}`,
+                  borderRadius: borderRadius.md,
                   fontFamily: typography.fontFamily,
                   fontSize: typography.fontSize.sm,
                   outline: "none",
+                  transition: "all 0.3s ease",
+                }}
+                onFocus={(e) => {
+                  e.target.style.border = `1px solid ${colors.primary.main}50`;
+                  e.target.style.boxShadow = `0 0 0 2px ${colors.primary.main}20`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.border = `1px solid ${colors.neutral[700]}`;
+                  e.target.style.boxShadow = "none";
                 }}
               />
             </Box>
@@ -410,14 +467,23 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                 placeholder="Min"
                 style={{
                   width: "100%",
-                  background: colors.neutral[900],
+                  background: `linear-gradient(145deg, ${colors.neutral[900]} 0%, ${colors.neutral[850]} 100%)`,
                   border: `1px solid ${colors.neutral[700]}`,
-                  color: colors.neutral[300],
-                  padding: "8px 12px",
-                  borderRadius: borderRadius.lg,
+                  color: colors.neutral[200],
+                  padding: `${spacing.sm} ${spacing.md}`,
+                  borderRadius: borderRadius.md,
                   fontFamily: typography.fontFamily,
                   fontSize: typography.fontSize.sm,
                   outline: "none",
+                  transition: "all 0.3s ease",
+                }}
+                onFocus={(e) => {
+                  e.target.style.border = `1px solid ${colors.primary.main}50`;
+                  e.target.style.boxShadow = `0 0 0 2px ${colors.primary.main}20`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.border = `1px solid ${colors.neutral[700]}`;
+                  e.target.style.boxShadow = "none";
                 }}
               />
             </Box>
@@ -449,23 +515,85 @@ const FilterMenu = ({ activeFilters, applyFilters }: FilterMenuProps) => {
                 placeholder="Max"
                 style={{
                   width: "100%",
-                  background: colors.neutral[900],
+                  background: `linear-gradient(145deg, ${colors.neutral[900]} 0%, ${colors.neutral[850]} 100%)`,
                   border: `1px solid ${colors.neutral[700]}`,
-                  color: colors.neutral[300],
-                  padding: "8px 12px",
-                  borderRadius: borderRadius.lg,
+                  color: colors.neutral[200],
+                  padding: `${spacing.sm} ${spacing.md}`,
+                  borderRadius: borderRadius.md,
                   fontFamily: typography.fontFamily,
                   fontSize: typography.fontSize.sm,
                   outline: "none",
+                  transition: "all 0.3s ease",
+                }}
+                onFocus={(e) => {
+                  e.target.style.border = `1px solid ${colors.primary.main}50`;
+                  e.target.style.boxShadow = `0 0 0 2px ${colors.primary.main}20`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.border = `1px solid ${colors.neutral[700]}`;
+                  e.target.style.boxShadow = "none";
                 }}
               />
             </Box>
           </Box>
         </Box>
 
-        <Box sx={{ display: "flex", gap: spacing.sm, mt: spacing.md }}>
-          <Button label="Apply" onClick={updateFilters} type="primary" />
-          <Button label="Reset" onClick={resetFilters} type="secondary" />
+        <Box sx={{ display: "flex", gap: spacing.sm, mt: spacing.lg }}>
+          <Box
+            component="button"
+            onClick={updateFilters}
+            sx={{
+              flex: 1,
+              padding: `${spacing.sm} ${spacing.md}`,
+              borderRadius: borderRadius.md,
+              border: `1px solid ${colors.primary.main}`,
+              background: `linear-gradient(135deg, ${colors.primary.main} 0%, ${colors.primary.dark} 100%)`,
+              color: colors.neutral[50],
+              fontSize: typography.fontSize.sm,
+              fontWeight: typography.fontWeights.medium,
+              fontFamily: typography.fontFamily,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                background: `linear-gradient(135deg, ${colors.primary.light} 0%, ${colors.primary.main} 100%)`,
+                transform: "translateY(-1px)",
+                boxShadow: `0 4px 12px ${colors.primary.main}40`,
+              },
+              "&:active": {
+                transform: "translateY(0)",
+              },
+            }}
+          >
+            Apply Filters
+          </Box>
+          <Box
+            component="button"
+            onClick={resetFilters}
+            sx={{
+              flex: 1,
+              padding: `${spacing.sm} ${spacing.md}`,
+              borderRadius: borderRadius.md,
+              border: `1px solid ${colors.neutral[700]}`,
+              background: `linear-gradient(145deg, ${colors.neutral[850]} 0%, ${colors.neutral[800]} 100%)`,
+              color: colors.neutral[300],
+              fontSize: typography.fontSize.sm,
+              fontWeight: typography.fontWeights.medium,
+              fontFamily: typography.fontFamily,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                background: `linear-gradient(145deg, ${colors.neutral[800]} 0%, ${colors.neutral[750]} 100%)`,
+                border: `1px solid ${colors.neutral[600]}`,
+                color: colors.neutral[200],
+                transform: "translateY(-1px)",
+              },
+              "&:active": {
+                transform: "translateY(0)",
+              },
+            }}
+          >
+            Reset
+          </Box>
         </Box>
       </Menu>
     </div>

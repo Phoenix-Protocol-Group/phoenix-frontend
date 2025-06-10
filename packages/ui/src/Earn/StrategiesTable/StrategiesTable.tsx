@@ -17,6 +17,7 @@ import {
   typography,
   spacing,
   borderRadius,
+  cardStyles,
 } from "../../Theme/styleConstants";
 
 export interface StrategiesTableProps {
@@ -157,38 +158,89 @@ export const StrategiesTable = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
     >
-      <Box sx={{ mt: 4 }}>
+      <Box
+        sx={{
+          ...cardStyles.base,
+          borderRadius: borderRadius.xl,
+          background: `linear-gradient(135deg, ${colors.neutral[800]}40 0%, ${colors.neutral[900]}60 100%)`,
+          border: `1px solid ${colors.neutral[700]}`,
+          backdropFilter: "blur(20px)",
+          boxShadow: `0 4px 16px rgba(0, 0, 0, 0.2)`,
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "1px",
+            background: `linear-gradient(90deg, transparent, ${colors.primary.main}60, transparent)`,
+            zIndex: 1,
+          },
+          "&:hover": {
+            border: `1px solid ${colors.primary.main}40`,
+            boxShadow: `0 6px 24px rgba(0, 0, 0, 0.25)`,
+          },
+          transition: "all 0.2s ease",
+        }}
+      >
+        {/* Title Section */}
+        <Box
+          sx={{
+            p: { xs: spacing.md, md: spacing.lg },
+            pb: 0,
+            position: "relative",
+            zIndex: 2,
+          }}
+        >
+          <Typography
+            sx={{
+              color: colors.neutral[50],
+              fontFamily: typography.fontFamily,
+              fontSize: typography.fontSize.xl,
+              fontWeight: typography.fontWeights.bold,
+              lineHeight: 1.2,
+              background: `linear-gradient(135deg, ${colors.neutral[50]} 0%, ${colors.neutral[300]} 100%)`,
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              mb: spacing.sm,
+            }}
+          >
+            {title}
+          </Typography>
+        </Box>
+
         {showFilters && (
-          <FilterBar
-            assetsFilter={assetsFilter}
-            onAssetsFilterChange={setAssetsFilter}
-            typeFilter={typeFilter}
-            onTypeFilterChange={setTypeFilter}
-            platformFilter={platformFilter}
-            onPlatformFilterChange={setPlatformFilter}
-            instantUnbondOnly={instantUnbondOnly}
-            onInstantUnbondOnlyChange={(value) => setInstantUnbondOnly(value)}
-            types={types}
-            platforms={platforms}
-          />
+          <Box sx={{ p: { xs: spacing.md, md: spacing.lg }, pt: 0 }}>
+            <FilterBar
+              assetsFilter={assetsFilter}
+              onAssetsFilterChange={setAssetsFilter}
+              typeFilter={typeFilter}
+              onTypeFilterChange={setTypeFilter}
+              platformFilter={platformFilter}
+              onPlatformFilterChange={setPlatformFilter}
+              instantUnbondOnly={instantUnbondOnly}
+              onInstantUnbondOnlyChange={(value) => setInstantUnbondOnly(value)}
+              types={types}
+              platforms={platforms}
+            />
+          </Box>
         )}
 
         {/* Table header - only show on desktop */}
         {!isMobile && (
           <Box
             sx={{
-              padding: spacing.lg,
-              borderRadius: "16px",
-              background:
-                "linear-gradient(135deg, rgba(15, 15, 15, 0.8) 0%, rgba(25, 25, 25, 0.8) 100%)",
-              border: "1px solid rgba(249, 115, 22, 0.1)",
-              mb: 3,
-              cursor: "default",
-              backdropFilter: "blur(10px)",
+              px: { xs: spacing.md, md: spacing.lg },
+              py: spacing.md,
+              borderBottom: `1px solid ${colors.neutral[800]}`,
+              background: `linear-gradient(135deg, ${colors.neutral[900]}20 0%, ${colors.neutral[800]}20 100%)`,
             }}
           >
             <Grid container spacing={3} alignItems="center">
@@ -200,6 +252,7 @@ export const StrategiesTable = ({
                     fontSize: typography.fontSize.xs,
                     fontWeight: typography.fontWeights.bold,
                     textTransform: "uppercase",
+                    letterSpacing: "0.5px",
                   }}
                 >
                   Assets
@@ -214,6 +267,7 @@ export const StrategiesTable = ({
                     fontSize: typography.fontSize.xs,
                     fontWeight: typography.fontWeights.bold,
                     textTransform: "uppercase",
+                    letterSpacing: "0.5px",
                   }}
                 >
                   Strategy
@@ -234,6 +288,7 @@ export const StrategiesTable = ({
                     fontSize: typography.fontSize.xs,
                     fontWeight: typography.fontWeights.bold,
                     textTransform: "uppercase",
+                    letterSpacing: "0.5px",
                   }}
                 >
                   Reward
@@ -249,6 +304,7 @@ export const StrategiesTable = ({
                       fontSize: typography.fontSize.xs,
                       fontWeight: typography.fontWeights.bold,
                       textTransform: "uppercase",
+                      letterSpacing: "0.5px",
                     }}
                   >
                     Your Stake
@@ -265,6 +321,7 @@ export const StrategiesTable = ({
                       fontSize: typography.fontSize.xs,
                       fontWeight: typography.fontWeights.bold,
                       textTransform: "uppercase",
+                      letterSpacing: "0.5px",
                     }}
                   >
                     Claimable
@@ -281,6 +338,7 @@ export const StrategiesTable = ({
                       fontSize: typography.fontSize.xs,
                       fontWeight: typography.fontWeights.bold,
                       textTransform: "uppercase",
+                      letterSpacing: "0.5px",
                     }}
                   >
                     Unbond Time
@@ -296,6 +354,7 @@ export const StrategiesTable = ({
                     fontSize: typography.fontSize.xs,
                     fontWeight: typography.fontWeights.bold,
                     textTransform: "uppercase",
+                    letterSpacing: "0.5px",
                     textAlign: "right",
                   }}
                 >
@@ -306,39 +365,61 @@ export const StrategiesTable = ({
           </Box>
         )}
 
-        {/* Mobile title for strategies - only show on mobile */}
-        {isMobile && (
-          <Typography
-            sx={{
-              color: colors.neutral[300],
-              fontSize: typography.fontSize.sm,
-              fontWeight: typography.fontWeights.medium,
-              mb: spacing.sm,
-            }}
-          >
-            {filteredStrategies.length} strategies found
-          </Typography>
-        )}
+        {/* Content Container */}
+        <Box
+          sx={{
+            overflow: "auto",
+            maxHeight: isMobile ? "auto" : "60vh",
+            position: "relative",
+            zIndex: 2,
+            "&::-webkit-scrollbar": {
+              width: "6px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: colors.neutral[800],
+              borderRadius: borderRadius.md,
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: colors.primary.main,
+              borderRadius: borderRadius.md,
+              "&:hover": {
+                backgroundColor: colors.primary.light,
+              },
+            },
+            // Styles for Firefox
+            scrollbarWidth: "thin",
+            scrollbarColor: `${colors.primary.main} ${colors.neutral[800]}`,
+          }}
+        >
+          {/* Mobile strategy count */}
+          {isMobile && !isLoading && filteredStrategies.length > 0 && (
+            <Box sx={{ p: spacing.md, pb: 0 }}>
+              <Typography
+                sx={{
+                  color: colors.neutral[300],
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.medium,
+                }}
+              >
+                {filteredStrategies.length} strategies found
+              </Typography>
+            </Box>
+          )}
 
-        {/* Loading state */}
-        {isLoading ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "300px",
-              borderRadius: "16px",
-              background:
-                "linear-gradient(135deg, rgba(15, 15, 15, 0.8) 0%, rgba(25, 25, 25, 0.8) 100%)",
-              border: "1px solid rgba(249, 115, 22, 0.1)",
-              backdropFilter: "blur(10px)",
-            }}
-          >
-            <Box sx={{ textAlign: "center" }}>
+          {/* Loading state */}
+          {isLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "300px",
+                flexDirection: "column",
+              }}
+            >
               <CircularProgress
                 sx={{
-                  color: "#F97316",
+                  color: colors.primary.main,
                   mb: 2,
                 }}
               />
@@ -351,85 +432,82 @@ export const StrategiesTable = ({
                 Loading strategies...
               </Typography>
             </Box>
-          </Box>
-        ) : filteredStrategies.length > 0 ? (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {filteredStrategies.map((strategy, index) => (
-              <motion.div
-                key={strategy.id || index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-              >
-                <StrategyEntry
-                  strategy={strategy}
-                  isMobile={isMobile}
-                  onViewDetails={onViewDetails}
-                  onBondClick={onBondClick}
-                  onUnbondClick={onUnbondClick}
-                />
-              </motion.div>
-            ))}
-          </Box>
-        ) : (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "300px",
-              borderRadius: "16px",
-              background:
-                "linear-gradient(135deg, rgba(15, 15, 15, 0.8) 0%, rgba(25, 25, 25, 0.8) 100%)",
-              border: "1px solid rgba(115, 115, 115, 0.2)",
-              textAlign: "center",
-              padding: spacing.xl,
-              backdropFilter: "blur(10px)",
-            }}
-          >
+          ) : filteredStrategies.length > 0 ? (
+            <Box sx={{ p: { xs: spacing.sm, md: 0 } }}>
+              {filteredStrategies.map((strategy, index) => (
+                <motion.div
+                  key={strategy.id || index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                >
+                  <StrategyEntry
+                    strategy={strategy}
+                    isMobile={isMobile}
+                    onViewDetails={onViewDetails}
+                    onBondClick={onBondClick}
+                    onUnbondClick={onUnbondClick}
+                  />
+                </motion.div>
+              ))}
+            </Box>
+          ) : (
             <Box
               sx={{
-                width: "80px",
-                height: "80px",
-                borderRadius: "50%",
-                background: "rgba(249, 115, 22, 0.1)",
                 display: "flex",
-                alignItems: "center",
+                flexDirection: "column",
                 justifyContent: "center",
-                mb: 3,
+                alignItems: "center",
+                height: "300px",
+                textAlign: "center",
+                p: spacing.xl,
               }}
             >
-              <Typography
+              <Box
                 sx={{
-                  fontSize: "2rem",
-                  color: "#F97316",
+                  width: "64px",
+                  height: "64px",
+                  borderRadius: "50%",
+                  background: `linear-gradient(135deg, ${colors.primary.main}20 0%, ${colors.primary.main}10 100%)`,
+                  border: `1px solid ${colors.primary.main}30`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  mb: 3,
                 }}
               >
-                📊
+                <Typography
+                  sx={{
+                    fontSize: "1.5rem",
+                    color: colors.primary.main,
+                  }}
+                >
+                  📊
+                </Typography>
+              </Box>
+              <Typography
+                sx={{
+                  color: colors.neutral[100],
+                  fontSize: typography.fontSize.lg,
+                  fontWeight: typography.fontWeights.medium,
+                  mb: 1,
+                }}
+              >
+                No strategies found
+              </Typography>
+              <Typography
+                sx={{
+                  color: colors.neutral[400],
+                  fontSize: typography.fontSize.sm,
+                  maxWidth: "400px",
+                  opacity: 0.8,
+                }}
+              >
+                {emptyStateMessage}
               </Typography>
             </Box>
-            <Typography
-              sx={{
-                color: colors.neutral[100],
-                fontSize: typography.fontSize.lg,
-                fontWeight: typography.fontWeights.medium,
-                mb: 1,
-              }}
-            >
-              No strategies found
-            </Typography>
-            <Typography
-              sx={{
-                color: colors.neutral[400],
-                fontSize: typography.fontSize.sm,
-                maxWidth: "400px",
-              }}
-            >
-              {emptyStateMessage}
-            </Typography>
-          </Box>
-        )}
+          )}
+        </Box>
       </Box>
     </motion.div>
   );

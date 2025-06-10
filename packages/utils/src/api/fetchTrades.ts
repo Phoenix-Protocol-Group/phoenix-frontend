@@ -10,7 +10,9 @@ export async function fetchAllTrades(
   type?: string | undefined,
   startTime?: string | undefined,
   endTime?: string | undefined,
-  personal: string | undefined = undefined
+  personal: string | undefined = undefined,
+  sortBy?: string,
+  sortOrder?: "asc" | "desc"
 ) {
   try {
     const tradeApi = new API(constants.TRADING_API_URL);
@@ -41,6 +43,8 @@ export async function fetchAllTrades(
       limit: limit,
       startTime: startTime ? Number(startTime) : undefined,
       endTime: endTime ? Number(endTime) : undefined,
+      sortBy: sortBy,
+      sortOrder: sortOrder,
     });
 
     // Current timestamp and 24 hours ago

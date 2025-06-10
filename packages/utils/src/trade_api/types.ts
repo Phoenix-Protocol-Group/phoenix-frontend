@@ -70,6 +70,8 @@ export interface AdvancedTradesParams {
   limit?: number;
   startTime?: number;
   endTime?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 export interface TradeHistoryParams {
