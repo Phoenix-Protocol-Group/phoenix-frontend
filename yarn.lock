@@ -12,6 +12,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@albedo-link/intent@npm:^0.12.0":
+  version: 0.12.0
+  resolution: "@albedo-link/intent@npm:0.12.0"
+  checksum: 2aece3c1f6624976300ad377eaffa72546d9dfcebd28791b1c1fd6c2bf2774aed080f15d8aa2c5a2408d5f4471b934b01934459f37174bd292969a95efb9fa02
+  languageName: node
+  linkType: hard
+
 "@ampproject/remapping@npm:^2.1.0, @ampproject/remapping@npm:^2.2.0":
   version: 2.3.0
   resolution: "@ampproject/remapping@npm:2.3.0"
@@ -3723,6 +3730,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/state@workspace:packages/state"
   dependencies:
+    "@albedo-link/intent": ^0.12.0
     "@lobstrco/signer-extension-api": ^1.0.0-beta.0
     "@phoenix-protocol/contracts": "workspace:^"
     "@phoenix-protocol/types": "workspace:^"
@@ -3839,6 +3847,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/utils@workspace:packages/utils"
   dependencies:
+    "@albedo-link/intent": ^0.12.0
     "@apollo/client": ^3.9.0
     "@creit.tech/xbull-wallet-connect": 0.3.0
     "@phoenix-protocol/types": "*"
