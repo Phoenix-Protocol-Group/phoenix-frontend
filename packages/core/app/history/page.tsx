@@ -26,11 +26,12 @@ import {
   PriceHistoryResponse,
   TradingVolumeResponse,
 } from "@phoenix-protocol/utils/build/api/types";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 export default function Page() {
   const appStore = useAppStore();
   const appStorePersist = usePersistStore();
+  const isSorting = useRef(false);
 
   const tradeApi = new TradeAPi.API(constants.TRADING_API_URL);
 
@@ -71,29 +72,128 @@ export default function Page() {
     string | undefined
   >();
 
-  const applyFilters = useCallback((newFilters: ActiveFilters) => {
-    setActiveFilters(newFilters);
-    loadAllTrades(newFilters);
-  }, []);
+  const loadAllTrades = useCallback(
+    async (newFilters: ActiveFilters = activeFilters) => {
+      setHistoryLoading(true);
+
+      try {
+        let from, to;
+        if (newFilters.dateRange.from) {
+          from = (newFilters.dateRange.from.getTime() / 1000).toFixed(0);
+        }
+        if (newFilters.dateRange.to) {
+          to = (newFilters.dateRange.to.getTime() / 1000).toFixed(0);
+        }
+
+        const trades = await fetchAllTrades(
+          appStore,
+          pageSize,
+          undefined,
+          from,
+          to,
+          activeView === "personal"
+            ? appStorePersist.wallet.address
+            : undefined,
+          sortBy,
+          sortOrder
+        );
+
+        // Apply client-side filtering for tradeSize and tradeValue
+        let filteredTrades = trades;
+
+        if (
+          newFilters.tradeSize.from !== undefined ||
+          newFilters.tradeSize.to !== undefined
+        ) {
+          filteredTrades = filteredTrades.filter((trade) => {
+            // Use fromAmount as the trade size
+            const size = trade.fromAmount;
+            if (
+              newFilters.tradeSize.from !== undefined &&
+              newFilters.tradeSize.to !== undefined
+            ) {
+              return (
+                size >= newFilters.tradeSize.from &&
+                size <= newFilters.tradeSize.to
+              );
+            } else if (newFilters.tradeSize.from !== undefined) {
+              return size >= newFilters.tradeSize.from;
+            } else if (newFilters.tradeSize.to !== undefined) {
+              return size <= newFilters.tradeSize.to;
+            }
+            return true;
+          });
+        }
+
+        if (
+          newFilters.tradeValue.from !== undefined ||
+          newFilters.tradeValue.to !== undefined
+        ) {
+          filteredTrades = filteredTrades.filter((trade) => {
+            const value = parseFloat(trade.tradeValue);
+            if (
+              newFilters.tradeValue.from !== undefined &&
+              newFilters.tradeValue.to !== undefined
+            ) {
+              return (
+                value >= newFilters.tradeValue.from &&
+                value <= newFilters.tradeValue.to
+              );
+            } else if (newFilters.tradeValue.from !== undefined) {
+              return value >= newFilters.tradeValue.from;
+            } else if (newFilters.tradeValue.to !== undefined) {
+              return value <= newFilters.tradeValue.to;
+            }
+            return true;
+          });
+        }
+
+        // Server-side sorting applied, no need for client-side sorting
+        setHistory(filteredTrades);
+      } catch (error) {
+        console.error("Error loading trades:", error);
+      } finally {
+        setHistoryLoading(false);
+      }
+    },
+    [
+      pageSize,
+      activeView,
+      appStorePersist.wallet.address,
+      activeFilters,
+      sortBy,
+      sortOrder,
+    ]
+  );
+
+  const applyFilters = useCallback(
+    (newFilters: ActiveFilters) => {
+      setActiveFilters(newFilters);
+      loadAllTrades(newFilters);
+    },
+    [loadAllTrades]
+  );
 
   const loadMore = () => {
     setPageSize((prev) => prev + 10);
   };
 
-  const handleSortChange = (
-    newSortBy:
-      | "tradeType"
-      | "asset"
-      | "tradeSize"
-      | "tradeValue"
-      | "date"
-      | "actions"
-      | undefined,
-    newSortOrder: "asc" | "desc"
-  ) => {
-    setSortBy(newSortBy);
+  const handleSortChange = (column: string) => {
+    let newSortOrder: "asc" | "desc";
+
+    // If clicking the same column, toggle the sort order
+    if (sortBy === column) {
+      newSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    } else {
+      // If clicking a different column, start with descending order (except for date which should start with desc to show newest first)
+      newSortOrder = column === "date" ? "desc" : "asc";
+    }
+
+    // Update sort state
+    setSortBy(column as any);
     setSortOrder(newSortOrder);
-    applyFilters(activeFilters);
+
+    // The loadAllTrades function will be automatically called due to dependency array including sortBy and sortOrder
   };
 
   const loadVolumeData = async (timeEpoch: "D" | "M" | "A") => {
@@ -293,80 +393,9 @@ export default function Page() {
     setHistoricalPrices(graph);
   };
 
-  const loadAllTrades = async (newFilters: ActiveFilters = activeFilters) => {
-    let from, to;
-    if (newFilters.dateRange.from) {
-      from = (newFilters.dateRange.from.getTime() / 1000).toFixed(0);
-    }
-    if (newFilters.dateRange.to) {
-      to = (newFilters.dateRange.to.getTime() / 1000).toFixed(0);
-    }
-
-    const trades = await fetchAllTrades(
-      appStore,
-      pageSize,
-      undefined,
-      from,
-      to,
-      activeView === "personal" ? appStorePersist.wallet.address : undefined
-    );
-
-    // Apply client-side filtering for tradeSize and tradeValue
-    let filteredTrades = trades;
-
-    if (
-      newFilters.tradeSize.from !== undefined ||
-      newFilters.tradeSize.to !== undefined
-    ) {
-      filteredTrades = filteredTrades.filter((trade) => {
-        // Use fromAmount as the trade size
-        const size = trade.fromAmount;
-        if (
-          newFilters.tradeSize.from !== undefined &&
-          newFilters.tradeSize.to !== undefined
-        ) {
-          return (
-            size >= newFilters.tradeSize.from && size <= newFilters.tradeSize.to
-          );
-        } else if (newFilters.tradeSize.from !== undefined) {
-          return size >= newFilters.tradeSize.from;
-        } else if (newFilters.tradeSize.to !== undefined) {
-          return size <= newFilters.tradeSize.to;
-        }
-        return true;
-      });
-    }
-
-    if (
-      newFilters.tradeValue.from !== undefined ||
-      newFilters.tradeValue.to !== undefined
-    ) {
-      filteredTrades = filteredTrades.filter((trade) => {
-        const value = parseFloat(trade.tradeValue);
-        if (
-          newFilters.tradeValue.from !== undefined &&
-          newFilters.tradeValue.to !== undefined
-        ) {
-          return (
-            value >= newFilters.tradeValue.from &&
-            value <= newFilters.tradeValue.to
-          );
-        } else if (newFilters.tradeValue.from !== undefined) {
-          return value >= newFilters.tradeValue.from;
-        } else if (newFilters.tradeValue.to !== undefined) {
-          return value <= newFilters.tradeValue.to;
-        }
-        return true;
-      });
-    }
-
-    setHistory(filteredTrades);
-    setHistoryLoading(false);
-  };
-
   useEffect(() => {
     loadAllTrades();
-  }, [pageSize, activeView]);
+  }, [loadAllTrades]);
 
   useEffect(() => {
     loadVolumeData(volumeTimeframe); // Use independent volume timeframe
@@ -604,12 +633,7 @@ export default function Page() {
               applyFilters={(newFilters: ActiveFilters) =>
                 applyFilters(newFilters)
               }
-              handleSort={(column) =>
-                handleSortChange(
-                  column as any,
-                  sortOrder === "asc" ? "desc" : "asc"
-                )
-              }
+              handleSort={(column) => handleSortChange(column)}
             />
           ) : (
             <Skeleton.TransactionsTable />

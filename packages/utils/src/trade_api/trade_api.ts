@@ -48,7 +48,10 @@ export class API {
   }
 
   async getPrice(name: string): Promise<number> {
-    if (name === "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75" || name === "CDIKURWHYS4FFTR5KOQK6MBFZA2K3E26WGBQI6PXBYWZ4XIOPJHDFJKP") {
+    if (
+      name === "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75" ||
+      name === "CDIKURWHYS4FFTR5KOQK6MBFZA2K3E26WGBQI6PXBYWZ4XIOPJHDFJKP"
+    ) {
       return 1;
     }
     return this.get<number>(`/price/${name}`);

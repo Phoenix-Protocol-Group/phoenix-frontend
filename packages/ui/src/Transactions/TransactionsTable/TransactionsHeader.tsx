@@ -3,10 +3,19 @@ import { Box, Typography } from "@mui/material";
 import { ArrowDownward, SwapVert } from "@mui/icons-material";
 import { colors, typography, spacing } from "../../Theme/styleConstants";
 
-function convertToCamelCase(input: string): string {
-  return input
-    .toLowerCase()
-    .replace(/\s+(\w)/g, (_, match) => match.toUpperCase());
+function mapLabelToColumn(label: string): string {
+  switch (label) {
+    case "Date & Time":
+      return "date";
+    case "Swap Details":
+      return "asset";
+    case "Trade Value (USD)":
+      return "tradeValue";
+    case "Transaction ID":
+      return "actions"; // This should not be sortable, but keeping for consistency
+    default:
+      return label.toLowerCase().replace(/\s+/g, "");
+  }
 }
 
 const TransactionHeader = ({
@@ -22,12 +31,15 @@ const TransactionHeader = ({
     sx={{
       display: "flex",
       alignItems: "center",
-      cursor: label !== "Actions" ? "pointer" : "default",
+      cursor:
+        label !== "Actions" && label !== "Transaction ID"
+          ? "pointer"
+          : "default",
       p: spacing.xs,
       borderRadius: "6px",
       transition: "all 0.2s ease",
       "&:hover":
-        label !== "Actions"
+        label !== "Actions" && label !== "Transaction ID"
           ? {
               background: `linear-gradient(135deg, ${colors.primary.main}10 0%, ${colors.primary.dark}05 100%)`,
               "& .header-text": {
@@ -40,8 +52,8 @@ const TransactionHeader = ({
           : {},
     }}
     onClick={() => {
-      if (label !== "Actions") {
-        handleSort(convertToCamelCase(label));
+      if (label !== "Actions" && label !== "Transaction ID") {
+        handleSort(mapLabelToColumn(label));
       }
     }}
   >
@@ -61,6 +73,7 @@ const TransactionHeader = ({
       {label}
     </Typography>
     {label !== "Actions" &&
+      label !== "Transaction ID" &&
       (active ? (
         <ArrowDownward
           className="header-icon"
