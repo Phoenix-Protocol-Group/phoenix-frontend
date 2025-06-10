@@ -26,6 +26,7 @@ const anchor: Anchor = {
       amount: 100,
       category: "Stable",
       usdValue: 1 * 100,
+      contractId: "usdt-token",
     },
     {
       name: "USD",
@@ -33,6 +34,7 @@ const anchor: Anchor = {
       amount: 100,
       category: "Stable",
       usdValue: 1,
+      contractId: "usd-token",
     },
   ],
 };
@@ -49,6 +51,7 @@ const anchor2: Anchor = {
       amount: 100,
       category: "Stable",
       usdValue: 1 * 100,
+      contractId: "usdt-token",
     },
     {
       name: "USD",
@@ -56,6 +59,7 @@ const anchor2: Anchor = {
       amount: 100,
       category: "Stable",
       usdValue: 1,
+      contractId: "usd-token",
     },
   ],
 };

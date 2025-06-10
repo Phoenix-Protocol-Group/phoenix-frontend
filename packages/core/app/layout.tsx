@@ -145,6 +145,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     }
   }, [persistStore.disclaimer.accepted, isClient]);
 
+  // Fetch tokens if not already fetched
+  useEffect(() => {
+    const fetchTokens = async () => {
+      await appStore.getAllTokens();
+    };
+    fetchTokens();
+  }, [persistStore.wallet.address]);
   /**
    * Handles accepting or rejecting the disclaimer.
    *
@@ -210,7 +217,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       ...swapPageStyle,
       width: largerThanMd ? `auto` : "100vw", // Full width on mobile
     }),
-    [largerThanMd, navOpen, swapPageStyle]
+    [largerThanMd, swapPageStyle]
   );
 
   // Hacky way to avoid overflows

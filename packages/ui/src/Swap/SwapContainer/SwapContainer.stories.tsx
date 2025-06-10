@@ -8,6 +8,7 @@ const fromToken = {
   amount: 100,
   category: "Stable",
   usdValue: 1 * 100,
+  contractId: "usdt-token",
 };
 
 const toToken = {
@@ -16,6 +17,7 @@ const toToken = {
   amount: 100,
   category: "Stable",
   usdValue: 1 * 100,
+  contractId: "usdt-token",
 };
 
 // Default metadata of the story https://storybook.js.org/docs/react/api/csf#default-export

@@ -282,8 +282,8 @@ export const Primary: Story = {
             amount: 101269.5131775,
             category: "",
             usdValue: 0,
-            // @ts-ignore
-            address: "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
+            contractId:
+              "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
           },
           {
             name: "PHO",
@@ -291,8 +291,8 @@ export const Primary: Story = {
             amount: 64151.8168754,
             category: "",
             usdValue: 0,
-            // @ts-ignore
-            address: "CBZ7M5B3Y4WWBZ5XK5UZCAFOEZ23KSSZXYECYX3IXM6E2JOLQC52DK32",
+            contractId:
+              "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
           },
         ],
         // @ts-ignore
@@ -309,9 +309,8 @@ export const Primary: Story = {
             amount: 42983.8944,
             category: "",
             usdValue: 0,
-            // @ts-ignore
-
-            address: "CBZ7M5B3Y4WWBZ5XK5UZCAFOEZ23KSSZXYECYX3IXM6E2JOLQC52DK32",
+            contractId:
+              "CBZ7M5B3Y4WWBZ5XK5UZCAFOEZ23KSSZXYECYX3IXM6E2JOLQC52DK32",
           },
           {
             name: "USDC",
@@ -319,8 +318,8 @@ export const Primary: Story = {
             amount: 17745.4097827,
             category: "",
             usdValue: 0,
-            // @ts-ignore
-            address: "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
+            contractId:
+              "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
           },
         ],
         // @ts-ignore

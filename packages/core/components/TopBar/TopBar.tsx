@@ -43,7 +43,7 @@ const TopBar = ({
   );
 
   const tokenBalance = token
-    ? Number(token?.balance) / 10 ** token?.decimals
+    ? Number(token?.balance) / 10 ** token?.decimals!
     : 0;
 
   const fetch = async () =>

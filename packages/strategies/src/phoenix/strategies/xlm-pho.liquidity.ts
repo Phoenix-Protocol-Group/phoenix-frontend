@@ -33,6 +33,7 @@ class PhoenixXlmPhoStrategy implements Strategy {
       amount: 0,
       category: "phoenix",
       usdValue: 0,
+      contractId: "", // TODO: Set the correct contractId for PHO if available
     },
     unbondTime: 0,
     category: "liquidity",
@@ -178,22 +179,28 @@ class PhoenixXlmPhoStrategy implements Strategy {
         // Set assets in metadata
         this.metadata.assets = [
           {
-            name: _tokenA?.symbol!,
-            icon: `/cryptoIcons/${_tokenA?.symbol.toLowerCase()}.svg`,
+            name: _tokenA?.symbol ?? "",
+            icon: _tokenA?.symbol
+              ? `/cryptoIcons/${_tokenA.symbol.toLowerCase()}.svg`
+              : "",
             usdValue: priceA,
             amount:
               Number(pairInfo.result.asset_a.amount) /
-              10 ** Number(_tokenA?.decimals),
+              10 ** Number(_tokenA?.decimals ?? 7),
             category: "phoenix",
+            contractId: _tokenA?.contractId ?? "",
           },
           {
-            name: _tokenB?.symbol!,
-            icon: `/cryptoIcons/${_tokenB?.symbol.toLowerCase()}.svg`,
+            name: _tokenB?.symbol ?? "",
+            icon: _tokenB?.symbol
+              ? `/cryptoIcons/${_tokenB.symbol.toLowerCase()}.svg`
+              : "",
             usdValue: priceB,
             amount:
               Number(pairInfo.result.asset_b.amount) /
-              10 ** Number(_tokenB?.decimals),
+              10 ** Number(_tokenB?.decimals ?? 7),
             category: "phoenix",
+            contractId: _tokenB?.contractId ?? "",
           },
         ];
 
@@ -259,8 +266,8 @@ class PhoenixXlmPhoStrategy implements Strategy {
           async (reward: any) => {
             const token = await store.fetchTokenInfo(reward.reward_address);
             return {
-              name: token?.symbol.toUpperCase(),
-              icon: `/cryptoIcons/${token?.symbol.toLowerCase()}.svg`,
+              name: token?.symbol!.toUpperCase(),
+              icon: `/cryptoIcons/${token?.symbol!.toLowerCase()}.svg`,
               usdValue: await API.getPrice(token?.symbol || ""),
               amount:
                 Number(reward.reward_amount.toString()) /

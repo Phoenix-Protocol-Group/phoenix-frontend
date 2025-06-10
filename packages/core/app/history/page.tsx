@@ -39,7 +39,6 @@ export default function Page() {
     users24h: "0",
     totalUsers: "0",
     totalTrades: "0",
-    mostTradedAsset: {} as Token,
   });
   const [data, setData] = useState<{ timestamp: string; volume: number }[]>([]);
   const [totalVolume, setTotalVolume] = useState(0);
@@ -313,16 +312,11 @@ export default function Page() {
     const _totalUsers = await tradeApi.getTotalUsers();
     const _mostResult = (await tradeApi.getMostTraded()).asset;
     const _mostTradedAsset = await appStore.fetchTokenInfo(_mostResult);
-    const mostTradedAsset = {
-      ..._mostTradedAsset,
-      icon: `/cryptoIcons/${_mostTradedAsset?.symbol.toLowerCase()}.svg`,
-      name: _mostTradedAsset?.symbol,
-    };
+
     setMeta({
       totalTrades,
       users24h: _totalUsers.usersLast24h,
       totalUsers: _totalUsers.totalUsers,
-      mostTradedAsset: mostTradedAsset as Token,
     });
   };
 
@@ -337,11 +331,11 @@ export default function Page() {
             contractAddress: ticker.pool_id,
             tokenA: {
               ...tokenA,
-              icon: `/cryptoIcons/${tokenA?.symbol.toLowerCase()}.svg`,
+              icon: `/cryptoIcons/${tokenA?.symbol!.toLowerCase()}.svg`,
             },
             tokenB: {
               ...tokenB,
-              icon: `/cryptoIcons/${tokenB?.symbol.toLowerCase()}.svg`,
+              icon: `/cryptoIcons/${tokenB?.symbol!.toLowerCase()}.svg`,
             },
           };
         })

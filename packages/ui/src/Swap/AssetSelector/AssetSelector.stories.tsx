@@ -1,7 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { AssetSelector } from "./AssetSelector";
-import { Token } from "@phoenix-protocol/types"
+import { Token } from "@phoenix-protocol/types";
 
 const testTokens: Token[] = [
   {
@@ -10,6 +10,7 @@ const testTokens: Token[] = [
     amount: 100,
     category: "Stable",
     usdValue: 1 * 100,
+    contractId: "",
   },
   {
     name: "USDC",
@@ -17,6 +18,7 @@ const testTokens: Token[] = [
     amount: 50,
     category: "Stable",
     usdValue: 1 * 50,
+    contractId: "",
   },
   {
     name: "DAI",
@@ -24,6 +26,7 @@ const testTokens: Token[] = [
     amount: 25,
     category: "Stable",
     usdValue: 1 * 25,
+    contractId: "",
   },
   {
     name: "XLM",
@@ -31,6 +34,7 @@ const testTokens: Token[] = [
     amount: 200,
     category: "Non-Stable",
     usdValue: 0.85 * 200,
+    contractId: "",
   },
   {
     name: "BTC",
@@ -38,6 +42,7 @@ const testTokens: Token[] = [
     amount: 0.5,
     category: "Non-Stable",
     usdValue: 30000 * 0.5,
+    contractId: "",
   },
 ];
 

@@ -73,7 +73,7 @@ interface _Token extends Token {
 export default function Page(props: PoolPageProps) {
   const params = use(props.params);
   // Load App Store
-  const store = useAppStore();
+  const appStore = useAppStore();
   const storePersist = usePersistStore();
 
   const { executeContractTransaction } = useContractTransaction();
@@ -127,7 +127,7 @@ export default function Page(props: PoolPageProps) {
     [params.poolAddress]
   );
 
-  const appStore = useAppStore();
+  // Remove duplicate appStore declaration - already declared above
 
   const loadRewards = useCallback(
     async (stakeContract = StakeContract) => {
@@ -139,13 +139,14 @@ export default function Page(props: PoolPageProps) {
 
         const __rewards = _rewards?.result.rewards?.map(async (reward: any) => {
           // Get the token
-          const token = await store.fetchTokenInfo(reward.reward_address);
+          const token = await appStore.fetchTokenInfo(reward.reward_address);
           return {
-            name: token?.symbol.toUpperCase(),
-            icon: `/cryptoIcons/${token?.symbol.toLowerCase()}.svg`,
+            name: token?.symbol?.toUpperCase() || "",
+            icon: `/cryptoIcons/${(token?.symbol || "").toLowerCase()}.svg`,
             usdValue: "0",
             amount:
-              Number(reward.reward_amount.toString()) / 10 ** token?.decimals!,
+              Number(reward.reward_amount.toString()) /
+              10 ** (token?.decimals || 7),
             category: "",
           };
         });
@@ -156,7 +157,7 @@ export default function Page(props: PoolPageProps) {
         console.log(e);
       }
     },
-    [StakeContract, store, storePersist.wallet.address]
+    [StakeContract, appStore, storePersist.wallet.address]
   );
 
   const fetchStakes = useCallback(
@@ -442,9 +443,9 @@ export default function Page(props: PoolPageProps) {
         // Fetch token infos from chain and save in global appstore
         const [_tokenA, _tokenB, _lpToken, stakeContractAddress] =
           await Promise.all([
-            store.fetchTokenInfo(pairConfig.result.token_a),
-            store.fetchTokenInfo(pairConfig.result.token_b),
-            store.fetchTokenInfo(pairConfig.result.share_token, true),
+            appStore.fetchTokenInfo(pairConfig.result.token_a),
+            appStore.fetchTokenInfo(pairConfig.result.token_b),
+            appStore.fetchTokenInfo(pairConfig.result.share_token, true),
             new PhoenixStakeContract.Client({
               contractId: pairConfig.result.stake_contract.toString(),
               networkPassphrase: constants.NETWORK_PASSPHRASE,
@@ -472,19 +473,21 @@ export default function Page(props: PoolPageProps) {
         // Set token states
         setTokenA({
           name: _tokenA?.symbol as string,
-          icon: `/cryptoIcons/${_tokenA?.symbol.toLowerCase()}.svg`,
+          icon: `/cryptoIcons/${(_tokenA?.symbol || "").toLowerCase()}.svg`,
           usdValue: Number(priceA),
           amount: Number(_tokenA?.balance) / 10 ** Number(_tokenA?.decimals),
           category: "none",
           decimals: Number(_tokenA?.decimals),
+          contractId: _tokenA?.contractId as string,
         });
         setTokenB({
           name: _tokenB?.symbol as string,
-          icon: `/cryptoIcons/${_tokenB?.symbol.toLowerCase()}.svg`,
+          icon: `/cryptoIcons/${(_tokenB?.symbol || "").toLowerCase()}.svg`,
           usdValue: Number(priceB),
           amount: Number(_tokenB?.balance) / 10 ** Number(_tokenB?.decimals),
           category: "none",
           decimals: Number(_tokenB?.decimals),
+          contractId: _tokenB?.contractId as string,
         });
         setLpToken({
           name: _lpToken?.symbol as string,
@@ -493,6 +496,7 @@ export default function Page(props: PoolPageProps) {
           amount: Number(_lpToken?.balance) / 10 ** Number(_lpToken?.decimals),
           category: "none",
           decimals: Number(_lpToken?.decimals),
+          contractId: _lpToken?.contractId as string,
         });
         setAssetLpShare(
           Number(pairInfo.result.asset_lp_share.amount) /

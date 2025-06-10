@@ -33,6 +33,7 @@ class PhoenixXlmUsdcStrategy implements Strategy {
       amount: 0,
       category: "phoenix",
       usdValue: 0,
+      contractId: "", // TODO: Set the actual PHO contractId if available
     },
     unbondTime: 0,
     category: "liquidity",
@@ -178,22 +179,38 @@ class PhoenixXlmUsdcStrategy implements Strategy {
         // Set assets in metadata
         this.metadata.assets = [
           {
-            name: _tokenA?.symbol!,
-            icon: `/cryptoIcons/${_tokenA?.symbol.toLowerCase()}.svg`,
+            name: _tokenA?.symbol ?? "",
+            icon: _tokenA?.symbol
+              ? `/cryptoIcons/${_tokenA.symbol.toLowerCase()}.svg`
+              : "",
             usdValue: priceA,
             amount:
               Number(pairInfo.result.asset_a.amount) /
-              10 ** Number(_tokenA?.decimals),
+              10 ** Number(_tokenA?.decimals ?? 7),
             category: "phoenix",
+            contractId: _tokenA?.contractId ?? "",
+            id: _tokenA?.id,
+            symbol: _tokenA?.symbol,
+            decimals: _tokenA?.decimals,
+            balance: _tokenA?.balance,
+            isStakingToken: _tokenA?.isStakingToken,
           },
           {
-            name: _tokenB?.symbol!,
-            icon: `/cryptoIcons/${_tokenB?.symbol.toLowerCase()}.svg`,
+            name: _tokenB?.symbol ?? "",
+            icon: _tokenB?.symbol
+              ? `/cryptoIcons/${_tokenB.symbol.toLowerCase()}.svg`
+              : "",
             usdValue: priceB,
             amount:
               Number(pairInfo.result.asset_b.amount) /
-              10 ** Number(_tokenB?.decimals),
+              10 ** Number(_tokenB?.decimals ?? 7),
             category: "phoenix",
+            contractId: _tokenB?.contractId ?? "",
+            id: _tokenB?.id,
+            symbol: _tokenB?.symbol,
+            decimals: _tokenB?.decimals,
+            balance: _tokenB?.balance,
+            isStakingToken: _tokenB?.isStakingToken,
           },
         ];
 
@@ -259,8 +276,8 @@ class PhoenixXlmUsdcStrategy implements Strategy {
           async (reward: any) => {
             const token = await store.fetchTokenInfo(reward.reward_address);
             return {
-              name: token?.symbol.toUpperCase(),
-              icon: `/cryptoIcons/${token?.symbol.toLowerCase()}.svg`,
+              name: token?.symbol!.toUpperCase(),
+              icon: `/cryptoIcons/${token?.symbol!.toLowerCase()}.svg`,
               usdValue: await API.getPrice(token?.symbol || ""),
               amount:
                 Number(reward.reward_amount.toString()) /

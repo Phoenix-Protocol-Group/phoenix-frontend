@@ -40,7 +40,7 @@ import {
   WalletConnect,
 } from "@phoenix-protocol/utils";
 import { LoadingSwap, SwapError, SwapSuccess } from "@/components/Modal/Modal";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import ClientOnly from "@/providers/ClientOnlyProvider";
 
 /**
@@ -62,7 +62,6 @@ export default function SwapPage(): JSX.Element {
   const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
   const [errorDescription, setErrorDescription] = useState<string>("");
   const [tokenAmounts, setTokenAmounts] = useState<number[]>([0, 0]);
-  const [tokens, setTokens] = useState<Token[]>([]);
   const [fromToken, setFromToken] = useState<Token | undefined>(undefined);
   const [toToken, setToToken] = useState<Token | undefined>(undefined);
   const [maxSpread, setMaxSpread] = useState<number>(1);
@@ -297,32 +296,12 @@ export default function SwapPage(): JSX.Element {
         if (toToken && token.name === toToken.name) {
           setToToken(fromToken);
         }
-
-        // Update the tokens list, maintaining the current toToken
-        setTokens((prevTokens) => {
-          const filteredTokens = prevTokens.filter(
-            (t) =>
-              t.name !== token.name && (!toToken || t.name !== toToken.name)
-          );
-          // Add fromToken back to the list if it exists
-          return fromToken ? [...filteredTokens, fromToken] : filteredTokens;
-        });
       } else {
         setToToken(token);
         // If the selected token was the fromToken, swap them
         if (fromToken && token.name === fromToken.name) {
           setFromToken(toToken);
         }
-
-        // Update the tokens list, maintaining the current fromToken
-        setTokens((prevTokens) => {
-          const filteredTokens = prevTokens.filter(
-            (t) =>
-              t.name !== token.name && (!fromToken || t.name !== fromToken.name)
-          );
-          // Add toToken back to the list if it exists
-          return toToken ? [...filteredTokens, toToken] : filteredTokens;
-        });
       }
       setAssetSelectorOpen(false);
       // Reset simulation flags when token changes
@@ -372,39 +351,27 @@ export default function SwapPage(): JSX.Element {
     }
   }, [appStore]);
 
-  // Effect hook to fetch all tokens once the component mounts - with better controls
+  // Effect hook to fetch all tokens once the component mounts
   useEffect(() => {
-    if (!isClient || hasTokensLoaded.current) return;
+    if (!isClient) return;
 
     const getAllTokens = async () => {
-      // Avoid multiple loads
-      tokenLoadCount.current += 1;
-      if (tokenLoadCount.current > 1) return;
-
-      if (appStore.allTokens.length > 0) {
-        // Avoid fetching if we already have tokens
-        setIsLoading(false);
-        setTokens(appStore.allTokens.slice(2));
-        setFromToken(appStore.allTokens[0]);
-        setToToken(appStore.allTokens[1]);
-        hasTokensLoaded.current = true;
-        appStore.setLoading(false);
-
-        // Still load pools in the background
-        setTimeout(() => {
-          loadPoolsData();
-        }, 500);
-
+      // Skip if we already have tokens set
+      if (fromToken && toToken) {
         return;
       }
 
       setIsLoading(true);
-      try {
-        // Load tokens first
-        const allTokens = await appStore.getAllTokens();
 
-        if (allTokens?.length > 1) {
-          setTokens(allTokens.slice(2));
+      try {
+        // Always try to fetch tokens if we don't have enough
+        if (appStore.tokens.length < 2) {
+          await appStore.getAllTokens();
+        }
+
+        const allTokens = appStore.tokens;
+
+        if (allTokens?.length >= 2) {
           setFromToken(allTokens[0]);
           setToToken(allTokens[1]);
           hasTokensLoaded.current = true;
@@ -425,13 +392,47 @@ export default function SwapPage(): JSX.Element {
     getAllTokens();
   }, [appStore, loadPoolsData, isClient]);
 
+  // Separate effect to set tokens if they're already available in the store
+  useEffect(() => {
+    if (!isClient || !appStore.tokens.length || fromToken || toToken) return;
+
+    if (appStore.tokens.length >= 2) {
+      setFromToken(appStore.tokens[0]);
+      setToToken(appStore.tokens[1]);
+    }
+  }, [isClient, appStore.tokens.length]);
+
+  // Get fresh token data from store whenever tokens change
+  const currentFromToken = useMemo(() => {
+    if (!fromToken || !appStore.tokens.length) return fromToken;
+
+    const updatedToken = appStore.tokens.find(
+      (token: Token) =>
+        token.contractId === fromToken.contractId ||
+        token.name === fromToken.name
+    );
+
+    return updatedToken || fromToken;
+  }, [fromToken, appStore.tokens]);
+
+  const currentToToken = useMemo(() => {
+    if (!toToken || !appStore.tokens.length) return toToken;
+
+    const updatedToken = appStore.tokens.find(
+      (token: Token) =>
+        token.contractId === toToken.contractId || token.name === toToken.name
+    );
+
+    return updatedToken || toToken;
+  }, [toToken, appStore.tokens]);
+
   // Update operations when tokens change with stricter control to prevent infinite loops
   const updateSwapOperations = useCallback(() => {
     // Only run this once per token pair change
     if (
       !fromToken ||
       !toToken ||
-      !appStore.allTokens.length ||
+      !appStore.tokens.length ||
       !allPools.length ||
       fromToken.name === toToken.name
     ) {
@@ -447,11 +448,11 @@ export default function SwapPage(): JSX.Element {
     }
 
     // Find token contract IDs
-    const fromTokenContractID = appStore.allTokens.find(
+    const fromTokenContractID = appStore.tokens.find(
       (token: Token) => token.name === fromToken.name
     )?.contractId;
 
-    const toTokenContractID = appStore.allTokens.find(
+    const toTokenContractID = appStore.tokens.find(
       (token: Token) => token.name === toToken.name
     )?.contractId;
 
@@ -470,7 +471,7 @@ export default function SwapPage(): JSX.Element {
     const _swapRoute = _operations
       .map(
         (op) =>
-          appStore.allTokens.find(
+          appStore.tokens.find(
             (token: any) => token.contractId === op.ask_asset
           )?.name
       )
@@ -499,7 +500,7 @@ export default function SwapPage(): JSX.Element {
     allPools,
     fromToken,
     toToken,
-    appStore.allTokens,
+    appStore.tokens,
     storePersist.wallet.address,
     handleTrustLine,
   ]);
@@ -647,8 +648,8 @@ export default function SwapPage(): JSX.Element {
       },
       fromTokenValue: tokenAmounts[0].toString()!,
       toTokenValue: tokenAmounts[1].toString()!,
-      fromToken: fromToken!,
-      toToken: toToken!,
+      fromToken: currentFromToken!,
+      toToken: currentToToken!,
       onTokenSelectorClick: handleSelectorOpen,
       onSwapButtonClick: doSwap,
       onInputChange: (isFrom: boolean, value: string) => {
@@ -683,8 +684,8 @@ export default function SwapPage(): JSX.Element {
     }),
     [
       tokenAmounts,
-      fromToken,
-      toToken,
+      currentFromToken,
+      currentToToken,
       exchangeRate,
       networkFee,
       swapRoute,
@@ -699,6 +700,8 @@ export default function SwapPage(): JSX.Element {
       doSwap,
       handleSelectorOpen,
       addTrustLine,
+      fromToken,
+      toToken,
     ]
   );
 
@@ -708,7 +711,6 @@ export default function SwapPage(): JSX.Element {
       {isClient && (
         <input type="hidden" value="Phoenix DeFi Hub - Swap your tokens" />
       )}
-
       {isLoading || !isClient ? (
         <Box
           sx={{
@@ -736,16 +738,48 @@ export default function SwapPage(): JSX.Element {
           }}
         >
           <Box sx={{ width: "100%", maxWidth: "600px" }}>
-            {!optionsOpen && !assetSelectorOpen && fromToken && toToken && (
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-              >
-                <SwapContainer {...swapContainerProps} />
-              </motion.div>
-            )}
+            {!optionsOpen &&
+              !assetSelectorOpen &&
+              currentFromToken &&
+              currentToToken && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                >
+                  <SwapContainer {...swapContainerProps} />
+                </motion.div>
+              )}
+
+            {/* Show message when tokens aren't loaded */}
+            {!optionsOpen &&
+              !assetSelectorOpen &&
+              (!currentFromToken || !currentToToken) &&
+              !isLoading && (
+                <Box
+                  sx={{
+                    p: 4,
+                    textAlign: "center",
+                    color: "white",
+                    border: "1px solid #404040",
+                    borderRadius: 2,
+                    background: "#171717",
+                  }}
+                >
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    Loading tokens...
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: "#A3A3A3" }}>
+                    {!currentFromToken && "From token not loaded"}
+                    {!currentFromToken && !currentToToken && " | "}
+                    {!currentToToken && "To token not loaded"}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: "#A3A3A3", mt: 1 }}>
+                    Available tokens: {appStore.tokens.length}
+                  </Typography>
+                </Box>
+              )}
             {optionsOpen && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -768,10 +802,14 @@ export default function SwapPage(): JSX.Element {
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
               >
-                {tokens.length > 0 ? (
+                {appStore.tokens.length > 0 ? (
                   <AssetSelector
-                    tokens={tokens}
-                    tokensAll={tokens}
+                    tokens={appStore.tokens.filter(
+                      (token) =>
+                        token.name !== currentFromToken?.name &&
+                        token.name !== currentToToken?.name
+                    )}
+                    tokensAll={appStore.tokens}
                     onClose={() => setAssetSelectorOpen(false)}
                     onTokenClick={handleTokenClick}
                   />

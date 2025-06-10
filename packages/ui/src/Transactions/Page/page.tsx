@@ -48,6 +48,7 @@ const cardArgs = {
     amount: 100,
     category: "Stable",
     usdValue: 1 * 100,
+    contractId: "usdt-token",
   },
 };
 
