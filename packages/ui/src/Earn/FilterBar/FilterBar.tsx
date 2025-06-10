@@ -11,6 +11,7 @@ import {
   useMediaQuery,
   useTheme,
   SelectChangeEvent,
+  FormControl,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -19,6 +20,7 @@ import {
   typography,
   spacing,
   borderRadius,
+  cardStyles,
 } from "../../Theme/styleConstants";
 
 interface FilterBarProps {
@@ -59,9 +61,9 @@ export const FilterBar = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
     >
       <Box
         sx={{
@@ -69,14 +71,12 @@ export const FilterBar = ({
           flexDirection: isMobile ? "column" : "row",
           alignItems: isMobile ? "stretch" : "center",
           gap: spacing.md,
-          mb: 3,
-          padding: spacing.lg,
-          borderRadius: "16px",
-          background:
-            "linear-gradient(135deg, rgba(15, 15, 15, 0.8) 0%, rgba(25, 25, 25, 0.8) 100%)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(249, 115, 22, 0.1)",
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+          p: spacing.lg,
+          borderRadius: borderRadius.lg,
+          background: `linear-gradient(135deg, ${colors.neutral[800]}30 0%, ${colors.neutral[900]}50 100%)`,
+          backdropFilter: "blur(10px)",
+          border: `1px solid ${colors.neutral[700]}`,
+          boxShadow: `0 4px 12px rgba(0, 0, 0, 0.15)`,
           position: "relative",
           overflow: "hidden",
           "&::before": {
@@ -85,11 +85,15 @@ export const FilterBar = ({
             top: 0,
             left: 0,
             right: 0,
-            bottom: 0,
-            background:
-              "linear-gradient(135deg, rgba(249, 115, 22, 0.02) 0%, rgba(251, 146, 60, 0.02) 50%, rgba(249, 115, 22, 0.02) 100%)",
-            zIndex: 0,
+            height: "1px",
+            background: `linear-gradient(90deg, transparent, ${colors.primary.main}40, transparent)`,
+            zIndex: 1,
           },
+          "&:hover": {
+            border: `1px solid ${colors.primary.main}30`,
+            boxShadow: `0 6px 20px rgba(0, 0, 0, 0.2)`,
+          },
+          transition: "all 0.2s ease",
         }}
       >
         {/* Assets Filter */}
@@ -99,50 +103,46 @@ export const FilterBar = ({
             gap: spacing.xs,
             flexShrink: 0,
             position: "relative",
-            zIndex: 1,
+            zIndex: 2,
+            background: `linear-gradient(135deg, ${colors.neutral[800]}40 0%, ${colors.neutral[900]}60 100%)`,
+            borderRadius: borderRadius.md,
+            p: spacing.xs,
+            border: `1px solid ${colors.neutral[700]}`,
           }}
         >
           <Button
             variant="text"
             onClick={() => onAssetsFilterChange("Your assets")}
             sx={{
-              color: assetsFilter === "Your assets" ? "#FAFAFA" : "#A3A3A3",
-              fontWeight: assetsFilter === "Your assets" ? 600 : 400,
-              fontSize: "14px",
+              color:
+                assetsFilter === "Your assets"
+                  ? colors.neutral[50]
+                  : colors.neutral[400],
+              fontWeight:
+                assetsFilter === "Your assets"
+                  ? typography.fontWeights.semiBold
+                  : typography.fontWeights.medium,
+              fontSize: typography.fontSize.sm,
+              fontFamily: typography.fontFamily,
               textTransform: "none",
-              p: spacing.sm,
+              px: spacing.md,
+              py: spacing.sm,
               minWidth: "auto",
-              borderRadius: "8px",
-              position: "relative",
+              borderRadius: borderRadius.sm,
               background:
                 assetsFilter === "Your assets"
-                  ? "linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(251, 146, 60, 0.1) 100%)"
+                  ? `linear-gradient(135deg, ${colors.primary.main}20 0%, ${colors.primary.main}10 100%)`
                   : "transparent",
               border:
                 assetsFilter === "Your assets"
-                  ? "1px solid rgba(249, 115, 22, 0.3)"
+                  ? `1px solid ${colors.primary.main}40`
                   : "1px solid transparent",
-              transition: "all 0.3s ease",
+              transition: "all 0.2s ease",
               "&:hover": {
-                backgroundColor: "rgba(249, 115, 22, 0.1)",
-                color: "#FAFAFA",
+                background: `linear-gradient(135deg, ${colors.primary.main}15 0%, ${colors.primary.main}08 100%)`,
+                color: colors.neutral[50],
                 transform: "translateY(-1px)",
               },
-              "&::after":
-                assetsFilter === "Your assets"
-                  ? {
-                      content: '""',
-                      position: "absolute",
-                      bottom: 0,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      width: "70%",
-                      height: "2px",
-                      background:
-                        "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
-                      borderRadius: "1px",
-                    }
-                  : {},
             }}
           >
             Your assets
@@ -151,43 +151,35 @@ export const FilterBar = ({
             variant="text"
             onClick={() => onAssetsFilterChange("All Assets")}
             sx={{
-              color: assetsFilter === "All Assets" ? "#FAFAFA" : "#A3A3A3",
-              fontWeight: assetsFilter === "All Assets" ? 600 : 400,
-              fontSize: "14px",
+              color:
+                assetsFilter === "All Assets"
+                  ? colors.neutral[50]
+                  : colors.neutral[400],
+              fontWeight:
+                assetsFilter === "All Assets"
+                  ? typography.fontWeights.semiBold
+                  : typography.fontWeights.medium,
+              fontSize: typography.fontSize.sm,
+              fontFamily: typography.fontFamily,
               textTransform: "none",
-              p: spacing.sm,
+              px: spacing.md,
+              py: spacing.sm,
               minWidth: "auto",
-              borderRadius: "8px",
-              position: "relative",
+              borderRadius: borderRadius.sm,
               background:
                 assetsFilter === "All Assets"
-                  ? "linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(251, 146, 60, 0.1) 100%)"
+                  ? `linear-gradient(135deg, ${colors.primary.main}20 0%, ${colors.primary.main}10 100%)`
                   : "transparent",
               border:
                 assetsFilter === "All Assets"
-                  ? "1px solid rgba(249, 115, 22, 0.3)"
+                  ? `1px solid ${colors.primary.main}40`
                   : "1px solid transparent",
-              transition: "all 0.3s ease",
+              transition: "all 0.2s ease",
               "&:hover": {
-                backgroundColor: "rgba(249, 115, 22, 0.1)",
-                color: "#FAFAFA",
+                background: `linear-gradient(135deg, ${colors.primary.main}15 0%, ${colors.primary.main}08 100%)`,
+                color: colors.neutral[50],
                 transform: "translateY(-1px)",
               },
-              "&::after":
-                assetsFilter === "All Assets"
-                  ? {
-                      content: '""',
-                      position: "absolute",
-                      bottom: 0,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      width: "70%",
-                      height: "2px",
-                      background:
-                        "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
-                      borderRadius: "1px",
-                    }
-                  : {},
             }}
           >
             All assets
@@ -195,20 +187,21 @@ export const FilterBar = ({
         </Box>
 
         {/* Type Filter */}
-        <Box
+        <FormControl
           sx={{
             minWidth: 120,
             flexGrow: isMobile ? 1 : 0,
             position: "relative",
-            zIndex: 1,
+            zIndex: 2,
           }}
         >
           <Typography
             sx={{
-              color: "#D4D4D4",
-              fontSize: "12px",
-              fontWeight: 500,
-              mb: 0.5,
+              color: colors.neutral[300],
+              fontSize: typography.fontSize.xs,
+              fontWeight: typography.fontWeights.semiBold,
+              fontFamily: typography.fontFamily,
+              mb: spacing.xs,
               textTransform: "uppercase",
               letterSpacing: "0.5px",
             }}
@@ -222,47 +215,59 @@ export const FilterBar = ({
             }
             size="small"
             sx={{
-              color: "#FAFAFA",
-              fontSize: "14px",
-              borderRadius: "10px",
-              background: "rgba(255, 255, 255, 0.05)",
+              height: "40px",
+              borderRadius: borderRadius.md,
+              background: `linear-gradient(135deg, ${colors.neutral[800]}60 0%, ${colors.neutral[900]}80 100%)`,
               backdropFilter: "blur(10px)",
-              ".MuiOutlinedInput-notchedOutline": {
-                borderColor: "rgba(249, 115, 22, 0.2)",
-                borderWidth: "1px",
+              border: `1px solid ${colors.neutral[600]}`,
+              color: colors.neutral[50],
+              fontSize: typography.fontSize.sm,
+              fontFamily: typography.fontFamily,
+              "& .MuiSelect-select": {
+                padding: "8px 12px",
+                height: "40px",
+                display: "flex",
+                alignItems: "center",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "transparent",
               },
               "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: "rgba(249, 115, 22, 0.4)",
+                borderColor: colors.primary.main,
               },
               "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "rgba(249, 115, 22, 0.6)",
+                borderColor: colors.primary.main,
+                boxShadow: `0 0 0 2px ${colors.primary.main}20`,
               },
-              ".MuiSvgIcon-root": {
-                color: "#F97316",
+              "& .MuiSelect-icon": {
+                color: colors.neutral[400],
               },
-              minWidth: "100px",
-              maxWidth: "150px",
-              transition: "all 0.3s ease",
+              transition: "all 0.2s ease",
               "&:hover": {
                 transform: "translateY(-1px)",
-                background: "rgba(249, 115, 22, 0.05)",
+                boxShadow: `0 4px 12px rgba(0, 0, 0, 0.2)`,
               },
             }}
             MenuProps={{
               PaperProps: {
                 sx: {
-                  background:
-                    "linear-gradient(135deg, rgba(15, 15, 15, 0.95) 0%, rgba(25, 25, 25, 0.95) 100%)",
+                  background: `linear-gradient(135deg, ${colors.neutral[800]} 0%, ${colors.neutral[900]} 100%)`,
                   backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(249, 115, 22, 0.2)",
-                  borderRadius: "10px",
+                  border: `1px solid ${colors.neutral[700]}`,
+                  borderRadius: borderRadius.md,
+                  boxShadow: `0 8px 32px rgba(0, 0, 0, 0.3)`,
                   "& .MuiMenuItem-root": {
-                    color: "#FAFAFA",
+                    color: colors.neutral[50],
+                    fontSize: typography.fontSize.sm,
+                    fontFamily: typography.fontFamily,
                     "&:hover": {
-                      background: "rgba(249, 115, 22, 0.1)",
+                      background: `linear-gradient(135deg, ${colors.primary.main}15 0%, ${colors.primary.main}08 100%)`,
                     },
                     "&.Mui-selected": {
-                      background: "rgba(249, 115, 22, 0.2)",
+                      background: `linear-gradient(135deg, ${colors.primary.main}20 0%, ${colors.primary.main}10 100%)`,
+                      "&:hover": {
+                        background: `linear-gradient(135deg, ${colors.primary.main}25 0%, ${colors.primary.main}15 100%)`,
+                      },
                     },
                   },
                 },
@@ -275,23 +280,24 @@ export const FilterBar = ({
               </MenuItem>
             ))}
           </Select>
-        </Box>
+        </FormControl>
 
         {/* Platform Filter */}
-        <Box
+        <FormControl
           sx={{
             minWidth: 120,
             flexGrow: isMobile ? 1 : 0,
             position: "relative",
-            zIndex: 1,
+            zIndex: 2,
           }}
         >
           <Typography
             sx={{
-              color: "#D4D4D4",
-              fontSize: "12px",
-              fontWeight: 500,
-              mb: 0.5,
+              color: colors.neutral[300],
+              fontSize: typography.fontSize.xs,
+              fontWeight: typography.fontWeights.semiBold,
+              fontFamily: typography.fontFamily,
+              mb: spacing.xs,
               textTransform: "uppercase",
               letterSpacing: "0.5px",
             }}
@@ -305,47 +311,59 @@ export const FilterBar = ({
             }
             size="small"
             sx={{
-              color: "#FAFAFA",
-              fontSize: "14px",
-              borderRadius: "10px",
-              background: "rgba(255, 255, 255, 0.05)",
+              height: "40px",
+              borderRadius: borderRadius.md,
+              background: `linear-gradient(135deg, ${colors.neutral[800]}60 0%, ${colors.neutral[900]}80 100%)`,
               backdropFilter: "blur(10px)",
-              ".MuiOutlinedInput-notchedOutline": {
-                borderColor: "rgba(249, 115, 22, 0.2)",
-                borderWidth: "1px",
+              border: `1px solid ${colors.neutral[600]}`,
+              color: colors.neutral[50],
+              fontSize: typography.fontSize.sm,
+              fontFamily: typography.fontFamily,
+              "& .MuiSelect-select": {
+                padding: "8px 12px",
+                height: "40px",
+                display: "flex",
+                alignItems: "center",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "transparent",
               },
               "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: "rgba(249, 115, 22, 0.4)",
+                borderColor: colors.primary.main,
               },
               "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "rgba(249, 115, 22, 0.6)",
+                borderColor: colors.primary.main,
+                boxShadow: `0 0 0 2px ${colors.primary.main}20`,
               },
-              ".MuiSvgIcon-root": {
-                color: "#F97316",
+              "& .MuiSelect-icon": {
+                color: colors.neutral[400],
               },
-              minWidth: "100px",
-              maxWidth: "150px",
-              transition: "all 0.3s ease",
+              transition: "all 0.2s ease",
               "&:hover": {
                 transform: "translateY(-1px)",
-                background: "rgba(249, 115, 22, 0.05)",
+                boxShadow: `0 4px 12px rgba(0, 0, 0, 0.2)`,
               },
             }}
             MenuProps={{
               PaperProps: {
                 sx: {
-                  background:
-                    "linear-gradient(135deg, rgba(15, 15, 15, 0.95) 0%, rgba(25, 25, 25, 0.95) 100%)",
+                  background: `linear-gradient(135deg, ${colors.neutral[800]} 0%, ${colors.neutral[900]} 100%)`,
                   backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(249, 115, 22, 0.2)",
-                  borderRadius: "10px",
+                  border: `1px solid ${colors.neutral[700]}`,
+                  borderRadius: borderRadius.md,
+                  boxShadow: `0 8px 32px rgba(0, 0, 0, 0.3)`,
                   "& .MuiMenuItem-root": {
-                    color: "#FAFAFA",
+                    color: colors.neutral[50],
+                    fontSize: typography.fontSize.sm,
+                    fontFamily: typography.fontFamily,
                     "&:hover": {
-                      background: "rgba(249, 115, 22, 0.1)",
+                      background: `linear-gradient(135deg, ${colors.primary.main}15 0%, ${colors.primary.main}08 100%)`,
                     },
                     "&.Mui-selected": {
-                      background: "rgba(249, 115, 22, 0.2)",
+                      background: `linear-gradient(135deg, ${colors.primary.main}20 0%, ${colors.primary.main}10 100%)`,
+                      "&:hover": {
+                        background: `linear-gradient(135deg, ${colors.primary.main}25 0%, ${colors.primary.main}15 100%)`,
+                      },
                     },
                   },
                 },
@@ -358,17 +376,21 @@ export const FilterBar = ({
               </MenuItem>
             ))}
           </Select>
-        </Box>
+        </FormControl>
 
         {/* Instant Unbond Toggle */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            marginLeft: "auto",
-            gap: 0.5,
+            marginLeft: isMobile ? 0 : "auto",
+            gap: spacing.xs,
             position: "relative",
-            zIndex: 1,
+            zIndex: 2,
+            p: spacing.sm,
+            borderRadius: borderRadius.md,
+            background: `linear-gradient(135deg, ${colors.neutral[800]}30 0%, ${colors.neutral[900]}50 100%)`,
+            border: `1px solid ${colors.neutral[700]}`,
           }}
         >
           <FormControlLabel
@@ -378,19 +400,19 @@ export const FilterBar = ({
                 onChange={handleToggleChange}
                 sx={{
                   "& .MuiSwitch-switchBase.Mui-checked": {
-                    color: "#F97316",
+                    color: colors.primary.main,
                     "&:hover": {
-                      backgroundColor: "rgba(249, 115, 22, 0.08)",
+                      backgroundColor: `${colors.primary.main}08`,
                     },
                   },
                   "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                    backgroundColor: "rgba(249, 115, 22, 0.6)",
+                    backgroundColor: `${colors.primary.main}60`,
                   },
                   "& .MuiSwitch-track": {
-                    backgroundColor: "rgba(115, 115, 115, 0.4)",
+                    backgroundColor: colors.neutral[600],
                   },
                   "& .MuiSwitch-thumb": {
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+                    boxShadow: `0 2px 4px rgba(0, 0, 0, 0.2)`,
                   },
                 }}
               />
@@ -398,9 +420,10 @@ export const FilterBar = ({
             label={
               <Typography
                 sx={{
-                  color: "#FAFAFA",
-                  fontSize: "14px",
-                  fontWeight: 500,
+                  color: colors.neutral[50],
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeights.medium,
+                  fontFamily: typography.fontFamily,
                 }}
               >
                 Instant unbond only
@@ -415,15 +438,17 @@ export const FilterBar = ({
             PopperProps={{
               sx: {
                 "& .MuiTooltip-tooltip": {
-                  backgroundColor: "rgba(15, 15, 15, 0.95)",
-                  border: "1px solid rgba(249, 115, 22, 0.2)",
-                  borderRadius: "8px",
+                  backgroundColor: colors.neutral[800],
+                  border: `1px solid ${colors.neutral[700]}`,
+                  borderRadius: borderRadius.sm,
                   backdropFilter: "blur(10px)",
+                  fontSize: typography.fontSize.xs,
+                  fontFamily: typography.fontFamily,
                 },
                 "& .MuiTooltip-arrow": {
-                  color: "rgba(15, 15, 15, 0.95)",
+                  color: colors.neutral[800],
                   "&::before": {
-                    border: "1px solid rgba(249, 115, 22, 0.2)",
+                    border: `1px solid ${colors.neutral[700]}`,
                   },
                 },
               },
@@ -431,12 +456,12 @@ export const FilterBar = ({
           >
             <InfoOutlinedIcon
               sx={{
-                color: "#F97316",
+                color: colors.primary.main,
                 fontSize: "18px",
                 cursor: "help",
-                transition: "all 0.3s ease",
+                transition: "all 0.2s ease",
                 "&:hover": {
-                  color: "#FB923C",
+                  color: colors.primary.light,
                   transform: "scale(1.1)",
                 },
               }}
