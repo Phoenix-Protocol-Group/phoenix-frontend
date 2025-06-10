@@ -86,7 +86,7 @@ export const BondModal = ({
     };
 
     fetchUserBalances();
-  }, [open, strategy, appStore.tokens]);
+  }, [open, strategy, appStore.tokens.length]);
 
   // Create tokens with user balances for display
   const tokensWithUserBalances = useMemo(() => {
