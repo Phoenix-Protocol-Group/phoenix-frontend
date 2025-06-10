@@ -286,7 +286,7 @@ export default function Page(props: PoolPageProps) {
       await executeContractTransaction({
         contractType: "pair",
         contractAddress: params.poolAddress,
-        transactionFunction: async (client, restore) => {
+        transactionFunction: async (client, restore, txOptions) => {
           return client.provide_liquidity(
             {
               sender: storePersist.wallet.address!,
@@ -302,7 +302,7 @@ export default function Page(props: PoolPageProps) {
               deadline: undefined,
               auto_stake: false,
             },
-            { simulate: !restore }
+            { simulate: !restore, ...txOptions }
           );
         },
       });
@@ -325,7 +325,7 @@ export default function Page(props: PoolPageProps) {
       await executeContractTransaction({
         contractType: "pair",
         contractAddress: params.poolAddress,
-        transactionFunction: async (client, restore) => {
+        transactionFunction: async (client, restore, txOptions) => {
           return client.withdraw_liquidity(
             {
               sender: storePersist.wallet.address!,
@@ -337,7 +337,7 @@ export default function Page(props: PoolPageProps) {
               deadline: undefined,
               auto_unstake: undefined,
             },
-            { simulate: !restore }
+            { simulate: !restore, ...txOptions }
           );
         },
       });
@@ -365,7 +365,7 @@ export default function Page(props: PoolPageProps) {
       await executeContractTransaction({
         contractType: "stake",
         contractAddress: stakeAddress,
-        transactionFunction: async (client, restore) => {
+        transactionFunction: async (client, restore, txOptions) => {
           return client.bond(
             {
               sender: storePersist.wallet.address!,
@@ -373,7 +373,7 @@ export default function Page(props: PoolPageProps) {
                 (lpTokenAmount * 10 ** (lpToken?.decimals || 7)).toFixed(0)
               ),
             },
-            { simulate: !restore }
+            { simulate: !restore, ...txOptions }
           );
         },
       });
@@ -404,7 +404,7 @@ export default function Page(props: PoolPageProps) {
       await executeContractTransaction({
         contractType: "stake",
         contractAddress: stakeAddress,
-        transactionFunction: async (client, restore) => {
+        transactionFunction: async (client, restore, txOptions) => {
           return client.unbond(
             {
               sender: storePersist.wallet.address!,
@@ -413,7 +413,7 @@ export default function Page(props: PoolPageProps) {
               ),
               stake_timestamp: BigInt(stake_timestamp),
             },
-            { simulate: !restore }
+            { simulate: !restore, ...txOptions }
           );
         },
       });
@@ -611,12 +611,12 @@ export default function Page(props: PoolPageProps) {
     await executeContractTransaction({
       contractType: "stake",
       contractAddress: stakeAddress,
-      transactionFunction: async (client, restore) => {
+      transactionFunction: async (client, restore, txOptions) => {
         return client.withdraw_rewards(
           {
             sender: storePersist.wallet.address!,
           },
-          { simulate: !restore }
+          { simulate: !restore, ...txOptions }
         );
       },
     });

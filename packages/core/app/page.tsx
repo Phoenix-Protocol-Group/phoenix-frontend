@@ -187,13 +187,13 @@ export default function Page() {
       await executeContractTransaction({
         contractType: "vesting",
         contractAddress: constants.VESTING_ADDRESS,
-        transactionFunction: async (client, restore) => {
+        transactionFunction: async (client, restore, txOptions) => {
           return client.claim(
             {
               index: index,
               sender: walletAddress!,
             },
-            { simulate: !restore }
+            { simulate: !restore, ...txOptions }
           );
         },
       });

@@ -364,7 +364,7 @@ class PhoenixPhoUsdcStrategy implements Strategy {
     }
     const assembledTx = await this.stakeContract.withdraw_rewards(
       { sender: walletAddress },
-      { simulate: true }
+      { simulate: true, fee: parseInt(constants.PHOENIX_BASE_FEE) }
     );
     return assembledTx;
   }
@@ -393,7 +393,7 @@ class PhoenixPhoUsdcStrategy implements Strategy {
         deadline: undefined,
         auto_stake: true,
       },
-      { simulate: true }
+      { simulate: true, fee: parseInt(constants.PHOENIX_BASE_FEE) }
     );
     return assembledTx;
   }
@@ -419,7 +419,7 @@ class PhoenixPhoUsdcStrategy implements Strategy {
           stake_timestamp: stakeBucket.timestamp,
         },
       },
-      { simulate: true }
+      { simulate: true, fee: parseInt(constants.PHOENIX_BASE_FEE) }
     );
     return assembledTx;
   }
