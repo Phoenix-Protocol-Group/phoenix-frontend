@@ -82,6 +82,7 @@
     "@mui/utils": "6.1.7"
   },
   "dependencies": {
+    "@codemirror/lang-json": "^6.0.1",
     "@fontsource/inter": "^5.0.3",
     "@fontsource/poppins": "^5.0.3",
     "@fontsource/roboto": "^5.0.3",
@@ -90,6 +91,8 @@
     "@mui/x-date-pickers": "^6.19.2",
     "@types/react": "npm:types-react@19.0.0-rc.1",
     "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
+    "@uiw/codemirror-theme-vscode": "^4.23.13",
+    "@uiw/react-codemirror": "^4.23.13",
     "classnames": "^2.3.2",
     "cross-env": "^7.0.3",
     "dayjs": "^1.11.10",

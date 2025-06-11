@@ -23,3 +23,4 @@ export * from "./TransactionsTable";
 export * from "./AssetInfoModal";
 export * from "./UnstakeInfoModal";
 export * from "./VestingTokensModal";
+export * from "./Marketplace";

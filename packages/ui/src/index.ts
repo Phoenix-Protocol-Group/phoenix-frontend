@@ -19,3 +19,4 @@ export * from "./Transactions";
 export * from "./HelpCenter";
 export * from "./UnstakeInfoModal/UnstakeInfoModal";
 export * from "./Earn";
+export * from "./Marketplace";
