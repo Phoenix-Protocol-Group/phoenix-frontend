@@ -23,7 +23,7 @@ const CollectionPreview = (props: CollectionPreviewProps) => {
             component="img"
             sx={{
               width: "16px",
-              mr: 0.5,
+              mr: 0.5
             }}
             alt="pho icon"
             src="/cryptoIcons/pho.svg"
@@ -55,7 +55,7 @@ const CollectionPreview = (props: CollectionPreviewProps) => {
             component="img"
             sx={{
               width: "16px",
-              mr: 0.5,
+              mr: 0.5
             }}
             alt="pho icon"
             src="/cryptoIcons/pho.svg"
@@ -102,6 +102,35 @@ const CollectionPreview = (props: CollectionPreviewProps) => {
         bottomContent={bottomContent}
         size="medium"
       />
+    </Box>
+  );
+};
+                Volume
+              </Typography>
+              <Box display="flex" alignItems="center">
+                <Box
+                  component="img"
+                  sx={{
+                    width: "16px",
+                    mr: 0.5
+                  }}
+                  alt="pho icon"
+                  src="/cryptoIcons/pho.svg"
+                />
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    lineHeight: "24px",
+                    color: "#FFF",
+                  }}
+                >
+                  {props.volume}
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 };

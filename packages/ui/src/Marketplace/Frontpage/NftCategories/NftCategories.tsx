@@ -90,7 +90,7 @@ const NftCategories = (props: NftCategoriesProps) => {
                   mb: spacing.xs,
                 }}
               >
-                Recent NFTs
+                Recent Collections
               </Typography>
               <Typography
                 sx={{

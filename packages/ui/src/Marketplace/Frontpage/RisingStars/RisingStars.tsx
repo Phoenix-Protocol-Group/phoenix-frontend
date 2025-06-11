@@ -3,6 +3,8 @@ import { Box, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
 import RisingStarsCard from "./RisingStarsCard";
 import { RisingStarCardProps, RisingStarsProps } from "@phoenix-protocol/types";
+import { colors, spacing, typography } from "../../../Theme/styleConstants";
+import { Star } from "@mui/icons-material";
 
 const tabUnselectedStyles = {
   display: "flex",
@@ -85,31 +87,53 @@ const RisingStars = (props: RisingStarsProps) => {
           gap: { xs: 2, md: 0 },
         }}
       >
-        <Box>
-          <Typography
-            component="h2"
+        <Box sx={{ display: "flex", alignItems: "center", gap: spacing.md }}>
+          <Box
             sx={{
-              fontSize: { xs: "1.75rem", md: "2.25rem" },
-              fontWeight: 700,
-              fontFamily: "Ubuntu, sans-serif",
-              background: "linear-gradient(135deg, #FAFAFA 0%, #F97316 100%)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              mb: 0.5,
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              background: `linear-gradient(135deg, ${colors.primary.main}20, ${colors.primary.dark}10)`,
+              border: `1px solid ${colors.primary.main}30`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            Rising Stars
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: { xs: "0.875rem", md: "1rem" },
-              color: "#A3A3A3",
-              fontWeight: 400,
-            }}
-          >
-            Collections with the highest percentage gains
-          </Typography>
+            <Star
+              sx={{
+                fontSize: "24px",
+                color: colors.primary.main,
+              }}
+            />
+          </Box>
+          <Box>
+            <Typography
+              sx={{
+                background: `linear-gradient(135deg, ${colors.primary.main} 0%, ${colors.primary.light} 100%)`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontSize: typography.fontSize["2xl"],
+                fontWeight: typography.fontWeights.bold,
+                fontFamily: typography.fontFamily,
+                lineHeight: 1.2,
+                mb: spacing.xs,
+              }}
+            >
+              Rising Stars{" "}
+            </Typography>
+            <Typography
+              sx={{
+                color: colors.neutral[400],
+                fontSize: typography.fontSize.sm,
+                fontFamily: typography.fontFamily,
+                fontWeight: typography.fontWeights.medium,
+              }}
+            >
+              Collections with the highest percentage gains{" "}
+            </Typography>
+          </Box>
         </Box>
 
         {/* Time Period Tabs */}

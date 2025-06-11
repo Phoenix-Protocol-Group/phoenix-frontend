@@ -1,14 +1,14 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
-import { PhoenixNFTCollectionDeployerContract } from "@phoenix-protocol/contracts";
+import { PhoenixNftDeployerContract } from "@phoenix-protocol/contracts";
 import { TextSelectItemProps } from "@phoenix-protocol/types";
 import { constants, Signer } from "@phoenix-protocol/utils";
 import { CreateCollection } from "@phoenix-protocol/ui";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import { PhoenixNFTCollectionContract } from "@phoenix-protocol/contracts";
+import { PhoenixNftCollectionContract } from "@phoenix-protocol/contracts";
 import { Keypair, TransactionBuilder } from "@stellar/stellar-sdk";
 
 export default function Page() {
@@ -75,13 +75,12 @@ export default function Page() {
           ? store.walletConnectInstance
           : new Signer();
 
-      const CollectionDeployerContract =
-        new PhoenixNFTCollectionDeployerContract.Client({
-          publicKey: storePersist.wallet.address!,
-          contractId: constants.COLLECTION_DEPLOYER_ADDRESS,
-          networkPassphrase: constants.NETWORK_PASSPHRASE,
-          rpcUrl: constants.RPC_URL
-        });
+      const CollectionDeployerContract = new PhoenixNftDeployerContract.Client({
+        publicKey: storePersist.wallet.address!,
+        contractId: "",
+        networkPassphrase: constants.NETWORK_PASSPHRASE,
+        rpcUrl: constants.RPC_URL,
+      });
 
       const tx = await CollectionDeployerContract.deploy_new_collection({
         salt,
@@ -93,15 +92,18 @@ export default function Page() {
       const res = await tx?.signAndSend({
         signTransaction: async (xdr: string) => {
           const res = await signer.sign(xdr);
-          return { signedTxXdr: res, signerAddress: storePersist.wallet.address };
-        }
+          return {
+            signedTxXdr: res,
+            signerAddress: storePersist.wallet.address,
+          };
+        },
       });
 
       if (res.result) {
         const previewImageUrl = await uploadPreviewImage();
 
         if (previewImage) {
-          const CollectionContract = new PhoenixNFTCollectionContract.Client({
+          const CollectionContract = new PhoenixNftCollectionContract.Client({
             publicKey: storePersist.wallet.address!,
             contractId: res.result,
             networkPassphrase: constants.NETWORK_PASSPHRASE,
@@ -122,8 +124,11 @@ export default function Page() {
           await collectionUriTx?.signAndSend({
             signTransaction: async (xdr: string) => {
               const res = await signer.sign(xdr);
-              return { signedTxXdr: res, signerAddress: storePersist.wallet.address };
-            }
+              return {
+                signedTxXdr: res,
+                signerAddress: storePersist.wallet.address,
+              };
+            },
           });
 
           console.log(res);
