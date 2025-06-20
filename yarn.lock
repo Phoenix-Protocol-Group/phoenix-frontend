@@ -1575,6 +1575,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@blend-capital/blend-sdk@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@blend-capital/blend-sdk@npm:2.2.0"
+  dependencies:
+    "@stellar/stellar-sdk": 13.0.0
+    buffer: 6.0.3
+    follow-redirects: ">=1.15.6"
+  checksum: e2d959a1879c026918dcd8ef6b8e07305023c8df694740b9b38f01cc00d4cbb902c045a3b3baf6b86a13b8874c36748ce5e6c33b3407a2fc073ff2ba1e3a3ff8
+  languageName: node
+  linkType: hard
+
 "@creit.tech/xbull-wallet-connect@npm:0.3.0":
   version: 0.3.0
   resolution: "@creit.tech/xbull-wallet-connect@npm:0.3.0"
@@ -3709,6 +3720,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/phoenix-frontend@workspace:."
   dependencies:
+    "@blend-capital/blend-sdk": ^2.2.0
     "@emotion/react": ^11.14.0
     "@emotion/styled": ^11.14.0
     "@stellar/stellar-sdk": ^13.1.0
@@ -3748,6 +3760,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@phoenix-protocol/strategies@workspace:packages/strategies"
   dependencies:
+    "@blend-capital/blend-sdk": ^2.2.0
     "@phoenix-protocol/contracts": "*"
     "@phoenix-protocol/state": "*"
     "@phoenix-protocol/types": "*"
@@ -4190,6 +4203,22 @@ __metadata:
     sodium-native:
       optional: true
   checksum: b4a4d049c332ab63aa112c183ffed706dac4236b369a1b53eac86e8efcbba228693be5550e39762bc3c13c9c2e56dc76f611454191d54a1c740832059adb52bd
+  languageName: node
+  linkType: hard
+
+"@stellar/stellar-sdk@npm:13.0.0":
+  version: 13.0.0
+  resolution: "@stellar/stellar-sdk@npm:13.0.0"
+  dependencies:
+    "@stellar/stellar-base": ^13.0.1
+    axios: ^1.7.7
+    bignumber.js: ^9.1.2
+    eventsource: ^2.0.2
+    feaxios: ^0.0.20
+    randombytes: ^2.1.0
+    toml: ^3.0.0
+    urijs: ^1.19.1
+  checksum: fb3e3c5db9ab43882947b0e19b6a49bea421096e57271a4a2e7eafe3b1fbc79c8b69cbe3281c386050dd04d6825ca6a63641a534b2fe97b108e86722bd4eea35
   languageName: node
   linkType: hard
 
@@ -6311,6 +6340,17 @@ __metadata:
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
   checksum: 882d4fe0ec694a07c7f5c1f68205eb6dc5a62aecdb632cc7a4a3d0985188ce3030e0b277e1a8260ac3f194d314ae342117660a151fabffdc5081ca0b5a8b47fe
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.7.7":
+  version: 1.10.0
+  resolution: "axios@npm:1.10.0"
+  dependencies:
+    follow-redirects: ^1.15.6
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: b5fd840d499469bf968e44b8ac96f4b363c6aa4c791a50834c086a7cffbc2d77fe24f27af1aba46c3e1f4840aaf991461fc27537990596b93dea0f4df3245a86
   languageName: node
   linkType: hard
 
@@ -8999,6 +9039,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"feaxios@npm:^0.0.20":
+  version: 0.0.20
+  resolution: "feaxios@npm:0.0.20"
+  dependencies:
+    is-retry-allowed: ^3.0.0
+  checksum: 73ff5dc8b8a814bdd79f55521aa0cb9160f06afcbe36402a891d457d0085bff8cffba08a02878c838f5826c62e240fdefddd01bf931cb38bd89050c4de9f3c9a
+  languageName: node
+  linkType: hard
+
 "feaxios@npm:^0.0.23":
   version: 0.0.23
   resolution: "feaxios@npm:0.0.23"
@@ -9118,7 +9167,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.6":
+"follow-redirects@npm:>=1.15.6, follow-redirects@npm:^1.15.6":
   version: 1.15.9
   resolution: "follow-redirects@npm:1.15.9"
   peerDependenciesMeta:

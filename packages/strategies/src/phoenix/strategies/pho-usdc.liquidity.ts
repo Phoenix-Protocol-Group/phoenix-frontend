@@ -42,6 +42,10 @@ class PhoenixPhoUsdcStrategy implements Strategy {
     available: true,
     contractAddress,
     contractType,
+    // Provider metadata for grouping
+    providerName: "Phoenix Protocol",
+    providerIcon: "/cryptoIcons/pho.svg",
+    providerDomain: "phoenix-hub.io",
   };
 
   private initialized: boolean = false;

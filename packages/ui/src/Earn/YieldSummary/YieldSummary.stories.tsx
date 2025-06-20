@@ -16,7 +16,7 @@ const meta: Meta<typeof YieldSummary> = {
   ],
   argTypes: {
     totalValue: { control: "number" },
-    claimableRewards: { control: "number" },
+    claimableRewards: { control: "object" },
     onClaimAll: { action: "clicked" },
   },
 };
@@ -31,6 +31,39 @@ export const Default: Story = {
   render: Template,
   args: {
     totalValue: 12345.67,
-    claimableRewards: 123.45,
+    claimableRewards: [
+      {
+        token: "PHO",
+        icon: "/cryptoIcons/pho.svg",
+        amount: 123.45,
+      },
+    ],
+  },
+};
+
+export const MultipleRewards: Story = {
+  render: Template,
+  args: {
+    totalValue: 25678.9,
+    claimableRewards: [
+      {
+        token: "PHO",
+        icon: "/cryptoIcons/pho.svg",
+        amount: 85.2,
+      },
+      {
+        token: "BLND",
+        icon: "/cryptoIcons/blend.svg",
+        amount: 42.7,
+      },
+    ],
+  },
+};
+
+export const NoRewards: Story = {
+  render: Template,
+  args: {
+    totalValue: 5432.1,
+    claimableRewards: [],
   },
 };
