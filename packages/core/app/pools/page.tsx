@@ -13,6 +13,8 @@ import {
   API,
   constants,
   fetchTokenPrices,
+  fetchTVL,
+  fetchTVLByPoolId,
   formatCurrency,
 } from "@phoenix-protocol/utils";
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -43,10 +45,7 @@ export default function Page() {
   const hasInitialized = useRef(false);
 
   const getTVL = async () => {
-    const allTickers = await API.getTickers();
-    const _tvl = allTickers.reduce((total, ticker) => {
-      return total + ticker.liquidity_in_usd;
-    }, 0);
+    const _tvl = await fetchTVL();
     setTvl(_tvl);
   };
 
@@ -83,11 +82,8 @@ export default function Page() {
             API.getPrice(tokenB?.symbol || ""),
           ]);
 
-          const tvl =
-            (priceA * Number(pairInfo.result.asset_a.amount)) /
-              10 ** Number(tokenA?.decimals) +
-            (priceB * Number(pairInfo.result.asset_b.amount)) /
-              10 ** Number(tokenB?.decimals);
+          const tvl = await fetchTVLByPoolId(poolAddress);
+          console.log(tvl);
 
           const stakingAddress = pairInfo.result.stake_address;
 

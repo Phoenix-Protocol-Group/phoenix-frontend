@@ -22,6 +22,7 @@ import {
   constants,
   fetchBiggestWinnerAndLoser,
   fetchHistoricalPrices,
+  fetchTVL,
   formatCurrency,
   formatCurrencyStatic,
   TradingVolumeResponse,
@@ -145,10 +146,7 @@ export default function Page() {
   };
 
   const getTVL = async () => {
-    const allTickers = await API.getTickers();
-    const _tvl = allTickers.reduce((total, ticker) => {
-      return total + ticker.liquidity_in_usd;
-    }, 0);
+    const _tvl = await fetchTVL();
     setTVL(_tvl);
   };
 
