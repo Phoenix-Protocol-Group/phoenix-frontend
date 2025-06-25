@@ -96,7 +96,7 @@ export const groupStrategiesByProvider = (
 const getProviderDescription = (mainProviderId: string): string => {
   switch (mainProviderId) {
     case "phoenix":
-      return "Decentralized liquidity and staking on Stellar";
+      return "Provide liquidity to the Phoenix trading pairs";
     case "blend":
       return "Lending and borrowing protocol on Stellar";
     default:
