@@ -10,8 +10,8 @@ import {
   xdr,
 } from "@stellar/stellar-sdk";
 import {
-  PoolContract,
-  Pool,
+  PoolContractV2 as PoolContract,
+  PoolV2 as Pool,
   RequestType,
   Request,
   Network,

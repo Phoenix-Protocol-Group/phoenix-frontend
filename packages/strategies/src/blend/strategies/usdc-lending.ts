@@ -1,6 +1,9 @@
 import { BaseBlendStrategy } from "../BaseBlendStrategy";
 import { StrategyMetadata } from "../../types";
-import { PositionsEstimate, Reserve } from "@blend-capital/blend-sdk";
+import {
+  PositionsEstimate,
+  ReserveV2 as Reserve,
+} from "@blend-capital/blend-sdk";
 import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract";
 import { API } from "@phoenix-protocol/utils/build/trade_api";
 import { constants } from "@phoenix-protocol/utils";
@@ -8,7 +11,7 @@ import { constants } from "@phoenix-protocol/utils";
 // Real Blend Pool and Asset addresses - need to find actual deployed Blend pools
 // For now, we'll use a known USDC address and handle pool loading errors gracefully
 const BLEND_USDC_POOL_ADDRESS =
-  "CDVQVKOY2YSXS2IC7KN6MNASSHPAO7UN2UR2ON4OI2SKMFJNVAMDX6DP";
+  "CAJJZSGMMM3PD7N33TAPHGBUGTB43OC73HVIK2L2G6BNGGGYOSSYBXBD";
 const USDC_CONTRACT_ADDRESS =
   "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75";
 const XLM_CONTRACT_ADDRESS =
