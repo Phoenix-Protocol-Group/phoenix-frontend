@@ -9,6 +9,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
+    "@blend-capital/blend-sdk": "^3.1.0",
     "@phoenix-protocol/contracts": "*",
     "@phoenix-protocol/state": "*",
     "@phoenix-protocol/types": "*",

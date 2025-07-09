@@ -225,7 +225,10 @@ export const useContractTransaction = () => {
                   appStore.getAllTokens();
                 }
               } catch (error) {
-                console.error("Error during signing and sending:", error);
+                console.error(
+                  "Error during signing and sending:",
+                  JSON.stringify(error)
+                );
 
                 // Check if restore is required
                 if (

@@ -467,7 +467,11 @@ const StrategyEntry = ({
                     color: colors.success[300],
                   }}
                 >
-                  Up to {((apr * 100) / 2).toFixed(1)}%
+                  {strategy.providerId.includes("phoenix") ? (
+                    <>Up to {((apr * 100) / 2).toFixed(1)}%</>
+                  ) : (
+                    <>{(apr * 100).toFixed(3)}%</>
+                  )}
                 </Typography>
               </Grid>
 
