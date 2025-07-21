@@ -3,6 +3,7 @@ import { Box, Grid, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
 import { StrategyMetadata } from "@phoenix-protocol/strategies";
 import StrategyEntry from "../StrategiesTable/StrategyEntry";
+import ProviderStrategyRow from "./ProviderStrategyRow";
 import { formatCurrencyStatic } from "@phoenix-protocol/utils";
 import {
   colors,
@@ -359,13 +360,23 @@ export const ProviderStrategyGroup = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
             >
-              <StrategyEntry
-                strategy={strategy}
-                isMobile={isMobile}
-                onViewDetails={onViewDetails}
-                onBondClick={onBondClick}
-                onUnbondClick={onUnbondClick}
-              />
+              {isMobile ? (
+                <StrategyEntry
+                  strategy={strategy}
+                  isMobile={isMobile}
+                  onViewDetails={(id) => onViewDetails(strategy)}
+                  onBondClick={onBondClick}
+                  onUnbondClick={onUnbondClick}
+                />
+              ) : (
+                <ProviderStrategyRow
+                  strategy={strategy}
+                  isMobile={isMobile}
+                  onViewDetails={onViewDetails}
+                  onBondClick={onBondClick}
+                  onUnbondClick={onUnbondClick}
+                />
+              )}
             </motion.div>
           ))}
         </Box>

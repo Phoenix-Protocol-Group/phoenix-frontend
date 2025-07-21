@@ -1,19 +1,19 @@
 import { BaseBlendStrategy } from "../BaseBlendStrategy";
 import { StrategyMetadata } from "../../types";
-import { PositionsEstimate, Reserve } from "@blend-capital/blend-sdk";
+import {
+  PositionsEstimate,
+  ReserveV2 as Reserve,
+} from "@blend-capital/blend-sdk";
 import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract";
 import { API } from "@phoenix-protocol/utils/build/trade_api";
 import { constants } from "@phoenix-protocol/utils";
-import { useAppStore } from "@phoenix-protocol/state";
 
 // Real Blend Pool and Asset addresses - need to find actual deployed Blend pools
 // For now, we'll use native XLM and handle pool loading errors gracefully
 const BLEND_XLM_POOL_ADDRESS =
-  "CDVQVKOY2YSXS2IC7KN6MNASSHPAO7UN2UR2ON4OI2SKMFJNVAMDX6DP";
+  "CAJJZSGMMM3PD7N33TAPHGBUGTB43OC73HVIK2L2G6BNGGGYOSSYBXBD";
 const XLM_CONTRACT_ADDRESS =
   "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA";
-const USDC_CONTRACT_ADDRESS =
-  "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75";
 
 class BlendXLMLendingStrategy extends BaseBlendStrategy {
   constructor() {
@@ -26,7 +26,7 @@ class BlendXLMLendingStrategy extends BaseBlendStrategy {
         assets: [
           {
             name: "XLM",
-            icon: "/cryptoIcons/XLM.svg",
+            icon: "/cryptoIcons/xlm.svg",
             amount: 0,
             category: "token",
             usdValue: 1.0,
