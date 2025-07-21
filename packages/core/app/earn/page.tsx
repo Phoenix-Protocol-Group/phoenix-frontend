@@ -339,8 +339,8 @@ export default function EarnPage(): JSX.Element {
   };
 
   const handleViewStrategyDetails = useCallback(
-    (strategyId: string) => {
-      router.push(`/earn/${strategyId}`);
+    (strategy: StrategyMetadata) => {
+      router.push(`/earn/${strategy.id}`);
     },
     [router]
   );
