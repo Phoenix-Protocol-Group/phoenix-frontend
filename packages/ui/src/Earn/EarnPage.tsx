@@ -25,7 +25,7 @@ import { StrategyMetadata } from "@phoenix-protocol/strategies";
 
 interface EarnPageProps {
   isLoadingOverride?: boolean;
-  onViewStrategyDetails?: (id: string) => void;
+  onViewStrategyDetails?: (strategy: StrategyMetadata) => void;
 }
 
 export const EarnPage = ({
@@ -44,14 +44,9 @@ export const EarnPage = ({
   const [tabValue, setTabValue] = useState(0);
   const [isLoading, setIsLoading] = useState(isLoadingOverride || false);
 
-  const handleViewDetails = (id: string) => {
-    console.log(`View details for strategy: ${id}`);
-    if (onViewStrategyDetails) {
-      onViewStrategyDetails(id);
-    } else {
-      // For storybook, just show an alert
-      alert(`View details for strategy: ${id}`);
-    }
+  const handleViewDetails = (strategy: StrategyMetadata) => {
+    // No click behavior for now
+    return;
   };
 
   const strategies: StrategyMetadata[] = [

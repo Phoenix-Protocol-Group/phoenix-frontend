@@ -35,10 +35,6 @@ const ProviderStrategyRow: React.FC<ProviderStrategyRowProps> = ({
     userStake = 0,
   } = strategy;
 
-  const handleClick = () => {
-    onViewDetails(strategy);
-  };
-
   if (isMobile) {
     // For mobile, use the existing StrategyEntry component
     // We'll import and use it directly
@@ -47,7 +43,6 @@ const ProviderStrategyRow: React.FC<ProviderStrategyRowProps> = ({
 
   return (
     <Box
-      onClick={handleClick}
       sx={{
         position: "relative",
         borderRadius: borderRadius.lg,
@@ -55,14 +50,9 @@ const ProviderStrategyRow: React.FC<ProviderStrategyRowProps> = ({
         border: `1px solid ${colors.neutral[700]}50`,
         backdropFilter: "blur(20px)",
         p: spacing.lg,
-        cursor: "pointer",
+        cursor: "default",
         transition: "all 0.3s ease",
-        "&:hover": {
-          background: `linear-gradient(135deg, ${colors.neutral[700]}40 0%, ${colors.neutral[800]}60 100%)`,
-          borderColor: colors.primary.main + "30",
-          transform: "translateY(-2px)",
-          boxShadow: `0 8px 32px ${colors.primary.main}10`,
-        },
+        "&:hover": {},
       }}
     >
       <Grid container spacing={2} alignItems="center">

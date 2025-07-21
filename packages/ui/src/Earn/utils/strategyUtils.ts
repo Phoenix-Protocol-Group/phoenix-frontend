@@ -88,9 +88,13 @@ export const groupStrategiesByProvider = (
     }
   });
 
-  return Array.from(providerMap.values()).sort(
-    (a, b) => b.totalTVL - a.totalTVL
-  );
+  return Array.from(providerMap.values()).sort((a, b) => {
+    // Phoenix Protocol always comes first
+    if (a.id === "phoenix") return -1;
+    if (b.id === "phoenix") return 1;
+    // Then sort by TVL
+    return b.totalTVL - a.totalTVL;
+  });
 };
 
 const getProviderDescription = (mainProviderId: string): string => {

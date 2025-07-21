@@ -22,7 +22,7 @@ export interface ProviderStrategyGroupProps {
   rewardTokens: { token: string; icon: string; amount: number }[];
   onBondClick: (strategy: StrategyMetadata) => void;
   onUnbondClick: (strategy: StrategyMetadata) => void;
-  onViewDetails?: (id: string) => void;
+  onViewDetails?: (strategy: StrategyMetadata) => void;
 }
 
 export const ProviderStrategyGroup = ({
@@ -364,7 +364,7 @@ export const ProviderStrategyGroup = ({
                 <StrategyEntry
                   strategy={strategy}
                   isMobile={isMobile}
-                  onViewDetails={(id) => onViewDetails(strategy)}
+                  onViewDetails={(id) => onViewDetails?.(strategy)}
                   onBondClick={onBondClick}
                   onUnbondClick={onUnbondClick}
                 />
@@ -372,7 +372,7 @@ export const ProviderStrategyGroup = ({
                 <ProviderStrategyRow
                   strategy={strategy}
                   isMobile={isMobile}
-                  onViewDetails={onViewDetails}
+                  onViewDetails={onViewDetails || (() => {})}
                   onBondClick={onBondClick}
                   onUnbondClick={onUnbondClick}
                 />
