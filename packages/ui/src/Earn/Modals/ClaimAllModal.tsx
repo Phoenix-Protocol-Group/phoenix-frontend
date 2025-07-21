@@ -217,6 +217,16 @@ export const ClaimAllModal = ({
     setIsClaiming(true); // This will trigger the processing useEffect
   }, [claimableStrategies, isClaiming]); // isClaiming is a dependency for the safety check
 
+  // Group rewards by token type
+  const rewardsByToken = items.reduce((acc, item) => {
+    const tokenName = item.metadata.rewardToken?.name || 'PHO';
+    if (!acc[tokenName]) {
+      acc[tokenName] = { amount: 0, icon: item.metadata.rewardToken?.icon };
+    }
+    acc[tokenName].amount += item.rewards;
+    return acc;
+  }, {} as Record<string, { amount: number; icon?: string }>);
+
   const totalRewards = items.reduce((sum, item) => sum + item.rewards, 0);
   const claimedCount = items.filter((item) => item.status === "success").length;
   const errorCount = items.filter((item) => item.status === "error").length;
@@ -417,21 +427,38 @@ export const ClaimAllModal = ({
               }}
             >
               Total Rewards to Claim:{" "}
-              <Typography
-                component="span"
-                sx={{
-                  background:
-                    "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  fontSize: "1.25rem",
-                  fontWeight: typography.fontWeights.bold,
-                  ml: 1,
-                }}
-              >
-                {totalRewards} PHO
-              </Typography>
+              <Box sx={{ ml: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
+                {Object.entries(rewardsByToken).map(([tokenName, tokenData]) => (
+                  <Box key={tokenName} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    {tokenData.icon && (
+                      <Box
+                        component="img"
+                        src={tokenData.icon}
+                        alt={tokenName}
+                        sx={{
+                          width: "20px",
+                          height: "20px",
+                          borderRadius: "50%",
+                        }}
+                      />
+                    )}
+                    <Typography
+                      component="span"
+                      sx={{
+                        background:
+                          "linear-gradient(135deg, #F97316 0%, #FB923C 100%)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                        fontSize: "1.25rem",
+                        fontWeight: typography.fontWeights.bold,
+                      }}
+                    >
+                      {tokenData.amount.toFixed(2)} {tokenName}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
             </Typography>
             {(isClaiming || isComplete) && (
               <motion.div
@@ -533,18 +560,42 @@ export const ClaimAllModal = ({
                         </Typography>
                       }
                       secondary={
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            color: colors.neutral[400],
-                            fontSize: "0.85rem",
-                          }}
-                        >
-                          Rewards: {item.rewards} PHO{" "}
-                          {item.status === "error" &&
-                            item.error &&
-                            ` - Error: ${item.error}`}
-                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: colors.neutral[400],
+                              fontSize: "0.85rem",
+                            }}
+                          >
+                            Rewards: {item.rewards} {item.metadata.rewardToken?.name || 'PHO'}
+                          </Typography>
+                          {item.metadata.rewardToken?.icon && (
+                            <Box
+                              component="img"
+                              src={item.metadata.rewardToken.icon}
+                              alt={item.metadata.rewardToken.name}
+                              sx={{
+                                width: "16px",
+                                height: "16px",
+                                borderRadius: "50%",
+                                ml: 0.5,
+                              }}
+                            />
+                          )}
+                          {item.status === "error" && item.error && (
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: colors.error[400],
+                                fontSize: "0.85rem",
+                                ml: 1,
+                              }}
+                            >
+                              - Error: {item.error}
+                            </Typography>
+                          )}
+                        </Box>
                       }
                     />
                   </ListItem>
