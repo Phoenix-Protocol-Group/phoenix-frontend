@@ -1,3 +1,4 @@
+import { BlendUsdcLendingStrategy } from "../blend";
 import { Strategy, StrategyProvider } from "../types";
 import PhoenixPhoUsdcStrategy from "./strategies/pho-usdc.liquidity";
 import PhoenixXlmPhoStrategy from "./strategies/xlm-pho.liquidity";

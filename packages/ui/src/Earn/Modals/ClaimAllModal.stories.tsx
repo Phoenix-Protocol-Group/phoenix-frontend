@@ -71,8 +71,11 @@ const mockStrategy = (metadata: StrategyMetadata): Strategy => ({
   getUserStake: async () => metadata.userStake || 0,
   hasUserJoined: async () => metadata.hasJoined || false,
   getUserRewards: async () => metadata.userRewards || 0,
+  // @ts-ignore
   bond: async () => ({} as unknown as AssembledTransaction<any>),
+  // @ts-ignore
   unbond: async () => ({} as unknown as AssembledTransaction<any>),
+  // @ts-ignore
   claim: async () => ({} as unknown as AssembledTransaction<any>),
 });
 

@@ -58,6 +58,10 @@ export interface StrategyMetadata {
   // UI state properties
   isMobile?: boolean; // For UI rendering
   userAssetMatch?: boolean; // Used in StrategiesTable filtering
+  // Provider-specific properties for grouping
+  providerName?: string; // Display name for the provider (e.g., "Phoenix Protocol", "Blend")
+  providerIcon?: string; // Icon for the provider
+  providerDomain?: string; // Domain for the provider
 }
 
 export interface Strategy {

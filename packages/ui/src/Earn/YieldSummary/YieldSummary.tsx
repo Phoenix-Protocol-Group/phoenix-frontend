@@ -12,7 +12,7 @@ import {
 
 export interface YieldSummaryProps {
   totalValue: number;
-  claimableRewards: number;
+  claimableRewards: { token: string; icon: string; amount: number }[];
   onClaimAll: () => void;
 }
 
@@ -21,6 +21,12 @@ export const YieldSummary = ({
   claimableRewards,
   onClaimAll,
 }: YieldSummaryProps) => {
+  const totalRewards = claimableRewards.reduce(
+    (sum, reward) => sum + reward.amount,
+    0
+  );
+  const hasRewards = totalRewards > 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -130,61 +136,73 @@ export const YieldSummary = ({
               >
                 Claimable Rewards
               </Typography>
-              <Typography
-                sx={{
-                  fontSize: { xs: "1.5rem", md: "1.75rem" },
-                  color: claimableRewards > 0 ? "#F97316" : colors.neutral[50],
-                  fontWeight: typography.fontWeights.bold,
-                  marginBottom: spacing.md,
-                  background:
-                    claimableRewards > 0
-                      ? "linear-gradient(135deg, #F97316 0%, #FB923C 100%)"
-                      : "linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Box
-                    component="span"
+
+              {/* Multiple reward tokens display */}
+              <Box sx={{ mb: spacing.md }}>
+                {claimableRewards.length === 0 ? (
+                  <Typography
                     sx={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      height: 28,
-                      width: 28,
-                      mr: 0.5,
+                      fontSize: { xs: "1.5rem", md: "1.75rem" },
+                      color: colors.neutral[50],
+                      fontWeight: typography.fontWeights.bold,
+                      background:
+                        "linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
                     }}
                   >
+                    No rewards available
+                  </Typography>
+                ) : (
+                  claimableRewards.map((reward, index) => (
                     <Box
-                      component="img"
-                      src="/cryptoIcons/pho.svg"
-                      alt="PHO Icon"
+                      key={reward.token}
                       sx={{
-                        height: "100%",
-                        width: "100%",
-                        borderRadius: "50%",
-                      }}
-                    />
-                  </Box>
-                  <span>
-                    {claimableRewards}
-                    <span
-                      style={{
-                        marginLeft: 6,
-                        fontWeight: 600,
-                        letterSpacing: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: { xs: "center", md: "flex-end" },
+                        gap: 1,
+                        mb:
+                          index < claimableRewards.length - 1 ? spacing.xs : 0,
                       }}
                     >
-                      PHO
-                    </span>
-                  </span>
-                </Box>
-              </Typography>
+                      <Box
+                        component="img"
+                        src={reward.icon}
+                        alt={`${reward.token} Icon`}
+                        sx={{
+                          height: "24px",
+                          width: "24px",
+                          borderRadius: "50%",
+                        }}
+                      />
+                      <Typography
+                        sx={{
+                          fontSize: { xs: "1.25rem", md: "1.5rem" },
+                          color:
+                            reward.amount > 0 ? "#F97316" : colors.neutral[50],
+                          fontWeight: typography.fontWeights.bold,
+                          background:
+                            reward.amount > 0
+                              ? "linear-gradient(135deg, #F97316 0%, #FB923C 100%)"
+                              : "linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 100%)",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          backgroundClip: "text",
+                        }}
+                      >
+                        {reward.amount.toFixed(2)} {reward.token}
+                      </Typography>
+                    </Box>
+                  ))
+                )}
+              </Box>
+
               <Button
                 type="primary"
                 onClick={onClaimAll}
-                disabled={claimableRewards <= 0}
+                disabled={!hasRewards}
                 sx={{
                   minWidth: "160px",
                   height: "44px",
@@ -192,27 +210,33 @@ export const YieldSummary = ({
                   fontSize: "0.9rem",
                   fontWeight: 600,
                   textTransform: "none",
-                  background:
-                    claimableRewards > 0
-                      ? "linear-gradient(135deg, #F97316 0%, #FB923C 100%)"
-                      : "rgba(115, 115, 115, 0.3)",
-                  border:
-                    claimableRewards > 0
-                      ? "1px solid rgba(249, 115, 22, 0.3)"
-                      : "1px solid rgba(115, 115, 115, 0.3)",
+                  background: hasRewards
+                    ? "linear-gradient(135deg, #F97316 0%, #FB923C 100%)"
+                    : "rgba(115, 115, 115, 0.3)",
+                  border: hasRewards
+                    ? "1px solid rgba(249, 115, 22, 0.3)"
+                    : "1px solid rgba(115, 115, 115, 0.3)",
+                  color: hasRewards ? "#FFFFFF" : "rgba(255, 255, 255, 0.5)",
+                  boxShadow: hasRewards
+                    ? "0 4px 16px rgba(249, 115, 22, 0.3)"
+                    : "none",
+                  opacity: hasRewards ? 1 : 0.5,
+                  transform: hasRewards ? "translateY(0)" : "none",
                   transition: "all 0.3s ease",
-                  opacity: claimableRewards <= 0 ? 0.5 : 1,
                   "&:hover": {
-                    transform:
-                      claimableRewards <= 0 ? "none" : "translateY(-2px)",
-                    boxShadow:
-                      claimableRewards <= 0
-                        ? "none"
-                        : "0 8px 25px rgba(249, 115, 22, 0.3)",
-                    background:
-                      claimableRewards > 0
-                        ? "linear-gradient(135deg, #EA580C 0%, #F97316 100%)"
-                        : "rgba(115, 115, 115, 0.3)",
+                    transform: hasRewards ? "translateY(-2px)" : "none",
+                    boxShadow: hasRewards
+                      ? "0 6px 24px rgba(249, 115, 22, 0.4)"
+                      : "none",
+                    background: hasRewards
+                      ? "linear-gradient(135deg, #EA580C 0%, #F97316 100%)"
+                      : "rgba(115, 115, 115, 0.3)",
+                  },
+                  "&:disabled": {
+                    background: "rgba(115, 115, 115, 0.3)",
+                    border: "1px solid rgba(115, 115, 115, 0.3)",
+                    color: "rgba(255, 255, 255, 0.5)",
+                    cursor: "not-allowed",
                   },
                 }}
               >

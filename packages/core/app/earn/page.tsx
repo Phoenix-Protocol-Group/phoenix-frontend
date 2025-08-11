@@ -9,6 +9,9 @@ import {
   UnbondModal,
   ClaimAllModal,
   Button,
+  ProviderStrategyGroup,
+  groupStrategiesByProvider,
+  getProviderRewardsSummary,
 } from "@phoenix-protocol/ui";
 
 // Fix the imports to properly import StrategyRegistry
@@ -38,7 +41,9 @@ export default function EarnPage(): JSX.Element {
     { strategy: Strategy; metadata: StrategyMetadata }[]
   >([]);
   const [totalValue, setTotalValue] = useState<number>(0);
-  const [claimableRewards, setClaimableRewards] = useState<number>(0);
+  const [claimableRewards, setClaimableRewards] = useState<
+    { token: string; icon: string; amount: number }[]
+  >([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Modal States
@@ -69,7 +74,7 @@ export default function EarnPage(): JSX.Element {
     } else {
       setUserStrategies([]);
       setTotalValue(0);
-      setClaimableRewards(0);
+      setClaimableRewards([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletAddress, allStrategies]);
@@ -140,14 +145,39 @@ export default function EarnPage(): JSX.Element {
   // Calculate total value and rewards from user strategies
   const calculateUserStats = useCallback(async () => {
     if (!walletAddress) return;
+
     let totalStaked = 0;
-    let totalRewards = 0;
+    const rewardTokenMap = new Map<string, { icon: string; amount: number }>();
+
     allStrategies.forEach(({ metadata }) => {
       totalStaked += metadata.userStake || 0;
-      totalRewards += metadata.userRewards || 0;
+
+      const rewardTokenName = metadata.rewardToken.name;
+      const userRewards = metadata.userRewards || 0;
+
+      if (userRewards > 0) {
+        const existing = rewardTokenMap.get(rewardTokenName);
+        if (existing) {
+          existing.amount += userRewards;
+        } else {
+          rewardTokenMap.set(rewardTokenName, {
+            icon: metadata.rewardToken.icon,
+            amount: userRewards,
+          });
+        }
+      }
     });
+
+    const rewardTokens = Array.from(rewardTokenMap.entries()).map(
+      ([token, data]) => ({
+        token,
+        icon: data.icon,
+        amount: data.amount,
+      })
+    );
+
     setTotalValue(totalStaked);
-    setClaimableRewards(totalRewards);
+    setClaimableRewards(rewardTokens);
   }, [walletAddress, allStrategies]);
 
   // Modal Handlers
@@ -166,7 +196,7 @@ export default function EarnPage(): JSX.Element {
   );
 
   const handleClaimAllClick = useCallback(() => {
-    if (!walletAddress || claimableRewards <= 0) return;
+    if (!walletAddress || claimableRewards.length === 0) return;
     setClaimAllModalOpen(true);
   }, [walletAddress, claimableRewards]);
 
@@ -309,8 +339,8 @@ export default function EarnPage(): JSX.Element {
   };
 
   const handleViewStrategyDetails = useCallback(
-    (strategyId: string) => {
-      router.push(`/earn/${strategyId}`);
+    (strategy: StrategyMetadata) => {
+      router.push(`/earn/${strategy.id}`);
     },
     [router]
   );
@@ -330,6 +360,14 @@ export default function EarnPage(): JSX.Element {
     ...s.metadata,
     isMobile,
   }));
+
+  // Group strategies by provider for provider-grouped display
+  const groupedDiscoverStrategies =
+    groupStrategiesByProvider(discoverStrategiesUI);
+  const groupedUserStrategies = groupStrategiesByProvider(userStrategiesUI);
+
+  // Calculate summary data for YieldSummary
+  const summaryData = getProviderRewardsSummary(userStrategiesUI);
 
   // Prepare claimable strategies for modal
   const claimableForModal = allStrategies
@@ -409,8 +447,8 @@ export default function EarnPage(): JSX.Element {
         transition={{ delay: 0.2, duration: 0.6 }}
       >
         <YieldSummary
-          totalValue={totalValue}
-          claimableRewards={claimableRewards}
+          totalValue={summaryData.totalValue}
+          claimableRewards={summaryData.rewardTokens}
           onClaimAll={handleClaimAllClick}
         />
       </motion.div>
@@ -532,36 +570,68 @@ export default function EarnPage(): JSX.Element {
                       </Button>
                     </Box>
                   ) : (
-                    <StrategiesTable
-                      title="Discover Strategies"
-                      strategies={discoverStrategiesUI}
-                      showFilters={true}
-                      isLoading={isLoading}
-                      onViewDetails={handleViewStrategyDetails}
-                      onBondClick={handleBondClick}
-                      onUnbondClick={handleUnbondClick}
-                      emptyStateMessage={
-                        !walletAddress
-                          ? "Connect your wallet to discover strategies."
-                          : "No strategies available to discover at the moment."
-                      }
-                    />
+                    <Box>
+                      {groupedDiscoverStrategies.map((provider) => (
+                        <ProviderStrategyGroup
+                          key={provider.id}
+                          providerId={provider.id}
+                          providerName={provider.name}
+                          providerIcon={provider.icon}
+                          providerDescription={provider.description}
+                          strategies={provider.strategies}
+                          totalTVL={provider.totalTVL}
+                          rewardTokens={provider.rewardTokens}
+                          onBondClick={handleBondClick}
+                          onUnbondClick={handleUnbondClick}
+                          onViewDetails={handleViewStrategyDetails}
+                        />
+                      ))}
+                      {groupedDiscoverStrategies.length === 0 && (
+                        <Box
+                          sx={{
+                            textAlign: "center",
+                            py: 4,
+                            color: "#A3A3A3",
+                          }}
+                        >
+                          {!walletAddress
+                            ? "Connect your wallet to discover strategies."
+                            : "No strategies available to discover at the moment."}
+                        </Box>
+                      )}
+                    </Box>
                   )
                 ) : (
-                  <StrategiesTable
-                    title="Your Strategies"
-                    strategies={userStrategiesUI}
-                    showFilters={false}
-                    isLoading={isLoading}
-                    onViewDetails={handleViewStrategyDetails}
-                    onBondClick={handleBondClick}
-                    onUnbondClick={handleUnbondClick}
-                    emptyStateMessage={
-                      walletAddress
-                        ? "You haven't joined any strategies yet. Discover strategies to start earning!"
-                        : "Connect your wallet to see your strategies"
-                    }
-                  />
+                  <Box>
+                    {groupedUserStrategies.map((provider) => (
+                      <ProviderStrategyGroup
+                        key={provider.id}
+                        providerId={provider.id}
+                        providerName={provider.name}
+                        providerIcon={provider.icon}
+                        providerDescription={provider.description}
+                        strategies={provider.strategies}
+                        totalTVL={provider.totalTVL}
+                        rewardTokens={provider.rewardTokens}
+                        onBondClick={handleBondClick}
+                        onUnbondClick={handleUnbondClick}
+                        onViewDetails={handleViewStrategyDetails}
+                      />
+                    ))}
+                    {groupedUserStrategies.length === 0 && (
+                      <Box
+                        sx={{
+                          textAlign: "center",
+                          py: 4,
+                          color: "#A3A3A3",
+                        }}
+                      >
+                        {walletAddress
+                          ? "You haven't joined any strategies yet. Discover strategies to start earning!"
+                          : "Connect your wallet to see your strategies"}
+                      </Box>
+                    )}
+                  </Box>
                 )}
               </motion.div>
             </AnimatePresence>
