@@ -158,17 +158,16 @@ export default function Page() {
 
           const token1FeesUSD =
             (poolFeesData30d.token1Fees / 10 ** (tokenA?.decimals || 7)) *
-            token1Price;
+            token1Price *
+            0.3; // 30% of fees in token1
           const token2FeesUSD =
             (poolFeesData30d.token2Fees / 10 ** (tokenB?.decimals || 7)) *
-            token2Price;
+            token2Price *
+            0.3; // 30% of fees in token2
 
           const totalFeesUSD = token1FeesUSD + token2FeesUSD;
 
-          console.log(valueStaked, poolAddress);
-
           if (valueStaked === 0) {
-            
           }
 
           const _apr = (totalFeesUSD / valueStaked) * 100 * 12 * 0.7;

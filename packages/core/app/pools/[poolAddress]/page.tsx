@@ -546,15 +546,56 @@ export default function Page(props: PoolPageProps) {
         const ratioStaked =
           totalStaked / Number(pairInfo.result.asset_lp_share.amount);
         const valueStaked = tvl * ratioStaked;
-        const poolIncentive = poolIncentives.find(
-          (incentive) => incentive.address === params.poolAddress
-        )!;
-        const phoprice = await fetchPho();
-        const apr =
-          ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
+
+        // Fetch pool fees data
+        const _poolFees = await fetch(
+          "https://trades.phoenix-hub.io/fees/by-pool/daily"
+        );
+        const poolFees = await _poolFees.json();
+
+        const dailyFees = poolFees.feesByPoolPerDay;
+
+        const poolFeesData30d = dailyFees
+          .flatMap((day: { [s: string]: unknown } | ArrayLike<unknown>) =>
+            Object.values(day)
+              .flat()
+              .filter(
+                (fee) => (fee as { pool: string }).pool === params.poolAddress
+              )
+          )
+          .reduce(
+            (
+              acc: { token1Fees: any; token2Fees: any },
+              fee: { token1Fees: any; token2Fees: any }
+            ) => {
+              acc.token1Fees += fee.token1Fees;
+              acc.token2Fees += fee.token2Fees;
+              return acc;
+            },
+            { token1Fees: 0, token2Fees: 0 }
+          );
+
+        // Get dollar price for fees
+        const token1Price = priceA || 0;
+        const token2Price = priceB || 0;
+
+        const token1FeesUSD =
+          (poolFeesData30d.token1Fees / 10 ** (_tokenA?.decimals || 7)) *
+          token1Price *
+          0.3; // 30% of fees in token1
+        const token2FeesUSD =
+          (poolFeesData30d.token2Fees / 10 ** (_tokenB?.decimals || 7)) *
+          token2Price *
+          0.3; // 30% of fees in token2
+
+        const totalFeesUSD = token1FeesUSD + token2FeesUSD;
+
+        const _apr = (totalFeesUSD / valueStaked) * 100 * 12 * 0.7;
+        const apr = isNaN(_apr) ? 0 : _apr;
 
         const tokenPrice = valueStaked / (totalStaked / 10 ** 7);
         setLpTokenPrice(tokenPrice);
+        setMaxApr(apr);
         const stakes = await fetchStakes(
           _lpToken?.symbol,
           stakeContractAddress,

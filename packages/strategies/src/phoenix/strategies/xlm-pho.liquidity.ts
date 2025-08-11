@@ -13,6 +13,23 @@ import {
 } from "@phoenix-protocol/contracts";
 import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract";
 
+interface PoolFeeEntry {
+  date: string;
+  pool: string;
+  token1: string;
+  token2: string;
+  token1Fees: number;
+  token2Fees: number;
+}
+
+interface FeesByDay {
+  [date: string]: PoolFeeEntry[];
+}
+
+interface FeesResponse {
+  feesByPoolPerDay: FeesByDay[];
+}
+
 // Needed constants and types
 const contractAddress =
   "CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH";
@@ -145,36 +162,51 @@ class PhoenixXlmPhoStrategy implements Strategy {
           totalStaked / Number(pairInfo.result.asset_lp_share.amount);
         const valueStaked = tvl * ratioStaked;
 
-        // Apply the same pool incentives logic
-        const poolIncentives = [
-          {
-            // XLM / USDC
-            address: "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX",
-            amount: 12500,
-          },
-          // XLM/PHO
-          {
-            address: "CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH",
-            amount: 25000,
-          },
-          {
-            // PHO/USDC
-            address: "CD5XNKK3B6BEF2N7ULNHHGAMOKZ7P6456BFNIHRF4WNTEDKBRWAE7IAA",
-            amount: 18750,
-          },
-        ];
+        // Fetch pool fees data
+        const _poolFees = await fetch(
+          "https://trades.phoenix-hub.io/fees/by-pool/daily"
+        );
+        const poolFees = (await _poolFees.json()) as FeesResponse;
 
-        const poolIncentive = poolIncentives.find(
-          (incentive) => incentive.address === contractAddress
-        )!;
+        const dailyFees = poolFees.feesByPoolPerDay;
 
-        const phoprice = await fetchPho();
-        const apr =
-          ((poolIncentive?.amount * phoprice) / valueStaked) * 100 * 6;
+        const poolFeesData30d = dailyFees
+          .flatMap((day) =>
+            Object.values(day)
+              .flat()
+              .filter((fee) => fee.pool === contractAddress)
+          )
+          .reduce(
+            (acc, fee) => {
+              acc.token1Fees += fee.token1Fees;
+              acc.token2Fees += fee.token2Fees;
+              return acc;
+            },
+            { token1Fees: 0, token2Fees: 0 }
+          );
+
+        // Get dollar price for fees
+        const token1Price = priceA || 0;
+        const token2Price = priceB || 0;
+
+        const token1FeesUSD =
+          (poolFeesData30d.token1Fees / 10 ** (this.tokenA?.decimals || 7)) *
+          token1Price *
+          0.3; // 30% of fees in token1
+        const token2FeesUSD =
+          (poolFeesData30d.token2Fees / 10 ** (this.tokenB?.decimals || 7)) *
+          token2Price *
+          0.3; // 30% of fees in token2
+
+        const totalFeesUSD = token1FeesUSD + token2FeesUSD;
+
+        const _apr = (totalFeesUSD / valueStaked) * 100 * 12 * 0.7;
+        const apr = isNaN(_apr) ? 0 : _apr;
 
         this.metadata.apr = apr / 100;
 
         // Update reward token USD value
+        const phoprice = await fetchPho();
         this.metadata.rewardToken.usdValue = phoprice;
 
         // Calculate LP token price for value conversion

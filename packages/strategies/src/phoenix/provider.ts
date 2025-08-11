@@ -3,6 +3,11 @@ import { Strategy, StrategyProvider } from "../types";
 import PhoenixPhoUsdcStrategy from "./strategies/pho-usdc.liquidity";
 import PhoenixXlmPhoStrategy from "./strategies/xlm-pho.liquidity";
 import PhoenixXlmUsdcStrategy from "./strategies/xlm-usdc.liquidity";
+import PhoenixXlmUsdxStrategy from "./strategies/xlm-usdx.liquidity";
+import PhoenixEurxUsdcStrategy from "./strategies/eurx-usdc.liquidity";
+import PhoenixXlmEurxStrategy from "./strategies/xlm-eurx.liquidity";
+import PhoenixXlmGbpxStrategy from "./strategies/xlm-gbpx.liquidity";
+import PhoenixGbpxUsdcStrategy from "./strategies/gbpx-usdc.liquidity";
 
 export class PhoenixBoostProvider implements StrategyProvider {
   id = "phoenix-boost";
@@ -14,11 +19,16 @@ export class PhoenixBoostProvider implements StrategyProvider {
   private strategies: Strategy[] = [];
 
   constructor() {
-    // Initialize with the PHO-USDC strategy
+    // Initialize with all Phoenix strategies
     this.strategies.push(
       new PhoenixPhoUsdcStrategy(),
       new PhoenixXlmPhoStrategy(),
-      new PhoenixXlmUsdcStrategy()
+      new PhoenixXlmUsdcStrategy(),
+      new PhoenixXlmUsdxStrategy(),
+      new PhoenixEurxUsdcStrategy(),
+      new PhoenixXlmEurxStrategy(),
+      new PhoenixXlmGbpxStrategy(),
+      new PhoenixGbpxUsdcStrategy()
     );
     console.log(
       "Phoenix provider initialized with strategies:",
