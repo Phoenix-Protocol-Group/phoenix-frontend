@@ -862,7 +862,7 @@ export default function Page(props: PoolPageProps) {
                 },
                 {
                   title: "Swap fee",
-                  value: "1%",
+                  value: "0.5%",
                 },
               ]}
             />
