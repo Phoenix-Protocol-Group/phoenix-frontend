@@ -9,8 +9,9 @@ import {
 import {
   PhoenixPairContract,
   PhoenixStakeContract,
-  fetchPho,
+  fetchPho, // Ensure AssembledTransaction is available
 } from "@phoenix-protocol/contracts";
+
 import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract";
 
 interface PoolFeeEntry {
@@ -31,16 +32,17 @@ interface FeesResponse {
 }
 
 // Needed constants and types
+const userWalletAddress = usePersistStore.getState().wallet;
 const contractAddress =
-  "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX";
+  "CCUCE5H5CKW3S7JBESGCES6ZGDMWLNRY3HOFET3OH33MXZWKXNJTKSM3";
 const contractType = "pair";
 
-class PhoenixXlmUsdcStrategy implements Strategy {
+class PhoenixGbpxUsdcStrategy implements Strategy {
   private metadata: StrategyMetadata = {
-    id: "phoenix-provide-liquidity-xlm-usdc",
-    providerId: "phoenix-xlm-usdc",
-    name: "Provide Liquidity to XLM-USDC",
-    description: "Provide liquidity to the XLM-USDC pair and earn PHO rewards",
+    id: "phoenix-provide-liquidity-gbpx-usdc",
+    providerId: "phoenix-gbpx-usdc",
+    name: "Provide Liquidity to GBPx-USDC",
+    description: "Provide liquidity to the GBPx-USDC pair and earn PHO rewards",
     assets: [],
     tvl: 0,
     apr: 0,
@@ -50,7 +52,7 @@ class PhoenixXlmUsdcStrategy implements Strategy {
       amount: 0,
       category: "phoenix",
       usdValue: 0,
-      contractId: "", // TODO: Set the actual PHO contractId if available
+      contractId: "", // TODO: Set the correct contractId for PHO if available
     },
     unbondTime: 0,
     category: "liquidity",
@@ -97,9 +99,9 @@ class PhoenixXlmUsdcStrategy implements Strategy {
 
       // Mark as initialized
       this.initialized = true;
-      console.log("PhoenixBoostStrategy initialized successfully");
+      console.log("PhoenixGbpxUsdcStrategy initialized successfully");
     } catch (error) {
-      console.error("Failed to initialize PhoenixBoostStrategy:", error);
+      console.error("Failed to initialize PhoenixGbpxUsdcStrategy:", error);
     }
   }
 
@@ -225,11 +227,6 @@ class PhoenixXlmUsdcStrategy implements Strategy {
               10 ** Number(_tokenA?.decimals ?? 7),
             category: "phoenix",
             contractId: _tokenA?.contractId ?? "",
-            id: _tokenA?.id,
-            symbol: _tokenA?.symbol,
-            decimals: _tokenA?.decimals,
-            balance: _tokenA?.balance,
-            isStakingToken: _tokenA?.isStakingToken,
           },
           {
             name: _tokenB?.symbol ?? "",
@@ -242,11 +239,6 @@ class PhoenixXlmUsdcStrategy implements Strategy {
               10 ** Number(_tokenB?.decimals ?? 7),
             category: "phoenix",
             contractId: _tokenB?.contractId ?? "",
-            id: _tokenB?.id,
-            symbol: _tokenB?.symbol,
-            decimals: _tokenB?.decimals,
-            balance: _tokenB?.balance,
-            isStakingToken: _tokenB?.isStakingToken,
           },
         ];
 
@@ -322,7 +314,6 @@ class PhoenixXlmUsdcStrategy implements Strategy {
             };
           }
         );
-
         this.userRewards = await Promise.all(rewardPromises);
       }
     } catch (error) {
@@ -477,4 +468,4 @@ class PhoenixXlmUsdcStrategy implements Strategy {
   }
 }
 
-export default PhoenixXlmUsdcStrategy;
+export default PhoenixGbpxUsdcStrategy;
