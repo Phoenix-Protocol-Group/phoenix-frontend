@@ -201,7 +201,14 @@ class PhoenixXlmPhoStrategy implements Strategy {
         const totalFeesUSD = token1FeesUSD + token2FeesUSD;
 
         const _apr = (totalFeesUSD / valueStaked) * 100 * 12 * 0.7;
-        const apr = isNaN(_apr) ? 0 : _apr;
+        let apr = isNaN(_apr) ? 0 : _apr;
+
+        const phoPrice = await fetchPho();
+
+        // Increase the rewards for PHO pair
+        if (_tokenA?.symbol === "PHO" || _tokenB?.symbol === "PHO") {
+          apr = ((45000 * phoPrice) / valueStaked) * 100 * 12;
+        }
 
         this.metadata.apr = apr / 100;
 

@@ -520,11 +520,6 @@ export default function Page(props: PoolPageProps) {
         );
 
         const poolIncentives = [
-          {
-            // XLM / USDC
-            address: "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX",
-            amount: 12500,
-          },
           // XLM/PHO
           {
             address: "CBCZGGNOEUZG4CAAE7TGTQQHETZMKUT4OIPFHHPKEUX46U4KXBBZ3GLH",
@@ -591,7 +586,13 @@ export default function Page(props: PoolPageProps) {
         const totalFeesUSD = token1FeesUSD + token2FeesUSD;
 
         const _apr = (totalFeesUSD / valueStaked) * 100 * 12 * 0.7;
-        const apr = isNaN(_apr) ? 0 : _apr;
+        let apr = isNaN(_apr) ? 0 : _apr;
+        const phoPrice = await fetchPho();
+
+        // Increase the rewards for PHO pair
+        if (_tokenA?.symbol === "PHO" || _tokenB?.symbol === "PHO") {
+          apr = ((45000 * phoPrice) / valueStaked) * 100 * 12;
+        }
 
         const tokenPrice = valueStaked / (totalStaked / 10 ** 7);
         setLpTokenPrice(tokenPrice);

@@ -172,7 +172,14 @@ export default function Page() {
 
           const _apr = (totalFeesUSD / valueStaked) * 100 * 12 * 0.7;
 
-          const apr = isNaN(_apr) ? 0 : _apr;
+          let apr = isNaN(_apr) ? 0 : _apr;
+
+          const phoPrice = await fetchPho();
+
+          // Increase the rewards for PHO pair
+          if (tokenA?.symbol === "PHO" || tokenB?.symbol === "PHO") {
+            apr = ((45000 * phoPrice) / valueStaked) * 100 * 12;
+          }
 
           return {
             tokens: [
