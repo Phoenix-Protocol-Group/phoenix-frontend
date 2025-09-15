@@ -1,17 +1,12 @@
 import { Strategy, StrategyMetadata } from "../../types";
 import { useAppStore, usePersistStore } from "@phoenix-protocol/state";
-import {
-  API,
-  constants,
-  fetchTokenPrices,
-  Signer,
-} from "@phoenix-protocol/utils";
+import { constants, fetchTokenPrices, Signer } from "@phoenix-protocol/utils";
 import {
   PhoenixPairContract,
   PhoenixStakeContract,
   fetchPho, // Ensure AssembledTransaction is available
 } from "@phoenix-protocol/contracts";
-
+import { API } from "@phoenix-protocol/utils/build/trade_api";
 import { AssembledTransaction } from "@stellar/stellar-sdk/lib/contract";
 
 interface PoolFeeEntry {
@@ -138,10 +133,12 @@ class PhoenixPhoUsdcStrategy implements Strategy {
         this.tokenB = _tokenB;
         this.lpToken = _lpToken;
 
-        // Fetch token prices and calculate TVL
+        const api = new API(constants.TRADING_API_URL);
+
+        // Fetch prices and calculate TVL
         const [priceA, priceB] = await Promise.all([
-          API.getPrice(_tokenA?.symbol || ""),
-          API.getPrice(_tokenB?.symbol || ""),
+          api.getPrice(_tokenA?.contractId || ""),
+          api.getPrice(_tokenB?.contractId || ""),
         ]);
 
         // Calculate pool TVL
@@ -305,6 +302,8 @@ class PhoenixPhoUsdcStrategy implements Strategy {
         user: walletAddress,
       });
 
+      const api = new API(constants.TRADING_API_URL);
+
       if (rewards?.result?.rewards) {
         const store = useAppStore.getState();
         const rewardPromises = rewards.result.rewards.map(
@@ -313,7 +312,7 @@ class PhoenixPhoUsdcStrategy implements Strategy {
             return {
               name: token?.symbol!.toUpperCase(),
               icon: `/cryptoIcons/${token?.symbol!.toLowerCase()}.svg`,
-              usdValue: await API.getPrice(token?.symbol || ""),
+              usdValue: await api.getPrice(token?.contractId || ""),
               amount:
                 Number(reward.reward_amount.toString()) /
                 10 ** token?.decimals!,

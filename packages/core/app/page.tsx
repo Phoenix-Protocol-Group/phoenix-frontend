@@ -18,7 +18,6 @@ import {
 } from "@phoenix-protocol/ui";
 import { useRouter } from "next/navigation";
 import {
-  API,
   constants,
   fetchBiggestWinnerAndLoser,
   fetchHistoricalPrices,
@@ -51,7 +50,7 @@ import {
   TradingVolume,
 } from "@phoenix-protocol/utils/build/trade_api";
 import { LiquidityPoolInfo } from "@phoenix-protocol/contracts/build/phoenix-pair";
-
+import { API } from "@phoenix-protocol/utils/build/trade_api";
 export default function Page() {
   const theme = useTheme();
   const router = useRouter();
@@ -330,10 +329,12 @@ export default function Page() {
                 appStore.fetchTokenInfo(pairConfig.result.token_b),
               ]);
 
+              const api = new API(constants.TRADING_API_URL);
+
               // Fetch prices and calculate TVL
               const [priceA, priceB] = await Promise.all([
-                API.getPrice(tokenA?.symbol || ""),
-                API.getPrice(tokenB?.symbol || ""),
+                api.getPrice(tokenA?.contractId || ""),
+                api.getPrice(tokenB?.contractId || ""),
               ]);
 
               const tvl =
