@@ -118,6 +118,7 @@ export default class Signer {
     } else {
       console.log("Wallet type not supported.");
     }
+    return this.wallet;
   }
 
   /**
