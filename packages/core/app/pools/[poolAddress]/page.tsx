@@ -459,8 +459,8 @@ export default function Page(props: PoolPageProps) {
 
         // Fetch prices and calculate TVL
         const [priceA, priceB] = await Promise.all([
-          api.getPrice(tokenA?.contractId || ""),
-          api.getPrice(tokenB?.contractId || ""),
+          api.getPrice(_tokenA?.contractId || ""),
+          api.getPrice(_tokenB?.contractId || ""),
         ]);
 
         const tvl =

@@ -6,7 +6,7 @@
     "test": "turbo run test",
     "build": "turbo run build",
     "storybook": "yarn workspace @phoenix-protocol/ui storybook",
-    "dev": "turbo run dev",
+    "dev": "rm -rf packages/ui/module && turbo run dev",
     "dev:core": "turbo run dev --filter=@phoenix-protocol/core",
     "dev:ui": "turbo run dev --filter=@phoenix-protocol/ui",
     "dev:experimental": "yarn workspace @phoenix-protocol/core dev:experimental",
